@@ -7,7 +7,13 @@
   "license": "MIT",
   "main": "index.ts",
   "scripts": {
-    "compile": "tsc"
+    "check": "gts check",
+    "clean": "gts clean",
+    "compile": "tsc",
+    "fix": "gts fix",
+    "prepare": "npm run compile",
+    "pretest": "npm run compile",
+    "posttest": "npm run check"
   },
   "dependencies": {
     "google-protobuf": "^3.11.4",
@@ -16,6 +22,7 @@
   "devDependencies": {
     "@types/node": "^10.0.3",
     "jasmine": "^3.5.0",
+    "gts": "^2.0.0",
     "typescript": "~3.8.0"
   }
 }

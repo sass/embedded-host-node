@@ -10,6 +10,7 @@
     "compile": "tsc"
   },
   "dependencies": {
+    "google-protobuf": "^3.11.4",
     "immutable": "^4.0.0-rc.12"
   },
   "devDependencies": {

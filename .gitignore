@@ -1,0 +1,14 @@
+.DS_Store
+dist
+node_modules
+npm-debug.log*
+package-lock.json
+
+# Editors
+.idea
+.vscode
+*.njsproj
+*.ntvs*
+*.sln
+*.suo
+*.sw?

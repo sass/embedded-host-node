@@ -1,0 +1,28 @@
+{
+  "name": "embedded-host-node",
+  "version": "1.0.0-alpha.1",
+  "description": "Node.js library that communicates with Embedded Dart Sass using the Embedded Sass protocol",
+  "repository": "sass/embedded-host-node",
+  "author": "Google Inc.",
+  "license": "MIT",
+  "main": "index.ts",
+  "scripts": {
+    "check": "gts check",
+    "clean": "gts clean",
+    "compile": "tsc",
+    "fix": "gts fix",
+    "prepare": "npm run compile",
+    "pretest": "npm run compile",
+    "posttest": "npm run check"
+  },
+  "dependencies": {
+    "google-protobuf": "^3.11.4",
+    "immutable": "^4.0.0-rc.12"
+  },
+  "devDependencies": {
+    "@types/node": "^10.0.3",
+    "jasmine": "^3.5.0",
+    "gts": "^2.0.0",
+    "typescript": "~3.8.0"
+  }
+}

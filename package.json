@@ -11,18 +11,41 @@
     "clean": "gts clean",
     "compile": "tsc",
     "fix": "gts fix",
-    "prepare": "npm run compile",
-    "pretest": "npm run compile",
-    "posttest": "npm run check"
+    "test": "jest"
   },
   "dependencies": {
     "google-protobuf": "^3.11.4",
-    "immutable": "^4.0.0-rc.12"
+    "immutable": "^4.0.0-rc.12",
+    "rxjs": "^6.5.5"
   },
   "devDependencies": {
+    "@types/google-protobuf": "^3.7.2",
+    "@types/jest": "^26.0.0",
     "@types/node": "^10.0.3",
-    "jasmine": "^3.5.0",
-    "gts": "^2.0.0",
+    "gts": "^2.0.2",
+    "jest": "^26.0.1",
+    "ts-jest": "^26.1.1",
     "typescript": "~3.8.0"
-  }
+  },
+  "jest": {
+    "clearMocks": true,
+    "coverageDirectory": "coverage",
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "testPathIgnorePatterns": [
+      "/dist/",
+      "/node_modules/"
+    ]
+  },
+  "eslintConfig": {
+    "env": {
+      "jest": true
+    },
+    "extends": "./node_modules/gts/",
+    "ignorePatterns": [
+      "dist/**/*",
+      "embedded_sass_pb.*"
+    ]
+  },
+  "prettier": "gts/.prettierrc.json"
 }

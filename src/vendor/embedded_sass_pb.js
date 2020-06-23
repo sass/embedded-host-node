@@ -1,4 +1,4 @@
-// source: src/vendor/embedded-protocol/embedded_sass.proto
+// source: embedded_sass.proto
 /**
  * @fileoverview
  * @enhanceable
@@ -8,89 +8,37 @@
  */
 // GENERATED CODE -- DO NOT EDIT!
 
-const jspb = require('google-protobuf');
-const goog = jspb;
-const global = Function('return this')();
+var jspb = require('google-protobuf');
+var goog = jspb;
+var global = Function('return this')();
 
 goog.exportSymbol('proto.InboundMessage', null, global);
 goog.exportSymbol('proto.InboundMessage.CanonicalizeResponse', null, global);
-goog.exportSymbol(
-  'proto.InboundMessage.CanonicalizeResponse.ResultCase',
-  null,
-  global
-);
+goog.exportSymbol('proto.InboundMessage.CanonicalizeResponse.ResultCase', null, global);
 goog.exportSymbol('proto.InboundMessage.CompileRequest', null, global);
 goog.exportSymbol('proto.InboundMessage.CompileRequest.Importer', null, global);
-goog.exportSymbol(
-  'proto.InboundMessage.CompileRequest.Importer.ImporterCase',
-  null,
-  global
-);
-goog.exportSymbol(
-  'proto.InboundMessage.CompileRequest.InputCase',
-  null,
-  global
-);
-goog.exportSymbol(
-  'proto.InboundMessage.CompileRequest.OutputStyle',
-  null,
-  global
-);
-goog.exportSymbol(
-  'proto.InboundMessage.CompileRequest.StringInput',
-  null,
-  global
-);
+goog.exportSymbol('proto.InboundMessage.CompileRequest.Importer.ImporterCase', null, global);
+goog.exportSymbol('proto.InboundMessage.CompileRequest.InputCase', null, global);
+goog.exportSymbol('proto.InboundMessage.CompileRequest.OutputStyle', null, global);
+goog.exportSymbol('proto.InboundMessage.CompileRequest.StringInput', null, global);
 goog.exportSymbol('proto.InboundMessage.FileImportResponse', null, global);
-goog.exportSymbol(
-  'proto.InboundMessage.FileImportResponse.ResultCase',
-  null,
-  global
-);
+goog.exportSymbol('proto.InboundMessage.FileImportResponse.ResultCase', null, global);
 goog.exportSymbol('proto.InboundMessage.FunctionCallResponse', null, global);
-goog.exportSymbol(
-  'proto.InboundMessage.FunctionCallResponse.ResultCase',
-  null,
-  global
-);
+goog.exportSymbol('proto.InboundMessage.FunctionCallResponse.ResultCase', null, global);
 goog.exportSymbol('proto.InboundMessage.ImportResponse', null, global);
-goog.exportSymbol(
-  'proto.InboundMessage.ImportResponse.ImportSuccess',
-  null,
-  global
-);
-goog.exportSymbol(
-  'proto.InboundMessage.ImportResponse.ResultCase',
-  null,
-  global
-);
+goog.exportSymbol('proto.InboundMessage.ImportResponse.ImportSuccess', null, global);
+goog.exportSymbol('proto.InboundMessage.ImportResponse.ResultCase', null, global);
 goog.exportSymbol('proto.InboundMessage.MessageCase', null, global);
 goog.exportSymbol('proto.InboundMessage.Syntax', null, global);
 goog.exportSymbol('proto.OutboundMessage', null, global);
 goog.exportSymbol('proto.OutboundMessage.CanonicalizeRequest', null, global);
 goog.exportSymbol('proto.OutboundMessage.CompileResponse', null, global);
-goog.exportSymbol(
-  'proto.OutboundMessage.CompileResponse.CompileFailure',
-  null,
-  global
-);
-goog.exportSymbol(
-  'proto.OutboundMessage.CompileResponse.CompileSuccess',
-  null,
-  global
-);
-goog.exportSymbol(
-  'proto.OutboundMessage.CompileResponse.ResultCase',
-  null,
-  global
-);
+goog.exportSymbol('proto.OutboundMessage.CompileResponse.CompileFailure', null, global);
+goog.exportSymbol('proto.OutboundMessage.CompileResponse.CompileSuccess', null, global);
+goog.exportSymbol('proto.OutboundMessage.CompileResponse.ResultCase', null, global);
 goog.exportSymbol('proto.OutboundMessage.FileImportRequest', null, global);
 goog.exportSymbol('proto.OutboundMessage.FunctionCallRequest', null, global);
-goog.exportSymbol(
-  'proto.OutboundMessage.FunctionCallRequest.IdentifierCase',
-  null,
-  global
-);
+goog.exportSymbol('proto.OutboundMessage.FunctionCallRequest.IdentifierCase', null, global);
 goog.exportSymbol('proto.OutboundMessage.ImportRequest', null, global);
 goog.exportSymbol('proto.OutboundMessage.LogEvent', null, global);
 goog.exportSymbol('proto.OutboundMessage.LogEvent.Type', null, global);
@@ -122,15 +70,8 @@ goog.exportSymbol('proto.Value.ValueCase', null, global);
  * @extends {jspb.Message}
  * @constructor
  */
-proto.InboundMessage = function (opt_data) {
-  jspb.Message.initialize(
-    this,
-    opt_data,
-    0,
-    -1,
-    null,
-    proto.InboundMessage.oneofGroups_
-  );
+proto.InboundMessage = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, null, proto.InboundMessage.oneofGroups_);
 };
 goog.inherits(proto.InboundMessage, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
@@ -150,15 +91,8 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.InboundMessage.CompileRequest = function (opt_data) {
-  jspb.Message.initialize(
-    this,
-    opt_data,
-    0,
-    -1,
-    proto.InboundMessage.CompileRequest.repeatedFields_,
-    proto.InboundMessage.CompileRequest.oneofGroups_
-  );
+proto.InboundMessage.CompileRequest = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, proto.InboundMessage.CompileRequest.repeatedFields_, proto.InboundMessage.CompileRequest.oneofGroups_);
 };
 goog.inherits(proto.InboundMessage.CompileRequest, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
@@ -166,8 +100,7 @@ if (goog.DEBUG && !COMPILED) {
    * @public
    * @override
    */
-  proto.InboundMessage.CompileRequest.displayName =
-    'proto.InboundMessage.CompileRequest';
+  proto.InboundMessage.CompileRequest.displayName = 'proto.InboundMessage.CompileRequest';
 }
 /**
  * Generated by JsPbCodeGenerator.
@@ -179,7 +112,7 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.InboundMessage.CompileRequest.StringInput = function (opt_data) {
+proto.InboundMessage.CompileRequest.StringInput = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
 goog.inherits(proto.InboundMessage.CompileRequest.StringInput, jspb.Message);
@@ -188,8 +121,7 @@ if (goog.DEBUG && !COMPILED) {
    * @public
    * @override
    */
-  proto.InboundMessage.CompileRequest.StringInput.displayName =
-    'proto.InboundMessage.CompileRequest.StringInput';
+  proto.InboundMessage.CompileRequest.StringInput.displayName = 'proto.InboundMessage.CompileRequest.StringInput';
 }
 /**
  * Generated by JsPbCodeGenerator.
@@ -201,15 +133,8 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.InboundMessage.CompileRequest.Importer = function (opt_data) {
-  jspb.Message.initialize(
-    this,
-    opt_data,
-    0,
-    -1,
-    null,
-    proto.InboundMessage.CompileRequest.Importer.oneofGroups_
-  );
+proto.InboundMessage.CompileRequest.Importer = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, null, proto.InboundMessage.CompileRequest.Importer.oneofGroups_);
 };
 goog.inherits(proto.InboundMessage.CompileRequest.Importer, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
@@ -217,8 +142,7 @@ if (goog.DEBUG && !COMPILED) {
    * @public
    * @override
    */
-  proto.InboundMessage.CompileRequest.Importer.displayName =
-    'proto.InboundMessage.CompileRequest.Importer';
+  proto.InboundMessage.CompileRequest.Importer.displayName = 'proto.InboundMessage.CompileRequest.Importer';
 }
 /**
  * Generated by JsPbCodeGenerator.
@@ -230,15 +154,8 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.InboundMessage.CanonicalizeResponse = function (opt_data) {
-  jspb.Message.initialize(
-    this,
-    opt_data,
-    0,
-    -1,
-    null,
-    proto.InboundMessage.CanonicalizeResponse.oneofGroups_
-  );
+proto.InboundMessage.CanonicalizeResponse = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, null, proto.InboundMessage.CanonicalizeResponse.oneofGroups_);
 };
 goog.inherits(proto.InboundMessage.CanonicalizeResponse, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
@@ -246,8 +163,7 @@ if (goog.DEBUG && !COMPILED) {
    * @public
    * @override
    */
-  proto.InboundMessage.CanonicalizeResponse.displayName =
-    'proto.InboundMessage.CanonicalizeResponse';
+  proto.InboundMessage.CanonicalizeResponse.displayName = 'proto.InboundMessage.CanonicalizeResponse';
 }
 /**
  * Generated by JsPbCodeGenerator.
@@ -259,15 +175,8 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.InboundMessage.ImportResponse = function (opt_data) {
-  jspb.Message.initialize(
-    this,
-    opt_data,
-    0,
-    -1,
-    null,
-    proto.InboundMessage.ImportResponse.oneofGroups_
-  );
+proto.InboundMessage.ImportResponse = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, null, proto.InboundMessage.ImportResponse.oneofGroups_);
 };
 goog.inherits(proto.InboundMessage.ImportResponse, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
@@ -275,8 +184,7 @@ if (goog.DEBUG && !COMPILED) {
    * @public
    * @override
    */
-  proto.InboundMessage.ImportResponse.displayName =
-    'proto.InboundMessage.ImportResponse';
+  proto.InboundMessage.ImportResponse.displayName = 'proto.InboundMessage.ImportResponse';
 }
 /**
  * Generated by JsPbCodeGenerator.
@@ -288,7 +196,7 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.InboundMessage.ImportResponse.ImportSuccess = function (opt_data) {
+proto.InboundMessage.ImportResponse.ImportSuccess = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
 goog.inherits(proto.InboundMessage.ImportResponse.ImportSuccess, jspb.Message);
@@ -297,8 +205,7 @@ if (goog.DEBUG && !COMPILED) {
    * @public
    * @override
    */
-  proto.InboundMessage.ImportResponse.ImportSuccess.displayName =
-    'proto.InboundMessage.ImportResponse.ImportSuccess';
+  proto.InboundMessage.ImportResponse.ImportSuccess.displayName = 'proto.InboundMessage.ImportResponse.ImportSuccess';
 }
 /**
  * Generated by JsPbCodeGenerator.
@@ -310,15 +217,8 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.InboundMessage.FileImportResponse = function (opt_data) {
-  jspb.Message.initialize(
-    this,
-    opt_data,
-    0,
-    -1,
-    null,
-    proto.InboundMessage.FileImportResponse.oneofGroups_
-  );
+proto.InboundMessage.FileImportResponse = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, null, proto.InboundMessage.FileImportResponse.oneofGroups_);
 };
 goog.inherits(proto.InboundMessage.FileImportResponse, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
@@ -326,8 +226,7 @@ if (goog.DEBUG && !COMPILED) {
    * @public
    * @override
    */
-  proto.InboundMessage.FileImportResponse.displayName =
-    'proto.InboundMessage.FileImportResponse';
+  proto.InboundMessage.FileImportResponse.displayName = 'proto.InboundMessage.FileImportResponse';
 }
 /**
  * Generated by JsPbCodeGenerator.
@@ -339,15 +238,8 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.InboundMessage.FunctionCallResponse = function (opt_data) {
-  jspb.Message.initialize(
-    this,
-    opt_data,
-    0,
-    -1,
-    null,
-    proto.InboundMessage.FunctionCallResponse.oneofGroups_
-  );
+proto.InboundMessage.FunctionCallResponse = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, null, proto.InboundMessage.FunctionCallResponse.oneofGroups_);
 };
 goog.inherits(proto.InboundMessage.FunctionCallResponse, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
@@ -355,8 +247,7 @@ if (goog.DEBUG && !COMPILED) {
    * @public
    * @override
    */
-  proto.InboundMessage.FunctionCallResponse.displayName =
-    'proto.InboundMessage.FunctionCallResponse';
+  proto.InboundMessage.FunctionCallResponse.displayName = 'proto.InboundMessage.FunctionCallResponse';
 }
 /**
  * Generated by JsPbCodeGenerator.
@@ -368,15 +259,8 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.OutboundMessage = function (opt_data) {
-  jspb.Message.initialize(
-    this,
-    opt_data,
-    0,
-    -1,
-    null,
-    proto.OutboundMessage.oneofGroups_
-  );
+proto.OutboundMessage = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, null, proto.OutboundMessage.oneofGroups_);
 };
 goog.inherits(proto.OutboundMessage, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
@@ -396,15 +280,8 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.OutboundMessage.CompileResponse = function (opt_data) {
-  jspb.Message.initialize(
-    this,
-    opt_data,
-    0,
-    -1,
-    null,
-    proto.OutboundMessage.CompileResponse.oneofGroups_
-  );
+proto.OutboundMessage.CompileResponse = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, null, proto.OutboundMessage.CompileResponse.oneofGroups_);
 };
 goog.inherits(proto.OutboundMessage.CompileResponse, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
@@ -412,8 +289,7 @@ if (goog.DEBUG && !COMPILED) {
    * @public
    * @override
    */
-  proto.OutboundMessage.CompileResponse.displayName =
-    'proto.OutboundMessage.CompileResponse';
+  proto.OutboundMessage.CompileResponse.displayName = 'proto.OutboundMessage.CompileResponse';
 }
 /**
  * Generated by JsPbCodeGenerator.
@@ -425,20 +301,16 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.OutboundMessage.CompileResponse.CompileSuccess = function (opt_data) {
+proto.OutboundMessage.CompileResponse.CompileSuccess = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
-goog.inherits(
-  proto.OutboundMessage.CompileResponse.CompileSuccess,
-  jspb.Message
-);
+goog.inherits(proto.OutboundMessage.CompileResponse.CompileSuccess, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
   /**
    * @public
    * @override
    */
-  proto.OutboundMessage.CompileResponse.CompileSuccess.displayName =
-    'proto.OutboundMessage.CompileResponse.CompileSuccess';
+  proto.OutboundMessage.CompileResponse.CompileSuccess.displayName = 'proto.OutboundMessage.CompileResponse.CompileSuccess';
 }
 /**
  * Generated by JsPbCodeGenerator.
@@ -450,20 +322,16 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.OutboundMessage.CompileResponse.CompileFailure = function (opt_data) {
+proto.OutboundMessage.CompileResponse.CompileFailure = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
-goog.inherits(
-  proto.OutboundMessage.CompileResponse.CompileFailure,
-  jspb.Message
-);
+goog.inherits(proto.OutboundMessage.CompileResponse.CompileFailure, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
   /**
    * @public
    * @override
    */
-  proto.OutboundMessage.CompileResponse.CompileFailure.displayName =
-    'proto.OutboundMessage.CompileResponse.CompileFailure';
+  proto.OutboundMessage.CompileResponse.CompileFailure.displayName = 'proto.OutboundMessage.CompileResponse.CompileFailure';
 }
 /**
  * Generated by JsPbCodeGenerator.
@@ -475,7 +343,7 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.OutboundMessage.LogEvent = function (opt_data) {
+proto.OutboundMessage.LogEvent = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
 goog.inherits(proto.OutboundMessage.LogEvent, jspb.Message);
@@ -496,7 +364,7 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.OutboundMessage.CanonicalizeRequest = function (opt_data) {
+proto.OutboundMessage.CanonicalizeRequest = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
 goog.inherits(proto.OutboundMessage.CanonicalizeRequest, jspb.Message);
@@ -505,8 +373,7 @@ if (goog.DEBUG && !COMPILED) {
    * @public
    * @override
    */
-  proto.OutboundMessage.CanonicalizeRequest.displayName =
-    'proto.OutboundMessage.CanonicalizeRequest';
+  proto.OutboundMessage.CanonicalizeRequest.displayName = 'proto.OutboundMessage.CanonicalizeRequest';
 }
 /**
  * Generated by JsPbCodeGenerator.
@@ -518,7 +385,7 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.OutboundMessage.ImportRequest = function (opt_data) {
+proto.OutboundMessage.ImportRequest = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
 goog.inherits(proto.OutboundMessage.ImportRequest, jspb.Message);
@@ -527,8 +394,7 @@ if (goog.DEBUG && !COMPILED) {
    * @public
    * @override
    */
-  proto.OutboundMessage.ImportRequest.displayName =
-    'proto.OutboundMessage.ImportRequest';
+  proto.OutboundMessage.ImportRequest.displayName = 'proto.OutboundMessage.ImportRequest';
 }
 /**
  * Generated by JsPbCodeGenerator.
@@ -540,7 +406,7 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.OutboundMessage.FileImportRequest = function (opt_data) {
+proto.OutboundMessage.FileImportRequest = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
 goog.inherits(proto.OutboundMessage.FileImportRequest, jspb.Message);
@@ -549,8 +415,7 @@ if (goog.DEBUG && !COMPILED) {
    * @public
    * @override
    */
-  proto.OutboundMessage.FileImportRequest.displayName =
-    'proto.OutboundMessage.FileImportRequest';
+  proto.OutboundMessage.FileImportRequest.displayName = 'proto.OutboundMessage.FileImportRequest';
 }
 /**
  * Generated by JsPbCodeGenerator.
@@ -562,15 +427,8 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.OutboundMessage.FunctionCallRequest = function (opt_data) {
-  jspb.Message.initialize(
-    this,
-    opt_data,
-    0,
-    -1,
-    proto.OutboundMessage.FunctionCallRequest.repeatedFields_,
-    proto.OutboundMessage.FunctionCallRequest.oneofGroups_
-  );
+proto.OutboundMessage.FunctionCallRequest = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, proto.OutboundMessage.FunctionCallRequest.repeatedFields_, proto.OutboundMessage.FunctionCallRequest.oneofGroups_);
 };
 goog.inherits(proto.OutboundMessage.FunctionCallRequest, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
@@ -578,8 +436,7 @@ if (goog.DEBUG && !COMPILED) {
    * @public
    * @override
    */
-  proto.OutboundMessage.FunctionCallRequest.displayName =
-    'proto.OutboundMessage.FunctionCallRequest';
+  proto.OutboundMessage.FunctionCallRequest.displayName = 'proto.OutboundMessage.FunctionCallRequest';
 }
 /**
  * Generated by JsPbCodeGenerator.
@@ -591,7 +448,7 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.ProtocolError = function (opt_data) {
+proto.ProtocolError = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
 goog.inherits(proto.ProtocolError, jspb.Message);
@@ -612,7 +469,7 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.SourceSpan = function (opt_data) {
+proto.SourceSpan = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
 goog.inherits(proto.SourceSpan, jspb.Message);
@@ -633,7 +490,7 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.SourceSpan.SourceLocation = function (opt_data) {
+proto.SourceSpan.SourceLocation = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
 goog.inherits(proto.SourceSpan.SourceLocation, jspb.Message);
@@ -642,8 +499,7 @@ if (goog.DEBUG && !COMPILED) {
    * @public
    * @override
    */
-  proto.SourceSpan.SourceLocation.displayName =
-    'proto.SourceSpan.SourceLocation';
+  proto.SourceSpan.SourceLocation.displayName = 'proto.SourceSpan.SourceLocation';
 }
 /**
  * Generated by JsPbCodeGenerator.
@@ -655,15 +511,8 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.Value = function (opt_data) {
-  jspb.Message.initialize(
-    this,
-    opt_data,
-    0,
-    -1,
-    null,
-    proto.Value.oneofGroups_
-  );
+proto.Value = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, null, proto.Value.oneofGroups_);
 };
 goog.inherits(proto.Value, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
@@ -683,7 +532,7 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.Value.String = function (opt_data) {
+proto.Value.String = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
 goog.inherits(proto.Value.String, jspb.Message);
@@ -704,15 +553,8 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.Value.Number = function (opt_data) {
-  jspb.Message.initialize(
-    this,
-    opt_data,
-    0,
-    -1,
-    proto.Value.Number.repeatedFields_,
-    null
-  );
+proto.Value.Number = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, proto.Value.Number.repeatedFields_, null);
 };
 goog.inherits(proto.Value.Number, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
@@ -732,7 +574,7 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.Value.RgbColor = function (opt_data) {
+proto.Value.RgbColor = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
 goog.inherits(proto.Value.RgbColor, jspb.Message);
@@ -753,7 +595,7 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.Value.HslColor = function (opt_data) {
+proto.Value.HslColor = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
 goog.inherits(proto.Value.HslColor, jspb.Message);
@@ -774,15 +616,8 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.Value.List = function (opt_data) {
-  jspb.Message.initialize(
-    this,
-    opt_data,
-    0,
-    -1,
-    proto.Value.List.repeatedFields_,
-    null
-  );
+proto.Value.List = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, proto.Value.List.repeatedFields_, null);
 };
 goog.inherits(proto.Value.List, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
@@ -802,15 +637,8 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.Value.Map = function (opt_data) {
-  jspb.Message.initialize(
-    this,
-    opt_data,
-    0,
-    -1,
-    proto.Value.Map.repeatedFields_,
-    null
-  );
+proto.Value.Map = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, proto.Value.Map.repeatedFields_, null);
 };
 goog.inherits(proto.Value.Map, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
@@ -830,7 +658,7 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.Value.Map.Entry = function (opt_data) {
+proto.Value.Map.Entry = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
 goog.inherits(proto.Value.Map.Entry, jspb.Message);
@@ -851,7 +679,7 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.Value.CompilerFunction = function (opt_data) {
+proto.Value.CompilerFunction = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
 goog.inherits(proto.Value.CompilerFunction, jspb.Message);
@@ -872,7 +700,7 @@ if (goog.DEBUG && !COMPILED) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.Value.HostFunction = function (opt_data) {
+proto.Value.HostFunction = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
 goog.inherits(proto.Value.HostFunction, jspb.Message);
@@ -892,7 +720,7 @@ if (goog.DEBUG && !COMPILED) {
  * @private {!Array<!Array<number>>}
  * @const
  */
-proto.InboundMessage.oneofGroups_ = [[1, 2, 3, 4, 5, 6]];
+proto.InboundMessage.oneofGroups_ = [[1,2,3,4,5,6]];
 
 /**
  * @enum {number}
@@ -904,91 +732,74 @@ proto.InboundMessage.MessageCase = {
   CANONICALIZERESPONSE: 3,
   IMPORTRESPONSE: 4,
   FILEIMPORTRESPONSE: 5,
-  FUNCTIONCALLRESPONSE: 6,
+  FUNCTIONCALLRESPONSE: 6
 };
 
 /**
  * @return {proto.InboundMessage.MessageCase}
  */
-proto.InboundMessage.prototype.getMessageCase = function () {
-  return /** @type {proto.InboundMessage.MessageCase} */ (jspb.Message.computeOneofCase(
-    this,
-    proto.InboundMessage.oneofGroups_[0]
-  ));
+proto.InboundMessage.prototype.getMessageCase = function() {
+  return /** @type {proto.InboundMessage.MessageCase} */(jspb.Message.computeOneofCase(this, proto.InboundMessage.oneofGroups_[0]));
 };
 
+
+
 if (jspb.Message.GENERATE_TO_OBJECT) {
-  /**
-   * Creates an object representation of this proto.
-   * Field names that are reserved in JavaScript and will be renamed to pb_name.
-   * Optional fields that are not set will be set to undefined.
-   * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
-   * For the list of reserved names please see:
-   *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
-   * @param {boolean=} opt_includeInstance Deprecated. whether to include the
-   *     JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @return {!Object}
-   */
-  proto.InboundMessage.prototype.toObject = function (opt_includeInstance) {
-    return proto.InboundMessage.toObject(opt_includeInstance, this);
+/**
+ * Creates an object representation of this proto.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * Optional fields that are not set will be set to undefined.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
+ * @param {boolean=} opt_includeInstance Deprecated. whether to include the
+ *     JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.InboundMessage.prototype.toObject = function(opt_includeInstance) {
+  return proto.InboundMessage.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Deprecated. Whether to include
+ *     the JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.InboundMessage} msg The msg instance to transform.
+ * @return {!Object}
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.InboundMessage.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    error: (f = msg.getError()) && proto.ProtocolError.toObject(includeInstance, f),
+    compilerequest: (f = msg.getCompilerequest()) && proto.InboundMessage.CompileRequest.toObject(includeInstance, f),
+    canonicalizeresponse: (f = msg.getCanonicalizeresponse()) && proto.InboundMessage.CanonicalizeResponse.toObject(includeInstance, f),
+    importresponse: (f = msg.getImportresponse()) && proto.InboundMessage.ImportResponse.toObject(includeInstance, f),
+    fileimportresponse: (f = msg.getFileimportresponse()) && proto.InboundMessage.FileImportResponse.toObject(includeInstance, f),
+    functioncallresponse: (f = msg.getFunctioncallresponse()) && proto.InboundMessage.FunctionCallResponse.toObject(includeInstance, f)
   };
 
-  /**
-   * Static version of the {@see toObject} method.
-   * @param {boolean|undefined} includeInstance Deprecated. Whether to include
-   *     the JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @param {!proto.InboundMessage} msg The msg instance to transform.
-   * @return {!Object}
-   * @suppress {unusedLocalVariables} f is only used for nested messages
-   */
-  proto.InboundMessage.toObject = function (includeInstance, msg) {
-    let f,
-      obj = {
-        error:
-          (f = msg.getError()) &&
-          proto.ProtocolError.toObject(includeInstance, f),
-        compilerequest:
-          (f = msg.getCompilerequest()) &&
-          proto.InboundMessage.CompileRequest.toObject(includeInstance, f),
-        canonicalizeresponse:
-          (f = msg.getCanonicalizeresponse()) &&
-          proto.InboundMessage.CanonicalizeResponse.toObject(
-            includeInstance,
-            f
-          ),
-        importresponse:
-          (f = msg.getImportresponse()) &&
-          proto.InboundMessage.ImportResponse.toObject(includeInstance, f),
-        fileimportresponse:
-          (f = msg.getFileimportresponse()) &&
-          proto.InboundMessage.FileImportResponse.toObject(includeInstance, f),
-        functioncallresponse:
-          (f = msg.getFunctioncallresponse()) &&
-          proto.InboundMessage.FunctionCallResponse.toObject(
-            includeInstance,
-            f
-          ),
-      };
-
-    if (includeInstance) {
-      obj.$jspbMessageInstance = msg;
-    }
-    return obj;
-  };
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
 }
+
 
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
  * @return {!proto.InboundMessage}
  */
-proto.InboundMessage.deserializeBinary = function (bytes) {
-  const reader = new jspb.BinaryReader(bytes);
-  const msg = new proto.InboundMessage();
+proto.InboundMessage.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.InboundMessage;
   return proto.InboundMessage.deserializeBinaryFromReader(msg, reader);
 };
+
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
@@ -997,78 +808,62 @@ proto.InboundMessage.deserializeBinary = function (bytes) {
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
  * @return {!proto.InboundMessage}
  */
-proto.InboundMessage.deserializeBinaryFromReader = function (msg, reader) {
+proto.InboundMessage.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
     }
-    const field = reader.getFieldNumber();
+    var field = reader.getFieldNumber();
     switch (field) {
-      case 1:
-        var value = new proto.ProtocolError();
-        reader.readMessage(
-          value,
-          proto.ProtocolError.deserializeBinaryFromReader
-        );
-        msg.setError(value);
-        break;
-      case 2:
-        var value = new proto.InboundMessage.CompileRequest();
-        reader.readMessage(
-          value,
-          proto.InboundMessage.CompileRequest.deserializeBinaryFromReader
-        );
-        msg.setCompilerequest(value);
-        break;
-      case 3:
-        var value = new proto.InboundMessage.CanonicalizeResponse();
-        reader.readMessage(
-          value,
-          proto.InboundMessage.CanonicalizeResponse.deserializeBinaryFromReader
-        );
-        msg.setCanonicalizeresponse(value);
-        break;
-      case 4:
-        var value = new proto.InboundMessage.ImportResponse();
-        reader.readMessage(
-          value,
-          proto.InboundMessage.ImportResponse.deserializeBinaryFromReader
-        );
-        msg.setImportresponse(value);
-        break;
-      case 5:
-        var value = new proto.InboundMessage.FileImportResponse();
-        reader.readMessage(
-          value,
-          proto.InboundMessage.FileImportResponse.deserializeBinaryFromReader
-        );
-        msg.setFileimportresponse(value);
-        break;
-      case 6:
-        var value = new proto.InboundMessage.FunctionCallResponse();
-        reader.readMessage(
-          value,
-          proto.InboundMessage.FunctionCallResponse.deserializeBinaryFromReader
-        );
-        msg.setFunctioncallresponse(value);
-        break;
-      default:
-        reader.skipField();
-        break;
+    case 1:
+      var value = new proto.ProtocolError;
+      reader.readMessage(value,proto.ProtocolError.deserializeBinaryFromReader);
+      msg.setError(value);
+      break;
+    case 2:
+      var value = new proto.InboundMessage.CompileRequest;
+      reader.readMessage(value,proto.InboundMessage.CompileRequest.deserializeBinaryFromReader);
+      msg.setCompilerequest(value);
+      break;
+    case 3:
+      var value = new proto.InboundMessage.CanonicalizeResponse;
+      reader.readMessage(value,proto.InboundMessage.CanonicalizeResponse.deserializeBinaryFromReader);
+      msg.setCanonicalizeresponse(value);
+      break;
+    case 4:
+      var value = new proto.InboundMessage.ImportResponse;
+      reader.readMessage(value,proto.InboundMessage.ImportResponse.deserializeBinaryFromReader);
+      msg.setImportresponse(value);
+      break;
+    case 5:
+      var value = new proto.InboundMessage.FileImportResponse;
+      reader.readMessage(value,proto.InboundMessage.FileImportResponse.deserializeBinaryFromReader);
+      msg.setFileimportresponse(value);
+      break;
+    case 6:
+      var value = new proto.InboundMessage.FunctionCallResponse;
+      reader.readMessage(value,proto.InboundMessage.FunctionCallResponse.deserializeBinaryFromReader);
+      msg.setFunctioncallresponse(value);
+      break;
+    default:
+      reader.skipField();
+      break;
     }
   }
   return msg;
 };
 
+
 /**
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.InboundMessage.prototype.serializeBinary = function () {
-  const writer = new jspb.BinaryWriter();
+proto.InboundMessage.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
   proto.InboundMessage.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
+
 
 /**
  * Serializes the given message to binary data (in protobuf wire
@@ -1077,11 +872,15 @@ proto.InboundMessage.prototype.serializeBinary = function () {
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.InboundMessage.serializeBinaryToWriter = function (message, writer) {
-  let f = undefined;
+proto.InboundMessage.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
   f = message.getError();
   if (f != null) {
-    writer.writeMessage(1, f, proto.ProtocolError.serializeBinaryToWriter);
+    writer.writeMessage(
+      1,
+      f,
+      proto.ProtocolError.serializeBinaryToWriter
+    );
   }
   f = message.getCompilerequest();
   if (f != null) {
@@ -1125,21 +924,23 @@ proto.InboundMessage.serializeBinaryToWriter = function (message, writer) {
   }
 };
 
+
 /**
  * @enum {number}
  */
 proto.InboundMessage.Syntax = {
   SCSS: 0,
   INDENTED: 1,
-  CSS: 2,
+  CSS: 2
 };
+
 
 /**
  * List of repeated fields within this message type.
  * @private {!Array<number>}
  * @const
  */
-proto.InboundMessage.CompileRequest.repeatedFields_ = [6, 7];
+proto.InboundMessage.CompileRequest.repeatedFields_ = [6,7];
 
 /**
  * Oneof group definitions for this message. Each group defines the field
@@ -1149,7 +950,7 @@ proto.InboundMessage.CompileRequest.repeatedFields_ = [6, 7];
  * @private {!Array<!Array<number>>}
  * @const
  */
-proto.InboundMessage.CompileRequest.oneofGroups_ = [[2, 3]];
+proto.InboundMessage.CompileRequest.oneofGroups_ = [[2,3]];
 
 /**
  * @enum {number}
@@ -1157,95 +958,76 @@ proto.InboundMessage.CompileRequest.oneofGroups_ = [[2, 3]];
 proto.InboundMessage.CompileRequest.InputCase = {
   INPUT_NOT_SET: 0,
   STRING: 2,
-  PATH: 3,
+  PATH: 3
 };
 
 /**
  * @return {proto.InboundMessage.CompileRequest.InputCase}
  */
-proto.InboundMessage.CompileRequest.prototype.getInputCase = function () {
-  return /** @type {proto.InboundMessage.CompileRequest.InputCase} */ (jspb.Message.computeOneofCase(
-    this,
-    proto.InboundMessage.CompileRequest.oneofGroups_[0]
-  ));
+proto.InboundMessage.CompileRequest.prototype.getInputCase = function() {
+  return /** @type {proto.InboundMessage.CompileRequest.InputCase} */(jspb.Message.computeOneofCase(this, proto.InboundMessage.CompileRequest.oneofGroups_[0]));
 };
 
+
+
 if (jspb.Message.GENERATE_TO_OBJECT) {
-  /**
-   * Creates an object representation of this proto.
-   * Field names that are reserved in JavaScript and will be renamed to pb_name.
-   * Optional fields that are not set will be set to undefined.
-   * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
-   * For the list of reserved names please see:
-   *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
-   * @param {boolean=} opt_includeInstance Deprecated. whether to include the
-   *     JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @return {!Object}
-   */
-  proto.InboundMessage.CompileRequest.prototype.toObject = function (
-    opt_includeInstance
-  ) {
-    return proto.InboundMessage.CompileRequest.toObject(
-      opt_includeInstance,
-      this
-    );
+/**
+ * Creates an object representation of this proto.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * Optional fields that are not set will be set to undefined.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
+ * @param {boolean=} opt_includeInstance Deprecated. whether to include the
+ *     JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.InboundMessage.CompileRequest.prototype.toObject = function(opt_includeInstance) {
+  return proto.InboundMessage.CompileRequest.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Deprecated. Whether to include
+ *     the JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.InboundMessage.CompileRequest} msg The msg instance to transform.
+ * @return {!Object}
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.InboundMessage.CompileRequest.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    id: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    string: (f = msg.getString()) && proto.InboundMessage.CompileRequest.StringInput.toObject(includeInstance, f),
+    path: jspb.Message.getFieldWithDefault(msg, 3, ""),
+    style: jspb.Message.getFieldWithDefault(msg, 4, 0),
+    sourceMap: jspb.Message.getBooleanFieldWithDefault(msg, 5, false),
+    importersList: jspb.Message.toObjectList(msg.getImportersList(),
+    proto.InboundMessage.CompileRequest.Importer.toObject, includeInstance),
+    globalFunctionsList: (f = jspb.Message.getRepeatedField(msg, 7)) == null ? undefined : f
   };
 
-  /**
-   * Static version of the {@see toObject} method.
-   * @param {boolean|undefined} includeInstance Deprecated. Whether to include
-   *     the JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @param {!proto.InboundMessage.CompileRequest} msg The msg instance to transform.
-   * @return {!Object}
-   * @suppress {unusedLocalVariables} f is only used for nested messages
-   */
-  proto.InboundMessage.CompileRequest.toObject = function (
-    includeInstance,
-    msg
-  ) {
-    let f,
-      obj = {
-        id: jspb.Message.getFieldWithDefault(msg, 1, 0),
-        string:
-          (f = msg.getString()) &&
-          proto.InboundMessage.CompileRequest.StringInput.toObject(
-            includeInstance,
-            f
-          ),
-        path: jspb.Message.getFieldWithDefault(msg, 3, ''),
-        style: jspb.Message.getFieldWithDefault(msg, 4, 0),
-        sourceMap: jspb.Message.getBooleanFieldWithDefault(msg, 5, false),
-        importersList: jspb.Message.toObjectList(
-          msg.getImportersList(),
-          proto.InboundMessage.CompileRequest.Importer.toObject,
-          includeInstance
-        ),
-        globalFunctionsList:
-          (f = jspb.Message.getRepeatedField(msg, 7)) == null ? undefined : f,
-      };
-
-    if (includeInstance) {
-      obj.$jspbMessageInstance = msg;
-    }
-    return obj;
-  };
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
 }
+
 
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
  * @return {!proto.InboundMessage.CompileRequest}
  */
-proto.InboundMessage.CompileRequest.deserializeBinary = function (bytes) {
-  const reader = new jspb.BinaryReader(bytes);
-  const msg = new proto.InboundMessage.CompileRequest();
-  return proto.InboundMessage.CompileRequest.deserializeBinaryFromReader(
-    msg,
-    reader
-  );
+proto.InboundMessage.CompileRequest.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.InboundMessage.CompileRequest;
+  return proto.InboundMessage.CompileRequest.deserializeBinaryFromReader(msg, reader);
 };
+
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
@@ -1254,71 +1036,62 @@ proto.InboundMessage.CompileRequest.deserializeBinary = function (bytes) {
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
  * @return {!proto.InboundMessage.CompileRequest}
  */
-proto.InboundMessage.CompileRequest.deserializeBinaryFromReader = function (
-  msg,
-  reader
-) {
+proto.InboundMessage.CompileRequest.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
     }
-    const field = reader.getFieldNumber();
+    var field = reader.getFieldNumber();
     switch (field) {
-      case 1:
-        var value = /** @type {number} */ (reader.readUint32());
-        msg.setId(value);
-        break;
-      case 2:
-        var value = new proto.InboundMessage.CompileRequest.StringInput();
-        reader.readMessage(
-          value,
-          proto.InboundMessage.CompileRequest.StringInput
-            .deserializeBinaryFromReader
-        );
-        msg.setString(value);
-        break;
-      case 3:
-        var value = /** @type {string} */ (reader.readString());
-        msg.setPath(value);
-        break;
-      case 4:
-        var value = /** @type {!proto.InboundMessage.CompileRequest.OutputStyle} */ (reader.readEnum());
-        msg.setStyle(value);
-        break;
-      case 5:
-        var value = /** @type {boolean} */ (reader.readBool());
-        msg.setSourceMap(value);
-        break;
-      case 6:
-        var value = new proto.InboundMessage.CompileRequest.Importer();
-        reader.readMessage(
-          value,
-          proto.InboundMessage.CompileRequest.Importer
-            .deserializeBinaryFromReader
-        );
-        msg.addImporters(value);
-        break;
-      case 7:
-        var value = /** @type {string} */ (reader.readString());
-        msg.addGlobalFunctions(value);
-        break;
-      default:
-        reader.skipField();
-        break;
+    case 1:
+      var value = /** @type {number} */ (reader.readUint32());
+      msg.setId(value);
+      break;
+    case 2:
+      var value = new proto.InboundMessage.CompileRequest.StringInput;
+      reader.readMessage(value,proto.InboundMessage.CompileRequest.StringInput.deserializeBinaryFromReader);
+      msg.setString(value);
+      break;
+    case 3:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setPath(value);
+      break;
+    case 4:
+      var value = /** @type {!proto.InboundMessage.CompileRequest.OutputStyle} */ (reader.readEnum());
+      msg.setStyle(value);
+      break;
+    case 5:
+      var value = /** @type {boolean} */ (reader.readBool());
+      msg.setSourceMap(value);
+      break;
+    case 6:
+      var value = new proto.InboundMessage.CompileRequest.Importer;
+      reader.readMessage(value,proto.InboundMessage.CompileRequest.Importer.deserializeBinaryFromReader);
+      msg.addImporters(value);
+      break;
+    case 7:
+      var value = /** @type {string} */ (reader.readString());
+      msg.addGlobalFunctions(value);
+      break;
+    default:
+      reader.skipField();
+      break;
     }
   }
   return msg;
 };
 
+
 /**
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.InboundMessage.CompileRequest.prototype.serializeBinary = function () {
-  const writer = new jspb.BinaryWriter();
+proto.InboundMessage.CompileRequest.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
   proto.InboundMessage.CompileRequest.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
+
 
 /**
  * Serializes the given message to binary data (in protobuf wire
@@ -1327,14 +1100,14 @@ proto.InboundMessage.CompileRequest.prototype.serializeBinary = function () {
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.InboundMessage.CompileRequest.serializeBinaryToWriter = function (
-  message,
-  writer
-) {
-  let f = undefined;
+proto.InboundMessage.CompileRequest.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
   f = message.getId();
   if (f !== 0) {
-    writer.writeUint32(1, f);
+    writer.writeUint32(
+      1,
+      f
+    );
   }
   f = message.getString();
   if (f != null) {
@@ -1346,15 +1119,24 @@ proto.InboundMessage.CompileRequest.serializeBinaryToWriter = function (
   }
   f = /** @type {string} */ (jspb.Message.getField(message, 3));
   if (f != null) {
-    writer.writeString(3, f);
+    writer.writeString(
+      3,
+      f
+    );
   }
   f = message.getStyle();
   if (f !== 0.0) {
-    writer.writeEnum(4, f);
+    writer.writeEnum(
+      4,
+      f
+    );
   }
   f = message.getSourceMap();
   if (f) {
-    writer.writeBool(5, f);
+    writer.writeBool(
+      5,
+      f
+    );
   }
   f = message.getImportersList();
   if (f.length > 0) {
@@ -1366,9 +1148,13 @@ proto.InboundMessage.CompileRequest.serializeBinaryToWriter = function (
   }
   f = message.getGlobalFunctionsList();
   if (f.length > 0) {
-    writer.writeRepeatedString(7, f);
+    writer.writeRepeatedString(
+      7,
+      f
+    );
   }
 };
+
 
 /**
  * @enum {number}
@@ -1377,79 +1163,66 @@ proto.InboundMessage.CompileRequest.OutputStyle = {
   EXPANDED: 0,
   COMPRESSED: 1,
   NESTED: 2,
-  COMPACT: 3,
+  COMPACT: 3
 };
 
+
+
+
 if (jspb.Message.GENERATE_TO_OBJECT) {
-  /**
-   * Creates an object representation of this proto.
-   * Field names that are reserved in JavaScript and will be renamed to pb_name.
-   * Optional fields that are not set will be set to undefined.
-   * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
-   * For the list of reserved names please see:
-   *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
-   * @param {boolean=} opt_includeInstance Deprecated. whether to include the
-   *     JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @return {!Object}
-   */
-  proto.InboundMessage.CompileRequest.StringInput.prototype.toObject = function (
-    opt_includeInstance
-  ) {
-    return proto.InboundMessage.CompileRequest.StringInput.toObject(
-      opt_includeInstance,
-      this
-    );
+/**
+ * Creates an object representation of this proto.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * Optional fields that are not set will be set to undefined.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
+ * @param {boolean=} opt_includeInstance Deprecated. whether to include the
+ *     JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.InboundMessage.CompileRequest.StringInput.prototype.toObject = function(opt_includeInstance) {
+  return proto.InboundMessage.CompileRequest.StringInput.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Deprecated. Whether to include
+ *     the JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.InboundMessage.CompileRequest.StringInput} msg The msg instance to transform.
+ * @return {!Object}
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.InboundMessage.CompileRequest.StringInput.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    source: jspb.Message.getFieldWithDefault(msg, 1, ""),
+    url: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    syntax: jspb.Message.getFieldWithDefault(msg, 3, 0),
+    importer: (f = msg.getImporter()) && proto.InboundMessage.CompileRequest.Importer.toObject(includeInstance, f)
   };
 
-  /**
-   * Static version of the {@see toObject} method.
-   * @param {boolean|undefined} includeInstance Deprecated. Whether to include
-   *     the JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @param {!proto.InboundMessage.CompileRequest.StringInput} msg The msg instance to transform.
-   * @return {!Object}
-   * @suppress {unusedLocalVariables} f is only used for nested messages
-   */
-  proto.InboundMessage.CompileRequest.StringInput.toObject = function (
-    includeInstance,
-    msg
-  ) {
-    let f,
-      obj = {
-        source: jspb.Message.getFieldWithDefault(msg, 1, ''),
-        url: jspb.Message.getFieldWithDefault(msg, 2, ''),
-        syntax: jspb.Message.getFieldWithDefault(msg, 3, 0),
-        importer:
-          (f = msg.getImporter()) &&
-          proto.InboundMessage.CompileRequest.Importer.toObject(
-            includeInstance,
-            f
-          ),
-      };
-
-    if (includeInstance) {
-      obj.$jspbMessageInstance = msg;
-    }
-    return obj;
-  };
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
 }
+
 
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
  * @return {!proto.InboundMessage.CompileRequest.StringInput}
  */
-proto.InboundMessage.CompileRequest.StringInput.deserializeBinary = function (
-  bytes
-) {
-  const reader = new jspb.BinaryReader(bytes);
-  const msg = new proto.InboundMessage.CompileRequest.StringInput();
-  return proto.InboundMessage.CompileRequest.StringInput.deserializeBinaryFromReader(
-    msg,
-    reader
-  );
+proto.InboundMessage.CompileRequest.StringInput.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.InboundMessage.CompileRequest.StringInput;
+  return proto.InboundMessage.CompileRequest.StringInput.deserializeBinaryFromReader(msg, reader);
 };
+
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
@@ -1458,57 +1231,49 @@ proto.InboundMessage.CompileRequest.StringInput.deserializeBinary = function (
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
  * @return {!proto.InboundMessage.CompileRequest.StringInput}
  */
-proto.InboundMessage.CompileRequest.StringInput.deserializeBinaryFromReader = function (
-  msg,
-  reader
-) {
+proto.InboundMessage.CompileRequest.StringInput.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
     }
-    const field = reader.getFieldNumber();
+    var field = reader.getFieldNumber();
     switch (field) {
-      case 1:
-        var value = /** @type {string} */ (reader.readString());
-        msg.setSource(value);
-        break;
-      case 2:
-        var value = /** @type {string} */ (reader.readString());
-        msg.setUrl(value);
-        break;
-      case 3:
-        var value = /** @type {!proto.InboundMessage.Syntax} */ (reader.readEnum());
-        msg.setSyntax(value);
-        break;
-      case 4:
-        var value = new proto.InboundMessage.CompileRequest.Importer();
-        reader.readMessage(
-          value,
-          proto.InboundMessage.CompileRequest.Importer
-            .deserializeBinaryFromReader
-        );
-        msg.setImporter(value);
-        break;
-      default:
-        reader.skipField();
-        break;
+    case 1:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setSource(value);
+      break;
+    case 2:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setUrl(value);
+      break;
+    case 3:
+      var value = /** @type {!proto.InboundMessage.Syntax} */ (reader.readEnum());
+      msg.setSyntax(value);
+      break;
+    case 4:
+      var value = new proto.InboundMessage.CompileRequest.Importer;
+      reader.readMessage(value,proto.InboundMessage.CompileRequest.Importer.deserializeBinaryFromReader);
+      msg.setImporter(value);
+      break;
+    default:
+      reader.skipField();
+      break;
     }
   }
   return msg;
 };
 
+
 /**
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.InboundMessage.CompileRequest.StringInput.prototype.serializeBinary = function () {
-  const writer = new jspb.BinaryWriter();
-  proto.InboundMessage.CompileRequest.StringInput.serializeBinaryToWriter(
-    this,
-    writer
-  );
+proto.InboundMessage.CompileRequest.StringInput.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.InboundMessage.CompileRequest.StringInput.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
+
 
 /**
  * Serializes the given message to binary data (in protobuf wire
@@ -1517,22 +1282,28 @@ proto.InboundMessage.CompileRequest.StringInput.prototype.serializeBinary = func
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.InboundMessage.CompileRequest.StringInput.serializeBinaryToWriter = function (
-  message,
-  writer
-) {
-  let f = undefined;
+proto.InboundMessage.CompileRequest.StringInput.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
   f = message.getSource();
   if (f.length > 0) {
-    writer.writeString(1, f);
+    writer.writeString(
+      1,
+      f
+    );
   }
   f = message.getUrl();
   if (f.length > 0) {
-    writer.writeString(2, f);
+    writer.writeString(
+      2,
+      f
+    );
   }
   f = message.getSyntax();
   if (f !== 0.0) {
-    writer.writeEnum(3, f);
+    writer.writeEnum(
+      3,
+      f
+    );
   }
   f = message.getImporter();
   if (f != null) {
@@ -1544,101 +1315,98 @@ proto.InboundMessage.CompileRequest.StringInput.serializeBinaryToWriter = functi
   }
 };
 
+
 /**
  * optional string source = 1;
  * @return {string}
  */
-proto.InboundMessage.CompileRequest.StringInput.prototype.getSource = function () {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ''));
+proto.InboundMessage.CompileRequest.StringInput.prototype.getSource = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
+
 
 /**
  * @param {string} value
  * @return {!proto.InboundMessage.CompileRequest.StringInput} returns this
  */
-proto.InboundMessage.CompileRequest.StringInput.prototype.setSource = function (
-  value
-) {
+proto.InboundMessage.CompileRequest.StringInput.prototype.setSource = function(value) {
   return jspb.Message.setProto3StringField(this, 1, value);
 };
+
 
 /**
  * optional string url = 2;
  * @return {string}
  */
-proto.InboundMessage.CompileRequest.StringInput.prototype.getUrl = function () {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ''));
+proto.InboundMessage.CompileRequest.StringInput.prototype.getUrl = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
+
 
 /**
  * @param {string} value
  * @return {!proto.InboundMessage.CompileRequest.StringInput} returns this
  */
-proto.InboundMessage.CompileRequest.StringInput.prototype.setUrl = function (
-  value
-) {
+proto.InboundMessage.CompileRequest.StringInput.prototype.setUrl = function(value) {
   return jspb.Message.setProto3StringField(this, 2, value);
 };
+
 
 /**
  * optional Syntax syntax = 3;
  * @return {!proto.InboundMessage.Syntax}
  */
-proto.InboundMessage.CompileRequest.StringInput.prototype.getSyntax = function () {
-  return /** @type {!proto.InboundMessage.Syntax} */ (jspb.Message.getFieldWithDefault(
-    this,
-    3,
-    0
-  ));
+proto.InboundMessage.CompileRequest.StringInput.prototype.getSyntax = function() {
+  return /** @type {!proto.InboundMessage.Syntax} */ (jspb.Message.getFieldWithDefault(this, 3, 0));
 };
+
 
 /**
  * @param {!proto.InboundMessage.Syntax} value
  * @return {!proto.InboundMessage.CompileRequest.StringInput} returns this
  */
-proto.InboundMessage.CompileRequest.StringInput.prototype.setSyntax = function (
-  value
-) {
+proto.InboundMessage.CompileRequest.StringInput.prototype.setSyntax = function(value) {
   return jspb.Message.setProto3EnumField(this, 3, value);
 };
+
 
 /**
  * optional Importer importer = 4;
  * @return {?proto.InboundMessage.CompileRequest.Importer}
  */
-proto.InboundMessage.CompileRequest.StringInput.prototype.getImporter = function () {
-  return /** @type{?proto.InboundMessage.CompileRequest.Importer} */ (jspb.Message.getWrapperField(
-    this,
-    proto.InboundMessage.CompileRequest.Importer,
-    4
-  ));
+proto.InboundMessage.CompileRequest.StringInput.prototype.getImporter = function() {
+  return /** @type{?proto.InboundMessage.CompileRequest.Importer} */ (
+    jspb.Message.getWrapperField(this, proto.InboundMessage.CompileRequest.Importer, 4));
 };
+
 
 /**
  * @param {?proto.InboundMessage.CompileRequest.Importer|undefined} value
  * @return {!proto.InboundMessage.CompileRequest.StringInput} returns this
- */
-proto.InboundMessage.CompileRequest.StringInput.prototype.setImporter = function (
-  value
-) {
+*/
+proto.InboundMessage.CompileRequest.StringInput.prototype.setImporter = function(value) {
   return jspb.Message.setWrapperField(this, 4, value);
 };
+
 
 /**
  * Clears the message field making it undefined.
  * @return {!proto.InboundMessage.CompileRequest.StringInput} returns this
  */
-proto.InboundMessage.CompileRequest.StringInput.prototype.clearImporter = function () {
+proto.InboundMessage.CompileRequest.StringInput.prototype.clearImporter = function() {
   return this.setImporter(undefined);
 };
+
 
 /**
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.InboundMessage.CompileRequest.StringInput.prototype.hasImporter = function () {
+proto.InboundMessage.CompileRequest.StringInput.prototype.hasImporter = function() {
   return jspb.Message.getField(this, 4) != null;
 };
+
+
 
 /**
  * Oneof group definitions for this message. Each group defines the field
@@ -1648,7 +1416,7 @@ proto.InboundMessage.CompileRequest.StringInput.prototype.hasImporter = function
  * @private {!Array<!Array<number>>}
  * @const
  */
-proto.InboundMessage.CompileRequest.Importer.oneofGroups_ = [[1, 2, 3]];
+proto.InboundMessage.CompileRequest.Importer.oneofGroups_ = [[1,2,3]];
 
 /**
  * @enum {number}
@@ -1657,83 +1425,71 @@ proto.InboundMessage.CompileRequest.Importer.ImporterCase = {
   IMPORTER_NOT_SET: 0,
   PATH: 1,
   IMPORTER_ID: 2,
-  FILE_IMPORTER_ID: 3,
+  FILE_IMPORTER_ID: 3
 };
 
 /**
  * @return {proto.InboundMessage.CompileRequest.Importer.ImporterCase}
  */
-proto.InboundMessage.CompileRequest.Importer.prototype.getImporterCase = function () {
-  return /** @type {proto.InboundMessage.CompileRequest.Importer.ImporterCase} */ (jspb.Message.computeOneofCase(
-    this,
-    proto.InboundMessage.CompileRequest.Importer.oneofGroups_[0]
-  ));
+proto.InboundMessage.CompileRequest.Importer.prototype.getImporterCase = function() {
+  return /** @type {proto.InboundMessage.CompileRequest.Importer.ImporterCase} */(jspb.Message.computeOneofCase(this, proto.InboundMessage.CompileRequest.Importer.oneofGroups_[0]));
 };
 
+
+
 if (jspb.Message.GENERATE_TO_OBJECT) {
-  /**
-   * Creates an object representation of this proto.
-   * Field names that are reserved in JavaScript and will be renamed to pb_name.
-   * Optional fields that are not set will be set to undefined.
-   * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
-   * For the list of reserved names please see:
-   *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
-   * @param {boolean=} opt_includeInstance Deprecated. whether to include the
-   *     JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @return {!Object}
-   */
-  proto.InboundMessage.CompileRequest.Importer.prototype.toObject = function (
-    opt_includeInstance
-  ) {
-    return proto.InboundMessage.CompileRequest.Importer.toObject(
-      opt_includeInstance,
-      this
-    );
+/**
+ * Creates an object representation of this proto.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * Optional fields that are not set will be set to undefined.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
+ * @param {boolean=} opt_includeInstance Deprecated. whether to include the
+ *     JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.InboundMessage.CompileRequest.Importer.prototype.toObject = function(opt_includeInstance) {
+  return proto.InboundMessage.CompileRequest.Importer.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Deprecated. Whether to include
+ *     the JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.InboundMessage.CompileRequest.Importer} msg The msg instance to transform.
+ * @return {!Object}
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.InboundMessage.CompileRequest.Importer.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    path: jspb.Message.getFieldWithDefault(msg, 1, ""),
+    importerId: jspb.Message.getFieldWithDefault(msg, 2, 0),
+    fileImporterId: jspb.Message.getFieldWithDefault(msg, 3, 0)
   };
 
-  /**
-   * Static version of the {@see toObject} method.
-   * @param {boolean|undefined} includeInstance Deprecated. Whether to include
-   *     the JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @param {!proto.InboundMessage.CompileRequest.Importer} msg The msg instance to transform.
-   * @return {!Object}
-   * @suppress {unusedLocalVariables} f is only used for nested messages
-   */
-  proto.InboundMessage.CompileRequest.Importer.toObject = function (
-    includeInstance,
-    msg
-  ) {
-    let f,
-      obj = {
-        path: jspb.Message.getFieldWithDefault(msg, 1, ''),
-        importerId: jspb.Message.getFieldWithDefault(msg, 2, 0),
-        fileImporterId: jspb.Message.getFieldWithDefault(msg, 3, 0),
-      };
-
-    if (includeInstance) {
-      obj.$jspbMessageInstance = msg;
-    }
-    return obj;
-  };
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
 }
+
 
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
  * @return {!proto.InboundMessage.CompileRequest.Importer}
  */
-proto.InboundMessage.CompileRequest.Importer.deserializeBinary = function (
-  bytes
-) {
-  const reader = new jspb.BinaryReader(bytes);
-  const msg = new proto.InboundMessage.CompileRequest.Importer();
-  return proto.InboundMessage.CompileRequest.Importer.deserializeBinaryFromReader(
-    msg,
-    reader
-  );
+proto.InboundMessage.CompileRequest.Importer.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.InboundMessage.CompileRequest.Importer;
+  return proto.InboundMessage.CompileRequest.Importer.deserializeBinaryFromReader(msg, reader);
 };
+
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
@@ -1742,48 +1498,44 @@ proto.InboundMessage.CompileRequest.Importer.deserializeBinary = function (
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
  * @return {!proto.InboundMessage.CompileRequest.Importer}
  */
-proto.InboundMessage.CompileRequest.Importer.deserializeBinaryFromReader = function (
-  msg,
-  reader
-) {
+proto.InboundMessage.CompileRequest.Importer.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
     }
-    const field = reader.getFieldNumber();
+    var field = reader.getFieldNumber();
     switch (field) {
-      case 1:
-        var value = /** @type {string} */ (reader.readString());
-        msg.setPath(value);
-        break;
-      case 2:
-        var value = /** @type {number} */ (reader.readUint32());
-        msg.setImporterId(value);
-        break;
-      case 3:
-        var value = /** @type {number} */ (reader.readUint32());
-        msg.setFileImporterId(value);
-        break;
-      default:
-        reader.skipField();
-        break;
+    case 1:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setPath(value);
+      break;
+    case 2:
+      var value = /** @type {number} */ (reader.readUint32());
+      msg.setImporterId(value);
+      break;
+    case 3:
+      var value = /** @type {number} */ (reader.readUint32());
+      msg.setFileImporterId(value);
+      break;
+    default:
+      reader.skipField();
+      break;
     }
   }
   return msg;
 };
 
+
 /**
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.InboundMessage.CompileRequest.Importer.prototype.serializeBinary = function () {
-  const writer = new jspb.BinaryWriter();
-  proto.InboundMessage.CompileRequest.Importer.serializeBinaryToWriter(
-    this,
-    writer
-  );
+proto.InboundMessage.CompileRequest.Importer.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.InboundMessage.CompileRequest.Importer.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
+
 
 /**
  * Serializes the given message to binary data (in protobuf wire
@@ -1792,381 +1544,342 @@ proto.InboundMessage.CompileRequest.Importer.prototype.serializeBinary = functio
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.InboundMessage.CompileRequest.Importer.serializeBinaryToWriter = function (
-  message,
-  writer
-) {
-  let f = undefined;
+proto.InboundMessage.CompileRequest.Importer.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
   f = /** @type {string} */ (jspb.Message.getField(message, 1));
   if (f != null) {
-    writer.writeString(1, f);
+    writer.writeString(
+      1,
+      f
+    );
   }
   f = /** @type {number} */ (jspb.Message.getField(message, 2));
   if (f != null) {
-    writer.writeUint32(2, f);
+    writer.writeUint32(
+      2,
+      f
+    );
   }
   f = /** @type {number} */ (jspb.Message.getField(message, 3));
   if (f != null) {
-    writer.writeUint32(3, f);
+    writer.writeUint32(
+      3,
+      f
+    );
   }
 };
+
 
 /**
  * optional string path = 1;
  * @return {string}
  */
-proto.InboundMessage.CompileRequest.Importer.prototype.getPath = function () {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ''));
+proto.InboundMessage.CompileRequest.Importer.prototype.getPath = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
+
 
 /**
  * @param {string} value
  * @return {!proto.InboundMessage.CompileRequest.Importer} returns this
  */
-proto.InboundMessage.CompileRequest.Importer.prototype.setPath = function (
-  value
-) {
-  return jspb.Message.setOneofField(
-    this,
-    1,
-    proto.InboundMessage.CompileRequest.Importer.oneofGroups_[0],
-    value
-  );
+proto.InboundMessage.CompileRequest.Importer.prototype.setPath = function(value) {
+  return jspb.Message.setOneofField(this, 1, proto.InboundMessage.CompileRequest.Importer.oneofGroups_[0], value);
 };
+
 
 /**
  * Clears the field making it undefined.
  * @return {!proto.InboundMessage.CompileRequest.Importer} returns this
  */
-proto.InboundMessage.CompileRequest.Importer.prototype.clearPath = function () {
-  return jspb.Message.setOneofField(
-    this,
-    1,
-    proto.InboundMessage.CompileRequest.Importer.oneofGroups_[0],
-    undefined
-  );
+proto.InboundMessage.CompileRequest.Importer.prototype.clearPath = function() {
+  return jspb.Message.setOneofField(this, 1, proto.InboundMessage.CompileRequest.Importer.oneofGroups_[0], undefined);
 };
+
 
 /**
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.InboundMessage.CompileRequest.Importer.prototype.hasPath = function () {
+proto.InboundMessage.CompileRequest.Importer.prototype.hasPath = function() {
   return jspb.Message.getField(this, 1) != null;
 };
+
 
 /**
  * optional uint32 importer_id = 2;
  * @return {number}
  */
-proto.InboundMessage.CompileRequest.Importer.prototype.getImporterId = function () {
+proto.InboundMessage.CompileRequest.Importer.prototype.getImporterId = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
 };
+
 
 /**
  * @param {number} value
  * @return {!proto.InboundMessage.CompileRequest.Importer} returns this
  */
-proto.InboundMessage.CompileRequest.Importer.prototype.setImporterId = function (
-  value
-) {
-  return jspb.Message.setOneofField(
-    this,
-    2,
-    proto.InboundMessage.CompileRequest.Importer.oneofGroups_[0],
-    value
-  );
+proto.InboundMessage.CompileRequest.Importer.prototype.setImporterId = function(value) {
+  return jspb.Message.setOneofField(this, 2, proto.InboundMessage.CompileRequest.Importer.oneofGroups_[0], value);
 };
+
 
 /**
  * Clears the field making it undefined.
  * @return {!proto.InboundMessage.CompileRequest.Importer} returns this
  */
-proto.InboundMessage.CompileRequest.Importer.prototype.clearImporterId = function () {
-  return jspb.Message.setOneofField(
-    this,
-    2,
-    proto.InboundMessage.CompileRequest.Importer.oneofGroups_[0],
-    undefined
-  );
+proto.InboundMessage.CompileRequest.Importer.prototype.clearImporterId = function() {
+  return jspb.Message.setOneofField(this, 2, proto.InboundMessage.CompileRequest.Importer.oneofGroups_[0], undefined);
 };
+
 
 /**
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.InboundMessage.CompileRequest.Importer.prototype.hasImporterId = function () {
+proto.InboundMessage.CompileRequest.Importer.prototype.hasImporterId = function() {
   return jspb.Message.getField(this, 2) != null;
 };
+
 
 /**
  * optional uint32 file_importer_id = 3;
  * @return {number}
  */
-proto.InboundMessage.CompileRequest.Importer.prototype.getFileImporterId = function () {
+proto.InboundMessage.CompileRequest.Importer.prototype.getFileImporterId = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 3, 0));
 };
+
 
 /**
  * @param {number} value
  * @return {!proto.InboundMessage.CompileRequest.Importer} returns this
  */
-proto.InboundMessage.CompileRequest.Importer.prototype.setFileImporterId = function (
-  value
-) {
-  return jspb.Message.setOneofField(
-    this,
-    3,
-    proto.InboundMessage.CompileRequest.Importer.oneofGroups_[0],
-    value
-  );
+proto.InboundMessage.CompileRequest.Importer.prototype.setFileImporterId = function(value) {
+  return jspb.Message.setOneofField(this, 3, proto.InboundMessage.CompileRequest.Importer.oneofGroups_[0], value);
 };
+
 
 /**
  * Clears the field making it undefined.
  * @return {!proto.InboundMessage.CompileRequest.Importer} returns this
  */
-proto.InboundMessage.CompileRequest.Importer.prototype.clearFileImporterId = function () {
-  return jspb.Message.setOneofField(
-    this,
-    3,
-    proto.InboundMessage.CompileRequest.Importer.oneofGroups_[0],
-    undefined
-  );
+proto.InboundMessage.CompileRequest.Importer.prototype.clearFileImporterId = function() {
+  return jspb.Message.setOneofField(this, 3, proto.InboundMessage.CompileRequest.Importer.oneofGroups_[0], undefined);
 };
+
 
 /**
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.InboundMessage.CompileRequest.Importer.prototype.hasFileImporterId = function () {
+proto.InboundMessage.CompileRequest.Importer.prototype.hasFileImporterId = function() {
   return jspb.Message.getField(this, 3) != null;
 };
+
 
 /**
  * optional uint32 id = 1;
  * @return {number}
  */
-proto.InboundMessage.CompileRequest.prototype.getId = function () {
+proto.InboundMessage.CompileRequest.prototype.getId = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
 };
+
 
 /**
  * @param {number} value
  * @return {!proto.InboundMessage.CompileRequest} returns this
  */
-proto.InboundMessage.CompileRequest.prototype.setId = function (value) {
+proto.InboundMessage.CompileRequest.prototype.setId = function(value) {
   return jspb.Message.setProto3IntField(this, 1, value);
 };
+
 
 /**
  * optional StringInput string = 2;
  * @return {?proto.InboundMessage.CompileRequest.StringInput}
  */
-proto.InboundMessage.CompileRequest.prototype.getString = function () {
-  return /** @type{?proto.InboundMessage.CompileRequest.StringInput} */ (jspb.Message.getWrapperField(
-    this,
-    proto.InboundMessage.CompileRequest.StringInput,
-    2
-  ));
+proto.InboundMessage.CompileRequest.prototype.getString = function() {
+  return /** @type{?proto.InboundMessage.CompileRequest.StringInput} */ (
+    jspb.Message.getWrapperField(this, proto.InboundMessage.CompileRequest.StringInput, 2));
 };
+
 
 /**
  * @param {?proto.InboundMessage.CompileRequest.StringInput|undefined} value
  * @return {!proto.InboundMessage.CompileRequest} returns this
- */
-proto.InboundMessage.CompileRequest.prototype.setString = function (value) {
-  return jspb.Message.setOneofWrapperField(
-    this,
-    2,
-    proto.InboundMessage.CompileRequest.oneofGroups_[0],
-    value
-  );
+*/
+proto.InboundMessage.CompileRequest.prototype.setString = function(value) {
+  return jspb.Message.setOneofWrapperField(this, 2, proto.InboundMessage.CompileRequest.oneofGroups_[0], value);
 };
+
 
 /**
  * Clears the message field making it undefined.
  * @return {!proto.InboundMessage.CompileRequest} returns this
  */
-proto.InboundMessage.CompileRequest.prototype.clearString = function () {
+proto.InboundMessage.CompileRequest.prototype.clearString = function() {
   return this.setString(undefined);
 };
+
 
 /**
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.InboundMessage.CompileRequest.prototype.hasString = function () {
+proto.InboundMessage.CompileRequest.prototype.hasString = function() {
   return jspb.Message.getField(this, 2) != null;
 };
+
 
 /**
  * optional string path = 3;
  * @return {string}
  */
-proto.InboundMessage.CompileRequest.prototype.getPath = function () {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ''));
+proto.InboundMessage.CompileRequest.prototype.getPath = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
 };
+
 
 /**
  * @param {string} value
  * @return {!proto.InboundMessage.CompileRequest} returns this
  */
-proto.InboundMessage.CompileRequest.prototype.setPath = function (value) {
-  return jspb.Message.setOneofField(
-    this,
-    3,
-    proto.InboundMessage.CompileRequest.oneofGroups_[0],
-    value
-  );
+proto.InboundMessage.CompileRequest.prototype.setPath = function(value) {
+  return jspb.Message.setOneofField(this, 3, proto.InboundMessage.CompileRequest.oneofGroups_[0], value);
 };
+
 
 /**
  * Clears the field making it undefined.
  * @return {!proto.InboundMessage.CompileRequest} returns this
  */
-proto.InboundMessage.CompileRequest.prototype.clearPath = function () {
-  return jspb.Message.setOneofField(
-    this,
-    3,
-    proto.InboundMessage.CompileRequest.oneofGroups_[0],
-    undefined
-  );
+proto.InboundMessage.CompileRequest.prototype.clearPath = function() {
+  return jspb.Message.setOneofField(this, 3, proto.InboundMessage.CompileRequest.oneofGroups_[0], undefined);
 };
+
 
 /**
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.InboundMessage.CompileRequest.prototype.hasPath = function () {
+proto.InboundMessage.CompileRequest.prototype.hasPath = function() {
   return jspb.Message.getField(this, 3) != null;
 };
+
 
 /**
  * optional OutputStyle style = 4;
  * @return {!proto.InboundMessage.CompileRequest.OutputStyle}
  */
-proto.InboundMessage.CompileRequest.prototype.getStyle = function () {
-  return /** @type {!proto.InboundMessage.CompileRequest.OutputStyle} */ (jspb.Message.getFieldWithDefault(
-    this,
-    4,
-    0
-  ));
+proto.InboundMessage.CompileRequest.prototype.getStyle = function() {
+  return /** @type {!proto.InboundMessage.CompileRequest.OutputStyle} */ (jspb.Message.getFieldWithDefault(this, 4, 0));
 };
+
 
 /**
  * @param {!proto.InboundMessage.CompileRequest.OutputStyle} value
  * @return {!proto.InboundMessage.CompileRequest} returns this
  */
-proto.InboundMessage.CompileRequest.prototype.setStyle = function (value) {
+proto.InboundMessage.CompileRequest.prototype.setStyle = function(value) {
   return jspb.Message.setProto3EnumField(this, 4, value);
 };
+
 
 /**
  * optional bool source_map = 5;
  * @return {boolean}
  */
-proto.InboundMessage.CompileRequest.prototype.getSourceMap = function () {
-  return /** @type {boolean} */ (jspb.Message.getBooleanFieldWithDefault(
-    this,
-    5,
-    false
-  ));
+proto.InboundMessage.CompileRequest.prototype.getSourceMap = function() {
+  return /** @type {boolean} */ (jspb.Message.getBooleanFieldWithDefault(this, 5, false));
 };
+
 
 /**
  * @param {boolean} value
  * @return {!proto.InboundMessage.CompileRequest} returns this
  */
-proto.InboundMessage.CompileRequest.prototype.setSourceMap = function (value) {
+proto.InboundMessage.CompileRequest.prototype.setSourceMap = function(value) {
   return jspb.Message.setProto3BooleanField(this, 5, value);
 };
+
 
 /**
  * repeated Importer importers = 6;
  * @return {!Array<!proto.InboundMessage.CompileRequest.Importer>}
  */
-proto.InboundMessage.CompileRequest.prototype.getImportersList = function () {
-  return /** @type{!Array<!proto.InboundMessage.CompileRequest.Importer>} */ (jspb.Message.getRepeatedWrapperField(
-    this,
-    proto.InboundMessage.CompileRequest.Importer,
-    6
-  ));
+proto.InboundMessage.CompileRequest.prototype.getImportersList = function() {
+  return /** @type{!Array<!proto.InboundMessage.CompileRequest.Importer>} */ (
+    jspb.Message.getRepeatedWrapperField(this, proto.InboundMessage.CompileRequest.Importer, 6));
 };
+
 
 /**
  * @param {!Array<!proto.InboundMessage.CompileRequest.Importer>} value
  * @return {!proto.InboundMessage.CompileRequest} returns this
- */
-proto.InboundMessage.CompileRequest.prototype.setImportersList = function (
-  value
-) {
+*/
+proto.InboundMessage.CompileRequest.prototype.setImportersList = function(value) {
   return jspb.Message.setRepeatedWrapperField(this, 6, value);
 };
+
 
 /**
  * @param {!proto.InboundMessage.CompileRequest.Importer=} opt_value
  * @param {number=} opt_index
  * @return {!proto.InboundMessage.CompileRequest.Importer}
  */
-proto.InboundMessage.CompileRequest.prototype.addImporters = function (
-  opt_value,
-  opt_index
-) {
-  return jspb.Message.addToRepeatedWrapperField(
-    this,
-    6,
-    opt_value,
-    proto.InboundMessage.CompileRequest.Importer,
-    opt_index
-  );
+proto.InboundMessage.CompileRequest.prototype.addImporters = function(opt_value, opt_index) {
+  return jspb.Message.addToRepeatedWrapperField(this, 6, opt_value, proto.InboundMessage.CompileRequest.Importer, opt_index);
 };
+
 
 /**
  * Clears the list making it empty but non-null.
  * @return {!proto.InboundMessage.CompileRequest} returns this
  */
-proto.InboundMessage.CompileRequest.prototype.clearImportersList = function () {
+proto.InboundMessage.CompileRequest.prototype.clearImportersList = function() {
   return this.setImportersList([]);
 };
+
 
 /**
  * repeated string global_functions = 7;
  * @return {!Array<string>}
  */
-proto.InboundMessage.CompileRequest.prototype.getGlobalFunctionsList = function () {
+proto.InboundMessage.CompileRequest.prototype.getGlobalFunctionsList = function() {
   return /** @type {!Array<string>} */ (jspb.Message.getRepeatedField(this, 7));
 };
+
 
 /**
  * @param {!Array<string>} value
  * @return {!proto.InboundMessage.CompileRequest} returns this
  */
-proto.InboundMessage.CompileRequest.prototype.setGlobalFunctionsList = function (
-  value
-) {
+proto.InboundMessage.CompileRequest.prototype.setGlobalFunctionsList = function(value) {
   return jspb.Message.setField(this, 7, value || []);
 };
+
 
 /**
  * @param {string} value
  * @param {number=} opt_index
  * @return {!proto.InboundMessage.CompileRequest} returns this
  */
-proto.InboundMessage.CompileRequest.prototype.addGlobalFunctions = function (
-  value,
-  opt_index
-) {
+proto.InboundMessage.CompileRequest.prototype.addGlobalFunctions = function(value, opt_index) {
   return jspb.Message.addToRepeatedField(this, 7, value, opt_index);
 };
+
 
 /**
  * Clears the list making it empty but non-null.
  * @return {!proto.InboundMessage.CompileRequest} returns this
  */
-proto.InboundMessage.CompileRequest.prototype.clearGlobalFunctionsList = function () {
+proto.InboundMessage.CompileRequest.prototype.clearGlobalFunctionsList = function() {
   return this.setGlobalFunctionsList([]);
 };
+
+
 
 /**
  * Oneof group definitions for this message. Each group defines the field
@@ -2176,7 +1889,7 @@ proto.InboundMessage.CompileRequest.prototype.clearGlobalFunctionsList = functio
  * @private {!Array<!Array<number>>}
  * @const
  */
-proto.InboundMessage.CanonicalizeResponse.oneofGroups_ = [[2, 3]];
+proto.InboundMessage.CanonicalizeResponse.oneofGroups_ = [[2,3]];
 
 /**
  * @enum {number}
@@ -2184,81 +1897,71 @@ proto.InboundMessage.CanonicalizeResponse.oneofGroups_ = [[2, 3]];
 proto.InboundMessage.CanonicalizeResponse.ResultCase = {
   RESULT_NOT_SET: 0,
   URL: 2,
-  ERROR: 3,
+  ERROR: 3
 };
 
 /**
  * @return {proto.InboundMessage.CanonicalizeResponse.ResultCase}
  */
-proto.InboundMessage.CanonicalizeResponse.prototype.getResultCase = function () {
-  return /** @type {proto.InboundMessage.CanonicalizeResponse.ResultCase} */ (jspb.Message.computeOneofCase(
-    this,
-    proto.InboundMessage.CanonicalizeResponse.oneofGroups_[0]
-  ));
+proto.InboundMessage.CanonicalizeResponse.prototype.getResultCase = function() {
+  return /** @type {proto.InboundMessage.CanonicalizeResponse.ResultCase} */(jspb.Message.computeOneofCase(this, proto.InboundMessage.CanonicalizeResponse.oneofGroups_[0]));
 };
 
+
+
 if (jspb.Message.GENERATE_TO_OBJECT) {
-  /**
-   * Creates an object representation of this proto.
-   * Field names that are reserved in JavaScript and will be renamed to pb_name.
-   * Optional fields that are not set will be set to undefined.
-   * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
-   * For the list of reserved names please see:
-   *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
-   * @param {boolean=} opt_includeInstance Deprecated. whether to include the
-   *     JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @return {!Object}
-   */
-  proto.InboundMessage.CanonicalizeResponse.prototype.toObject = function (
-    opt_includeInstance
-  ) {
-    return proto.InboundMessage.CanonicalizeResponse.toObject(
-      opt_includeInstance,
-      this
-    );
+/**
+ * Creates an object representation of this proto.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * Optional fields that are not set will be set to undefined.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
+ * @param {boolean=} opt_includeInstance Deprecated. whether to include the
+ *     JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.InboundMessage.CanonicalizeResponse.prototype.toObject = function(opt_includeInstance) {
+  return proto.InboundMessage.CanonicalizeResponse.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Deprecated. Whether to include
+ *     the JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.InboundMessage.CanonicalizeResponse} msg The msg instance to transform.
+ * @return {!Object}
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.InboundMessage.CanonicalizeResponse.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    id: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    url: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    error: jspb.Message.getFieldWithDefault(msg, 3, "")
   };
 
-  /**
-   * Static version of the {@see toObject} method.
-   * @param {boolean|undefined} includeInstance Deprecated. Whether to include
-   *     the JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @param {!proto.InboundMessage.CanonicalizeResponse} msg The msg instance to transform.
-   * @return {!Object}
-   * @suppress {unusedLocalVariables} f is only used for nested messages
-   */
-  proto.InboundMessage.CanonicalizeResponse.toObject = function (
-    includeInstance,
-    msg
-  ) {
-    let f,
-      obj = {
-        id: jspb.Message.getFieldWithDefault(msg, 1, 0),
-        url: jspb.Message.getFieldWithDefault(msg, 2, ''),
-        error: jspb.Message.getFieldWithDefault(msg, 3, ''),
-      };
-
-    if (includeInstance) {
-      obj.$jspbMessageInstance = msg;
-    }
-    return obj;
-  };
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
 }
+
 
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
  * @return {!proto.InboundMessage.CanonicalizeResponse}
  */
-proto.InboundMessage.CanonicalizeResponse.deserializeBinary = function (bytes) {
-  const reader = new jspb.BinaryReader(bytes);
-  const msg = new proto.InboundMessage.CanonicalizeResponse();
-  return proto.InboundMessage.CanonicalizeResponse.deserializeBinaryFromReader(
-    msg,
-    reader
-  );
+proto.InboundMessage.CanonicalizeResponse.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.InboundMessage.CanonicalizeResponse;
+  return proto.InboundMessage.CanonicalizeResponse.deserializeBinaryFromReader(msg, reader);
 };
+
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
@@ -2267,48 +1970,44 @@ proto.InboundMessage.CanonicalizeResponse.deserializeBinary = function (bytes) {
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
  * @return {!proto.InboundMessage.CanonicalizeResponse}
  */
-proto.InboundMessage.CanonicalizeResponse.deserializeBinaryFromReader = function (
-  msg,
-  reader
-) {
+proto.InboundMessage.CanonicalizeResponse.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
     }
-    const field = reader.getFieldNumber();
+    var field = reader.getFieldNumber();
     switch (field) {
-      case 1:
-        var value = /** @type {number} */ (reader.readUint32());
-        msg.setId(value);
-        break;
-      case 2:
-        var value = /** @type {string} */ (reader.readString());
-        msg.setUrl(value);
-        break;
-      case 3:
-        var value = /** @type {string} */ (reader.readString());
-        msg.setError(value);
-        break;
-      default:
-        reader.skipField();
-        break;
+    case 1:
+      var value = /** @type {number} */ (reader.readUint32());
+      msg.setId(value);
+      break;
+    case 2:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setUrl(value);
+      break;
+    case 3:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setError(value);
+      break;
+    default:
+      reader.skipField();
+      break;
     }
   }
   return msg;
 };
 
+
 /**
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.InboundMessage.CanonicalizeResponse.prototype.serializeBinary = function () {
-  const writer = new jspb.BinaryWriter();
-  proto.InboundMessage.CanonicalizeResponse.serializeBinaryToWriter(
-    this,
-    writer
-  );
+proto.InboundMessage.CanonicalizeResponse.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.InboundMessage.CanonicalizeResponse.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
+
 
 /**
  * Serializes the given message to binary data (in protobuf wire
@@ -2317,126 +2016,122 @@ proto.InboundMessage.CanonicalizeResponse.prototype.serializeBinary = function (
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.InboundMessage.CanonicalizeResponse.serializeBinaryToWriter = function (
-  message,
-  writer
-) {
-  let f = undefined;
+proto.InboundMessage.CanonicalizeResponse.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
   f = message.getId();
   if (f !== 0) {
-    writer.writeUint32(1, f);
+    writer.writeUint32(
+      1,
+      f
+    );
   }
   f = /** @type {string} */ (jspb.Message.getField(message, 2));
   if (f != null) {
-    writer.writeString(2, f);
+    writer.writeString(
+      2,
+      f
+    );
   }
   f = /** @type {string} */ (jspb.Message.getField(message, 3));
   if (f != null) {
-    writer.writeString(3, f);
+    writer.writeString(
+      3,
+      f
+    );
   }
 };
+
 
 /**
  * optional uint32 id = 1;
  * @return {number}
  */
-proto.InboundMessage.CanonicalizeResponse.prototype.getId = function () {
+proto.InboundMessage.CanonicalizeResponse.prototype.getId = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
 };
+
 
 /**
  * @param {number} value
  * @return {!proto.InboundMessage.CanonicalizeResponse} returns this
  */
-proto.InboundMessage.CanonicalizeResponse.prototype.setId = function (value) {
+proto.InboundMessage.CanonicalizeResponse.prototype.setId = function(value) {
   return jspb.Message.setProto3IntField(this, 1, value);
 };
+
 
 /**
  * optional string url = 2;
  * @return {string}
  */
-proto.InboundMessage.CanonicalizeResponse.prototype.getUrl = function () {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ''));
+proto.InboundMessage.CanonicalizeResponse.prototype.getUrl = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
+
 
 /**
  * @param {string} value
  * @return {!proto.InboundMessage.CanonicalizeResponse} returns this
  */
-proto.InboundMessage.CanonicalizeResponse.prototype.setUrl = function (value) {
-  return jspb.Message.setOneofField(
-    this,
-    2,
-    proto.InboundMessage.CanonicalizeResponse.oneofGroups_[0],
-    value
-  );
+proto.InboundMessage.CanonicalizeResponse.prototype.setUrl = function(value) {
+  return jspb.Message.setOneofField(this, 2, proto.InboundMessage.CanonicalizeResponse.oneofGroups_[0], value);
 };
+
 
 /**
  * Clears the field making it undefined.
  * @return {!proto.InboundMessage.CanonicalizeResponse} returns this
  */
-proto.InboundMessage.CanonicalizeResponse.prototype.clearUrl = function () {
-  return jspb.Message.setOneofField(
-    this,
-    2,
-    proto.InboundMessage.CanonicalizeResponse.oneofGroups_[0],
-    undefined
-  );
+proto.InboundMessage.CanonicalizeResponse.prototype.clearUrl = function() {
+  return jspb.Message.setOneofField(this, 2, proto.InboundMessage.CanonicalizeResponse.oneofGroups_[0], undefined);
 };
+
 
 /**
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.InboundMessage.CanonicalizeResponse.prototype.hasUrl = function () {
+proto.InboundMessage.CanonicalizeResponse.prototype.hasUrl = function() {
   return jspb.Message.getField(this, 2) != null;
 };
+
 
 /**
  * optional string error = 3;
  * @return {string}
  */
-proto.InboundMessage.CanonicalizeResponse.prototype.getError = function () {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ''));
+proto.InboundMessage.CanonicalizeResponse.prototype.getError = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
 };
+
 
 /**
  * @param {string} value
  * @return {!proto.InboundMessage.CanonicalizeResponse} returns this
  */
-proto.InboundMessage.CanonicalizeResponse.prototype.setError = function (
-  value
-) {
-  return jspb.Message.setOneofField(
-    this,
-    3,
-    proto.InboundMessage.CanonicalizeResponse.oneofGroups_[0],
-    value
-  );
+proto.InboundMessage.CanonicalizeResponse.prototype.setError = function(value) {
+  return jspb.Message.setOneofField(this, 3, proto.InboundMessage.CanonicalizeResponse.oneofGroups_[0], value);
 };
+
 
 /**
  * Clears the field making it undefined.
  * @return {!proto.InboundMessage.CanonicalizeResponse} returns this
  */
-proto.InboundMessage.CanonicalizeResponse.prototype.clearError = function () {
-  return jspb.Message.setOneofField(
-    this,
-    3,
-    proto.InboundMessage.CanonicalizeResponse.oneofGroups_[0],
-    undefined
-  );
+proto.InboundMessage.CanonicalizeResponse.prototype.clearError = function() {
+  return jspb.Message.setOneofField(this, 3, proto.InboundMessage.CanonicalizeResponse.oneofGroups_[0], undefined);
 };
+
 
 /**
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.InboundMessage.CanonicalizeResponse.prototype.hasError = function () {
+proto.InboundMessage.CanonicalizeResponse.prototype.hasError = function() {
   return jspb.Message.getField(this, 3) != null;
 };
+
+
 
 /**
  * Oneof group definitions for this message. Each group defines the field
@@ -2446,7 +2141,7 @@ proto.InboundMessage.CanonicalizeResponse.prototype.hasError = function () {
  * @private {!Array<!Array<number>>}
  * @const
  */
-proto.InboundMessage.ImportResponse.oneofGroups_ = [[2, 3]];
+proto.InboundMessage.ImportResponse.oneofGroups_ = [[2,3]];
 
 /**
  * @enum {number}
@@ -2454,86 +2149,71 @@ proto.InboundMessage.ImportResponse.oneofGroups_ = [[2, 3]];
 proto.InboundMessage.ImportResponse.ResultCase = {
   RESULT_NOT_SET: 0,
   SUCCESS: 2,
-  ERROR: 3,
+  ERROR: 3
 };
 
 /**
  * @return {proto.InboundMessage.ImportResponse.ResultCase}
  */
-proto.InboundMessage.ImportResponse.prototype.getResultCase = function () {
-  return /** @type {proto.InboundMessage.ImportResponse.ResultCase} */ (jspb.Message.computeOneofCase(
-    this,
-    proto.InboundMessage.ImportResponse.oneofGroups_[0]
-  ));
+proto.InboundMessage.ImportResponse.prototype.getResultCase = function() {
+  return /** @type {proto.InboundMessage.ImportResponse.ResultCase} */(jspb.Message.computeOneofCase(this, proto.InboundMessage.ImportResponse.oneofGroups_[0]));
 };
 
+
+
 if (jspb.Message.GENERATE_TO_OBJECT) {
-  /**
-   * Creates an object representation of this proto.
-   * Field names that are reserved in JavaScript and will be renamed to pb_name.
-   * Optional fields that are not set will be set to undefined.
-   * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
-   * For the list of reserved names please see:
-   *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
-   * @param {boolean=} opt_includeInstance Deprecated. whether to include the
-   *     JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @return {!Object}
-   */
-  proto.InboundMessage.ImportResponse.prototype.toObject = function (
-    opt_includeInstance
-  ) {
-    return proto.InboundMessage.ImportResponse.toObject(
-      opt_includeInstance,
-      this
-    );
+/**
+ * Creates an object representation of this proto.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * Optional fields that are not set will be set to undefined.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
+ * @param {boolean=} opt_includeInstance Deprecated. whether to include the
+ *     JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.InboundMessage.ImportResponse.prototype.toObject = function(opt_includeInstance) {
+  return proto.InboundMessage.ImportResponse.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Deprecated. Whether to include
+ *     the JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.InboundMessage.ImportResponse} msg The msg instance to transform.
+ * @return {!Object}
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.InboundMessage.ImportResponse.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    id: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    success: (f = msg.getSuccess()) && proto.InboundMessage.ImportResponse.ImportSuccess.toObject(includeInstance, f),
+    error: jspb.Message.getFieldWithDefault(msg, 3, "")
   };
 
-  /**
-   * Static version of the {@see toObject} method.
-   * @param {boolean|undefined} includeInstance Deprecated. Whether to include
-   *     the JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @param {!proto.InboundMessage.ImportResponse} msg The msg instance to transform.
-   * @return {!Object}
-   * @suppress {unusedLocalVariables} f is only used for nested messages
-   */
-  proto.InboundMessage.ImportResponse.toObject = function (
-    includeInstance,
-    msg
-  ) {
-    let f,
-      obj = {
-        id: jspb.Message.getFieldWithDefault(msg, 1, 0),
-        success:
-          (f = msg.getSuccess()) &&
-          proto.InboundMessage.ImportResponse.ImportSuccess.toObject(
-            includeInstance,
-            f
-          ),
-        error: jspb.Message.getFieldWithDefault(msg, 3, ''),
-      };
-
-    if (includeInstance) {
-      obj.$jspbMessageInstance = msg;
-    }
-    return obj;
-  };
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
 }
+
 
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
  * @return {!proto.InboundMessage.ImportResponse}
  */
-proto.InboundMessage.ImportResponse.deserializeBinary = function (bytes) {
-  const reader = new jspb.BinaryReader(bytes);
-  const msg = new proto.InboundMessage.ImportResponse();
-  return proto.InboundMessage.ImportResponse.deserializeBinaryFromReader(
-    msg,
-    reader
-  );
+proto.InboundMessage.ImportResponse.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.InboundMessage.ImportResponse;
+  return proto.InboundMessage.ImportResponse.deserializeBinaryFromReader(msg, reader);
 };
+
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
@@ -2542,50 +2222,45 @@ proto.InboundMessage.ImportResponse.deserializeBinary = function (bytes) {
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
  * @return {!proto.InboundMessage.ImportResponse}
  */
-proto.InboundMessage.ImportResponse.deserializeBinaryFromReader = function (
-  msg,
-  reader
-) {
+proto.InboundMessage.ImportResponse.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
     }
-    const field = reader.getFieldNumber();
+    var field = reader.getFieldNumber();
     switch (field) {
-      case 1:
-        var value = /** @type {number} */ (reader.readUint32());
-        msg.setId(value);
-        break;
-      case 2:
-        var value = new proto.InboundMessage.ImportResponse.ImportSuccess();
-        reader.readMessage(
-          value,
-          proto.InboundMessage.ImportResponse.ImportSuccess
-            .deserializeBinaryFromReader
-        );
-        msg.setSuccess(value);
-        break;
-      case 3:
-        var value = /** @type {string} */ (reader.readString());
-        msg.setError(value);
-        break;
-      default:
-        reader.skipField();
-        break;
+    case 1:
+      var value = /** @type {number} */ (reader.readUint32());
+      msg.setId(value);
+      break;
+    case 2:
+      var value = new proto.InboundMessage.ImportResponse.ImportSuccess;
+      reader.readMessage(value,proto.InboundMessage.ImportResponse.ImportSuccess.deserializeBinaryFromReader);
+      msg.setSuccess(value);
+      break;
+    case 3:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setError(value);
+      break;
+    default:
+      reader.skipField();
+      break;
     }
   }
   return msg;
 };
 
+
 /**
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.InboundMessage.ImportResponse.prototype.serializeBinary = function () {
-  const writer = new jspb.BinaryWriter();
+proto.InboundMessage.ImportResponse.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
   proto.InboundMessage.ImportResponse.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
+
 
 /**
  * Serializes the given message to binary data (in protobuf wire
@@ -2594,14 +2269,14 @@ proto.InboundMessage.ImportResponse.prototype.serializeBinary = function () {
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.InboundMessage.ImportResponse.serializeBinaryToWriter = function (
-  message,
-  writer
-) {
-  let f = undefined;
+proto.InboundMessage.ImportResponse.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
   f = message.getId();
   if (f !== 0) {
-    writer.writeUint32(1, f);
+    writer.writeUint32(
+      1,
+      f
+    );
   }
   f = message.getSuccess();
   if (f != null) {
@@ -2613,74 +2288,70 @@ proto.InboundMessage.ImportResponse.serializeBinaryToWriter = function (
   }
   f = /** @type {string} */ (jspb.Message.getField(message, 3));
   if (f != null) {
-    writer.writeString(3, f);
+    writer.writeString(
+      3,
+      f
+    );
   }
 };
 
+
+
+
+
 if (jspb.Message.GENERATE_TO_OBJECT) {
-  /**
-   * Creates an object representation of this proto.
-   * Field names that are reserved in JavaScript and will be renamed to pb_name.
-   * Optional fields that are not set will be set to undefined.
-   * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
-   * For the list of reserved names please see:
-   *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
-   * @param {boolean=} opt_includeInstance Deprecated. whether to include the
-   *     JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @return {!Object}
-   */
-  proto.InboundMessage.ImportResponse.ImportSuccess.prototype.toObject = function (
-    opt_includeInstance
-  ) {
-    return proto.InboundMessage.ImportResponse.ImportSuccess.toObject(
-      opt_includeInstance,
-      this
-    );
+/**
+ * Creates an object representation of this proto.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * Optional fields that are not set will be set to undefined.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
+ * @param {boolean=} opt_includeInstance Deprecated. whether to include the
+ *     JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.InboundMessage.ImportResponse.ImportSuccess.prototype.toObject = function(opt_includeInstance) {
+  return proto.InboundMessage.ImportResponse.ImportSuccess.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Deprecated. Whether to include
+ *     the JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.InboundMessage.ImportResponse.ImportSuccess} msg The msg instance to transform.
+ * @return {!Object}
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.InboundMessage.ImportResponse.ImportSuccess.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    contents: jspb.Message.getFieldWithDefault(msg, 1, ""),
+    syntax: jspb.Message.getFieldWithDefault(msg, 2, 0),
+    sourcemapurl: jspb.Message.getFieldWithDefault(msg, 3, "")
   };
 
-  /**
-   * Static version of the {@see toObject} method.
-   * @param {boolean|undefined} includeInstance Deprecated. Whether to include
-   *     the JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @param {!proto.InboundMessage.ImportResponse.ImportSuccess} msg The msg instance to transform.
-   * @return {!Object}
-   * @suppress {unusedLocalVariables} f is only used for nested messages
-   */
-  proto.InboundMessage.ImportResponse.ImportSuccess.toObject = function (
-    includeInstance,
-    msg
-  ) {
-    let f,
-      obj = {
-        contents: jspb.Message.getFieldWithDefault(msg, 1, ''),
-        syntax: jspb.Message.getFieldWithDefault(msg, 2, 0),
-        sourcemapurl: jspb.Message.getFieldWithDefault(msg, 3, ''),
-      };
-
-    if (includeInstance) {
-      obj.$jspbMessageInstance = msg;
-    }
-    return obj;
-  };
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
 }
+
 
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
  * @return {!proto.InboundMessage.ImportResponse.ImportSuccess}
  */
-proto.InboundMessage.ImportResponse.ImportSuccess.deserializeBinary = function (
-  bytes
-) {
-  const reader = new jspb.BinaryReader(bytes);
-  const msg = new proto.InboundMessage.ImportResponse.ImportSuccess();
-  return proto.InboundMessage.ImportResponse.ImportSuccess.deserializeBinaryFromReader(
-    msg,
-    reader
-  );
+proto.InboundMessage.ImportResponse.ImportSuccess.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.InboundMessage.ImportResponse.ImportSuccess;
+  return proto.InboundMessage.ImportResponse.ImportSuccess.deserializeBinaryFromReader(msg, reader);
 };
+
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
@@ -2689,48 +2360,44 @@ proto.InboundMessage.ImportResponse.ImportSuccess.deserializeBinary = function (
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
  * @return {!proto.InboundMessage.ImportResponse.ImportSuccess}
  */
-proto.InboundMessage.ImportResponse.ImportSuccess.deserializeBinaryFromReader = function (
-  msg,
-  reader
-) {
+proto.InboundMessage.ImportResponse.ImportSuccess.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
     }
-    const field = reader.getFieldNumber();
+    var field = reader.getFieldNumber();
     switch (field) {
-      case 1:
-        var value = /** @type {string} */ (reader.readString());
-        msg.setContents(value);
-        break;
-      case 2:
-        var value = /** @type {!proto.InboundMessage.Syntax} */ (reader.readEnum());
-        msg.setSyntax(value);
-        break;
-      case 3:
-        var value = /** @type {string} */ (reader.readString());
-        msg.setSourcemapurl(value);
-        break;
-      default:
-        reader.skipField();
-        break;
+    case 1:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setContents(value);
+      break;
+    case 2:
+      var value = /** @type {!proto.InboundMessage.Syntax} */ (reader.readEnum());
+      msg.setSyntax(value);
+      break;
+    case 3:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setSourcemapurl(value);
+      break;
+    default:
+      reader.skipField();
+      break;
     }
   }
   return msg;
 };
 
+
 /**
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.InboundMessage.ImportResponse.ImportSuccess.prototype.serializeBinary = function () {
-  const writer = new jspb.BinaryWriter();
-  proto.InboundMessage.ImportResponse.ImportSuccess.serializeBinaryToWriter(
-    this,
-    writer
-  );
+proto.InboundMessage.ImportResponse.ImportSuccess.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.InboundMessage.ImportResponse.ImportSuccess.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
+
 
 /**
  * Serializes the given message to binary data (in protobuf wire
@@ -2739,181 +2406,177 @@ proto.InboundMessage.ImportResponse.ImportSuccess.prototype.serializeBinary = fu
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.InboundMessage.ImportResponse.ImportSuccess.serializeBinaryToWriter = function (
-  message,
-  writer
-) {
-  let f = undefined;
+proto.InboundMessage.ImportResponse.ImportSuccess.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
   f = message.getContents();
   if (f.length > 0) {
-    writer.writeString(1, f);
+    writer.writeString(
+      1,
+      f
+    );
   }
   f = message.getSyntax();
   if (f !== 0.0) {
-    writer.writeEnum(2, f);
+    writer.writeEnum(
+      2,
+      f
+    );
   }
   f = message.getSourcemapurl();
   if (f.length > 0) {
-    writer.writeString(3, f);
+    writer.writeString(
+      3,
+      f
+    );
   }
 };
+
 
 /**
  * optional string contents = 1;
  * @return {string}
  */
-proto.InboundMessage.ImportResponse.ImportSuccess.prototype.getContents = function () {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ''));
+proto.InboundMessage.ImportResponse.ImportSuccess.prototype.getContents = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
+
 
 /**
  * @param {string} value
  * @return {!proto.InboundMessage.ImportResponse.ImportSuccess} returns this
  */
-proto.InboundMessage.ImportResponse.ImportSuccess.prototype.setContents = function (
-  value
-) {
+proto.InboundMessage.ImportResponse.ImportSuccess.prototype.setContents = function(value) {
   return jspb.Message.setProto3StringField(this, 1, value);
 };
+
 
 /**
  * optional Syntax syntax = 2;
  * @return {!proto.InboundMessage.Syntax}
  */
-proto.InboundMessage.ImportResponse.ImportSuccess.prototype.getSyntax = function () {
-  return /** @type {!proto.InboundMessage.Syntax} */ (jspb.Message.getFieldWithDefault(
-    this,
-    2,
-    0
-  ));
+proto.InboundMessage.ImportResponse.ImportSuccess.prototype.getSyntax = function() {
+  return /** @type {!proto.InboundMessage.Syntax} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
 };
+
 
 /**
  * @param {!proto.InboundMessage.Syntax} value
  * @return {!proto.InboundMessage.ImportResponse.ImportSuccess} returns this
  */
-proto.InboundMessage.ImportResponse.ImportSuccess.prototype.setSyntax = function (
-  value
-) {
+proto.InboundMessage.ImportResponse.ImportSuccess.prototype.setSyntax = function(value) {
   return jspb.Message.setProto3EnumField(this, 2, value);
 };
+
 
 /**
  * optional string sourceMapUrl = 3;
  * @return {string}
  */
-proto.InboundMessage.ImportResponse.ImportSuccess.prototype.getSourcemapurl = function () {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ''));
+proto.InboundMessage.ImportResponse.ImportSuccess.prototype.getSourcemapurl = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
 };
+
 
 /**
  * @param {string} value
  * @return {!proto.InboundMessage.ImportResponse.ImportSuccess} returns this
  */
-proto.InboundMessage.ImportResponse.ImportSuccess.prototype.setSourcemapurl = function (
-  value
-) {
+proto.InboundMessage.ImportResponse.ImportSuccess.prototype.setSourcemapurl = function(value) {
   return jspb.Message.setProto3StringField(this, 3, value);
 };
+
 
 /**
  * optional uint32 id = 1;
  * @return {number}
  */
-proto.InboundMessage.ImportResponse.prototype.getId = function () {
+proto.InboundMessage.ImportResponse.prototype.getId = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
 };
+
 
 /**
  * @param {number} value
  * @return {!proto.InboundMessage.ImportResponse} returns this
  */
-proto.InboundMessage.ImportResponse.prototype.setId = function (value) {
+proto.InboundMessage.ImportResponse.prototype.setId = function(value) {
   return jspb.Message.setProto3IntField(this, 1, value);
 };
+
 
 /**
  * optional ImportSuccess success = 2;
  * @return {?proto.InboundMessage.ImportResponse.ImportSuccess}
  */
-proto.InboundMessage.ImportResponse.prototype.getSuccess = function () {
-  return /** @type{?proto.InboundMessage.ImportResponse.ImportSuccess} */ (jspb.Message.getWrapperField(
-    this,
-    proto.InboundMessage.ImportResponse.ImportSuccess,
-    2
-  ));
+proto.InboundMessage.ImportResponse.prototype.getSuccess = function() {
+  return /** @type{?proto.InboundMessage.ImportResponse.ImportSuccess} */ (
+    jspb.Message.getWrapperField(this, proto.InboundMessage.ImportResponse.ImportSuccess, 2));
 };
+
 
 /**
  * @param {?proto.InboundMessage.ImportResponse.ImportSuccess|undefined} value
  * @return {!proto.InboundMessage.ImportResponse} returns this
- */
-proto.InboundMessage.ImportResponse.prototype.setSuccess = function (value) {
-  return jspb.Message.setOneofWrapperField(
-    this,
-    2,
-    proto.InboundMessage.ImportResponse.oneofGroups_[0],
-    value
-  );
+*/
+proto.InboundMessage.ImportResponse.prototype.setSuccess = function(value) {
+  return jspb.Message.setOneofWrapperField(this, 2, proto.InboundMessage.ImportResponse.oneofGroups_[0], value);
 };
+
 
 /**
  * Clears the message field making it undefined.
  * @return {!proto.InboundMessage.ImportResponse} returns this
  */
-proto.InboundMessage.ImportResponse.prototype.clearSuccess = function () {
+proto.InboundMessage.ImportResponse.prototype.clearSuccess = function() {
   return this.setSuccess(undefined);
 };
+
 
 /**
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.InboundMessage.ImportResponse.prototype.hasSuccess = function () {
+proto.InboundMessage.ImportResponse.prototype.hasSuccess = function() {
   return jspb.Message.getField(this, 2) != null;
 };
+
 
 /**
  * optional string error = 3;
  * @return {string}
  */
-proto.InboundMessage.ImportResponse.prototype.getError = function () {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ''));
+proto.InboundMessage.ImportResponse.prototype.getError = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
 };
+
 
 /**
  * @param {string} value
  * @return {!proto.InboundMessage.ImportResponse} returns this
  */
-proto.InboundMessage.ImportResponse.prototype.setError = function (value) {
-  return jspb.Message.setOneofField(
-    this,
-    3,
-    proto.InboundMessage.ImportResponse.oneofGroups_[0],
-    value
-  );
+proto.InboundMessage.ImportResponse.prototype.setError = function(value) {
+  return jspb.Message.setOneofField(this, 3, proto.InboundMessage.ImportResponse.oneofGroups_[0], value);
 };
+
 
 /**
  * Clears the field making it undefined.
  * @return {!proto.InboundMessage.ImportResponse} returns this
  */
-proto.InboundMessage.ImportResponse.prototype.clearError = function () {
-  return jspb.Message.setOneofField(
-    this,
-    3,
-    proto.InboundMessage.ImportResponse.oneofGroups_[0],
-    undefined
-  );
+proto.InboundMessage.ImportResponse.prototype.clearError = function() {
+  return jspb.Message.setOneofField(this, 3, proto.InboundMessage.ImportResponse.oneofGroups_[0], undefined);
 };
+
 
 /**
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.InboundMessage.ImportResponse.prototype.hasError = function () {
+proto.InboundMessage.ImportResponse.prototype.hasError = function() {
   return jspb.Message.getField(this, 3) != null;
 };
+
+
 
 /**
  * Oneof group definitions for this message. Each group defines the field
@@ -2923,7 +2586,7 @@ proto.InboundMessage.ImportResponse.prototype.hasError = function () {
  * @private {!Array<!Array<number>>}
  * @const
  */
-proto.InboundMessage.FileImportResponse.oneofGroups_ = [[2, 3]];
+proto.InboundMessage.FileImportResponse.oneofGroups_ = [[2,3]];
 
 /**
  * @enum {number}
@@ -2931,81 +2594,71 @@ proto.InboundMessage.FileImportResponse.oneofGroups_ = [[2, 3]];
 proto.InboundMessage.FileImportResponse.ResultCase = {
   RESULT_NOT_SET: 0,
   FILE_URL: 2,
-  ERROR: 3,
+  ERROR: 3
 };
 
 /**
  * @return {proto.InboundMessage.FileImportResponse.ResultCase}
  */
-proto.InboundMessage.FileImportResponse.prototype.getResultCase = function () {
-  return /** @type {proto.InboundMessage.FileImportResponse.ResultCase} */ (jspb.Message.computeOneofCase(
-    this,
-    proto.InboundMessage.FileImportResponse.oneofGroups_[0]
-  ));
+proto.InboundMessage.FileImportResponse.prototype.getResultCase = function() {
+  return /** @type {proto.InboundMessage.FileImportResponse.ResultCase} */(jspb.Message.computeOneofCase(this, proto.InboundMessage.FileImportResponse.oneofGroups_[0]));
 };
 
+
+
 if (jspb.Message.GENERATE_TO_OBJECT) {
-  /**
-   * Creates an object representation of this proto.
-   * Field names that are reserved in JavaScript and will be renamed to pb_name.
-   * Optional fields that are not set will be set to undefined.
-   * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
-   * For the list of reserved names please see:
-   *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
-   * @param {boolean=} opt_includeInstance Deprecated. whether to include the
-   *     JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @return {!Object}
-   */
-  proto.InboundMessage.FileImportResponse.prototype.toObject = function (
-    opt_includeInstance
-  ) {
-    return proto.InboundMessage.FileImportResponse.toObject(
-      opt_includeInstance,
-      this
-    );
+/**
+ * Creates an object representation of this proto.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * Optional fields that are not set will be set to undefined.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
+ * @param {boolean=} opt_includeInstance Deprecated. whether to include the
+ *     JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.InboundMessage.FileImportResponse.prototype.toObject = function(opt_includeInstance) {
+  return proto.InboundMessage.FileImportResponse.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Deprecated. Whether to include
+ *     the JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.InboundMessage.FileImportResponse} msg The msg instance to transform.
+ * @return {!Object}
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.InboundMessage.FileImportResponse.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    id: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    fileUrl: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    error: jspb.Message.getFieldWithDefault(msg, 3, "")
   };
 
-  /**
-   * Static version of the {@see toObject} method.
-   * @param {boolean|undefined} includeInstance Deprecated. Whether to include
-   *     the JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @param {!proto.InboundMessage.FileImportResponse} msg The msg instance to transform.
-   * @return {!Object}
-   * @suppress {unusedLocalVariables} f is only used for nested messages
-   */
-  proto.InboundMessage.FileImportResponse.toObject = function (
-    includeInstance,
-    msg
-  ) {
-    let f,
-      obj = {
-        id: jspb.Message.getFieldWithDefault(msg, 1, 0),
-        fileUrl: jspb.Message.getFieldWithDefault(msg, 2, ''),
-        error: jspb.Message.getFieldWithDefault(msg, 3, ''),
-      };
-
-    if (includeInstance) {
-      obj.$jspbMessageInstance = msg;
-    }
-    return obj;
-  };
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
 }
+
 
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
  * @return {!proto.InboundMessage.FileImportResponse}
  */
-proto.InboundMessage.FileImportResponse.deserializeBinary = function (bytes) {
-  const reader = new jspb.BinaryReader(bytes);
-  const msg = new proto.InboundMessage.FileImportResponse();
-  return proto.InboundMessage.FileImportResponse.deserializeBinaryFromReader(
-    msg,
-    reader
-  );
+proto.InboundMessage.FileImportResponse.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.InboundMessage.FileImportResponse;
+  return proto.InboundMessage.FileImportResponse.deserializeBinaryFromReader(msg, reader);
 };
+
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
@@ -3014,45 +2667,44 @@ proto.InboundMessage.FileImportResponse.deserializeBinary = function (bytes) {
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
  * @return {!proto.InboundMessage.FileImportResponse}
  */
-proto.InboundMessage.FileImportResponse.deserializeBinaryFromReader = function (
-  msg,
-  reader
-) {
+proto.InboundMessage.FileImportResponse.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
     }
-    const field = reader.getFieldNumber();
+    var field = reader.getFieldNumber();
     switch (field) {
-      case 1:
-        var value = /** @type {number} */ (reader.readUint32());
-        msg.setId(value);
-        break;
-      case 2:
-        var value = /** @type {string} */ (reader.readString());
-        msg.setFileUrl(value);
-        break;
-      case 3:
-        var value = /** @type {string} */ (reader.readString());
-        msg.setError(value);
-        break;
-      default:
-        reader.skipField();
-        break;
+    case 1:
+      var value = /** @type {number} */ (reader.readUint32());
+      msg.setId(value);
+      break;
+    case 2:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setFileUrl(value);
+      break;
+    case 3:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setError(value);
+      break;
+    default:
+      reader.skipField();
+      break;
     }
   }
   return msg;
 };
 
+
 /**
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.InboundMessage.FileImportResponse.prototype.serializeBinary = function () {
-  const writer = new jspb.BinaryWriter();
+proto.InboundMessage.FileImportResponse.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
   proto.InboundMessage.FileImportResponse.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
+
 
 /**
  * Serializes the given message to binary data (in protobuf wire
@@ -3061,126 +2713,122 @@ proto.InboundMessage.FileImportResponse.prototype.serializeBinary = function () 
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.InboundMessage.FileImportResponse.serializeBinaryToWriter = function (
-  message,
-  writer
-) {
-  let f = undefined;
+proto.InboundMessage.FileImportResponse.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
   f = message.getId();
   if (f !== 0) {
-    writer.writeUint32(1, f);
+    writer.writeUint32(
+      1,
+      f
+    );
   }
   f = /** @type {string} */ (jspb.Message.getField(message, 2));
   if (f != null) {
-    writer.writeString(2, f);
+    writer.writeString(
+      2,
+      f
+    );
   }
   f = /** @type {string} */ (jspb.Message.getField(message, 3));
   if (f != null) {
-    writer.writeString(3, f);
+    writer.writeString(
+      3,
+      f
+    );
   }
 };
+
 
 /**
  * optional uint32 id = 1;
  * @return {number}
  */
-proto.InboundMessage.FileImportResponse.prototype.getId = function () {
+proto.InboundMessage.FileImportResponse.prototype.getId = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
 };
+
 
 /**
  * @param {number} value
  * @return {!proto.InboundMessage.FileImportResponse} returns this
  */
-proto.InboundMessage.FileImportResponse.prototype.setId = function (value) {
+proto.InboundMessage.FileImportResponse.prototype.setId = function(value) {
   return jspb.Message.setProto3IntField(this, 1, value);
 };
+
 
 /**
  * optional string file_url = 2;
  * @return {string}
  */
-proto.InboundMessage.FileImportResponse.prototype.getFileUrl = function () {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ''));
+proto.InboundMessage.FileImportResponse.prototype.getFileUrl = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
+
 
 /**
  * @param {string} value
  * @return {!proto.InboundMessage.FileImportResponse} returns this
  */
-proto.InboundMessage.FileImportResponse.prototype.setFileUrl = function (
-  value
-) {
-  return jspb.Message.setOneofField(
-    this,
-    2,
-    proto.InboundMessage.FileImportResponse.oneofGroups_[0],
-    value
-  );
+proto.InboundMessage.FileImportResponse.prototype.setFileUrl = function(value) {
+  return jspb.Message.setOneofField(this, 2, proto.InboundMessage.FileImportResponse.oneofGroups_[0], value);
 };
+
 
 /**
  * Clears the field making it undefined.
  * @return {!proto.InboundMessage.FileImportResponse} returns this
  */
-proto.InboundMessage.FileImportResponse.prototype.clearFileUrl = function () {
-  return jspb.Message.setOneofField(
-    this,
-    2,
-    proto.InboundMessage.FileImportResponse.oneofGroups_[0],
-    undefined
-  );
+proto.InboundMessage.FileImportResponse.prototype.clearFileUrl = function() {
+  return jspb.Message.setOneofField(this, 2, proto.InboundMessage.FileImportResponse.oneofGroups_[0], undefined);
 };
+
 
 /**
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.InboundMessage.FileImportResponse.prototype.hasFileUrl = function () {
+proto.InboundMessage.FileImportResponse.prototype.hasFileUrl = function() {
   return jspb.Message.getField(this, 2) != null;
 };
+
 
 /**
  * optional string error = 3;
  * @return {string}
  */
-proto.InboundMessage.FileImportResponse.prototype.getError = function () {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ''));
+proto.InboundMessage.FileImportResponse.prototype.getError = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
 };
+
 
 /**
  * @param {string} value
  * @return {!proto.InboundMessage.FileImportResponse} returns this
  */
-proto.InboundMessage.FileImportResponse.prototype.setError = function (value) {
-  return jspb.Message.setOneofField(
-    this,
-    3,
-    proto.InboundMessage.FileImportResponse.oneofGroups_[0],
-    value
-  );
+proto.InboundMessage.FileImportResponse.prototype.setError = function(value) {
+  return jspb.Message.setOneofField(this, 3, proto.InboundMessage.FileImportResponse.oneofGroups_[0], value);
 };
+
 
 /**
  * Clears the field making it undefined.
  * @return {!proto.InboundMessage.FileImportResponse} returns this
  */
-proto.InboundMessage.FileImportResponse.prototype.clearError = function () {
-  return jspb.Message.setOneofField(
-    this,
-    3,
-    proto.InboundMessage.FileImportResponse.oneofGroups_[0],
-    undefined
-  );
+proto.InboundMessage.FileImportResponse.prototype.clearError = function() {
+  return jspb.Message.setOneofField(this, 3, proto.InboundMessage.FileImportResponse.oneofGroups_[0], undefined);
 };
+
 
 /**
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.InboundMessage.FileImportResponse.prototype.hasError = function () {
+proto.InboundMessage.FileImportResponse.prototype.hasError = function() {
   return jspb.Message.getField(this, 3) != null;
 };
+
+
 
 /**
  * Oneof group definitions for this message. Each group defines the field
@@ -3190,7 +2838,7 @@ proto.InboundMessage.FileImportResponse.prototype.hasError = function () {
  * @private {!Array<!Array<number>>}
  * @const
  */
-proto.InboundMessage.FunctionCallResponse.oneofGroups_ = [[2, 3]];
+proto.InboundMessage.FunctionCallResponse.oneofGroups_ = [[2,3]];
 
 /**
  * @enum {number}
@@ -3198,82 +2846,71 @@ proto.InboundMessage.FunctionCallResponse.oneofGroups_ = [[2, 3]];
 proto.InboundMessage.FunctionCallResponse.ResultCase = {
   RESULT_NOT_SET: 0,
   SUCCESS: 2,
-  ERROR: 3,
+  ERROR: 3
 };
 
 /**
  * @return {proto.InboundMessage.FunctionCallResponse.ResultCase}
  */
-proto.InboundMessage.FunctionCallResponse.prototype.getResultCase = function () {
-  return /** @type {proto.InboundMessage.FunctionCallResponse.ResultCase} */ (jspb.Message.computeOneofCase(
-    this,
-    proto.InboundMessage.FunctionCallResponse.oneofGroups_[0]
-  ));
+proto.InboundMessage.FunctionCallResponse.prototype.getResultCase = function() {
+  return /** @type {proto.InboundMessage.FunctionCallResponse.ResultCase} */(jspb.Message.computeOneofCase(this, proto.InboundMessage.FunctionCallResponse.oneofGroups_[0]));
 };
 
+
+
 if (jspb.Message.GENERATE_TO_OBJECT) {
-  /**
-   * Creates an object representation of this proto.
-   * Field names that are reserved in JavaScript and will be renamed to pb_name.
-   * Optional fields that are not set will be set to undefined.
-   * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
-   * For the list of reserved names please see:
-   *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
-   * @param {boolean=} opt_includeInstance Deprecated. whether to include the
-   *     JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @return {!Object}
-   */
-  proto.InboundMessage.FunctionCallResponse.prototype.toObject = function (
-    opt_includeInstance
-  ) {
-    return proto.InboundMessage.FunctionCallResponse.toObject(
-      opt_includeInstance,
-      this
-    );
+/**
+ * Creates an object representation of this proto.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * Optional fields that are not set will be set to undefined.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
+ * @param {boolean=} opt_includeInstance Deprecated. whether to include the
+ *     JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.InboundMessage.FunctionCallResponse.prototype.toObject = function(opt_includeInstance) {
+  return proto.InboundMessage.FunctionCallResponse.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Deprecated. Whether to include
+ *     the JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.InboundMessage.FunctionCallResponse} msg The msg instance to transform.
+ * @return {!Object}
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.InboundMessage.FunctionCallResponse.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    id: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    success: (f = msg.getSuccess()) && proto.Value.toObject(includeInstance, f),
+    error: jspb.Message.getFieldWithDefault(msg, 3, "")
   };
 
-  /**
-   * Static version of the {@see toObject} method.
-   * @param {boolean|undefined} includeInstance Deprecated. Whether to include
-   *     the JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @param {!proto.InboundMessage.FunctionCallResponse} msg The msg instance to transform.
-   * @return {!Object}
-   * @suppress {unusedLocalVariables} f is only used for nested messages
-   */
-  proto.InboundMessage.FunctionCallResponse.toObject = function (
-    includeInstance,
-    msg
-  ) {
-    let f,
-      obj = {
-        id: jspb.Message.getFieldWithDefault(msg, 1, 0),
-        success:
-          (f = msg.getSuccess()) && proto.Value.toObject(includeInstance, f),
-        error: jspb.Message.getFieldWithDefault(msg, 3, ''),
-      };
-
-    if (includeInstance) {
-      obj.$jspbMessageInstance = msg;
-    }
-    return obj;
-  };
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
 }
+
 
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
  * @return {!proto.InboundMessage.FunctionCallResponse}
  */
-proto.InboundMessage.FunctionCallResponse.deserializeBinary = function (bytes) {
-  const reader = new jspb.BinaryReader(bytes);
-  const msg = new proto.InboundMessage.FunctionCallResponse();
-  return proto.InboundMessage.FunctionCallResponse.deserializeBinaryFromReader(
-    msg,
-    reader
-  );
+proto.InboundMessage.FunctionCallResponse.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.InboundMessage.FunctionCallResponse;
+  return proto.InboundMessage.FunctionCallResponse.deserializeBinaryFromReader(msg, reader);
 };
+
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
@@ -3282,49 +2919,45 @@ proto.InboundMessage.FunctionCallResponse.deserializeBinary = function (bytes) {
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
  * @return {!proto.InboundMessage.FunctionCallResponse}
  */
-proto.InboundMessage.FunctionCallResponse.deserializeBinaryFromReader = function (
-  msg,
-  reader
-) {
+proto.InboundMessage.FunctionCallResponse.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
     }
-    const field = reader.getFieldNumber();
+    var field = reader.getFieldNumber();
     switch (field) {
-      case 1:
-        var value = /** @type {number} */ (reader.readUint32());
-        msg.setId(value);
-        break;
-      case 2:
-        var value = new proto.Value();
-        reader.readMessage(value, proto.Value.deserializeBinaryFromReader);
-        msg.setSuccess(value);
-        break;
-      case 3:
-        var value = /** @type {string} */ (reader.readString());
-        msg.setError(value);
-        break;
-      default:
-        reader.skipField();
-        break;
+    case 1:
+      var value = /** @type {number} */ (reader.readUint32());
+      msg.setId(value);
+      break;
+    case 2:
+      var value = new proto.Value;
+      reader.readMessage(value,proto.Value.deserializeBinaryFromReader);
+      msg.setSuccess(value);
+      break;
+    case 3:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setError(value);
+      break;
+    default:
+      reader.skipField();
+      break;
     }
   }
   return msg;
 };
 
+
 /**
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.InboundMessage.FunctionCallResponse.prototype.serializeBinary = function () {
-  const writer = new jspb.BinaryWriter();
-  proto.InboundMessage.FunctionCallResponse.serializeBinaryToWriter(
-    this,
-    writer
-  );
+proto.InboundMessage.FunctionCallResponse.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.InboundMessage.FunctionCallResponse.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
+
 
 /**
  * Serializes the given message to binary data (in protobuf wire
@@ -3333,373 +2966,346 @@ proto.InboundMessage.FunctionCallResponse.prototype.serializeBinary = function (
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.InboundMessage.FunctionCallResponse.serializeBinaryToWriter = function (
-  message,
-  writer
-) {
-  let f = undefined;
+proto.InboundMessage.FunctionCallResponse.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
   f = message.getId();
   if (f !== 0) {
-    writer.writeUint32(1, f);
+    writer.writeUint32(
+      1,
+      f
+    );
   }
   f = message.getSuccess();
   if (f != null) {
-    writer.writeMessage(2, f, proto.Value.serializeBinaryToWriter);
+    writer.writeMessage(
+      2,
+      f,
+      proto.Value.serializeBinaryToWriter
+    );
   }
   f = /** @type {string} */ (jspb.Message.getField(message, 3));
   if (f != null) {
-    writer.writeString(3, f);
+    writer.writeString(
+      3,
+      f
+    );
   }
 };
+
 
 /**
  * optional uint32 id = 1;
  * @return {number}
  */
-proto.InboundMessage.FunctionCallResponse.prototype.getId = function () {
+proto.InboundMessage.FunctionCallResponse.prototype.getId = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
 };
+
 
 /**
  * @param {number} value
  * @return {!proto.InboundMessage.FunctionCallResponse} returns this
  */
-proto.InboundMessage.FunctionCallResponse.prototype.setId = function (value) {
+proto.InboundMessage.FunctionCallResponse.prototype.setId = function(value) {
   return jspb.Message.setProto3IntField(this, 1, value);
 };
+
 
 /**
  * optional Value success = 2;
  * @return {?proto.Value}
  */
-proto.InboundMessage.FunctionCallResponse.prototype.getSuccess = function () {
-  return /** @type{?proto.Value} */ (jspb.Message.getWrapperField(
-    this,
-    proto.Value,
-    2
-  ));
+proto.InboundMessage.FunctionCallResponse.prototype.getSuccess = function() {
+  return /** @type{?proto.Value} */ (
+    jspb.Message.getWrapperField(this, proto.Value, 2));
 };
+
 
 /**
  * @param {?proto.Value|undefined} value
  * @return {!proto.InboundMessage.FunctionCallResponse} returns this
- */
-proto.InboundMessage.FunctionCallResponse.prototype.setSuccess = function (
-  value
-) {
-  return jspb.Message.setOneofWrapperField(
-    this,
-    2,
-    proto.InboundMessage.FunctionCallResponse.oneofGroups_[0],
-    value
-  );
+*/
+proto.InboundMessage.FunctionCallResponse.prototype.setSuccess = function(value) {
+  return jspb.Message.setOneofWrapperField(this, 2, proto.InboundMessage.FunctionCallResponse.oneofGroups_[0], value);
 };
+
 
 /**
  * Clears the message field making it undefined.
  * @return {!proto.InboundMessage.FunctionCallResponse} returns this
  */
-proto.InboundMessage.FunctionCallResponse.prototype.clearSuccess = function () {
+proto.InboundMessage.FunctionCallResponse.prototype.clearSuccess = function() {
   return this.setSuccess(undefined);
 };
+
 
 /**
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.InboundMessage.FunctionCallResponse.prototype.hasSuccess = function () {
+proto.InboundMessage.FunctionCallResponse.prototype.hasSuccess = function() {
   return jspb.Message.getField(this, 2) != null;
 };
+
 
 /**
  * optional string error = 3;
  * @return {string}
  */
-proto.InboundMessage.FunctionCallResponse.prototype.getError = function () {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ''));
+proto.InboundMessage.FunctionCallResponse.prototype.getError = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
 };
+
 
 /**
  * @param {string} value
  * @return {!proto.InboundMessage.FunctionCallResponse} returns this
  */
-proto.InboundMessage.FunctionCallResponse.prototype.setError = function (
-  value
-) {
-  return jspb.Message.setOneofField(
-    this,
-    3,
-    proto.InboundMessage.FunctionCallResponse.oneofGroups_[0],
-    value
-  );
+proto.InboundMessage.FunctionCallResponse.prototype.setError = function(value) {
+  return jspb.Message.setOneofField(this, 3, proto.InboundMessage.FunctionCallResponse.oneofGroups_[0], value);
 };
+
 
 /**
  * Clears the field making it undefined.
  * @return {!proto.InboundMessage.FunctionCallResponse} returns this
  */
-proto.InboundMessage.FunctionCallResponse.prototype.clearError = function () {
-  return jspb.Message.setOneofField(
-    this,
-    3,
-    proto.InboundMessage.FunctionCallResponse.oneofGroups_[0],
-    undefined
-  );
+proto.InboundMessage.FunctionCallResponse.prototype.clearError = function() {
+  return jspb.Message.setOneofField(this, 3, proto.InboundMessage.FunctionCallResponse.oneofGroups_[0], undefined);
 };
+
 
 /**
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.InboundMessage.FunctionCallResponse.prototype.hasError = function () {
+proto.InboundMessage.FunctionCallResponse.prototype.hasError = function() {
   return jspb.Message.getField(this, 3) != null;
 };
+
 
 /**
  * optional ProtocolError error = 1;
  * @return {?proto.ProtocolError}
  */
-proto.InboundMessage.prototype.getError = function () {
-  return /** @type{?proto.ProtocolError} */ (jspb.Message.getWrapperField(
-    this,
-    proto.ProtocolError,
-    1
-  ));
+proto.InboundMessage.prototype.getError = function() {
+  return /** @type{?proto.ProtocolError} */ (
+    jspb.Message.getWrapperField(this, proto.ProtocolError, 1));
 };
+
 
 /**
  * @param {?proto.ProtocolError|undefined} value
  * @return {!proto.InboundMessage} returns this
- */
-proto.InboundMessage.prototype.setError = function (value) {
-  return jspb.Message.setOneofWrapperField(
-    this,
-    1,
-    proto.InboundMessage.oneofGroups_[0],
-    value
-  );
+*/
+proto.InboundMessage.prototype.setError = function(value) {
+  return jspb.Message.setOneofWrapperField(this, 1, proto.InboundMessage.oneofGroups_[0], value);
 };
+
 
 /**
  * Clears the message field making it undefined.
  * @return {!proto.InboundMessage} returns this
  */
-proto.InboundMessage.prototype.clearError = function () {
+proto.InboundMessage.prototype.clearError = function() {
   return this.setError(undefined);
 };
+
 
 /**
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.InboundMessage.prototype.hasError = function () {
+proto.InboundMessage.prototype.hasError = function() {
   return jspb.Message.getField(this, 1) != null;
 };
+
 
 /**
  * optional CompileRequest compileRequest = 2;
  * @return {?proto.InboundMessage.CompileRequest}
  */
-proto.InboundMessage.prototype.getCompilerequest = function () {
-  return /** @type{?proto.InboundMessage.CompileRequest} */ (jspb.Message.getWrapperField(
-    this,
-    proto.InboundMessage.CompileRequest,
-    2
-  ));
+proto.InboundMessage.prototype.getCompilerequest = function() {
+  return /** @type{?proto.InboundMessage.CompileRequest} */ (
+    jspb.Message.getWrapperField(this, proto.InboundMessage.CompileRequest, 2));
 };
+
 
 /**
  * @param {?proto.InboundMessage.CompileRequest|undefined} value
  * @return {!proto.InboundMessage} returns this
- */
-proto.InboundMessage.prototype.setCompilerequest = function (value) {
-  return jspb.Message.setOneofWrapperField(
-    this,
-    2,
-    proto.InboundMessage.oneofGroups_[0],
-    value
-  );
+*/
+proto.InboundMessage.prototype.setCompilerequest = function(value) {
+  return jspb.Message.setOneofWrapperField(this, 2, proto.InboundMessage.oneofGroups_[0], value);
 };
+
 
 /**
  * Clears the message field making it undefined.
  * @return {!proto.InboundMessage} returns this
  */
-proto.InboundMessage.prototype.clearCompilerequest = function () {
+proto.InboundMessage.prototype.clearCompilerequest = function() {
   return this.setCompilerequest(undefined);
 };
+
 
 /**
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.InboundMessage.prototype.hasCompilerequest = function () {
+proto.InboundMessage.prototype.hasCompilerequest = function() {
   return jspb.Message.getField(this, 2) != null;
 };
+
 
 /**
  * optional CanonicalizeResponse canonicalizeResponse = 3;
  * @return {?proto.InboundMessage.CanonicalizeResponse}
  */
-proto.InboundMessage.prototype.getCanonicalizeresponse = function () {
-  return /** @type{?proto.InboundMessage.CanonicalizeResponse} */ (jspb.Message.getWrapperField(
-    this,
-    proto.InboundMessage.CanonicalizeResponse,
-    3
-  ));
+proto.InboundMessage.prototype.getCanonicalizeresponse = function() {
+  return /** @type{?proto.InboundMessage.CanonicalizeResponse} */ (
+    jspb.Message.getWrapperField(this, proto.InboundMessage.CanonicalizeResponse, 3));
 };
+
 
 /**
  * @param {?proto.InboundMessage.CanonicalizeResponse|undefined} value
  * @return {!proto.InboundMessage} returns this
- */
-proto.InboundMessage.prototype.setCanonicalizeresponse = function (value) {
-  return jspb.Message.setOneofWrapperField(
-    this,
-    3,
-    proto.InboundMessage.oneofGroups_[0],
-    value
-  );
+*/
+proto.InboundMessage.prototype.setCanonicalizeresponse = function(value) {
+  return jspb.Message.setOneofWrapperField(this, 3, proto.InboundMessage.oneofGroups_[0], value);
 };
+
 
 /**
  * Clears the message field making it undefined.
  * @return {!proto.InboundMessage} returns this
  */
-proto.InboundMessage.prototype.clearCanonicalizeresponse = function () {
+proto.InboundMessage.prototype.clearCanonicalizeresponse = function() {
   return this.setCanonicalizeresponse(undefined);
 };
+
 
 /**
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.InboundMessage.prototype.hasCanonicalizeresponse = function () {
+proto.InboundMessage.prototype.hasCanonicalizeresponse = function() {
   return jspb.Message.getField(this, 3) != null;
 };
+
 
 /**
  * optional ImportResponse importResponse = 4;
  * @return {?proto.InboundMessage.ImportResponse}
  */
-proto.InboundMessage.prototype.getImportresponse = function () {
-  return /** @type{?proto.InboundMessage.ImportResponse} */ (jspb.Message.getWrapperField(
-    this,
-    proto.InboundMessage.ImportResponse,
-    4
-  ));
+proto.InboundMessage.prototype.getImportresponse = function() {
+  return /** @type{?proto.InboundMessage.ImportResponse} */ (
+    jspb.Message.getWrapperField(this, proto.InboundMessage.ImportResponse, 4));
 };
+
 
 /**
  * @param {?proto.InboundMessage.ImportResponse|undefined} value
  * @return {!proto.InboundMessage} returns this
- */
-proto.InboundMessage.prototype.setImportresponse = function (value) {
-  return jspb.Message.setOneofWrapperField(
-    this,
-    4,
-    proto.InboundMessage.oneofGroups_[0],
-    value
-  );
+*/
+proto.InboundMessage.prototype.setImportresponse = function(value) {
+  return jspb.Message.setOneofWrapperField(this, 4, proto.InboundMessage.oneofGroups_[0], value);
 };
+
 
 /**
  * Clears the message field making it undefined.
  * @return {!proto.InboundMessage} returns this
  */
-proto.InboundMessage.prototype.clearImportresponse = function () {
+proto.InboundMessage.prototype.clearImportresponse = function() {
   return this.setImportresponse(undefined);
 };
+
 
 /**
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.InboundMessage.prototype.hasImportresponse = function () {
+proto.InboundMessage.prototype.hasImportresponse = function() {
   return jspb.Message.getField(this, 4) != null;
 };
+
 
 /**
  * optional FileImportResponse fileImportResponse = 5;
  * @return {?proto.InboundMessage.FileImportResponse}
  */
-proto.InboundMessage.prototype.getFileimportresponse = function () {
-  return /** @type{?proto.InboundMessage.FileImportResponse} */ (jspb.Message.getWrapperField(
-    this,
-    proto.InboundMessage.FileImportResponse,
-    5
-  ));
+proto.InboundMessage.prototype.getFileimportresponse = function() {
+  return /** @type{?proto.InboundMessage.FileImportResponse} */ (
+    jspb.Message.getWrapperField(this, proto.InboundMessage.FileImportResponse, 5));
 };
+
 
 /**
  * @param {?proto.InboundMessage.FileImportResponse|undefined} value
  * @return {!proto.InboundMessage} returns this
- */
-proto.InboundMessage.prototype.setFileimportresponse = function (value) {
-  return jspb.Message.setOneofWrapperField(
-    this,
-    5,
-    proto.InboundMessage.oneofGroups_[0],
-    value
-  );
+*/
+proto.InboundMessage.prototype.setFileimportresponse = function(value) {
+  return jspb.Message.setOneofWrapperField(this, 5, proto.InboundMessage.oneofGroups_[0], value);
 };
+
 
 /**
  * Clears the message field making it undefined.
  * @return {!proto.InboundMessage} returns this
  */
-proto.InboundMessage.prototype.clearFileimportresponse = function () {
+proto.InboundMessage.prototype.clearFileimportresponse = function() {
   return this.setFileimportresponse(undefined);
 };
+
 
 /**
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.InboundMessage.prototype.hasFileimportresponse = function () {
+proto.InboundMessage.prototype.hasFileimportresponse = function() {
   return jspb.Message.getField(this, 5) != null;
 };
+
 
 /**
  * optional FunctionCallResponse functionCallResponse = 6;
  * @return {?proto.InboundMessage.FunctionCallResponse}
  */
-proto.InboundMessage.prototype.getFunctioncallresponse = function () {
-  return /** @type{?proto.InboundMessage.FunctionCallResponse} */ (jspb.Message.getWrapperField(
-    this,
-    proto.InboundMessage.FunctionCallResponse,
-    6
-  ));
+proto.InboundMessage.prototype.getFunctioncallresponse = function() {
+  return /** @type{?proto.InboundMessage.FunctionCallResponse} */ (
+    jspb.Message.getWrapperField(this, proto.InboundMessage.FunctionCallResponse, 6));
 };
+
 
 /**
  * @param {?proto.InboundMessage.FunctionCallResponse|undefined} value
  * @return {!proto.InboundMessage} returns this
- */
-proto.InboundMessage.prototype.setFunctioncallresponse = function (value) {
-  return jspb.Message.setOneofWrapperField(
-    this,
-    6,
-    proto.InboundMessage.oneofGroups_[0],
-    value
-  );
+*/
+proto.InboundMessage.prototype.setFunctioncallresponse = function(value) {
+  return jspb.Message.setOneofWrapperField(this, 6, proto.InboundMessage.oneofGroups_[0], value);
 };
+
 
 /**
  * Clears the message field making it undefined.
  * @return {!proto.InboundMessage} returns this
  */
-proto.InboundMessage.prototype.clearFunctioncallresponse = function () {
+proto.InboundMessage.prototype.clearFunctioncallresponse = function() {
   return this.setFunctioncallresponse(undefined);
 };
+
 
 /**
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.InboundMessage.prototype.hasFunctioncallresponse = function () {
+proto.InboundMessage.prototype.hasFunctioncallresponse = function() {
   return jspb.Message.getField(this, 6) != null;
 };
+
+
 
 /**
  * Oneof group definitions for this message. Each group defines the field
@@ -3709,7 +3315,7 @@ proto.InboundMessage.prototype.hasFunctioncallresponse = function () {
  * @private {!Array<!Array<number>>}
  * @const
  */
-proto.OutboundMessage.oneofGroups_ = [[1, 2, 3, 4, 5, 6, 7]];
+proto.OutboundMessage.oneofGroups_ = [[1,2,3,4,5,6,7]];
 
 /**
  * @enum {number}
@@ -3722,94 +3328,75 @@ proto.OutboundMessage.MessageCase = {
   CANONICALIZEREQUEST: 4,
   IMPORTREQUEST: 5,
   FILEIMPORTREQUEST: 6,
-  FUNCTIONCALLREQUEST: 7,
+  FUNCTIONCALLREQUEST: 7
 };
 
 /**
  * @return {proto.OutboundMessage.MessageCase}
  */
-proto.OutboundMessage.prototype.getMessageCase = function () {
-  return /** @type {proto.OutboundMessage.MessageCase} */ (jspb.Message.computeOneofCase(
-    this,
-    proto.OutboundMessage.oneofGroups_[0]
-  ));
+proto.OutboundMessage.prototype.getMessageCase = function() {
+  return /** @type {proto.OutboundMessage.MessageCase} */(jspb.Message.computeOneofCase(this, proto.OutboundMessage.oneofGroups_[0]));
 };
 
+
+
 if (jspb.Message.GENERATE_TO_OBJECT) {
-  /**
-   * Creates an object representation of this proto.
-   * Field names that are reserved in JavaScript and will be renamed to pb_name.
-   * Optional fields that are not set will be set to undefined.
-   * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
-   * For the list of reserved names please see:
-   *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
-   * @param {boolean=} opt_includeInstance Deprecated. whether to include the
-   *     JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @return {!Object}
-   */
-  proto.OutboundMessage.prototype.toObject = function (opt_includeInstance) {
-    return proto.OutboundMessage.toObject(opt_includeInstance, this);
+/**
+ * Creates an object representation of this proto.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * Optional fields that are not set will be set to undefined.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
+ * @param {boolean=} opt_includeInstance Deprecated. whether to include the
+ *     JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.OutboundMessage.prototype.toObject = function(opt_includeInstance) {
+  return proto.OutboundMessage.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Deprecated. Whether to include
+ *     the JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.OutboundMessage} msg The msg instance to transform.
+ * @return {!Object}
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.OutboundMessage.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    error: (f = msg.getError()) && proto.ProtocolError.toObject(includeInstance, f),
+    compileresponse: (f = msg.getCompileresponse()) && proto.OutboundMessage.CompileResponse.toObject(includeInstance, f),
+    logevent: (f = msg.getLogevent()) && proto.OutboundMessage.LogEvent.toObject(includeInstance, f),
+    canonicalizerequest: (f = msg.getCanonicalizerequest()) && proto.OutboundMessage.CanonicalizeRequest.toObject(includeInstance, f),
+    importrequest: (f = msg.getImportrequest()) && proto.OutboundMessage.ImportRequest.toObject(includeInstance, f),
+    fileimportrequest: (f = msg.getFileimportrequest()) && proto.OutboundMessage.FileImportRequest.toObject(includeInstance, f),
+    functioncallrequest: (f = msg.getFunctioncallrequest()) && proto.OutboundMessage.FunctionCallRequest.toObject(includeInstance, f)
   };
 
-  /**
-   * Static version of the {@see toObject} method.
-   * @param {boolean|undefined} includeInstance Deprecated. Whether to include
-   *     the JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @param {!proto.OutboundMessage} msg The msg instance to transform.
-   * @return {!Object}
-   * @suppress {unusedLocalVariables} f is only used for nested messages
-   */
-  proto.OutboundMessage.toObject = function (includeInstance, msg) {
-    let f,
-      obj = {
-        error:
-          (f = msg.getError()) &&
-          proto.ProtocolError.toObject(includeInstance, f),
-        compileresponse:
-          (f = msg.getCompileresponse()) &&
-          proto.OutboundMessage.CompileResponse.toObject(includeInstance, f),
-        logevent:
-          (f = msg.getLogevent()) &&
-          proto.OutboundMessage.LogEvent.toObject(includeInstance, f),
-        canonicalizerequest:
-          (f = msg.getCanonicalizerequest()) &&
-          proto.OutboundMessage.CanonicalizeRequest.toObject(
-            includeInstance,
-            f
-          ),
-        importrequest:
-          (f = msg.getImportrequest()) &&
-          proto.OutboundMessage.ImportRequest.toObject(includeInstance, f),
-        fileimportrequest:
-          (f = msg.getFileimportrequest()) &&
-          proto.OutboundMessage.FileImportRequest.toObject(includeInstance, f),
-        functioncallrequest:
-          (f = msg.getFunctioncallrequest()) &&
-          proto.OutboundMessage.FunctionCallRequest.toObject(
-            includeInstance,
-            f
-          ),
-      };
-
-    if (includeInstance) {
-      obj.$jspbMessageInstance = msg;
-    }
-    return obj;
-  };
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
 }
+
 
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
  * @return {!proto.OutboundMessage}
  */
-proto.OutboundMessage.deserializeBinary = function (bytes) {
-  const reader = new jspb.BinaryReader(bytes);
-  const msg = new proto.OutboundMessage();
+proto.OutboundMessage.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.OutboundMessage;
   return proto.OutboundMessage.deserializeBinaryFromReader(msg, reader);
 };
+
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
@@ -3818,86 +3405,67 @@ proto.OutboundMessage.deserializeBinary = function (bytes) {
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
  * @return {!proto.OutboundMessage}
  */
-proto.OutboundMessage.deserializeBinaryFromReader = function (msg, reader) {
+proto.OutboundMessage.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
     }
-    const field = reader.getFieldNumber();
+    var field = reader.getFieldNumber();
     switch (field) {
-      case 1:
-        var value = new proto.ProtocolError();
-        reader.readMessage(
-          value,
-          proto.ProtocolError.deserializeBinaryFromReader
-        );
-        msg.setError(value);
-        break;
-      case 2:
-        var value = new proto.OutboundMessage.CompileResponse();
-        reader.readMessage(
-          value,
-          proto.OutboundMessage.CompileResponse.deserializeBinaryFromReader
-        );
-        msg.setCompileresponse(value);
-        break;
-      case 3:
-        var value = new proto.OutboundMessage.LogEvent();
-        reader.readMessage(
-          value,
-          proto.OutboundMessage.LogEvent.deserializeBinaryFromReader
-        );
-        msg.setLogevent(value);
-        break;
-      case 4:
-        var value = new proto.OutboundMessage.CanonicalizeRequest();
-        reader.readMessage(
-          value,
-          proto.OutboundMessage.CanonicalizeRequest.deserializeBinaryFromReader
-        );
-        msg.setCanonicalizerequest(value);
-        break;
-      case 5:
-        var value = new proto.OutboundMessage.ImportRequest();
-        reader.readMessage(
-          value,
-          proto.OutboundMessage.ImportRequest.deserializeBinaryFromReader
-        );
-        msg.setImportrequest(value);
-        break;
-      case 6:
-        var value = new proto.OutboundMessage.FileImportRequest();
-        reader.readMessage(
-          value,
-          proto.OutboundMessage.FileImportRequest.deserializeBinaryFromReader
-        );
-        msg.setFileimportrequest(value);
-        break;
-      case 7:
-        var value = new proto.OutboundMessage.FunctionCallRequest();
-        reader.readMessage(
-          value,
-          proto.OutboundMessage.FunctionCallRequest.deserializeBinaryFromReader
-        );
-        msg.setFunctioncallrequest(value);
-        break;
-      default:
-        reader.skipField();
-        break;
+    case 1:
+      var value = new proto.ProtocolError;
+      reader.readMessage(value,proto.ProtocolError.deserializeBinaryFromReader);
+      msg.setError(value);
+      break;
+    case 2:
+      var value = new proto.OutboundMessage.CompileResponse;
+      reader.readMessage(value,proto.OutboundMessage.CompileResponse.deserializeBinaryFromReader);
+      msg.setCompileresponse(value);
+      break;
+    case 3:
+      var value = new proto.OutboundMessage.LogEvent;
+      reader.readMessage(value,proto.OutboundMessage.LogEvent.deserializeBinaryFromReader);
+      msg.setLogevent(value);
+      break;
+    case 4:
+      var value = new proto.OutboundMessage.CanonicalizeRequest;
+      reader.readMessage(value,proto.OutboundMessage.CanonicalizeRequest.deserializeBinaryFromReader);
+      msg.setCanonicalizerequest(value);
+      break;
+    case 5:
+      var value = new proto.OutboundMessage.ImportRequest;
+      reader.readMessage(value,proto.OutboundMessage.ImportRequest.deserializeBinaryFromReader);
+      msg.setImportrequest(value);
+      break;
+    case 6:
+      var value = new proto.OutboundMessage.FileImportRequest;
+      reader.readMessage(value,proto.OutboundMessage.FileImportRequest.deserializeBinaryFromReader);
+      msg.setFileimportrequest(value);
+      break;
+    case 7:
+      var value = new proto.OutboundMessage.FunctionCallRequest;
+      reader.readMessage(value,proto.OutboundMessage.FunctionCallRequest.deserializeBinaryFromReader);
+      msg.setFunctioncallrequest(value);
+      break;
+    default:
+      reader.skipField();
+      break;
     }
   }
   return msg;
 };
 
+
 /**
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.OutboundMessage.prototype.serializeBinary = function () {
-  const writer = new jspb.BinaryWriter();
+proto.OutboundMessage.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
   proto.OutboundMessage.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
+
 
 /**
  * Serializes the given message to binary data (in protobuf wire
@@ -3906,11 +3474,15 @@ proto.OutboundMessage.prototype.serializeBinary = function () {
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.OutboundMessage.serializeBinaryToWriter = function (message, writer) {
-  let f = undefined;
+proto.OutboundMessage.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
   f = message.getError();
   if (f != null) {
-    writer.writeMessage(1, f, proto.ProtocolError.serializeBinaryToWriter);
+    writer.writeMessage(
+      1,
+      f,
+      proto.ProtocolError.serializeBinaryToWriter
+    );
   }
   f = message.getCompileresponse();
   if (f != null) {
@@ -3962,6 +3534,8 @@ proto.OutboundMessage.serializeBinaryToWriter = function (message, writer) {
   }
 };
 
+
+
 /**
  * Oneof group definitions for this message. Each group defines the field
  * numbers belonging to that group. When of these fields' value is set, all
@@ -3970,7 +3544,7 @@ proto.OutboundMessage.serializeBinaryToWriter = function (message, writer) {
  * @private {!Array<!Array<number>>}
  * @const
  */
-proto.OutboundMessage.CompileResponse.oneofGroups_ = [[2, 3]];
+proto.OutboundMessage.CompileResponse.oneofGroups_ = [[2,3]];
 
 /**
  * @enum {number}
@@ -3978,91 +3552,71 @@ proto.OutboundMessage.CompileResponse.oneofGroups_ = [[2, 3]];
 proto.OutboundMessage.CompileResponse.ResultCase = {
   RESULT_NOT_SET: 0,
   SUCCESS: 2,
-  FAILURE: 3,
+  FAILURE: 3
 };
 
 /**
  * @return {proto.OutboundMessage.CompileResponse.ResultCase}
  */
-proto.OutboundMessage.CompileResponse.prototype.getResultCase = function () {
-  return /** @type {proto.OutboundMessage.CompileResponse.ResultCase} */ (jspb.Message.computeOneofCase(
-    this,
-    proto.OutboundMessage.CompileResponse.oneofGroups_[0]
-  ));
+proto.OutboundMessage.CompileResponse.prototype.getResultCase = function() {
+  return /** @type {proto.OutboundMessage.CompileResponse.ResultCase} */(jspb.Message.computeOneofCase(this, proto.OutboundMessage.CompileResponse.oneofGroups_[0]));
 };
 
+
+
 if (jspb.Message.GENERATE_TO_OBJECT) {
-  /**
-   * Creates an object representation of this proto.
-   * Field names that are reserved in JavaScript and will be renamed to pb_name.
-   * Optional fields that are not set will be set to undefined.
-   * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
-   * For the list of reserved names please see:
-   *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
-   * @param {boolean=} opt_includeInstance Deprecated. whether to include the
-   *     JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @return {!Object}
-   */
-  proto.OutboundMessage.CompileResponse.prototype.toObject = function (
-    opt_includeInstance
-  ) {
-    return proto.OutboundMessage.CompileResponse.toObject(
-      opt_includeInstance,
-      this
-    );
+/**
+ * Creates an object representation of this proto.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * Optional fields that are not set will be set to undefined.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
+ * @param {boolean=} opt_includeInstance Deprecated. whether to include the
+ *     JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.OutboundMessage.CompileResponse.prototype.toObject = function(opt_includeInstance) {
+  return proto.OutboundMessage.CompileResponse.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Deprecated. Whether to include
+ *     the JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.OutboundMessage.CompileResponse} msg The msg instance to transform.
+ * @return {!Object}
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.OutboundMessage.CompileResponse.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    id: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    success: (f = msg.getSuccess()) && proto.OutboundMessage.CompileResponse.CompileSuccess.toObject(includeInstance, f),
+    failure: (f = msg.getFailure()) && proto.OutboundMessage.CompileResponse.CompileFailure.toObject(includeInstance, f)
   };
 
-  /**
-   * Static version of the {@see toObject} method.
-   * @param {boolean|undefined} includeInstance Deprecated. Whether to include
-   *     the JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @param {!proto.OutboundMessage.CompileResponse} msg The msg instance to transform.
-   * @return {!Object}
-   * @suppress {unusedLocalVariables} f is only used for nested messages
-   */
-  proto.OutboundMessage.CompileResponse.toObject = function (
-    includeInstance,
-    msg
-  ) {
-    let f,
-      obj = {
-        id: jspb.Message.getFieldWithDefault(msg, 1, 0),
-        success:
-          (f = msg.getSuccess()) &&
-          proto.OutboundMessage.CompileResponse.CompileSuccess.toObject(
-            includeInstance,
-            f
-          ),
-        failure:
-          (f = msg.getFailure()) &&
-          proto.OutboundMessage.CompileResponse.CompileFailure.toObject(
-            includeInstance,
-            f
-          ),
-      };
-
-    if (includeInstance) {
-      obj.$jspbMessageInstance = msg;
-    }
-    return obj;
-  };
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
 }
+
 
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
  * @return {!proto.OutboundMessage.CompileResponse}
  */
-proto.OutboundMessage.CompileResponse.deserializeBinary = function (bytes) {
-  const reader = new jspb.BinaryReader(bytes);
-  const msg = new proto.OutboundMessage.CompileResponse();
-  return proto.OutboundMessage.CompileResponse.deserializeBinaryFromReader(
-    msg,
-    reader
-  );
+proto.OutboundMessage.CompileResponse.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.OutboundMessage.CompileResponse;
+  return proto.OutboundMessage.CompileResponse.deserializeBinaryFromReader(msg, reader);
 };
+
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
@@ -4071,55 +3625,46 @@ proto.OutboundMessage.CompileResponse.deserializeBinary = function (bytes) {
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
  * @return {!proto.OutboundMessage.CompileResponse}
  */
-proto.OutboundMessage.CompileResponse.deserializeBinaryFromReader = function (
-  msg,
-  reader
-) {
+proto.OutboundMessage.CompileResponse.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
     }
-    const field = reader.getFieldNumber();
+    var field = reader.getFieldNumber();
     switch (field) {
-      case 1:
-        var value = /** @type {number} */ (reader.readInt32());
-        msg.setId(value);
-        break;
-      case 2:
-        var value = new proto.OutboundMessage.CompileResponse.CompileSuccess();
-        reader.readMessage(
-          value,
-          proto.OutboundMessage.CompileResponse.CompileSuccess
-            .deserializeBinaryFromReader
-        );
-        msg.setSuccess(value);
-        break;
-      case 3:
-        var value = new proto.OutboundMessage.CompileResponse.CompileFailure();
-        reader.readMessage(
-          value,
-          proto.OutboundMessage.CompileResponse.CompileFailure
-            .deserializeBinaryFromReader
-        );
-        msg.setFailure(value);
-        break;
-      default:
-        reader.skipField();
-        break;
+    case 1:
+      var value = /** @type {number} */ (reader.readInt32());
+      msg.setId(value);
+      break;
+    case 2:
+      var value = new proto.OutboundMessage.CompileResponse.CompileSuccess;
+      reader.readMessage(value,proto.OutboundMessage.CompileResponse.CompileSuccess.deserializeBinaryFromReader);
+      msg.setSuccess(value);
+      break;
+    case 3:
+      var value = new proto.OutboundMessage.CompileResponse.CompileFailure;
+      reader.readMessage(value,proto.OutboundMessage.CompileResponse.CompileFailure.deserializeBinaryFromReader);
+      msg.setFailure(value);
+      break;
+    default:
+      reader.skipField();
+      break;
     }
   }
   return msg;
 };
 
+
 /**
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.OutboundMessage.CompileResponse.prototype.serializeBinary = function () {
-  const writer = new jspb.BinaryWriter();
+proto.OutboundMessage.CompileResponse.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
   proto.OutboundMessage.CompileResponse.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
+
 
 /**
  * Serializes the given message to binary data (in protobuf wire
@@ -4128,22 +3673,21 @@ proto.OutboundMessage.CompileResponse.prototype.serializeBinary = function () {
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.OutboundMessage.CompileResponse.serializeBinaryToWriter = function (
-  message,
-  writer
-) {
-  let f = undefined;
+proto.OutboundMessage.CompileResponse.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
   f = message.getId();
   if (f !== 0) {
-    writer.writeInt32(1, f);
+    writer.writeInt32(
+      1,
+      f
+    );
   }
   f = message.getSuccess();
   if (f != null) {
     writer.writeMessage(
       2,
       f,
-      proto.OutboundMessage.CompileResponse.CompileSuccess
-        .serializeBinaryToWriter
+      proto.OutboundMessage.CompileResponse.CompileSuccess.serializeBinaryToWriter
     );
   }
   f = message.getFailure();
@@ -4151,75 +3695,67 @@ proto.OutboundMessage.CompileResponse.serializeBinaryToWriter = function (
     writer.writeMessage(
       3,
       f,
-      proto.OutboundMessage.CompileResponse.CompileFailure
-        .serializeBinaryToWriter
+      proto.OutboundMessage.CompileResponse.CompileFailure.serializeBinaryToWriter
     );
   }
 };
 
+
+
+
+
 if (jspb.Message.GENERATE_TO_OBJECT) {
-  /**
-   * Creates an object representation of this proto.
-   * Field names that are reserved in JavaScript and will be renamed to pb_name.
-   * Optional fields that are not set will be set to undefined.
-   * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
-   * For the list of reserved names please see:
-   *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
-   * @param {boolean=} opt_includeInstance Deprecated. whether to include the
-   *     JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @return {!Object}
-   */
-  proto.OutboundMessage.CompileResponse.CompileSuccess.prototype.toObject = function (
-    opt_includeInstance
-  ) {
-    return proto.OutboundMessage.CompileResponse.CompileSuccess.toObject(
-      opt_includeInstance,
-      this
-    );
+/**
+ * Creates an object representation of this proto.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * Optional fields that are not set will be set to undefined.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
+ * @param {boolean=} opt_includeInstance Deprecated. whether to include the
+ *     JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.OutboundMessage.CompileResponse.CompileSuccess.prototype.toObject = function(opt_includeInstance) {
+  return proto.OutboundMessage.CompileResponse.CompileSuccess.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Deprecated. Whether to include
+ *     the JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.OutboundMessage.CompileResponse.CompileSuccess} msg The msg instance to transform.
+ * @return {!Object}
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.OutboundMessage.CompileResponse.CompileSuccess.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    css: jspb.Message.getFieldWithDefault(msg, 1, ""),
+    sourceMap: jspb.Message.getFieldWithDefault(msg, 2, "")
   };
 
-  /**
-   * Static version of the {@see toObject} method.
-   * @param {boolean|undefined} includeInstance Deprecated. Whether to include
-   *     the JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @param {!proto.OutboundMessage.CompileResponse.CompileSuccess} msg The msg instance to transform.
-   * @return {!Object}
-   * @suppress {unusedLocalVariables} f is only used for nested messages
-   */
-  proto.OutboundMessage.CompileResponse.CompileSuccess.toObject = function (
-    includeInstance,
-    msg
-  ) {
-    let f,
-      obj = {
-        css: jspb.Message.getFieldWithDefault(msg, 1, ''),
-        sourceMap: jspb.Message.getFieldWithDefault(msg, 2, ''),
-      };
-
-    if (includeInstance) {
-      obj.$jspbMessageInstance = msg;
-    }
-    return obj;
-  };
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
 }
+
 
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
  * @return {!proto.OutboundMessage.CompileResponse.CompileSuccess}
  */
-proto.OutboundMessage.CompileResponse.CompileSuccess.deserializeBinary = function (
-  bytes
-) {
-  const reader = new jspb.BinaryReader(bytes);
-  const msg = new proto.OutboundMessage.CompileResponse.CompileSuccess();
-  return proto.OutboundMessage.CompileResponse.CompileSuccess.deserializeBinaryFromReader(
-    msg,
-    reader
-  );
+proto.OutboundMessage.CompileResponse.CompileSuccess.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.OutboundMessage.CompileResponse.CompileSuccess;
+  return proto.OutboundMessage.CompileResponse.CompileSuccess.deserializeBinaryFromReader(msg, reader);
 };
+
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
@@ -4228,44 +3764,40 @@ proto.OutboundMessage.CompileResponse.CompileSuccess.deserializeBinary = functio
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
  * @return {!proto.OutboundMessage.CompileResponse.CompileSuccess}
  */
-proto.OutboundMessage.CompileResponse.CompileSuccess.deserializeBinaryFromReader = function (
-  msg,
-  reader
-) {
+proto.OutboundMessage.CompileResponse.CompileSuccess.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
     }
-    const field = reader.getFieldNumber();
+    var field = reader.getFieldNumber();
     switch (field) {
-      case 1:
-        var value = /** @type {string} */ (reader.readString());
-        msg.setCss(value);
-        break;
-      case 2:
-        var value = /** @type {string} */ (reader.readString());
-        msg.setSourceMap(value);
-        break;
-      default:
-        reader.skipField();
-        break;
+    case 1:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setCss(value);
+      break;
+    case 2:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setSourceMap(value);
+      break;
+    default:
+      reader.skipField();
+      break;
     }
   }
   return msg;
 };
 
+
 /**
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.OutboundMessage.CompileResponse.CompileSuccess.prototype.serializeBinary = function () {
-  const writer = new jspb.BinaryWriter();
-  proto.OutboundMessage.CompileResponse.CompileSuccess.serializeBinaryToWriter(
-    this,
-    writer
-  );
+proto.OutboundMessage.CompileResponse.CompileSuccess.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.OutboundMessage.CompileResponse.CompileSuccess.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
+
 
 /**
  * Serializes the given message to binary data (in protobuf wire
@@ -4274,122 +3806,117 @@ proto.OutboundMessage.CompileResponse.CompileSuccess.prototype.serializeBinary =
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.OutboundMessage.CompileResponse.CompileSuccess.serializeBinaryToWriter = function (
-  message,
-  writer
-) {
-  let f = undefined;
+proto.OutboundMessage.CompileResponse.CompileSuccess.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
   f = message.getCss();
   if (f.length > 0) {
-    writer.writeString(1, f);
+    writer.writeString(
+      1,
+      f
+    );
   }
   f = message.getSourceMap();
   if (f.length > 0) {
-    writer.writeString(2, f);
+    writer.writeString(
+      2,
+      f
+    );
   }
 };
+
 
 /**
  * optional string css = 1;
  * @return {string}
  */
-proto.OutboundMessage.CompileResponse.CompileSuccess.prototype.getCss = function () {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ''));
+proto.OutboundMessage.CompileResponse.CompileSuccess.prototype.getCss = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
+
 
 /**
  * @param {string} value
  * @return {!proto.OutboundMessage.CompileResponse.CompileSuccess} returns this
  */
-proto.OutboundMessage.CompileResponse.CompileSuccess.prototype.setCss = function (
-  value
-) {
+proto.OutboundMessage.CompileResponse.CompileSuccess.prototype.setCss = function(value) {
   return jspb.Message.setProto3StringField(this, 1, value);
 };
+
 
 /**
  * optional string source_map = 2;
  * @return {string}
  */
-proto.OutboundMessage.CompileResponse.CompileSuccess.prototype.getSourceMap = function () {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ''));
+proto.OutboundMessage.CompileResponse.CompileSuccess.prototype.getSourceMap = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
+
 
 /**
  * @param {string} value
  * @return {!proto.OutboundMessage.CompileResponse.CompileSuccess} returns this
  */
-proto.OutboundMessage.CompileResponse.CompileSuccess.prototype.setSourceMap = function (
-  value
-) {
+proto.OutboundMessage.CompileResponse.CompileSuccess.prototype.setSourceMap = function(value) {
   return jspb.Message.setProto3StringField(this, 2, value);
 };
 
+
+
+
+
 if (jspb.Message.GENERATE_TO_OBJECT) {
-  /**
-   * Creates an object representation of this proto.
-   * Field names that are reserved in JavaScript and will be renamed to pb_name.
-   * Optional fields that are not set will be set to undefined.
-   * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
-   * For the list of reserved names please see:
-   *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
-   * @param {boolean=} opt_includeInstance Deprecated. whether to include the
-   *     JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @return {!Object}
-   */
-  proto.OutboundMessage.CompileResponse.CompileFailure.prototype.toObject = function (
-    opt_includeInstance
-  ) {
-    return proto.OutboundMessage.CompileResponse.CompileFailure.toObject(
-      opt_includeInstance,
-      this
-    );
+/**
+ * Creates an object representation of this proto.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * Optional fields that are not set will be set to undefined.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
+ * @param {boolean=} opt_includeInstance Deprecated. whether to include the
+ *     JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.OutboundMessage.CompileResponse.CompileFailure.prototype.toObject = function(opt_includeInstance) {
+  return proto.OutboundMessage.CompileResponse.CompileFailure.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Deprecated. Whether to include
+ *     the JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.OutboundMessage.CompileResponse.CompileFailure} msg The msg instance to transform.
+ * @return {!Object}
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.OutboundMessage.CompileResponse.CompileFailure.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    message: jspb.Message.getFieldWithDefault(msg, 1, ""),
+    span: (f = msg.getSpan()) && proto.SourceSpan.toObject(includeInstance, f),
+    stackTrace: jspb.Message.getFieldWithDefault(msg, 3, "")
   };
 
-  /**
-   * Static version of the {@see toObject} method.
-   * @param {boolean|undefined} includeInstance Deprecated. Whether to include
-   *     the JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @param {!proto.OutboundMessage.CompileResponse.CompileFailure} msg The msg instance to transform.
-   * @return {!Object}
-   * @suppress {unusedLocalVariables} f is only used for nested messages
-   */
-  proto.OutboundMessage.CompileResponse.CompileFailure.toObject = function (
-    includeInstance,
-    msg
-  ) {
-    let f,
-      obj = {
-        message: jspb.Message.getFieldWithDefault(msg, 1, ''),
-        span:
-          (f = msg.getSpan()) && proto.SourceSpan.toObject(includeInstance, f),
-        stackTrace: jspb.Message.getFieldWithDefault(msg, 3, ''),
-      };
-
-    if (includeInstance) {
-      obj.$jspbMessageInstance = msg;
-    }
-    return obj;
-  };
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
 }
+
 
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
  * @return {!proto.OutboundMessage.CompileResponse.CompileFailure}
  */
-proto.OutboundMessage.CompileResponse.CompileFailure.deserializeBinary = function (
-  bytes
-) {
-  const reader = new jspb.BinaryReader(bytes);
-  const msg = new proto.OutboundMessage.CompileResponse.CompileFailure();
-  return proto.OutboundMessage.CompileResponse.CompileFailure.deserializeBinaryFromReader(
-    msg,
-    reader
-  );
+proto.OutboundMessage.CompileResponse.CompileFailure.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.OutboundMessage.CompileResponse.CompileFailure;
+  return proto.OutboundMessage.CompileResponse.CompileFailure.deserializeBinaryFromReader(msg, reader);
 };
+
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
@@ -4398,49 +3925,45 @@ proto.OutboundMessage.CompileResponse.CompileFailure.deserializeBinary = functio
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
  * @return {!proto.OutboundMessage.CompileResponse.CompileFailure}
  */
-proto.OutboundMessage.CompileResponse.CompileFailure.deserializeBinaryFromReader = function (
-  msg,
-  reader
-) {
+proto.OutboundMessage.CompileResponse.CompileFailure.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
     }
-    const field = reader.getFieldNumber();
+    var field = reader.getFieldNumber();
     switch (field) {
-      case 1:
-        var value = /** @type {string} */ (reader.readString());
-        msg.setMessage(value);
-        break;
-      case 2:
-        var value = new proto.SourceSpan();
-        reader.readMessage(value, proto.SourceSpan.deserializeBinaryFromReader);
-        msg.setSpan(value);
-        break;
-      case 3:
-        var value = /** @type {string} */ (reader.readString());
-        msg.setStackTrace(value);
-        break;
-      default:
-        reader.skipField();
-        break;
+    case 1:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setMessage(value);
+      break;
+    case 2:
+      var value = new proto.SourceSpan;
+      reader.readMessage(value,proto.SourceSpan.deserializeBinaryFromReader);
+      msg.setSpan(value);
+      break;
+    case 3:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setStackTrace(value);
+      break;
+    default:
+      reader.skipField();
+      break;
     }
   }
   return msg;
 };
 
+
 /**
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.OutboundMessage.CompileResponse.CompileFailure.prototype.serializeBinary = function () {
-  const writer = new jspb.BinaryWriter();
-  proto.OutboundMessage.CompileResponse.CompileFailure.serializeBinaryToWriter(
-    this,
-    writer
-  );
+proto.OutboundMessage.CompileResponse.CompileFailure.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.OutboundMessage.CompileResponse.CompileFailure.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
+
 
 /**
  * Serializes the given message to binary data (in protobuf wire
@@ -4449,256 +3972,256 @@ proto.OutboundMessage.CompileResponse.CompileFailure.prototype.serializeBinary =
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.OutboundMessage.CompileResponse.CompileFailure.serializeBinaryToWriter = function (
-  message,
-  writer
-) {
-  let f = undefined;
+proto.OutboundMessage.CompileResponse.CompileFailure.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
   f = message.getMessage();
   if (f.length > 0) {
-    writer.writeString(1, f);
+    writer.writeString(
+      1,
+      f
+    );
   }
   f = message.getSpan();
   if (f != null) {
-    writer.writeMessage(2, f, proto.SourceSpan.serializeBinaryToWriter);
+    writer.writeMessage(
+      2,
+      f,
+      proto.SourceSpan.serializeBinaryToWriter
+    );
   }
   f = message.getStackTrace();
   if (f.length > 0) {
-    writer.writeString(3, f);
+    writer.writeString(
+      3,
+      f
+    );
   }
 };
+
 
 /**
  * optional string message = 1;
  * @return {string}
  */
-proto.OutboundMessage.CompileResponse.CompileFailure.prototype.getMessage = function () {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ''));
+proto.OutboundMessage.CompileResponse.CompileFailure.prototype.getMessage = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
+
 
 /**
  * @param {string} value
  * @return {!proto.OutboundMessage.CompileResponse.CompileFailure} returns this
  */
-proto.OutboundMessage.CompileResponse.CompileFailure.prototype.setMessage = function (
-  value
-) {
+proto.OutboundMessage.CompileResponse.CompileFailure.prototype.setMessage = function(value) {
   return jspb.Message.setProto3StringField(this, 1, value);
 };
+
 
 /**
  * optional SourceSpan span = 2;
  * @return {?proto.SourceSpan}
  */
-proto.OutboundMessage.CompileResponse.CompileFailure.prototype.getSpan = function () {
-  return /** @type{?proto.SourceSpan} */ (jspb.Message.getWrapperField(
-    this,
-    proto.SourceSpan,
-    2
-  ));
+proto.OutboundMessage.CompileResponse.CompileFailure.prototype.getSpan = function() {
+  return /** @type{?proto.SourceSpan} */ (
+    jspb.Message.getWrapperField(this, proto.SourceSpan, 2));
 };
+
 
 /**
  * @param {?proto.SourceSpan|undefined} value
  * @return {!proto.OutboundMessage.CompileResponse.CompileFailure} returns this
- */
-proto.OutboundMessage.CompileResponse.CompileFailure.prototype.setSpan = function (
-  value
-) {
+*/
+proto.OutboundMessage.CompileResponse.CompileFailure.prototype.setSpan = function(value) {
   return jspb.Message.setWrapperField(this, 2, value);
 };
+
 
 /**
  * Clears the message field making it undefined.
  * @return {!proto.OutboundMessage.CompileResponse.CompileFailure} returns this
  */
-proto.OutboundMessage.CompileResponse.CompileFailure.prototype.clearSpan = function () {
+proto.OutboundMessage.CompileResponse.CompileFailure.prototype.clearSpan = function() {
   return this.setSpan(undefined);
 };
+
 
 /**
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.OutboundMessage.CompileResponse.CompileFailure.prototype.hasSpan = function () {
+proto.OutboundMessage.CompileResponse.CompileFailure.prototype.hasSpan = function() {
   return jspb.Message.getField(this, 2) != null;
 };
+
 
 /**
  * optional string stack_trace = 3;
  * @return {string}
  */
-proto.OutboundMessage.CompileResponse.CompileFailure.prototype.getStackTrace = function () {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ''));
+proto.OutboundMessage.CompileResponse.CompileFailure.prototype.getStackTrace = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
 };
+
 
 /**
  * @param {string} value
  * @return {!proto.OutboundMessage.CompileResponse.CompileFailure} returns this
  */
-proto.OutboundMessage.CompileResponse.CompileFailure.prototype.setStackTrace = function (
-  value
-) {
+proto.OutboundMessage.CompileResponse.CompileFailure.prototype.setStackTrace = function(value) {
   return jspb.Message.setProto3StringField(this, 3, value);
 };
+
 
 /**
  * optional int32 id = 1;
  * @return {number}
  */
-proto.OutboundMessage.CompileResponse.prototype.getId = function () {
+proto.OutboundMessage.CompileResponse.prototype.getId = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
 };
+
 
 /**
  * @param {number} value
  * @return {!proto.OutboundMessage.CompileResponse} returns this
  */
-proto.OutboundMessage.CompileResponse.prototype.setId = function (value) {
+proto.OutboundMessage.CompileResponse.prototype.setId = function(value) {
   return jspb.Message.setProto3IntField(this, 1, value);
 };
+
 
 /**
  * optional CompileSuccess success = 2;
  * @return {?proto.OutboundMessage.CompileResponse.CompileSuccess}
  */
-proto.OutboundMessage.CompileResponse.prototype.getSuccess = function () {
-  return /** @type{?proto.OutboundMessage.CompileResponse.CompileSuccess} */ (jspb.Message.getWrapperField(
-    this,
-    proto.OutboundMessage.CompileResponse.CompileSuccess,
-    2
-  ));
+proto.OutboundMessage.CompileResponse.prototype.getSuccess = function() {
+  return /** @type{?proto.OutboundMessage.CompileResponse.CompileSuccess} */ (
+    jspb.Message.getWrapperField(this, proto.OutboundMessage.CompileResponse.CompileSuccess, 2));
 };
+
 
 /**
  * @param {?proto.OutboundMessage.CompileResponse.CompileSuccess|undefined} value
  * @return {!proto.OutboundMessage.CompileResponse} returns this
- */
-proto.OutboundMessage.CompileResponse.prototype.setSuccess = function (value) {
-  return jspb.Message.setOneofWrapperField(
-    this,
-    2,
-    proto.OutboundMessage.CompileResponse.oneofGroups_[0],
-    value
-  );
+*/
+proto.OutboundMessage.CompileResponse.prototype.setSuccess = function(value) {
+  return jspb.Message.setOneofWrapperField(this, 2, proto.OutboundMessage.CompileResponse.oneofGroups_[0], value);
 };
+
 
 /**
  * Clears the message field making it undefined.
  * @return {!proto.OutboundMessage.CompileResponse} returns this
  */
-proto.OutboundMessage.CompileResponse.prototype.clearSuccess = function () {
+proto.OutboundMessage.CompileResponse.prototype.clearSuccess = function() {
   return this.setSuccess(undefined);
 };
+
 
 /**
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.OutboundMessage.CompileResponse.prototype.hasSuccess = function () {
+proto.OutboundMessage.CompileResponse.prototype.hasSuccess = function() {
   return jspb.Message.getField(this, 2) != null;
 };
+
 
 /**
  * optional CompileFailure failure = 3;
  * @return {?proto.OutboundMessage.CompileResponse.CompileFailure}
  */
-proto.OutboundMessage.CompileResponse.prototype.getFailure = function () {
-  return /** @type{?proto.OutboundMessage.CompileResponse.CompileFailure} */ (jspb.Message.getWrapperField(
-    this,
-    proto.OutboundMessage.CompileResponse.CompileFailure,
-    3
-  ));
+proto.OutboundMessage.CompileResponse.prototype.getFailure = function() {
+  return /** @type{?proto.OutboundMessage.CompileResponse.CompileFailure} */ (
+    jspb.Message.getWrapperField(this, proto.OutboundMessage.CompileResponse.CompileFailure, 3));
 };
+
 
 /**
  * @param {?proto.OutboundMessage.CompileResponse.CompileFailure|undefined} value
  * @return {!proto.OutboundMessage.CompileResponse} returns this
- */
-proto.OutboundMessage.CompileResponse.prototype.setFailure = function (value) {
-  return jspb.Message.setOneofWrapperField(
-    this,
-    3,
-    proto.OutboundMessage.CompileResponse.oneofGroups_[0],
-    value
-  );
+*/
+proto.OutboundMessage.CompileResponse.prototype.setFailure = function(value) {
+  return jspb.Message.setOneofWrapperField(this, 3, proto.OutboundMessage.CompileResponse.oneofGroups_[0], value);
 };
+
 
 /**
  * Clears the message field making it undefined.
  * @return {!proto.OutboundMessage.CompileResponse} returns this
  */
-proto.OutboundMessage.CompileResponse.prototype.clearFailure = function () {
+proto.OutboundMessage.CompileResponse.prototype.clearFailure = function() {
   return this.setFailure(undefined);
 };
+
 
 /**
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.OutboundMessage.CompileResponse.prototype.hasFailure = function () {
+proto.OutboundMessage.CompileResponse.prototype.hasFailure = function() {
   return jspb.Message.getField(this, 3) != null;
 };
 
+
+
+
+
 if (jspb.Message.GENERATE_TO_OBJECT) {
-  /**
-   * Creates an object representation of this proto.
-   * Field names that are reserved in JavaScript and will be renamed to pb_name.
-   * Optional fields that are not set will be set to undefined.
-   * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
-   * For the list of reserved names please see:
-   *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
-   * @param {boolean=} opt_includeInstance Deprecated. whether to include the
-   *     JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @return {!Object}
-   */
-  proto.OutboundMessage.LogEvent.prototype.toObject = function (
-    opt_includeInstance
-  ) {
-    return proto.OutboundMessage.LogEvent.toObject(opt_includeInstance, this);
+/**
+ * Creates an object representation of this proto.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * Optional fields that are not set will be set to undefined.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
+ * @param {boolean=} opt_includeInstance Deprecated. whether to include the
+ *     JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.OutboundMessage.LogEvent.prototype.toObject = function(opt_includeInstance) {
+  return proto.OutboundMessage.LogEvent.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Deprecated. Whether to include
+ *     the JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.OutboundMessage.LogEvent} msg The msg instance to transform.
+ * @return {!Object}
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.OutboundMessage.LogEvent.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    compilationId: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    type: jspb.Message.getFieldWithDefault(msg, 2, 0),
+    message: jspb.Message.getFieldWithDefault(msg, 3, ""),
+    span: (f = msg.getSpan()) && proto.SourceSpan.toObject(includeInstance, f),
+    stackTrace: jspb.Message.getFieldWithDefault(msg, 5, "")
   };
 
-  /**
-   * Static version of the {@see toObject} method.
-   * @param {boolean|undefined} includeInstance Deprecated. Whether to include
-   *     the JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @param {!proto.OutboundMessage.LogEvent} msg The msg instance to transform.
-   * @return {!Object}
-   * @suppress {unusedLocalVariables} f is only used for nested messages
-   */
-  proto.OutboundMessage.LogEvent.toObject = function (includeInstance, msg) {
-    let f,
-      obj = {
-        compilationId: jspb.Message.getFieldWithDefault(msg, 1, 0),
-        type: jspb.Message.getFieldWithDefault(msg, 2, 0),
-        message: jspb.Message.getFieldWithDefault(msg, 3, ''),
-        span:
-          (f = msg.getSpan()) && proto.SourceSpan.toObject(includeInstance, f),
-        stackTrace: jspb.Message.getFieldWithDefault(msg, 5, ''),
-      };
-
-    if (includeInstance) {
-      obj.$jspbMessageInstance = msg;
-    }
-    return obj;
-  };
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
 }
+
 
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
  * @return {!proto.OutboundMessage.LogEvent}
  */
-proto.OutboundMessage.LogEvent.deserializeBinary = function (bytes) {
-  const reader = new jspb.BinaryReader(bytes);
-  const msg = new proto.OutboundMessage.LogEvent();
-  return proto.OutboundMessage.LogEvent.deserializeBinaryFromReader(
-    msg,
-    reader
-  );
+proto.OutboundMessage.LogEvent.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.OutboundMessage.LogEvent;
+  return proto.OutboundMessage.LogEvent.deserializeBinaryFromReader(msg, reader);
 };
+
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
@@ -4707,54 +4230,53 @@ proto.OutboundMessage.LogEvent.deserializeBinary = function (bytes) {
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
  * @return {!proto.OutboundMessage.LogEvent}
  */
-proto.OutboundMessage.LogEvent.deserializeBinaryFromReader = function (
-  msg,
-  reader
-) {
+proto.OutboundMessage.LogEvent.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
     }
-    const field = reader.getFieldNumber();
+    var field = reader.getFieldNumber();
     switch (field) {
-      case 1:
-        var value = /** @type {number} */ (reader.readUint32());
-        msg.setCompilationId(value);
-        break;
-      case 2:
-        var value = /** @type {!proto.OutboundMessage.LogEvent.Type} */ (reader.readEnum());
-        msg.setType(value);
-        break;
-      case 3:
-        var value = /** @type {string} */ (reader.readString());
-        msg.setMessage(value);
-        break;
-      case 4:
-        var value = new proto.SourceSpan();
-        reader.readMessage(value, proto.SourceSpan.deserializeBinaryFromReader);
-        msg.setSpan(value);
-        break;
-      case 5:
-        var value = /** @type {string} */ (reader.readString());
-        msg.setStackTrace(value);
-        break;
-      default:
-        reader.skipField();
-        break;
+    case 1:
+      var value = /** @type {number} */ (reader.readUint32());
+      msg.setCompilationId(value);
+      break;
+    case 2:
+      var value = /** @type {!proto.OutboundMessage.LogEvent.Type} */ (reader.readEnum());
+      msg.setType(value);
+      break;
+    case 3:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setMessage(value);
+      break;
+    case 4:
+      var value = new proto.SourceSpan;
+      reader.readMessage(value,proto.SourceSpan.deserializeBinaryFromReader);
+      msg.setSpan(value);
+      break;
+    case 5:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setStackTrace(value);
+      break;
+    default:
+      reader.skipField();
+      break;
     }
   }
   return msg;
 };
 
+
 /**
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.OutboundMessage.LogEvent.prototype.serializeBinary = function () {
-  const writer = new jspb.BinaryWriter();
+proto.OutboundMessage.LogEvent.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
   proto.OutboundMessage.LogEvent.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
+
 
 /**
  * Serializes the given message to binary data (in protobuf wire
@@ -4763,32 +4285,46 @@ proto.OutboundMessage.LogEvent.prototype.serializeBinary = function () {
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.OutboundMessage.LogEvent.serializeBinaryToWriter = function (
-  message,
-  writer
-) {
-  let f = undefined;
+proto.OutboundMessage.LogEvent.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
   f = message.getCompilationId();
   if (f !== 0) {
-    writer.writeUint32(1, f);
+    writer.writeUint32(
+      1,
+      f
+    );
   }
   f = message.getType();
   if (f !== 0.0) {
-    writer.writeEnum(2, f);
+    writer.writeEnum(
+      2,
+      f
+    );
   }
   f = message.getMessage();
   if (f.length > 0) {
-    writer.writeString(3, f);
+    writer.writeString(
+      3,
+      f
+    );
   }
   f = message.getSpan();
   if (f != null) {
-    writer.writeMessage(4, f, proto.SourceSpan.serializeBinaryToWriter);
+    writer.writeMessage(
+      4,
+      f,
+      proto.SourceSpan.serializeBinaryToWriter
+    );
   }
   f = message.getStackTrace();
   if (f.length > 0) {
-    writer.writeString(5, f);
+    writer.writeString(
+      5,
+      f
+    );
   }
 };
+
 
 /**
  * @enum {number}
@@ -4796,176 +4332,175 @@ proto.OutboundMessage.LogEvent.serializeBinaryToWriter = function (
 proto.OutboundMessage.LogEvent.Type = {
   WARNING: 0,
   DEPRECATION_WARNING: 1,
-  DEBUG: 2,
+  DEBUG: 2
 };
 
 /**
  * optional uint32 compilation_id = 1;
  * @return {number}
  */
-proto.OutboundMessage.LogEvent.prototype.getCompilationId = function () {
+proto.OutboundMessage.LogEvent.prototype.getCompilationId = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
 };
+
 
 /**
  * @param {number} value
  * @return {!proto.OutboundMessage.LogEvent} returns this
  */
-proto.OutboundMessage.LogEvent.prototype.setCompilationId = function (value) {
+proto.OutboundMessage.LogEvent.prototype.setCompilationId = function(value) {
   return jspb.Message.setProto3IntField(this, 1, value);
 };
+
 
 /**
  * optional Type type = 2;
  * @return {!proto.OutboundMessage.LogEvent.Type}
  */
-proto.OutboundMessage.LogEvent.prototype.getType = function () {
-  return /** @type {!proto.OutboundMessage.LogEvent.Type} */ (jspb.Message.getFieldWithDefault(
-    this,
-    2,
-    0
-  ));
+proto.OutboundMessage.LogEvent.prototype.getType = function() {
+  return /** @type {!proto.OutboundMessage.LogEvent.Type} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
 };
+
 
 /**
  * @param {!proto.OutboundMessage.LogEvent.Type} value
  * @return {!proto.OutboundMessage.LogEvent} returns this
  */
-proto.OutboundMessage.LogEvent.prototype.setType = function (value) {
+proto.OutboundMessage.LogEvent.prototype.setType = function(value) {
   return jspb.Message.setProto3EnumField(this, 2, value);
 };
+
 
 /**
  * optional string message = 3;
  * @return {string}
  */
-proto.OutboundMessage.LogEvent.prototype.getMessage = function () {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ''));
+proto.OutboundMessage.LogEvent.prototype.getMessage = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
 };
+
 
 /**
  * @param {string} value
  * @return {!proto.OutboundMessage.LogEvent} returns this
  */
-proto.OutboundMessage.LogEvent.prototype.setMessage = function (value) {
+proto.OutboundMessage.LogEvent.prototype.setMessage = function(value) {
   return jspb.Message.setProto3StringField(this, 3, value);
 };
+
 
 /**
  * optional SourceSpan span = 4;
  * @return {?proto.SourceSpan}
  */
-proto.OutboundMessage.LogEvent.prototype.getSpan = function () {
-  return /** @type{?proto.SourceSpan} */ (jspb.Message.getWrapperField(
-    this,
-    proto.SourceSpan,
-    4
-  ));
+proto.OutboundMessage.LogEvent.prototype.getSpan = function() {
+  return /** @type{?proto.SourceSpan} */ (
+    jspb.Message.getWrapperField(this, proto.SourceSpan, 4));
 };
+
 
 /**
  * @param {?proto.SourceSpan|undefined} value
  * @return {!proto.OutboundMessage.LogEvent} returns this
- */
-proto.OutboundMessage.LogEvent.prototype.setSpan = function (value) {
+*/
+proto.OutboundMessage.LogEvent.prototype.setSpan = function(value) {
   return jspb.Message.setWrapperField(this, 4, value);
 };
+
 
 /**
  * Clears the message field making it undefined.
  * @return {!proto.OutboundMessage.LogEvent} returns this
  */
-proto.OutboundMessage.LogEvent.prototype.clearSpan = function () {
+proto.OutboundMessage.LogEvent.prototype.clearSpan = function() {
   return this.setSpan(undefined);
 };
+
 
 /**
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.OutboundMessage.LogEvent.prototype.hasSpan = function () {
+proto.OutboundMessage.LogEvent.prototype.hasSpan = function() {
   return jspb.Message.getField(this, 4) != null;
 };
+
 
 /**
  * optional string stack_trace = 5;
  * @return {string}
  */
-proto.OutboundMessage.LogEvent.prototype.getStackTrace = function () {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ''));
+proto.OutboundMessage.LogEvent.prototype.getStackTrace = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
 };
+
 
 /**
  * @param {string} value
  * @return {!proto.OutboundMessage.LogEvent} returns this
  */
-proto.OutboundMessage.LogEvent.prototype.setStackTrace = function (value) {
+proto.OutboundMessage.LogEvent.prototype.setStackTrace = function(value) {
   return jspb.Message.setProto3StringField(this, 5, value);
 };
 
+
+
+
+
 if (jspb.Message.GENERATE_TO_OBJECT) {
-  /**
-   * Creates an object representation of this proto.
-   * Field names that are reserved in JavaScript and will be renamed to pb_name.
-   * Optional fields that are not set will be set to undefined.
-   * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
-   * For the list of reserved names please see:
-   *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
-   * @param {boolean=} opt_includeInstance Deprecated. whether to include the
-   *     JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @return {!Object}
-   */
-  proto.OutboundMessage.CanonicalizeRequest.prototype.toObject = function (
-    opt_includeInstance
-  ) {
-    return proto.OutboundMessage.CanonicalizeRequest.toObject(
-      opt_includeInstance,
-      this
-    );
+/**
+ * Creates an object representation of this proto.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * Optional fields that are not set will be set to undefined.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
+ * @param {boolean=} opt_includeInstance Deprecated. whether to include the
+ *     JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.OutboundMessage.CanonicalizeRequest.prototype.toObject = function(opt_includeInstance) {
+  return proto.OutboundMessage.CanonicalizeRequest.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Deprecated. Whether to include
+ *     the JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.OutboundMessage.CanonicalizeRequest} msg The msg instance to transform.
+ * @return {!Object}
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.OutboundMessage.CanonicalizeRequest.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    id: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    compilationId: jspb.Message.getFieldWithDefault(msg, 2, 0),
+    importerId: jspb.Message.getFieldWithDefault(msg, 3, 0),
+    url: jspb.Message.getFieldWithDefault(msg, 4, "")
   };
 
-  /**
-   * Static version of the {@see toObject} method.
-   * @param {boolean|undefined} includeInstance Deprecated. Whether to include
-   *     the JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @param {!proto.OutboundMessage.CanonicalizeRequest} msg The msg instance to transform.
-   * @return {!Object}
-   * @suppress {unusedLocalVariables} f is only used for nested messages
-   */
-  proto.OutboundMessage.CanonicalizeRequest.toObject = function (
-    includeInstance,
-    msg
-  ) {
-    let f,
-      obj = {
-        id: jspb.Message.getFieldWithDefault(msg, 1, 0),
-        compilationId: jspb.Message.getFieldWithDefault(msg, 2, 0),
-        importerId: jspb.Message.getFieldWithDefault(msg, 3, 0),
-        url: jspb.Message.getFieldWithDefault(msg, 4, ''),
-      };
-
-    if (includeInstance) {
-      obj.$jspbMessageInstance = msg;
-    }
-    return obj;
-  };
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
 }
+
 
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
  * @return {!proto.OutboundMessage.CanonicalizeRequest}
  */
-proto.OutboundMessage.CanonicalizeRequest.deserializeBinary = function (bytes) {
-  const reader = new jspb.BinaryReader(bytes);
-  const msg = new proto.OutboundMessage.CanonicalizeRequest();
-  return proto.OutboundMessage.CanonicalizeRequest.deserializeBinaryFromReader(
-    msg,
-    reader
-  );
+proto.OutboundMessage.CanonicalizeRequest.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.OutboundMessage.CanonicalizeRequest;
+  return proto.OutboundMessage.CanonicalizeRequest.deserializeBinaryFromReader(msg, reader);
 };
+
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
@@ -4974,52 +4509,48 @@ proto.OutboundMessage.CanonicalizeRequest.deserializeBinary = function (bytes) {
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
  * @return {!proto.OutboundMessage.CanonicalizeRequest}
  */
-proto.OutboundMessage.CanonicalizeRequest.deserializeBinaryFromReader = function (
-  msg,
-  reader
-) {
+proto.OutboundMessage.CanonicalizeRequest.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
     }
-    const field = reader.getFieldNumber();
+    var field = reader.getFieldNumber();
     switch (field) {
-      case 1:
-        var value = /** @type {number} */ (reader.readUint32());
-        msg.setId(value);
-        break;
-      case 2:
-        var value = /** @type {number} */ (reader.readUint32());
-        msg.setCompilationId(value);
-        break;
-      case 3:
-        var value = /** @type {number} */ (reader.readUint32());
-        msg.setImporterId(value);
-        break;
-      case 4:
-        var value = /** @type {string} */ (reader.readString());
-        msg.setUrl(value);
-        break;
-      default:
-        reader.skipField();
-        break;
+    case 1:
+      var value = /** @type {number} */ (reader.readUint32());
+      msg.setId(value);
+      break;
+    case 2:
+      var value = /** @type {number} */ (reader.readUint32());
+      msg.setCompilationId(value);
+      break;
+    case 3:
+      var value = /** @type {number} */ (reader.readUint32());
+      msg.setImporterId(value);
+      break;
+    case 4:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setUrl(value);
+      break;
+    default:
+      reader.skipField();
+      break;
     }
   }
   return msg;
 };
 
+
 /**
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.OutboundMessage.CanonicalizeRequest.prototype.serializeBinary = function () {
-  const writer = new jspb.BinaryWriter();
-  proto.OutboundMessage.CanonicalizeRequest.serializeBinaryToWriter(
-    this,
-    writer
-  );
+proto.OutboundMessage.CanonicalizeRequest.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.OutboundMessage.CanonicalizeRequest.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
+
 
 /**
  * Serializes the given message to binary data (in protobuf wire
@@ -5028,160 +4559,168 @@ proto.OutboundMessage.CanonicalizeRequest.prototype.serializeBinary = function (
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.OutboundMessage.CanonicalizeRequest.serializeBinaryToWriter = function (
-  message,
-  writer
-) {
-  let f = undefined;
+proto.OutboundMessage.CanonicalizeRequest.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
   f = message.getId();
   if (f !== 0) {
-    writer.writeUint32(1, f);
+    writer.writeUint32(
+      1,
+      f
+    );
   }
   f = message.getCompilationId();
   if (f !== 0) {
-    writer.writeUint32(2, f);
+    writer.writeUint32(
+      2,
+      f
+    );
   }
   f = message.getImporterId();
   if (f !== 0) {
-    writer.writeUint32(3, f);
+    writer.writeUint32(
+      3,
+      f
+    );
   }
   f = message.getUrl();
   if (f.length > 0) {
-    writer.writeString(4, f);
+    writer.writeString(
+      4,
+      f
+    );
   }
 };
+
 
 /**
  * optional uint32 id = 1;
  * @return {number}
  */
-proto.OutboundMessage.CanonicalizeRequest.prototype.getId = function () {
+proto.OutboundMessage.CanonicalizeRequest.prototype.getId = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
 };
+
 
 /**
  * @param {number} value
  * @return {!proto.OutboundMessage.CanonicalizeRequest} returns this
  */
-proto.OutboundMessage.CanonicalizeRequest.prototype.setId = function (value) {
+proto.OutboundMessage.CanonicalizeRequest.prototype.setId = function(value) {
   return jspb.Message.setProto3IntField(this, 1, value);
 };
+
 
 /**
  * optional uint32 compilation_id = 2;
  * @return {number}
  */
-proto.OutboundMessage.CanonicalizeRequest.prototype.getCompilationId = function () {
+proto.OutboundMessage.CanonicalizeRequest.prototype.getCompilationId = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
 };
+
 
 /**
  * @param {number} value
  * @return {!proto.OutboundMessage.CanonicalizeRequest} returns this
  */
-proto.OutboundMessage.CanonicalizeRequest.prototype.setCompilationId = function (
-  value
-) {
+proto.OutboundMessage.CanonicalizeRequest.prototype.setCompilationId = function(value) {
   return jspb.Message.setProto3IntField(this, 2, value);
 };
+
 
 /**
  * optional uint32 importer_id = 3;
  * @return {number}
  */
-proto.OutboundMessage.CanonicalizeRequest.prototype.getImporterId = function () {
+proto.OutboundMessage.CanonicalizeRequest.prototype.getImporterId = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 3, 0));
 };
+
 
 /**
  * @param {number} value
  * @return {!proto.OutboundMessage.CanonicalizeRequest} returns this
  */
-proto.OutboundMessage.CanonicalizeRequest.prototype.setImporterId = function (
-  value
-) {
+proto.OutboundMessage.CanonicalizeRequest.prototype.setImporterId = function(value) {
   return jspb.Message.setProto3IntField(this, 3, value);
 };
+
 
 /**
  * optional string url = 4;
  * @return {string}
  */
-proto.OutboundMessage.CanonicalizeRequest.prototype.getUrl = function () {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ''));
+proto.OutboundMessage.CanonicalizeRequest.prototype.getUrl = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
 };
+
 
 /**
  * @param {string} value
  * @return {!proto.OutboundMessage.CanonicalizeRequest} returns this
  */
-proto.OutboundMessage.CanonicalizeRequest.prototype.setUrl = function (value) {
+proto.OutboundMessage.CanonicalizeRequest.prototype.setUrl = function(value) {
   return jspb.Message.setProto3StringField(this, 4, value);
 };
 
+
+
+
+
 if (jspb.Message.GENERATE_TO_OBJECT) {
-  /**
-   * Creates an object representation of this proto.
-   * Field names that are reserved in JavaScript and will be renamed to pb_name.
-   * Optional fields that are not set will be set to undefined.
-   * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
-   * For the list of reserved names please see:
-   *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
-   * @param {boolean=} opt_includeInstance Deprecated. whether to include the
-   *     JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @return {!Object}
-   */
-  proto.OutboundMessage.ImportRequest.prototype.toObject = function (
-    opt_includeInstance
-  ) {
-    return proto.OutboundMessage.ImportRequest.toObject(
-      opt_includeInstance,
-      this
-    );
+/**
+ * Creates an object representation of this proto.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * Optional fields that are not set will be set to undefined.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
+ * @param {boolean=} opt_includeInstance Deprecated. whether to include the
+ *     JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.OutboundMessage.ImportRequest.prototype.toObject = function(opt_includeInstance) {
+  return proto.OutboundMessage.ImportRequest.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Deprecated. Whether to include
+ *     the JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.OutboundMessage.ImportRequest} msg The msg instance to transform.
+ * @return {!Object}
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.OutboundMessage.ImportRequest.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    id: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    compilationId: jspb.Message.getFieldWithDefault(msg, 2, 0),
+    importerId: jspb.Message.getFieldWithDefault(msg, 3, 0),
+    url: jspb.Message.getFieldWithDefault(msg, 4, "")
   };
 
-  /**
-   * Static version of the {@see toObject} method.
-   * @param {boolean|undefined} includeInstance Deprecated. Whether to include
-   *     the JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @param {!proto.OutboundMessage.ImportRequest} msg The msg instance to transform.
-   * @return {!Object}
-   * @suppress {unusedLocalVariables} f is only used for nested messages
-   */
-  proto.OutboundMessage.ImportRequest.toObject = function (
-    includeInstance,
-    msg
-  ) {
-    let f,
-      obj = {
-        id: jspb.Message.getFieldWithDefault(msg, 1, 0),
-        compilationId: jspb.Message.getFieldWithDefault(msg, 2, 0),
-        importerId: jspb.Message.getFieldWithDefault(msg, 3, 0),
-        url: jspb.Message.getFieldWithDefault(msg, 4, ''),
-      };
-
-    if (includeInstance) {
-      obj.$jspbMessageInstance = msg;
-    }
-    return obj;
-  };
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
 }
+
 
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
  * @return {!proto.OutboundMessage.ImportRequest}
  */
-proto.OutboundMessage.ImportRequest.deserializeBinary = function (bytes) {
-  const reader = new jspb.BinaryReader(bytes);
-  const msg = new proto.OutboundMessage.ImportRequest();
-  return proto.OutboundMessage.ImportRequest.deserializeBinaryFromReader(
-    msg,
-    reader
-  );
+proto.OutboundMessage.ImportRequest.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.OutboundMessage.ImportRequest;
+  return proto.OutboundMessage.ImportRequest.deserializeBinaryFromReader(msg, reader);
 };
+
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
@@ -5190,49 +4729,48 @@ proto.OutboundMessage.ImportRequest.deserializeBinary = function (bytes) {
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
  * @return {!proto.OutboundMessage.ImportRequest}
  */
-proto.OutboundMessage.ImportRequest.deserializeBinaryFromReader = function (
-  msg,
-  reader
-) {
+proto.OutboundMessage.ImportRequest.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
     }
-    const field = reader.getFieldNumber();
+    var field = reader.getFieldNumber();
     switch (field) {
-      case 1:
-        var value = /** @type {number} */ (reader.readUint32());
-        msg.setId(value);
-        break;
-      case 2:
-        var value = /** @type {number} */ (reader.readUint32());
-        msg.setCompilationId(value);
-        break;
-      case 3:
-        var value = /** @type {number} */ (reader.readUint32());
-        msg.setImporterId(value);
-        break;
-      case 4:
-        var value = /** @type {string} */ (reader.readString());
-        msg.setUrl(value);
-        break;
-      default:
-        reader.skipField();
-        break;
+    case 1:
+      var value = /** @type {number} */ (reader.readUint32());
+      msg.setId(value);
+      break;
+    case 2:
+      var value = /** @type {number} */ (reader.readUint32());
+      msg.setCompilationId(value);
+      break;
+    case 3:
+      var value = /** @type {number} */ (reader.readUint32());
+      msg.setImporterId(value);
+      break;
+    case 4:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setUrl(value);
+      break;
+    default:
+      reader.skipField();
+      break;
     }
   }
   return msg;
 };
 
+
 /**
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.OutboundMessage.ImportRequest.prototype.serializeBinary = function () {
-  const writer = new jspb.BinaryWriter();
+proto.OutboundMessage.ImportRequest.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
   proto.OutboundMessage.ImportRequest.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
+
 
 /**
  * Serializes the given message to binary data (in protobuf wire
@@ -5241,158 +4779,168 @@ proto.OutboundMessage.ImportRequest.prototype.serializeBinary = function () {
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.OutboundMessage.ImportRequest.serializeBinaryToWriter = function (
-  message,
-  writer
-) {
-  let f = undefined;
+proto.OutboundMessage.ImportRequest.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
   f = message.getId();
   if (f !== 0) {
-    writer.writeUint32(1, f);
+    writer.writeUint32(
+      1,
+      f
+    );
   }
   f = message.getCompilationId();
   if (f !== 0) {
-    writer.writeUint32(2, f);
+    writer.writeUint32(
+      2,
+      f
+    );
   }
   f = message.getImporterId();
   if (f !== 0) {
-    writer.writeUint32(3, f);
+    writer.writeUint32(
+      3,
+      f
+    );
   }
   f = message.getUrl();
   if (f.length > 0) {
-    writer.writeString(4, f);
+    writer.writeString(
+      4,
+      f
+    );
   }
 };
+
 
 /**
  * optional uint32 id = 1;
  * @return {number}
  */
-proto.OutboundMessage.ImportRequest.prototype.getId = function () {
+proto.OutboundMessage.ImportRequest.prototype.getId = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
 };
+
 
 /**
  * @param {number} value
  * @return {!proto.OutboundMessage.ImportRequest} returns this
  */
-proto.OutboundMessage.ImportRequest.prototype.setId = function (value) {
+proto.OutboundMessage.ImportRequest.prototype.setId = function(value) {
   return jspb.Message.setProto3IntField(this, 1, value);
 };
+
 
 /**
  * optional uint32 compilation_id = 2;
  * @return {number}
  */
-proto.OutboundMessage.ImportRequest.prototype.getCompilationId = function () {
+proto.OutboundMessage.ImportRequest.prototype.getCompilationId = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
 };
+
 
 /**
  * @param {number} value
  * @return {!proto.OutboundMessage.ImportRequest} returns this
  */
-proto.OutboundMessage.ImportRequest.prototype.setCompilationId = function (
-  value
-) {
+proto.OutboundMessage.ImportRequest.prototype.setCompilationId = function(value) {
   return jspb.Message.setProto3IntField(this, 2, value);
 };
+
 
 /**
  * optional uint32 importer_id = 3;
  * @return {number}
  */
-proto.OutboundMessage.ImportRequest.prototype.getImporterId = function () {
+proto.OutboundMessage.ImportRequest.prototype.getImporterId = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 3, 0));
 };
+
 
 /**
  * @param {number} value
  * @return {!proto.OutboundMessage.ImportRequest} returns this
  */
-proto.OutboundMessage.ImportRequest.prototype.setImporterId = function (value) {
+proto.OutboundMessage.ImportRequest.prototype.setImporterId = function(value) {
   return jspb.Message.setProto3IntField(this, 3, value);
 };
+
 
 /**
  * optional string url = 4;
  * @return {string}
  */
-proto.OutboundMessage.ImportRequest.prototype.getUrl = function () {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ''));
+proto.OutboundMessage.ImportRequest.prototype.getUrl = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
 };
+
 
 /**
  * @param {string} value
  * @return {!proto.OutboundMessage.ImportRequest} returns this
  */
-proto.OutboundMessage.ImportRequest.prototype.setUrl = function (value) {
+proto.OutboundMessage.ImportRequest.prototype.setUrl = function(value) {
   return jspb.Message.setProto3StringField(this, 4, value);
 };
 
+
+
+
+
 if (jspb.Message.GENERATE_TO_OBJECT) {
-  /**
-   * Creates an object representation of this proto.
-   * Field names that are reserved in JavaScript and will be renamed to pb_name.
-   * Optional fields that are not set will be set to undefined.
-   * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
-   * For the list of reserved names please see:
-   *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
-   * @param {boolean=} opt_includeInstance Deprecated. whether to include the
-   *     JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @return {!Object}
-   */
-  proto.OutboundMessage.FileImportRequest.prototype.toObject = function (
-    opt_includeInstance
-  ) {
-    return proto.OutboundMessage.FileImportRequest.toObject(
-      opt_includeInstance,
-      this
-    );
+/**
+ * Creates an object representation of this proto.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * Optional fields that are not set will be set to undefined.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
+ * @param {boolean=} opt_includeInstance Deprecated. whether to include the
+ *     JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.OutboundMessage.FileImportRequest.prototype.toObject = function(opt_includeInstance) {
+  return proto.OutboundMessage.FileImportRequest.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Deprecated. Whether to include
+ *     the JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.OutboundMessage.FileImportRequest} msg The msg instance to transform.
+ * @return {!Object}
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.OutboundMessage.FileImportRequest.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    id: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    compilationId: jspb.Message.getFieldWithDefault(msg, 2, 0),
+    importerId: jspb.Message.getFieldWithDefault(msg, 3, 0),
+    url: jspb.Message.getFieldWithDefault(msg, 4, "")
   };
 
-  /**
-   * Static version of the {@see toObject} method.
-   * @param {boolean|undefined} includeInstance Deprecated. Whether to include
-   *     the JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @param {!proto.OutboundMessage.FileImportRequest} msg The msg instance to transform.
-   * @return {!Object}
-   * @suppress {unusedLocalVariables} f is only used for nested messages
-   */
-  proto.OutboundMessage.FileImportRequest.toObject = function (
-    includeInstance,
-    msg
-  ) {
-    let f,
-      obj = {
-        id: jspb.Message.getFieldWithDefault(msg, 1, 0),
-        compilationId: jspb.Message.getFieldWithDefault(msg, 2, 0),
-        importerId: jspb.Message.getFieldWithDefault(msg, 3, 0),
-        url: jspb.Message.getFieldWithDefault(msg, 4, ''),
-      };
-
-    if (includeInstance) {
-      obj.$jspbMessageInstance = msg;
-    }
-    return obj;
-  };
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
 }
+
 
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
  * @return {!proto.OutboundMessage.FileImportRequest}
  */
-proto.OutboundMessage.FileImportRequest.deserializeBinary = function (bytes) {
-  const reader = new jspb.BinaryReader(bytes);
-  const msg = new proto.OutboundMessage.FileImportRequest();
-  return proto.OutboundMessage.FileImportRequest.deserializeBinaryFromReader(
-    msg,
-    reader
-  );
+proto.OutboundMessage.FileImportRequest.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.OutboundMessage.FileImportRequest;
+  return proto.OutboundMessage.FileImportRequest.deserializeBinaryFromReader(msg, reader);
 };
+
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
@@ -5401,49 +4949,48 @@ proto.OutboundMessage.FileImportRequest.deserializeBinary = function (bytes) {
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
  * @return {!proto.OutboundMessage.FileImportRequest}
  */
-proto.OutboundMessage.FileImportRequest.deserializeBinaryFromReader = function (
-  msg,
-  reader
-) {
+proto.OutboundMessage.FileImportRequest.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
     }
-    const field = reader.getFieldNumber();
+    var field = reader.getFieldNumber();
     switch (field) {
-      case 1:
-        var value = /** @type {number} */ (reader.readUint32());
-        msg.setId(value);
-        break;
-      case 2:
-        var value = /** @type {number} */ (reader.readUint32());
-        msg.setCompilationId(value);
-        break;
-      case 3:
-        var value = /** @type {number} */ (reader.readUint32());
-        msg.setImporterId(value);
-        break;
-      case 4:
-        var value = /** @type {string} */ (reader.readString());
-        msg.setUrl(value);
-        break;
-      default:
-        reader.skipField();
-        break;
+    case 1:
+      var value = /** @type {number} */ (reader.readUint32());
+      msg.setId(value);
+      break;
+    case 2:
+      var value = /** @type {number} */ (reader.readUint32());
+      msg.setCompilationId(value);
+      break;
+    case 3:
+      var value = /** @type {number} */ (reader.readUint32());
+      msg.setImporterId(value);
+      break;
+    case 4:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setUrl(value);
+      break;
+    default:
+      reader.skipField();
+      break;
     }
   }
   return msg;
 };
 
+
 /**
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.OutboundMessage.FileImportRequest.prototype.serializeBinary = function () {
-  const writer = new jspb.BinaryWriter();
+proto.OutboundMessage.FileImportRequest.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
   proto.OutboundMessage.FileImportRequest.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
+
 
 /**
  * Serializes the given message to binary data (in protobuf wire
@@ -5452,96 +4999,111 @@ proto.OutboundMessage.FileImportRequest.prototype.serializeBinary = function () 
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.OutboundMessage.FileImportRequest.serializeBinaryToWriter = function (
-  message,
-  writer
-) {
-  let f = undefined;
+proto.OutboundMessage.FileImportRequest.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
   f = message.getId();
   if (f !== 0) {
-    writer.writeUint32(1, f);
+    writer.writeUint32(
+      1,
+      f
+    );
   }
   f = message.getCompilationId();
   if (f !== 0) {
-    writer.writeUint32(2, f);
+    writer.writeUint32(
+      2,
+      f
+    );
   }
   f = message.getImporterId();
   if (f !== 0) {
-    writer.writeUint32(3, f);
+    writer.writeUint32(
+      3,
+      f
+    );
   }
   f = message.getUrl();
   if (f.length > 0) {
-    writer.writeString(4, f);
+    writer.writeString(
+      4,
+      f
+    );
   }
 };
+
 
 /**
  * optional uint32 id = 1;
  * @return {number}
  */
-proto.OutboundMessage.FileImportRequest.prototype.getId = function () {
+proto.OutboundMessage.FileImportRequest.prototype.getId = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
 };
+
 
 /**
  * @param {number} value
  * @return {!proto.OutboundMessage.FileImportRequest} returns this
  */
-proto.OutboundMessage.FileImportRequest.prototype.setId = function (value) {
+proto.OutboundMessage.FileImportRequest.prototype.setId = function(value) {
   return jspb.Message.setProto3IntField(this, 1, value);
 };
+
 
 /**
  * optional uint32 compilation_id = 2;
  * @return {number}
  */
-proto.OutboundMessage.FileImportRequest.prototype.getCompilationId = function () {
+proto.OutboundMessage.FileImportRequest.prototype.getCompilationId = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
 };
+
 
 /**
  * @param {number} value
  * @return {!proto.OutboundMessage.FileImportRequest} returns this
  */
-proto.OutboundMessage.FileImportRequest.prototype.setCompilationId = function (
-  value
-) {
+proto.OutboundMessage.FileImportRequest.prototype.setCompilationId = function(value) {
   return jspb.Message.setProto3IntField(this, 2, value);
 };
+
 
 /**
  * optional uint32 importer_id = 3;
  * @return {number}
  */
-proto.OutboundMessage.FileImportRequest.prototype.getImporterId = function () {
+proto.OutboundMessage.FileImportRequest.prototype.getImporterId = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 3, 0));
 };
+
 
 /**
  * @param {number} value
  * @return {!proto.OutboundMessage.FileImportRequest} returns this
  */
-proto.OutboundMessage.FileImportRequest.prototype.setImporterId = function (
-  value
-) {
+proto.OutboundMessage.FileImportRequest.prototype.setImporterId = function(value) {
   return jspb.Message.setProto3IntField(this, 3, value);
 };
+
 
 /**
  * optional string url = 4;
  * @return {string}
  */
-proto.OutboundMessage.FileImportRequest.prototype.getUrl = function () {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ''));
+proto.OutboundMessage.FileImportRequest.prototype.getUrl = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
 };
+
 
 /**
  * @param {string} value
  * @return {!proto.OutboundMessage.FileImportRequest} returns this
  */
-proto.OutboundMessage.FileImportRequest.prototype.setUrl = function (value) {
+proto.OutboundMessage.FileImportRequest.prototype.setUrl = function(value) {
   return jspb.Message.setProto3StringField(this, 4, value);
 };
+
+
 
 /**
  * List of repeated fields within this message type.
@@ -5558,7 +5120,7 @@ proto.OutboundMessage.FunctionCallRequest.repeatedFields_ = [5];
  * @private {!Array<!Array<number>>}
  * @const
  */
-proto.OutboundMessage.FunctionCallRequest.oneofGroups_ = [[3, 4]];
+proto.OutboundMessage.FunctionCallRequest.oneofGroups_ = [[3,4]];
 
 /**
  * @enum {number}
@@ -5566,87 +5128,74 @@ proto.OutboundMessage.FunctionCallRequest.oneofGroups_ = [[3, 4]];
 proto.OutboundMessage.FunctionCallRequest.IdentifierCase = {
   IDENTIFIER_NOT_SET: 0,
   NAME: 3,
-  FUNCTION_ID: 4,
+  FUNCTION_ID: 4
 };
 
 /**
  * @return {proto.OutboundMessage.FunctionCallRequest.IdentifierCase}
  */
-proto.OutboundMessage.FunctionCallRequest.prototype.getIdentifierCase = function () {
-  return /** @type {proto.OutboundMessage.FunctionCallRequest.IdentifierCase} */ (jspb.Message.computeOneofCase(
-    this,
-    proto.OutboundMessage.FunctionCallRequest.oneofGroups_[0]
-  ));
+proto.OutboundMessage.FunctionCallRequest.prototype.getIdentifierCase = function() {
+  return /** @type {proto.OutboundMessage.FunctionCallRequest.IdentifierCase} */(jspb.Message.computeOneofCase(this, proto.OutboundMessage.FunctionCallRequest.oneofGroups_[0]));
 };
 
+
+
 if (jspb.Message.GENERATE_TO_OBJECT) {
-  /**
-   * Creates an object representation of this proto.
-   * Field names that are reserved in JavaScript and will be renamed to pb_name.
-   * Optional fields that are not set will be set to undefined.
-   * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
-   * For the list of reserved names please see:
-   *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
-   * @param {boolean=} opt_includeInstance Deprecated. whether to include the
-   *     JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @return {!Object}
-   */
-  proto.OutboundMessage.FunctionCallRequest.prototype.toObject = function (
-    opt_includeInstance
-  ) {
-    return proto.OutboundMessage.FunctionCallRequest.toObject(
-      opt_includeInstance,
-      this
-    );
+/**
+ * Creates an object representation of this proto.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * Optional fields that are not set will be set to undefined.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
+ * @param {boolean=} opt_includeInstance Deprecated. whether to include the
+ *     JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.OutboundMessage.FunctionCallRequest.prototype.toObject = function(opt_includeInstance) {
+  return proto.OutboundMessage.FunctionCallRequest.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Deprecated. Whether to include
+ *     the JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.OutboundMessage.FunctionCallRequest} msg The msg instance to transform.
+ * @return {!Object}
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.OutboundMessage.FunctionCallRequest.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    id: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    compilationId: jspb.Message.getFieldWithDefault(msg, 2, 0),
+    name: jspb.Message.getFieldWithDefault(msg, 3, ""),
+    functionId: jspb.Message.getFieldWithDefault(msg, 4, 0),
+    argumentsList: jspb.Message.toObjectList(msg.getArgumentsList(),
+    proto.Value.toObject, includeInstance)
   };
 
-  /**
-   * Static version of the {@see toObject} method.
-   * @param {boolean|undefined} includeInstance Deprecated. Whether to include
-   *     the JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @param {!proto.OutboundMessage.FunctionCallRequest} msg The msg instance to transform.
-   * @return {!Object}
-   * @suppress {unusedLocalVariables} f is only used for nested messages
-   */
-  proto.OutboundMessage.FunctionCallRequest.toObject = function (
-    includeInstance,
-    msg
-  ) {
-    let f,
-      obj = {
-        id: jspb.Message.getFieldWithDefault(msg, 1, 0),
-        compilationId: jspb.Message.getFieldWithDefault(msg, 2, 0),
-        name: jspb.Message.getFieldWithDefault(msg, 3, ''),
-        functionId: jspb.Message.getFieldWithDefault(msg, 4, 0),
-        argumentsList: jspb.Message.toObjectList(
-          msg.getArgumentsList(),
-          proto.Value.toObject,
-          includeInstance
-        ),
-      };
-
-    if (includeInstance) {
-      obj.$jspbMessageInstance = msg;
-    }
-    return obj;
-  };
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
 }
+
 
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
  * @return {!proto.OutboundMessage.FunctionCallRequest}
  */
-proto.OutboundMessage.FunctionCallRequest.deserializeBinary = function (bytes) {
-  const reader = new jspb.BinaryReader(bytes);
-  const msg = new proto.OutboundMessage.FunctionCallRequest();
-  return proto.OutboundMessage.FunctionCallRequest.deserializeBinaryFromReader(
-    msg,
-    reader
-  );
+proto.OutboundMessage.FunctionCallRequest.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.OutboundMessage.FunctionCallRequest;
+  return proto.OutboundMessage.FunctionCallRequest.deserializeBinaryFromReader(msg, reader);
 };
+
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
@@ -5655,57 +5204,53 @@ proto.OutboundMessage.FunctionCallRequest.deserializeBinary = function (bytes) {
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
  * @return {!proto.OutboundMessage.FunctionCallRequest}
  */
-proto.OutboundMessage.FunctionCallRequest.deserializeBinaryFromReader = function (
-  msg,
-  reader
-) {
+proto.OutboundMessage.FunctionCallRequest.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
     }
-    const field = reader.getFieldNumber();
+    var field = reader.getFieldNumber();
     switch (field) {
-      case 1:
-        var value = /** @type {number} */ (reader.readUint32());
-        msg.setId(value);
-        break;
-      case 2:
-        var value = /** @type {number} */ (reader.readUint32());
-        msg.setCompilationId(value);
-        break;
-      case 3:
-        var value = /** @type {string} */ (reader.readString());
-        msg.setName(value);
-        break;
-      case 4:
-        var value = /** @type {number} */ (reader.readUint32());
-        msg.setFunctionId(value);
-        break;
-      case 5:
-        var value = new proto.Value();
-        reader.readMessage(value, proto.Value.deserializeBinaryFromReader);
-        msg.addArguments(value);
-        break;
-      default:
-        reader.skipField();
-        break;
+    case 1:
+      var value = /** @type {number} */ (reader.readUint32());
+      msg.setId(value);
+      break;
+    case 2:
+      var value = /** @type {number} */ (reader.readUint32());
+      msg.setCompilationId(value);
+      break;
+    case 3:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setName(value);
+      break;
+    case 4:
+      var value = /** @type {number} */ (reader.readUint32());
+      msg.setFunctionId(value);
+      break;
+    case 5:
+      var value = new proto.Value;
+      reader.readMessage(value,proto.Value.deserializeBinaryFromReader);
+      msg.addArguments(value);
+      break;
+    default:
+      reader.skipField();
+      break;
     }
   }
   return msg;
 };
 
+
 /**
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.OutboundMessage.FunctionCallRequest.prototype.serializeBinary = function () {
-  const writer = new jspb.BinaryWriter();
-  proto.OutboundMessage.FunctionCallRequest.serializeBinaryToWriter(
-    this,
-    writer
-  );
+proto.OutboundMessage.FunctionCallRequest.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.OutboundMessage.FunctionCallRequest.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
+
 
 /**
  * Serializes the given message to binary data (in protobuf wire
@@ -5714,539 +5259,508 @@ proto.OutboundMessage.FunctionCallRequest.prototype.serializeBinary = function (
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.OutboundMessage.FunctionCallRequest.serializeBinaryToWriter = function (
-  message,
-  writer
-) {
-  let f = undefined;
+proto.OutboundMessage.FunctionCallRequest.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
   f = message.getId();
   if (f !== 0) {
-    writer.writeUint32(1, f);
+    writer.writeUint32(
+      1,
+      f
+    );
   }
   f = message.getCompilationId();
   if (f !== 0) {
-    writer.writeUint32(2, f);
+    writer.writeUint32(
+      2,
+      f
+    );
   }
   f = /** @type {string} */ (jspb.Message.getField(message, 3));
   if (f != null) {
-    writer.writeString(3, f);
+    writer.writeString(
+      3,
+      f
+    );
   }
   f = /** @type {number} */ (jspb.Message.getField(message, 4));
   if (f != null) {
-    writer.writeUint32(4, f);
+    writer.writeUint32(
+      4,
+      f
+    );
   }
   f = message.getArgumentsList();
   if (f.length > 0) {
-    writer.writeRepeatedMessage(5, f, proto.Value.serializeBinaryToWriter);
+    writer.writeRepeatedMessage(
+      5,
+      f,
+      proto.Value.serializeBinaryToWriter
+    );
   }
 };
+
 
 /**
  * optional uint32 id = 1;
  * @return {number}
  */
-proto.OutboundMessage.FunctionCallRequest.prototype.getId = function () {
+proto.OutboundMessage.FunctionCallRequest.prototype.getId = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
 };
+
 
 /**
  * @param {number} value
  * @return {!proto.OutboundMessage.FunctionCallRequest} returns this
  */
-proto.OutboundMessage.FunctionCallRequest.prototype.setId = function (value) {
+proto.OutboundMessage.FunctionCallRequest.prototype.setId = function(value) {
   return jspb.Message.setProto3IntField(this, 1, value);
 };
+
 
 /**
  * optional uint32 compilation_id = 2;
  * @return {number}
  */
-proto.OutboundMessage.FunctionCallRequest.prototype.getCompilationId = function () {
+proto.OutboundMessage.FunctionCallRequest.prototype.getCompilationId = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
 };
+
 
 /**
  * @param {number} value
  * @return {!proto.OutboundMessage.FunctionCallRequest} returns this
  */
-proto.OutboundMessage.FunctionCallRequest.prototype.setCompilationId = function (
-  value
-) {
+proto.OutboundMessage.FunctionCallRequest.prototype.setCompilationId = function(value) {
   return jspb.Message.setProto3IntField(this, 2, value);
 };
+
 
 /**
  * optional string name = 3;
  * @return {string}
  */
-proto.OutboundMessage.FunctionCallRequest.prototype.getName = function () {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ''));
+proto.OutboundMessage.FunctionCallRequest.prototype.getName = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
 };
+
 
 /**
  * @param {string} value
  * @return {!proto.OutboundMessage.FunctionCallRequest} returns this
  */
-proto.OutboundMessage.FunctionCallRequest.prototype.setName = function (value) {
-  return jspb.Message.setOneofField(
-    this,
-    3,
-    proto.OutboundMessage.FunctionCallRequest.oneofGroups_[0],
-    value
-  );
+proto.OutboundMessage.FunctionCallRequest.prototype.setName = function(value) {
+  return jspb.Message.setOneofField(this, 3, proto.OutboundMessage.FunctionCallRequest.oneofGroups_[0], value);
 };
+
 
 /**
  * Clears the field making it undefined.
  * @return {!proto.OutboundMessage.FunctionCallRequest} returns this
  */
-proto.OutboundMessage.FunctionCallRequest.prototype.clearName = function () {
-  return jspb.Message.setOneofField(
-    this,
-    3,
-    proto.OutboundMessage.FunctionCallRequest.oneofGroups_[0],
-    undefined
-  );
+proto.OutboundMessage.FunctionCallRequest.prototype.clearName = function() {
+  return jspb.Message.setOneofField(this, 3, proto.OutboundMessage.FunctionCallRequest.oneofGroups_[0], undefined);
 };
+
 
 /**
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.OutboundMessage.FunctionCallRequest.prototype.hasName = function () {
+proto.OutboundMessage.FunctionCallRequest.prototype.hasName = function() {
   return jspb.Message.getField(this, 3) != null;
 };
+
 
 /**
  * optional uint32 function_id = 4;
  * @return {number}
  */
-proto.OutboundMessage.FunctionCallRequest.prototype.getFunctionId = function () {
+proto.OutboundMessage.FunctionCallRequest.prototype.getFunctionId = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 4, 0));
 };
+
 
 /**
  * @param {number} value
  * @return {!proto.OutboundMessage.FunctionCallRequest} returns this
  */
-proto.OutboundMessage.FunctionCallRequest.prototype.setFunctionId = function (
-  value
-) {
-  return jspb.Message.setOneofField(
-    this,
-    4,
-    proto.OutboundMessage.FunctionCallRequest.oneofGroups_[0],
-    value
-  );
+proto.OutboundMessage.FunctionCallRequest.prototype.setFunctionId = function(value) {
+  return jspb.Message.setOneofField(this, 4, proto.OutboundMessage.FunctionCallRequest.oneofGroups_[0], value);
 };
+
 
 /**
  * Clears the field making it undefined.
  * @return {!proto.OutboundMessage.FunctionCallRequest} returns this
  */
-proto.OutboundMessage.FunctionCallRequest.prototype.clearFunctionId = function () {
-  return jspb.Message.setOneofField(
-    this,
-    4,
-    proto.OutboundMessage.FunctionCallRequest.oneofGroups_[0],
-    undefined
-  );
+proto.OutboundMessage.FunctionCallRequest.prototype.clearFunctionId = function() {
+  return jspb.Message.setOneofField(this, 4, proto.OutboundMessage.FunctionCallRequest.oneofGroups_[0], undefined);
 };
+
 
 /**
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.OutboundMessage.FunctionCallRequest.prototype.hasFunctionId = function () {
+proto.OutboundMessage.FunctionCallRequest.prototype.hasFunctionId = function() {
   return jspb.Message.getField(this, 4) != null;
 };
+
 
 /**
  * repeated Value arguments = 5;
  * @return {!Array<!proto.Value>}
  */
-proto.OutboundMessage.FunctionCallRequest.prototype.getArgumentsList = function () {
-  return /** @type{!Array<!proto.Value>} */ (jspb.Message.getRepeatedWrapperField(
-    this,
-    proto.Value,
-    5
-  ));
+proto.OutboundMessage.FunctionCallRequest.prototype.getArgumentsList = function() {
+  return /** @type{!Array<!proto.Value>} */ (
+    jspb.Message.getRepeatedWrapperField(this, proto.Value, 5));
 };
+
 
 /**
  * @param {!Array<!proto.Value>} value
  * @return {!proto.OutboundMessage.FunctionCallRequest} returns this
- */
-proto.OutboundMessage.FunctionCallRequest.prototype.setArgumentsList = function (
-  value
-) {
+*/
+proto.OutboundMessage.FunctionCallRequest.prototype.setArgumentsList = function(value) {
   return jspb.Message.setRepeatedWrapperField(this, 5, value);
 };
+
 
 /**
  * @param {!proto.Value=} opt_value
  * @param {number=} opt_index
  * @return {!proto.Value}
  */
-proto.OutboundMessage.FunctionCallRequest.prototype.addArguments = function (
-  opt_value,
-  opt_index
-) {
-  return jspb.Message.addToRepeatedWrapperField(
-    this,
-    5,
-    opt_value,
-    proto.Value,
-    opt_index
-  );
+proto.OutboundMessage.FunctionCallRequest.prototype.addArguments = function(opt_value, opt_index) {
+  return jspb.Message.addToRepeatedWrapperField(this, 5, opt_value, proto.Value, opt_index);
 };
+
 
 /**
  * Clears the list making it empty but non-null.
  * @return {!proto.OutboundMessage.FunctionCallRequest} returns this
  */
-proto.OutboundMessage.FunctionCallRequest.prototype.clearArgumentsList = function () {
+proto.OutboundMessage.FunctionCallRequest.prototype.clearArgumentsList = function() {
   return this.setArgumentsList([]);
 };
+
 
 /**
  * optional ProtocolError error = 1;
  * @return {?proto.ProtocolError}
  */
-proto.OutboundMessage.prototype.getError = function () {
-  return /** @type{?proto.ProtocolError} */ (jspb.Message.getWrapperField(
-    this,
-    proto.ProtocolError,
-    1
-  ));
+proto.OutboundMessage.prototype.getError = function() {
+  return /** @type{?proto.ProtocolError} */ (
+    jspb.Message.getWrapperField(this, proto.ProtocolError, 1));
 };
+
 
 /**
  * @param {?proto.ProtocolError|undefined} value
  * @return {!proto.OutboundMessage} returns this
- */
-proto.OutboundMessage.prototype.setError = function (value) {
-  return jspb.Message.setOneofWrapperField(
-    this,
-    1,
-    proto.OutboundMessage.oneofGroups_[0],
-    value
-  );
+*/
+proto.OutboundMessage.prototype.setError = function(value) {
+  return jspb.Message.setOneofWrapperField(this, 1, proto.OutboundMessage.oneofGroups_[0], value);
 };
+
 
 /**
  * Clears the message field making it undefined.
  * @return {!proto.OutboundMessage} returns this
  */
-proto.OutboundMessage.prototype.clearError = function () {
+proto.OutboundMessage.prototype.clearError = function() {
   return this.setError(undefined);
 };
+
 
 /**
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.OutboundMessage.prototype.hasError = function () {
+proto.OutboundMessage.prototype.hasError = function() {
   return jspb.Message.getField(this, 1) != null;
 };
+
 
 /**
  * optional CompileResponse compileResponse = 2;
  * @return {?proto.OutboundMessage.CompileResponse}
  */
-proto.OutboundMessage.prototype.getCompileresponse = function () {
-  return /** @type{?proto.OutboundMessage.CompileResponse} */ (jspb.Message.getWrapperField(
-    this,
-    proto.OutboundMessage.CompileResponse,
-    2
-  ));
+proto.OutboundMessage.prototype.getCompileresponse = function() {
+  return /** @type{?proto.OutboundMessage.CompileResponse} */ (
+    jspb.Message.getWrapperField(this, proto.OutboundMessage.CompileResponse, 2));
 };
+
 
 /**
  * @param {?proto.OutboundMessage.CompileResponse|undefined} value
  * @return {!proto.OutboundMessage} returns this
- */
-proto.OutboundMessage.prototype.setCompileresponse = function (value) {
-  return jspb.Message.setOneofWrapperField(
-    this,
-    2,
-    proto.OutboundMessage.oneofGroups_[0],
-    value
-  );
+*/
+proto.OutboundMessage.prototype.setCompileresponse = function(value) {
+  return jspb.Message.setOneofWrapperField(this, 2, proto.OutboundMessage.oneofGroups_[0], value);
 };
+
 
 /**
  * Clears the message field making it undefined.
  * @return {!proto.OutboundMessage} returns this
  */
-proto.OutboundMessage.prototype.clearCompileresponse = function () {
+proto.OutboundMessage.prototype.clearCompileresponse = function() {
   return this.setCompileresponse(undefined);
 };
+
 
 /**
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.OutboundMessage.prototype.hasCompileresponse = function () {
+proto.OutboundMessage.prototype.hasCompileresponse = function() {
   return jspb.Message.getField(this, 2) != null;
 };
+
 
 /**
  * optional LogEvent logEvent = 3;
  * @return {?proto.OutboundMessage.LogEvent}
  */
-proto.OutboundMessage.prototype.getLogevent = function () {
-  return /** @type{?proto.OutboundMessage.LogEvent} */ (jspb.Message.getWrapperField(
-    this,
-    proto.OutboundMessage.LogEvent,
-    3
-  ));
+proto.OutboundMessage.prototype.getLogevent = function() {
+  return /** @type{?proto.OutboundMessage.LogEvent} */ (
+    jspb.Message.getWrapperField(this, proto.OutboundMessage.LogEvent, 3));
 };
+
 
 /**
  * @param {?proto.OutboundMessage.LogEvent|undefined} value
  * @return {!proto.OutboundMessage} returns this
- */
-proto.OutboundMessage.prototype.setLogevent = function (value) {
-  return jspb.Message.setOneofWrapperField(
-    this,
-    3,
-    proto.OutboundMessage.oneofGroups_[0],
-    value
-  );
+*/
+proto.OutboundMessage.prototype.setLogevent = function(value) {
+  return jspb.Message.setOneofWrapperField(this, 3, proto.OutboundMessage.oneofGroups_[0], value);
 };
+
 
 /**
  * Clears the message field making it undefined.
  * @return {!proto.OutboundMessage} returns this
  */
-proto.OutboundMessage.prototype.clearLogevent = function () {
+proto.OutboundMessage.prototype.clearLogevent = function() {
   return this.setLogevent(undefined);
 };
+
 
 /**
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.OutboundMessage.prototype.hasLogevent = function () {
+proto.OutboundMessage.prototype.hasLogevent = function() {
   return jspb.Message.getField(this, 3) != null;
 };
+
 
 /**
  * optional CanonicalizeRequest canonicalizeRequest = 4;
  * @return {?proto.OutboundMessage.CanonicalizeRequest}
  */
-proto.OutboundMessage.prototype.getCanonicalizerequest = function () {
-  return /** @type{?proto.OutboundMessage.CanonicalizeRequest} */ (jspb.Message.getWrapperField(
-    this,
-    proto.OutboundMessage.CanonicalizeRequest,
-    4
-  ));
+proto.OutboundMessage.prototype.getCanonicalizerequest = function() {
+  return /** @type{?proto.OutboundMessage.CanonicalizeRequest} */ (
+    jspb.Message.getWrapperField(this, proto.OutboundMessage.CanonicalizeRequest, 4));
 };
+
 
 /**
  * @param {?proto.OutboundMessage.CanonicalizeRequest|undefined} value
  * @return {!proto.OutboundMessage} returns this
- */
-proto.OutboundMessage.prototype.setCanonicalizerequest = function (value) {
-  return jspb.Message.setOneofWrapperField(
-    this,
-    4,
-    proto.OutboundMessage.oneofGroups_[0],
-    value
-  );
+*/
+proto.OutboundMessage.prototype.setCanonicalizerequest = function(value) {
+  return jspb.Message.setOneofWrapperField(this, 4, proto.OutboundMessage.oneofGroups_[0], value);
 };
+
 
 /**
  * Clears the message field making it undefined.
  * @return {!proto.OutboundMessage} returns this
  */
-proto.OutboundMessage.prototype.clearCanonicalizerequest = function () {
+proto.OutboundMessage.prototype.clearCanonicalizerequest = function() {
   return this.setCanonicalizerequest(undefined);
 };
+
 
 /**
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.OutboundMessage.prototype.hasCanonicalizerequest = function () {
+proto.OutboundMessage.prototype.hasCanonicalizerequest = function() {
   return jspb.Message.getField(this, 4) != null;
 };
+
 
 /**
  * optional ImportRequest importRequest = 5;
  * @return {?proto.OutboundMessage.ImportRequest}
  */
-proto.OutboundMessage.prototype.getImportrequest = function () {
-  return /** @type{?proto.OutboundMessage.ImportRequest} */ (jspb.Message.getWrapperField(
-    this,
-    proto.OutboundMessage.ImportRequest,
-    5
-  ));
+proto.OutboundMessage.prototype.getImportrequest = function() {
+  return /** @type{?proto.OutboundMessage.ImportRequest} */ (
+    jspb.Message.getWrapperField(this, proto.OutboundMessage.ImportRequest, 5));
 };
+
 
 /**
  * @param {?proto.OutboundMessage.ImportRequest|undefined} value
  * @return {!proto.OutboundMessage} returns this
- */
-proto.OutboundMessage.prototype.setImportrequest = function (value) {
-  return jspb.Message.setOneofWrapperField(
-    this,
-    5,
-    proto.OutboundMessage.oneofGroups_[0],
-    value
-  );
+*/
+proto.OutboundMessage.prototype.setImportrequest = function(value) {
+  return jspb.Message.setOneofWrapperField(this, 5, proto.OutboundMessage.oneofGroups_[0], value);
 };
+
 
 /**
  * Clears the message field making it undefined.
  * @return {!proto.OutboundMessage} returns this
  */
-proto.OutboundMessage.prototype.clearImportrequest = function () {
+proto.OutboundMessage.prototype.clearImportrequest = function() {
   return this.setImportrequest(undefined);
 };
+
 
 /**
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.OutboundMessage.prototype.hasImportrequest = function () {
+proto.OutboundMessage.prototype.hasImportrequest = function() {
   return jspb.Message.getField(this, 5) != null;
 };
+
 
 /**
  * optional FileImportRequest fileImportRequest = 6;
  * @return {?proto.OutboundMessage.FileImportRequest}
  */
-proto.OutboundMessage.prototype.getFileimportrequest = function () {
-  return /** @type{?proto.OutboundMessage.FileImportRequest} */ (jspb.Message.getWrapperField(
-    this,
-    proto.OutboundMessage.FileImportRequest,
-    6
-  ));
+proto.OutboundMessage.prototype.getFileimportrequest = function() {
+  return /** @type{?proto.OutboundMessage.FileImportRequest} */ (
+    jspb.Message.getWrapperField(this, proto.OutboundMessage.FileImportRequest, 6));
 };
+
 
 /**
  * @param {?proto.OutboundMessage.FileImportRequest|undefined} value
  * @return {!proto.OutboundMessage} returns this
- */
-proto.OutboundMessage.prototype.setFileimportrequest = function (value) {
-  return jspb.Message.setOneofWrapperField(
-    this,
-    6,
-    proto.OutboundMessage.oneofGroups_[0],
-    value
-  );
+*/
+proto.OutboundMessage.prototype.setFileimportrequest = function(value) {
+  return jspb.Message.setOneofWrapperField(this, 6, proto.OutboundMessage.oneofGroups_[0], value);
 };
+
 
 /**
  * Clears the message field making it undefined.
  * @return {!proto.OutboundMessage} returns this
  */
-proto.OutboundMessage.prototype.clearFileimportrequest = function () {
+proto.OutboundMessage.prototype.clearFileimportrequest = function() {
   return this.setFileimportrequest(undefined);
 };
+
 
 /**
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.OutboundMessage.prototype.hasFileimportrequest = function () {
+proto.OutboundMessage.prototype.hasFileimportrequest = function() {
   return jspb.Message.getField(this, 6) != null;
 };
+
 
 /**
  * optional FunctionCallRequest functionCallRequest = 7;
  * @return {?proto.OutboundMessage.FunctionCallRequest}
  */
-proto.OutboundMessage.prototype.getFunctioncallrequest = function () {
-  return /** @type{?proto.OutboundMessage.FunctionCallRequest} */ (jspb.Message.getWrapperField(
-    this,
-    proto.OutboundMessage.FunctionCallRequest,
-    7
-  ));
+proto.OutboundMessage.prototype.getFunctioncallrequest = function() {
+  return /** @type{?proto.OutboundMessage.FunctionCallRequest} */ (
+    jspb.Message.getWrapperField(this, proto.OutboundMessage.FunctionCallRequest, 7));
 };
+
 
 /**
  * @param {?proto.OutboundMessage.FunctionCallRequest|undefined} value
  * @return {!proto.OutboundMessage} returns this
- */
-proto.OutboundMessage.prototype.setFunctioncallrequest = function (value) {
-  return jspb.Message.setOneofWrapperField(
-    this,
-    7,
-    proto.OutboundMessage.oneofGroups_[0],
-    value
-  );
+*/
+proto.OutboundMessage.prototype.setFunctioncallrequest = function(value) {
+  return jspb.Message.setOneofWrapperField(this, 7, proto.OutboundMessage.oneofGroups_[0], value);
 };
+
 
 /**
  * Clears the message field making it undefined.
  * @return {!proto.OutboundMessage} returns this
  */
-proto.OutboundMessage.prototype.clearFunctioncallrequest = function () {
+proto.OutboundMessage.prototype.clearFunctioncallrequest = function() {
   return this.setFunctioncallrequest(undefined);
 };
+
 
 /**
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.OutboundMessage.prototype.hasFunctioncallrequest = function () {
+proto.OutboundMessage.prototype.hasFunctioncallrequest = function() {
   return jspb.Message.getField(this, 7) != null;
 };
 
+
+
+
+
 if (jspb.Message.GENERATE_TO_OBJECT) {
-  /**
-   * Creates an object representation of this proto.
-   * Field names that are reserved in JavaScript and will be renamed to pb_name.
-   * Optional fields that are not set will be set to undefined.
-   * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
-   * For the list of reserved names please see:
-   *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
-   * @param {boolean=} opt_includeInstance Deprecated. whether to include the
-   *     JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @return {!Object}
-   */
-  proto.ProtocolError.prototype.toObject = function (opt_includeInstance) {
-    return proto.ProtocolError.toObject(opt_includeInstance, this);
+/**
+ * Creates an object representation of this proto.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * Optional fields that are not set will be set to undefined.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
+ * @param {boolean=} opt_includeInstance Deprecated. whether to include the
+ *     JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.ProtocolError.prototype.toObject = function(opt_includeInstance) {
+  return proto.ProtocolError.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Deprecated. Whether to include
+ *     the JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.ProtocolError} msg The msg instance to transform.
+ * @return {!Object}
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.ProtocolError.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    type: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    id: jspb.Message.getFieldWithDefault(msg, 2, 0),
+    message: jspb.Message.getFieldWithDefault(msg, 3, "")
   };
 
-  /**
-   * Static version of the {@see toObject} method.
-   * @param {boolean|undefined} includeInstance Deprecated. Whether to include
-   *     the JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @param {!proto.ProtocolError} msg The msg instance to transform.
-   * @return {!Object}
-   * @suppress {unusedLocalVariables} f is only used for nested messages
-   */
-  proto.ProtocolError.toObject = function (includeInstance, msg) {
-    let f,
-      obj = {
-        type: jspb.Message.getFieldWithDefault(msg, 1, 0),
-        id: jspb.Message.getFieldWithDefault(msg, 2, 0),
-        message: jspb.Message.getFieldWithDefault(msg, 3, ''),
-      };
-
-    if (includeInstance) {
-      obj.$jspbMessageInstance = msg;
-    }
-    return obj;
-  };
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
 }
+
 
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
  * @return {!proto.ProtocolError}
  */
-proto.ProtocolError.deserializeBinary = function (bytes) {
-  const reader = new jspb.BinaryReader(bytes);
-  const msg = new proto.ProtocolError();
+proto.ProtocolError.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.ProtocolError;
   return proto.ProtocolError.deserializeBinaryFromReader(msg, reader);
 };
+
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
@@ -6255,42 +5769,44 @@ proto.ProtocolError.deserializeBinary = function (bytes) {
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
  * @return {!proto.ProtocolError}
  */
-proto.ProtocolError.deserializeBinaryFromReader = function (msg, reader) {
+proto.ProtocolError.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
     }
-    const field = reader.getFieldNumber();
+    var field = reader.getFieldNumber();
     switch (field) {
-      case 1:
-        var value = /** @type {!proto.ProtocolError.ErrorType} */ (reader.readEnum());
-        msg.setType(value);
-        break;
-      case 2:
-        var value = /** @type {number} */ (reader.readInt32());
-        msg.setId(value);
-        break;
-      case 3:
-        var value = /** @type {string} */ (reader.readString());
-        msg.setMessage(value);
-        break;
-      default:
-        reader.skipField();
-        break;
+    case 1:
+      var value = /** @type {!proto.ProtocolError.ErrorType} */ (reader.readEnum());
+      msg.setType(value);
+      break;
+    case 2:
+      var value = /** @type {number} */ (reader.readInt32());
+      msg.setId(value);
+      break;
+    case 3:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setMessage(value);
+      break;
+    default:
+      reader.skipField();
+      break;
     }
   }
   return msg;
 };
 
+
 /**
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.ProtocolError.prototype.serializeBinary = function () {
-  const writer = new jspb.BinaryWriter();
+proto.ProtocolError.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
   proto.ProtocolError.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
+
 
 /**
  * Serializes the given message to binary data (in protobuf wire
@@ -6299,21 +5815,31 @@ proto.ProtocolError.prototype.serializeBinary = function () {
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.ProtocolError.serializeBinaryToWriter = function (message, writer) {
-  let f = undefined;
+proto.ProtocolError.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
   f = message.getType();
   if (f !== 0.0) {
-    writer.writeEnum(1, f);
+    writer.writeEnum(
+      1,
+      f
+    );
   }
   f = message.getId();
   if (f !== 0) {
-    writer.writeInt32(2, f);
+    writer.writeInt32(
+      2,
+      f
+    );
   }
   f = message.getMessage();
   if (f.length > 0) {
-    writer.writeString(3, f);
+    writer.writeString(
+      3,
+      f
+    );
   }
 };
+
 
 /**
  * @enum {number}
@@ -6321,118 +5847,121 @@ proto.ProtocolError.serializeBinaryToWriter = function (message, writer) {
 proto.ProtocolError.ErrorType = {
   PARSE: 0,
   PARAMS: 1,
-  INTERNAL: 2,
+  INTERNAL: 2
 };
 
 /**
  * optional ErrorType type = 1;
  * @return {!proto.ProtocolError.ErrorType}
  */
-proto.ProtocolError.prototype.getType = function () {
-  return /** @type {!proto.ProtocolError.ErrorType} */ (jspb.Message.getFieldWithDefault(
-    this,
-    1,
-    0
-  ));
+proto.ProtocolError.prototype.getType = function() {
+  return /** @type {!proto.ProtocolError.ErrorType} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
 };
+
 
 /**
  * @param {!proto.ProtocolError.ErrorType} value
  * @return {!proto.ProtocolError} returns this
  */
-proto.ProtocolError.prototype.setType = function (value) {
+proto.ProtocolError.prototype.setType = function(value) {
   return jspb.Message.setProto3EnumField(this, 1, value);
 };
+
 
 /**
  * optional int32 id = 2;
  * @return {number}
  */
-proto.ProtocolError.prototype.getId = function () {
+proto.ProtocolError.prototype.getId = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
 };
+
 
 /**
  * @param {number} value
  * @return {!proto.ProtocolError} returns this
  */
-proto.ProtocolError.prototype.setId = function (value) {
+proto.ProtocolError.prototype.setId = function(value) {
   return jspb.Message.setProto3IntField(this, 2, value);
 };
+
 
 /**
  * optional string message = 3;
  * @return {string}
  */
-proto.ProtocolError.prototype.getMessage = function () {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ''));
+proto.ProtocolError.prototype.getMessage = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
 };
+
 
 /**
  * @param {string} value
  * @return {!proto.ProtocolError} returns this
  */
-proto.ProtocolError.prototype.setMessage = function (value) {
+proto.ProtocolError.prototype.setMessage = function(value) {
   return jspb.Message.setProto3StringField(this, 3, value);
 };
 
+
+
+
+
 if (jspb.Message.GENERATE_TO_OBJECT) {
-  /**
-   * Creates an object representation of this proto.
-   * Field names that are reserved in JavaScript and will be renamed to pb_name.
-   * Optional fields that are not set will be set to undefined.
-   * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
-   * For the list of reserved names please see:
-   *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
-   * @param {boolean=} opt_includeInstance Deprecated. whether to include the
-   *     JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @return {!Object}
-   */
-  proto.SourceSpan.prototype.toObject = function (opt_includeInstance) {
-    return proto.SourceSpan.toObject(opt_includeInstance, this);
+/**
+ * Creates an object representation of this proto.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * Optional fields that are not set will be set to undefined.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
+ * @param {boolean=} opt_includeInstance Deprecated. whether to include the
+ *     JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.SourceSpan.prototype.toObject = function(opt_includeInstance) {
+  return proto.SourceSpan.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Deprecated. Whether to include
+ *     the JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.SourceSpan} msg The msg instance to transform.
+ * @return {!Object}
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.SourceSpan.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    text: jspb.Message.getFieldWithDefault(msg, 1, ""),
+    start: (f = msg.getStart()) && proto.SourceSpan.SourceLocation.toObject(includeInstance, f),
+    end: (f = msg.getEnd()) && proto.SourceSpan.SourceLocation.toObject(includeInstance, f),
+    url: jspb.Message.getFieldWithDefault(msg, 4, ""),
+    context: jspb.Message.getFieldWithDefault(msg, 5, "")
   };
 
-  /**
-   * Static version of the {@see toObject} method.
-   * @param {boolean|undefined} includeInstance Deprecated. Whether to include
-   *     the JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @param {!proto.SourceSpan} msg The msg instance to transform.
-   * @return {!Object}
-   * @suppress {unusedLocalVariables} f is only used for nested messages
-   */
-  proto.SourceSpan.toObject = function (includeInstance, msg) {
-    let f,
-      obj = {
-        text: jspb.Message.getFieldWithDefault(msg, 1, ''),
-        start:
-          (f = msg.getStart()) &&
-          proto.SourceSpan.SourceLocation.toObject(includeInstance, f),
-        end:
-          (f = msg.getEnd()) &&
-          proto.SourceSpan.SourceLocation.toObject(includeInstance, f),
-        url: jspb.Message.getFieldWithDefault(msg, 4, ''),
-        context: jspb.Message.getFieldWithDefault(msg, 5, ''),
-      };
-
-    if (includeInstance) {
-      obj.$jspbMessageInstance = msg;
-    }
-    return obj;
-  };
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
 }
+
 
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
  * @return {!proto.SourceSpan}
  */
-proto.SourceSpan.deserializeBinary = function (bytes) {
-  const reader = new jspb.BinaryReader(bytes);
-  const msg = new proto.SourceSpan();
+proto.SourceSpan.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.SourceSpan;
   return proto.SourceSpan.deserializeBinaryFromReader(msg, reader);
 };
+
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
@@ -6441,58 +5970,54 @@ proto.SourceSpan.deserializeBinary = function (bytes) {
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
  * @return {!proto.SourceSpan}
  */
-proto.SourceSpan.deserializeBinaryFromReader = function (msg, reader) {
+proto.SourceSpan.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
     }
-    const field = reader.getFieldNumber();
+    var field = reader.getFieldNumber();
     switch (field) {
-      case 1:
-        var value = /** @type {string} */ (reader.readString());
-        msg.setText(value);
-        break;
-      case 2:
-        var value = new proto.SourceSpan.SourceLocation();
-        reader.readMessage(
-          value,
-          proto.SourceSpan.SourceLocation.deserializeBinaryFromReader
-        );
-        msg.setStart(value);
-        break;
-      case 3:
-        var value = new proto.SourceSpan.SourceLocation();
-        reader.readMessage(
-          value,
-          proto.SourceSpan.SourceLocation.deserializeBinaryFromReader
-        );
-        msg.setEnd(value);
-        break;
-      case 4:
-        var value = /** @type {string} */ (reader.readString());
-        msg.setUrl(value);
-        break;
-      case 5:
-        var value = /** @type {string} */ (reader.readString());
-        msg.setContext(value);
-        break;
-      default:
-        reader.skipField();
-        break;
+    case 1:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setText(value);
+      break;
+    case 2:
+      var value = new proto.SourceSpan.SourceLocation;
+      reader.readMessage(value,proto.SourceSpan.SourceLocation.deserializeBinaryFromReader);
+      msg.setStart(value);
+      break;
+    case 3:
+      var value = new proto.SourceSpan.SourceLocation;
+      reader.readMessage(value,proto.SourceSpan.SourceLocation.deserializeBinaryFromReader);
+      msg.setEnd(value);
+      break;
+    case 4:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setUrl(value);
+      break;
+    case 5:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setContext(value);
+      break;
+    default:
+      reader.skipField();
+      break;
     }
   }
   return msg;
 };
 
+
 /**
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.SourceSpan.prototype.serializeBinary = function () {
-  const writer = new jspb.BinaryWriter();
+proto.SourceSpan.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
   proto.SourceSpan.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
+
 
 /**
  * Serializes the given message to binary data (in protobuf wire
@@ -6501,11 +6026,14 @@ proto.SourceSpan.prototype.serializeBinary = function () {
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.SourceSpan.serializeBinaryToWriter = function (message, writer) {
-  let f = undefined;
+proto.SourceSpan.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
   f = message.getText();
   if (f.length > 0) {
-    writer.writeString(1, f);
+    writer.writeString(
+      1,
+      f
+    );
   }
   f = message.getStart();
   if (f != null) {
@@ -6525,70 +6053,77 @@ proto.SourceSpan.serializeBinaryToWriter = function (message, writer) {
   }
   f = message.getUrl();
   if (f.length > 0) {
-    writer.writeString(4, f);
+    writer.writeString(
+      4,
+      f
+    );
   }
   f = message.getContext();
   if (f.length > 0) {
-    writer.writeString(5, f);
+    writer.writeString(
+      5,
+      f
+    );
   }
 };
 
+
+
+
+
 if (jspb.Message.GENERATE_TO_OBJECT) {
-  /**
-   * Creates an object representation of this proto.
-   * Field names that are reserved in JavaScript and will be renamed to pb_name.
-   * Optional fields that are not set will be set to undefined.
-   * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
-   * For the list of reserved names please see:
-   *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
-   * @param {boolean=} opt_includeInstance Deprecated. whether to include the
-   *     JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @return {!Object}
-   */
-  proto.SourceSpan.SourceLocation.prototype.toObject = function (
-    opt_includeInstance
-  ) {
-    return proto.SourceSpan.SourceLocation.toObject(opt_includeInstance, this);
+/**
+ * Creates an object representation of this proto.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * Optional fields that are not set will be set to undefined.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
+ * @param {boolean=} opt_includeInstance Deprecated. whether to include the
+ *     JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.SourceSpan.SourceLocation.prototype.toObject = function(opt_includeInstance) {
+  return proto.SourceSpan.SourceLocation.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Deprecated. Whether to include
+ *     the JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.SourceSpan.SourceLocation} msg The msg instance to transform.
+ * @return {!Object}
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.SourceSpan.SourceLocation.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    offset: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    line: jspb.Message.getFieldWithDefault(msg, 2, 0),
+    column: jspb.Message.getFieldWithDefault(msg, 3, 0)
   };
 
-  /**
-   * Static version of the {@see toObject} method.
-   * @param {boolean|undefined} includeInstance Deprecated. Whether to include
-   *     the JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @param {!proto.SourceSpan.SourceLocation} msg The msg instance to transform.
-   * @return {!Object}
-   * @suppress {unusedLocalVariables} f is only used for nested messages
-   */
-  proto.SourceSpan.SourceLocation.toObject = function (includeInstance, msg) {
-    let f,
-      obj = {
-        offset: jspb.Message.getFieldWithDefault(msg, 1, 0),
-        line: jspb.Message.getFieldWithDefault(msg, 2, 0),
-        column: jspb.Message.getFieldWithDefault(msg, 3, 0),
-      };
-
-    if (includeInstance) {
-      obj.$jspbMessageInstance = msg;
-    }
-    return obj;
-  };
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
 }
+
 
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
  * @return {!proto.SourceSpan.SourceLocation}
  */
-proto.SourceSpan.SourceLocation.deserializeBinary = function (bytes) {
-  const reader = new jspb.BinaryReader(bytes);
-  const msg = new proto.SourceSpan.SourceLocation();
-  return proto.SourceSpan.SourceLocation.deserializeBinaryFromReader(
-    msg,
-    reader
-  );
+proto.SourceSpan.SourceLocation.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.SourceSpan.SourceLocation;
+  return proto.SourceSpan.SourceLocation.deserializeBinaryFromReader(msg, reader);
 };
+
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
@@ -6597,45 +6132,44 @@ proto.SourceSpan.SourceLocation.deserializeBinary = function (bytes) {
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
  * @return {!proto.SourceSpan.SourceLocation}
  */
-proto.SourceSpan.SourceLocation.deserializeBinaryFromReader = function (
-  msg,
-  reader
-) {
+proto.SourceSpan.SourceLocation.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
     }
-    const field = reader.getFieldNumber();
+    var field = reader.getFieldNumber();
     switch (field) {
-      case 1:
-        var value = /** @type {number} */ (reader.readUint32());
-        msg.setOffset(value);
-        break;
-      case 2:
-        var value = /** @type {number} */ (reader.readUint32());
-        msg.setLine(value);
-        break;
-      case 3:
-        var value = /** @type {number} */ (reader.readUint32());
-        msg.setColumn(value);
-        break;
-      default:
-        reader.skipField();
-        break;
+    case 1:
+      var value = /** @type {number} */ (reader.readUint32());
+      msg.setOffset(value);
+      break;
+    case 2:
+      var value = /** @type {number} */ (reader.readUint32());
+      msg.setLine(value);
+      break;
+    case 3:
+      var value = /** @type {number} */ (reader.readUint32());
+      msg.setColumn(value);
+      break;
+    default:
+      reader.skipField();
+      break;
     }
   }
   return msg;
 };
 
+
 /**
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.SourceSpan.SourceLocation.prototype.serializeBinary = function () {
-  const writer = new jspb.BinaryWriter();
+proto.SourceSpan.SourceLocation.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
   proto.SourceSpan.SourceLocation.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
+
 
 /**
  * Serializes the given message to binary data (in protobuf wire
@@ -6644,192 +6178,214 @@ proto.SourceSpan.SourceLocation.prototype.serializeBinary = function () {
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.SourceSpan.SourceLocation.serializeBinaryToWriter = function (
-  message,
-  writer
-) {
-  let f = undefined;
+proto.SourceSpan.SourceLocation.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
   f = message.getOffset();
   if (f !== 0) {
-    writer.writeUint32(1, f);
+    writer.writeUint32(
+      1,
+      f
+    );
   }
   f = message.getLine();
   if (f !== 0) {
-    writer.writeUint32(2, f);
+    writer.writeUint32(
+      2,
+      f
+    );
   }
   f = message.getColumn();
   if (f !== 0) {
-    writer.writeUint32(3, f);
+    writer.writeUint32(
+      3,
+      f
+    );
   }
 };
+
 
 /**
  * optional uint32 offset = 1;
  * @return {number}
  */
-proto.SourceSpan.SourceLocation.prototype.getOffset = function () {
+proto.SourceSpan.SourceLocation.prototype.getOffset = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
 };
+
 
 /**
  * @param {number} value
  * @return {!proto.SourceSpan.SourceLocation} returns this
  */
-proto.SourceSpan.SourceLocation.prototype.setOffset = function (value) {
+proto.SourceSpan.SourceLocation.prototype.setOffset = function(value) {
   return jspb.Message.setProto3IntField(this, 1, value);
 };
+
 
 /**
  * optional uint32 line = 2;
  * @return {number}
  */
-proto.SourceSpan.SourceLocation.prototype.getLine = function () {
+proto.SourceSpan.SourceLocation.prototype.getLine = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
 };
+
 
 /**
  * @param {number} value
  * @return {!proto.SourceSpan.SourceLocation} returns this
  */
-proto.SourceSpan.SourceLocation.prototype.setLine = function (value) {
+proto.SourceSpan.SourceLocation.prototype.setLine = function(value) {
   return jspb.Message.setProto3IntField(this, 2, value);
 };
+
 
 /**
  * optional uint32 column = 3;
  * @return {number}
  */
-proto.SourceSpan.SourceLocation.prototype.getColumn = function () {
+proto.SourceSpan.SourceLocation.prototype.getColumn = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 3, 0));
 };
+
 
 /**
  * @param {number} value
  * @return {!proto.SourceSpan.SourceLocation} returns this
  */
-proto.SourceSpan.SourceLocation.prototype.setColumn = function (value) {
+proto.SourceSpan.SourceLocation.prototype.setColumn = function(value) {
   return jspb.Message.setProto3IntField(this, 3, value);
 };
+
 
 /**
  * optional string text = 1;
  * @return {string}
  */
-proto.SourceSpan.prototype.getText = function () {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ''));
+proto.SourceSpan.prototype.getText = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
+
 
 /**
  * @param {string} value
  * @return {!proto.SourceSpan} returns this
  */
-proto.SourceSpan.prototype.setText = function (value) {
+proto.SourceSpan.prototype.setText = function(value) {
   return jspb.Message.setProto3StringField(this, 1, value);
 };
+
 
 /**
  * optional SourceLocation start = 2;
  * @return {?proto.SourceSpan.SourceLocation}
  */
-proto.SourceSpan.prototype.getStart = function () {
-  return /** @type{?proto.SourceSpan.SourceLocation} */ (jspb.Message.getWrapperField(
-    this,
-    proto.SourceSpan.SourceLocation,
-    2
-  ));
+proto.SourceSpan.prototype.getStart = function() {
+  return /** @type{?proto.SourceSpan.SourceLocation} */ (
+    jspb.Message.getWrapperField(this, proto.SourceSpan.SourceLocation, 2));
 };
+
 
 /**
  * @param {?proto.SourceSpan.SourceLocation|undefined} value
  * @return {!proto.SourceSpan} returns this
- */
-proto.SourceSpan.prototype.setStart = function (value) {
+*/
+proto.SourceSpan.prototype.setStart = function(value) {
   return jspb.Message.setWrapperField(this, 2, value);
 };
+
 
 /**
  * Clears the message field making it undefined.
  * @return {!proto.SourceSpan} returns this
  */
-proto.SourceSpan.prototype.clearStart = function () {
+proto.SourceSpan.prototype.clearStart = function() {
   return this.setStart(undefined);
 };
+
 
 /**
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.SourceSpan.prototype.hasStart = function () {
+proto.SourceSpan.prototype.hasStart = function() {
   return jspb.Message.getField(this, 2) != null;
 };
+
 
 /**
  * optional SourceLocation end = 3;
  * @return {?proto.SourceSpan.SourceLocation}
  */
-proto.SourceSpan.prototype.getEnd = function () {
-  return /** @type{?proto.SourceSpan.SourceLocation} */ (jspb.Message.getWrapperField(
-    this,
-    proto.SourceSpan.SourceLocation,
-    3
-  ));
+proto.SourceSpan.prototype.getEnd = function() {
+  return /** @type{?proto.SourceSpan.SourceLocation} */ (
+    jspb.Message.getWrapperField(this, proto.SourceSpan.SourceLocation, 3));
 };
+
 
 /**
  * @param {?proto.SourceSpan.SourceLocation|undefined} value
  * @return {!proto.SourceSpan} returns this
- */
-proto.SourceSpan.prototype.setEnd = function (value) {
+*/
+proto.SourceSpan.prototype.setEnd = function(value) {
   return jspb.Message.setWrapperField(this, 3, value);
 };
+
 
 /**
  * Clears the message field making it undefined.
  * @return {!proto.SourceSpan} returns this
  */
-proto.SourceSpan.prototype.clearEnd = function () {
+proto.SourceSpan.prototype.clearEnd = function() {
   return this.setEnd(undefined);
 };
+
 
 /**
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.SourceSpan.prototype.hasEnd = function () {
+proto.SourceSpan.prototype.hasEnd = function() {
   return jspb.Message.getField(this, 3) != null;
 };
+
 
 /**
  * optional string url = 4;
  * @return {string}
  */
-proto.SourceSpan.prototype.getUrl = function () {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ''));
+proto.SourceSpan.prototype.getUrl = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
 };
+
 
 /**
  * @param {string} value
  * @return {!proto.SourceSpan} returns this
  */
-proto.SourceSpan.prototype.setUrl = function (value) {
+proto.SourceSpan.prototype.setUrl = function(value) {
   return jspb.Message.setProto3StringField(this, 4, value);
 };
+
 
 /**
  * optional string context = 5;
  * @return {string}
  */
-proto.SourceSpan.prototype.getContext = function () {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ''));
+proto.SourceSpan.prototype.getContext = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
 };
+
 
 /**
  * @param {string} value
  * @return {!proto.SourceSpan} returns this
  */
-proto.SourceSpan.prototype.setContext = function (value) {
+proto.SourceSpan.prototype.setContext = function(value) {
   return jspb.Message.setProto3StringField(this, 5, value);
 };
+
+
 
 /**
  * Oneof group definitions for this message. Each group defines the field
@@ -6839,7 +6395,7 @@ proto.SourceSpan.prototype.setContext = function (value) {
  * @private {!Array<!Array<number>>}
  * @const
  */
-proto.Value.oneofGroups_ = [[1, 2, 3, 4, 5, 6, 7, 8, 9]];
+proto.Value.oneofGroups_ = [[1,2,3,4,5,6,7,8,9]];
 
 /**
  * @enum {number}
@@ -6854,89 +6410,77 @@ proto.Value.ValueCase = {
   MAP: 6,
   SINGLETON: 7,
   COMPILER_FUNCTION: 8,
-  HOST_FUNCTION: 9,
+  HOST_FUNCTION: 9
 };
 
 /**
  * @return {proto.Value.ValueCase}
  */
-proto.Value.prototype.getValueCase = function () {
-  return /** @type {proto.Value.ValueCase} */ (jspb.Message.computeOneofCase(
-    this,
-    proto.Value.oneofGroups_[0]
-  ));
+proto.Value.prototype.getValueCase = function() {
+  return /** @type {proto.Value.ValueCase} */(jspb.Message.computeOneofCase(this, proto.Value.oneofGroups_[0]));
 };
 
+
+
 if (jspb.Message.GENERATE_TO_OBJECT) {
-  /**
-   * Creates an object representation of this proto.
-   * Field names that are reserved in JavaScript and will be renamed to pb_name.
-   * Optional fields that are not set will be set to undefined.
-   * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
-   * For the list of reserved names please see:
-   *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
-   * @param {boolean=} opt_includeInstance Deprecated. whether to include the
-   *     JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @return {!Object}
-   */
-  proto.Value.prototype.toObject = function (opt_includeInstance) {
-    return proto.Value.toObject(opt_includeInstance, this);
+/**
+ * Creates an object representation of this proto.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * Optional fields that are not set will be set to undefined.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
+ * @param {boolean=} opt_includeInstance Deprecated. whether to include the
+ *     JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.Value.prototype.toObject = function(opt_includeInstance) {
+  return proto.Value.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Deprecated. Whether to include
+ *     the JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.Value} msg The msg instance to transform.
+ * @return {!Object}
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.Value.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    string: (f = msg.getString()) && proto.Value.String.toObject(includeInstance, f),
+    number: (f = msg.getNumber()) && proto.Value.Number.toObject(includeInstance, f),
+    rgbColor: (f = msg.getRgbColor()) && proto.Value.RgbColor.toObject(includeInstance, f),
+    hslColor: (f = msg.getHslColor()) && proto.Value.HslColor.toObject(includeInstance, f),
+    list: (f = msg.getList()) && proto.Value.List.toObject(includeInstance, f),
+    map: (f = msg.getMap()) && proto.Value.Map.toObject(includeInstance, f),
+    singleton: jspb.Message.getFieldWithDefault(msg, 7, 0),
+    compilerFunction: (f = msg.getCompilerFunction()) && proto.Value.CompilerFunction.toObject(includeInstance, f),
+    hostFunction: (f = msg.getHostFunction()) && proto.Value.HostFunction.toObject(includeInstance, f)
   };
 
-  /**
-   * Static version of the {@see toObject} method.
-   * @param {boolean|undefined} includeInstance Deprecated. Whether to include
-   *     the JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @param {!proto.Value} msg The msg instance to transform.
-   * @return {!Object}
-   * @suppress {unusedLocalVariables} f is only used for nested messages
-   */
-  proto.Value.toObject = function (includeInstance, msg) {
-    let f,
-      obj = {
-        string:
-          (f = msg.getString()) &&
-          proto.Value.String.toObject(includeInstance, f),
-        number:
-          (f = msg.getNumber()) &&
-          proto.Value.Number.toObject(includeInstance, f),
-        rgbColor:
-          (f = msg.getRgbColor()) &&
-          proto.Value.RgbColor.toObject(includeInstance, f),
-        hslColor:
-          (f = msg.getHslColor()) &&
-          proto.Value.HslColor.toObject(includeInstance, f),
-        list:
-          (f = msg.getList()) && proto.Value.List.toObject(includeInstance, f),
-        map: (f = msg.getMap()) && proto.Value.Map.toObject(includeInstance, f),
-        singleton: jspb.Message.getFieldWithDefault(msg, 7, 0),
-        compilerFunction:
-          (f = msg.getCompilerFunction()) &&
-          proto.Value.CompilerFunction.toObject(includeInstance, f),
-        hostFunction:
-          (f = msg.getHostFunction()) &&
-          proto.Value.HostFunction.toObject(includeInstance, f),
-      };
-
-    if (includeInstance) {
-      obj.$jspbMessageInstance = msg;
-    }
-    return obj;
-  };
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
 }
+
 
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
  * @return {!proto.Value}
  */
-proto.Value.deserializeBinary = function (bytes) {
-  const reader = new jspb.BinaryReader(bytes);
-  const msg = new proto.Value();
+proto.Value.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.Value;
   return proto.Value.deserializeBinaryFromReader(msg, reader);
 };
+
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
@@ -6945,92 +6489,76 @@ proto.Value.deserializeBinary = function (bytes) {
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
  * @return {!proto.Value}
  */
-proto.Value.deserializeBinaryFromReader = function (msg, reader) {
+proto.Value.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
     }
-    const field = reader.getFieldNumber();
+    var field = reader.getFieldNumber();
     switch (field) {
-      case 1:
-        var value = new proto.Value.String();
-        reader.readMessage(
-          value,
-          proto.Value.String.deserializeBinaryFromReader
-        );
-        msg.setString(value);
-        break;
-      case 2:
-        var value = new proto.Value.Number();
-        reader.readMessage(
-          value,
-          proto.Value.Number.deserializeBinaryFromReader
-        );
-        msg.setNumber(value);
-        break;
-      case 3:
-        var value = new proto.Value.RgbColor();
-        reader.readMessage(
-          value,
-          proto.Value.RgbColor.deserializeBinaryFromReader
-        );
-        msg.setRgbColor(value);
-        break;
-      case 4:
-        var value = new proto.Value.HslColor();
-        reader.readMessage(
-          value,
-          proto.Value.HslColor.deserializeBinaryFromReader
-        );
-        msg.setHslColor(value);
-        break;
-      case 5:
-        var value = new proto.Value.List();
-        reader.readMessage(value, proto.Value.List.deserializeBinaryFromReader);
-        msg.setList(value);
-        break;
-      case 6:
-        var value = new proto.Value.Map();
-        reader.readMessage(value, proto.Value.Map.deserializeBinaryFromReader);
-        msg.setMap(value);
-        break;
-      case 7:
-        var value = /** @type {!proto.Value.Singleton} */ (reader.readEnum());
-        msg.setSingleton(value);
-        break;
-      case 8:
-        var value = new proto.Value.CompilerFunction();
-        reader.readMessage(
-          value,
-          proto.Value.CompilerFunction.deserializeBinaryFromReader
-        );
-        msg.setCompilerFunction(value);
-        break;
-      case 9:
-        var value = new proto.Value.HostFunction();
-        reader.readMessage(
-          value,
-          proto.Value.HostFunction.deserializeBinaryFromReader
-        );
-        msg.setHostFunction(value);
-        break;
-      default:
-        reader.skipField();
-        break;
+    case 1:
+      var value = new proto.Value.String;
+      reader.readMessage(value,proto.Value.String.deserializeBinaryFromReader);
+      msg.setString(value);
+      break;
+    case 2:
+      var value = new proto.Value.Number;
+      reader.readMessage(value,proto.Value.Number.deserializeBinaryFromReader);
+      msg.setNumber(value);
+      break;
+    case 3:
+      var value = new proto.Value.RgbColor;
+      reader.readMessage(value,proto.Value.RgbColor.deserializeBinaryFromReader);
+      msg.setRgbColor(value);
+      break;
+    case 4:
+      var value = new proto.Value.HslColor;
+      reader.readMessage(value,proto.Value.HslColor.deserializeBinaryFromReader);
+      msg.setHslColor(value);
+      break;
+    case 5:
+      var value = new proto.Value.List;
+      reader.readMessage(value,proto.Value.List.deserializeBinaryFromReader);
+      msg.setList(value);
+      break;
+    case 6:
+      var value = new proto.Value.Map;
+      reader.readMessage(value,proto.Value.Map.deserializeBinaryFromReader);
+      msg.setMap(value);
+      break;
+    case 7:
+      var value = /** @type {!proto.Value.Singleton} */ (reader.readEnum());
+      msg.setSingleton(value);
+      break;
+    case 8:
+      var value = new proto.Value.CompilerFunction;
+      reader.readMessage(value,proto.Value.CompilerFunction.deserializeBinaryFromReader);
+      msg.setCompilerFunction(value);
+      break;
+    case 9:
+      var value = new proto.Value.HostFunction;
+      reader.readMessage(value,proto.Value.HostFunction.deserializeBinaryFromReader);
+      msg.setHostFunction(value);
+      break;
+    default:
+      reader.skipField();
+      break;
     }
   }
   return msg;
 };
 
+
 /**
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.Value.prototype.serializeBinary = function () {
-  const writer = new jspb.BinaryWriter();
+proto.Value.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
   proto.Value.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
+
 
 /**
  * Serializes the given message to binary data (in protobuf wire
@@ -7039,35 +6567,62 @@ proto.Value.prototype.serializeBinary = function () {
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.Value.serializeBinaryToWriter = function (message, writer) {
-  let f = undefined;
+proto.Value.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
   f = message.getString();
   if (f != null) {
-    writer.writeMessage(1, f, proto.Value.String.serializeBinaryToWriter);
+    writer.writeMessage(
+      1,
+      f,
+      proto.Value.String.serializeBinaryToWriter
+    );
   }
   f = message.getNumber();
   if (f != null) {
-    writer.writeMessage(2, f, proto.Value.Number.serializeBinaryToWriter);
+    writer.writeMessage(
+      2,
+      f,
+      proto.Value.Number.serializeBinaryToWriter
+    );
   }
   f = message.getRgbColor();
   if (f != null) {
-    writer.writeMessage(3, f, proto.Value.RgbColor.serializeBinaryToWriter);
+    writer.writeMessage(
+      3,
+      f,
+      proto.Value.RgbColor.serializeBinaryToWriter
+    );
   }
   f = message.getHslColor();
   if (f != null) {
-    writer.writeMessage(4, f, proto.Value.HslColor.serializeBinaryToWriter);
+    writer.writeMessage(
+      4,
+      f,
+      proto.Value.HslColor.serializeBinaryToWriter
+    );
   }
   f = message.getList();
   if (f != null) {
-    writer.writeMessage(5, f, proto.Value.List.serializeBinaryToWriter);
+    writer.writeMessage(
+      5,
+      f,
+      proto.Value.List.serializeBinaryToWriter
+    );
   }
   f = message.getMap();
   if (f != null) {
-    writer.writeMessage(6, f, proto.Value.Map.serializeBinaryToWriter);
+    writer.writeMessage(
+      6,
+      f,
+      proto.Value.Map.serializeBinaryToWriter
+    );
   }
   f = /** @type {!proto.Value.Singleton} */ (jspb.Message.getField(message, 7));
   if (f != null) {
-    writer.writeEnum(7, f);
+    writer.writeEnum(
+      7,
+      f
+    );
   }
   f = message.getCompilerFunction();
   if (f != null) {
@@ -7079,9 +6634,14 @@ proto.Value.serializeBinaryToWriter = function (message, writer) {
   }
   f = message.getHostFunction();
   if (f != null) {
-    writer.writeMessage(9, f, proto.Value.HostFunction.serializeBinaryToWriter);
+    writer.writeMessage(
+      9,
+      f,
+      proto.Value.HostFunction.serializeBinaryToWriter
+    );
   }
 };
+
 
 /**
  * @enum {number}
@@ -7089,59 +6649,64 @@ proto.Value.serializeBinaryToWriter = function (message, writer) {
 proto.Value.Singleton = {
   TRUE: 0,
   FALSE: 1,
-  NULL: 2,
+  NULL: 2
 };
 
+
+
+
 if (jspb.Message.GENERATE_TO_OBJECT) {
-  /**
-   * Creates an object representation of this proto.
-   * Field names that are reserved in JavaScript and will be renamed to pb_name.
-   * Optional fields that are not set will be set to undefined.
-   * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
-   * For the list of reserved names please see:
-   *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
-   * @param {boolean=} opt_includeInstance Deprecated. whether to include the
-   *     JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @return {!Object}
-   */
-  proto.Value.String.prototype.toObject = function (opt_includeInstance) {
-    return proto.Value.String.toObject(opt_includeInstance, this);
+/**
+ * Creates an object representation of this proto.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * Optional fields that are not set will be set to undefined.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
+ * @param {boolean=} opt_includeInstance Deprecated. whether to include the
+ *     JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.Value.String.prototype.toObject = function(opt_includeInstance) {
+  return proto.Value.String.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Deprecated. Whether to include
+ *     the JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.Value.String} msg The msg instance to transform.
+ * @return {!Object}
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.Value.String.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    text: jspb.Message.getFieldWithDefault(msg, 1, ""),
+    quoted: jspb.Message.getBooleanFieldWithDefault(msg, 2, false)
   };
 
-  /**
-   * Static version of the {@see toObject} method.
-   * @param {boolean|undefined} includeInstance Deprecated. Whether to include
-   *     the JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @param {!proto.Value.String} msg The msg instance to transform.
-   * @return {!Object}
-   * @suppress {unusedLocalVariables} f is only used for nested messages
-   */
-  proto.Value.String.toObject = function (includeInstance, msg) {
-    let f,
-      obj = {
-        text: jspb.Message.getFieldWithDefault(msg, 1, ''),
-        quoted: jspb.Message.getBooleanFieldWithDefault(msg, 2, false),
-      };
-
-    if (includeInstance) {
-      obj.$jspbMessageInstance = msg;
-    }
-    return obj;
-  };
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
 }
+
 
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
  * @return {!proto.Value.String}
  */
-proto.Value.String.deserializeBinary = function (bytes) {
-  const reader = new jspb.BinaryReader(bytes);
-  const msg = new proto.Value.String();
+proto.Value.String.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.Value.String;
   return proto.Value.String.deserializeBinaryFromReader(msg, reader);
 };
+
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
@@ -7150,38 +6715,40 @@ proto.Value.String.deserializeBinary = function (bytes) {
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
  * @return {!proto.Value.String}
  */
-proto.Value.String.deserializeBinaryFromReader = function (msg, reader) {
+proto.Value.String.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
     }
-    const field = reader.getFieldNumber();
+    var field = reader.getFieldNumber();
     switch (field) {
-      case 1:
-        var value = /** @type {string} */ (reader.readString());
-        msg.setText(value);
-        break;
-      case 2:
-        var value = /** @type {boolean} */ (reader.readBool());
-        msg.setQuoted(value);
-        break;
-      default:
-        reader.skipField();
-        break;
+    case 1:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setText(value);
+      break;
+    case 2:
+      var value = /** @type {boolean} */ (reader.readBool());
+      msg.setQuoted(value);
+      break;
+    default:
+      reader.skipField();
+      break;
     }
   }
   return msg;
 };
 
+
 /**
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.Value.String.prototype.serializeBinary = function () {
-  const writer = new jspb.BinaryWriter();
+proto.Value.String.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
   proto.Value.String.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
+
 
 /**
  * Serializes the given message to binary data (in protobuf wire
@@ -7190,114 +6757,124 @@ proto.Value.String.prototype.serializeBinary = function () {
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.Value.String.serializeBinaryToWriter = function (message, writer) {
-  let f = undefined;
+proto.Value.String.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
   f = message.getText();
   if (f.length > 0) {
-    writer.writeString(1, f);
+    writer.writeString(
+      1,
+      f
+    );
   }
   f = message.getQuoted();
   if (f) {
-    writer.writeBool(2, f);
+    writer.writeBool(
+      2,
+      f
+    );
   }
 };
+
 
 /**
  * optional string text = 1;
  * @return {string}
  */
-proto.Value.String.prototype.getText = function () {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ''));
+proto.Value.String.prototype.getText = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
+
 
 /**
  * @param {string} value
  * @return {!proto.Value.String} returns this
  */
-proto.Value.String.prototype.setText = function (value) {
+proto.Value.String.prototype.setText = function(value) {
   return jspb.Message.setProto3StringField(this, 1, value);
 };
+
 
 /**
  * optional bool quoted = 2;
  * @return {boolean}
  */
-proto.Value.String.prototype.getQuoted = function () {
-  return /** @type {boolean} */ (jspb.Message.getBooleanFieldWithDefault(
-    this,
-    2,
-    false
-  ));
+proto.Value.String.prototype.getQuoted = function() {
+  return /** @type {boolean} */ (jspb.Message.getBooleanFieldWithDefault(this, 2, false));
 };
+
 
 /**
  * @param {boolean} value
  * @return {!proto.Value.String} returns this
  */
-proto.Value.String.prototype.setQuoted = function (value) {
+proto.Value.String.prototype.setQuoted = function(value) {
   return jspb.Message.setProto3BooleanField(this, 2, value);
 };
+
+
 
 /**
  * List of repeated fields within this message type.
  * @private {!Array<number>}
  * @const
  */
-proto.Value.Number.repeatedFields_ = [2, 3];
+proto.Value.Number.repeatedFields_ = [2,3];
+
+
 
 if (jspb.Message.GENERATE_TO_OBJECT) {
-  /**
-   * Creates an object representation of this proto.
-   * Field names that are reserved in JavaScript and will be renamed to pb_name.
-   * Optional fields that are not set will be set to undefined.
-   * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
-   * For the list of reserved names please see:
-   *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
-   * @param {boolean=} opt_includeInstance Deprecated. whether to include the
-   *     JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @return {!Object}
-   */
-  proto.Value.Number.prototype.toObject = function (opt_includeInstance) {
-    return proto.Value.Number.toObject(opt_includeInstance, this);
+/**
+ * Creates an object representation of this proto.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * Optional fields that are not set will be set to undefined.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
+ * @param {boolean=} opt_includeInstance Deprecated. whether to include the
+ *     JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.Value.Number.prototype.toObject = function(opt_includeInstance) {
+  return proto.Value.Number.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Deprecated. Whether to include
+ *     the JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.Value.Number} msg The msg instance to transform.
+ * @return {!Object}
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.Value.Number.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    value: jspb.Message.getFloatingPointFieldWithDefault(msg, 1, 0.0),
+    numeratorsList: (f = jspb.Message.getRepeatedField(msg, 2)) == null ? undefined : f,
+    denominatorsList: (f = jspb.Message.getRepeatedField(msg, 3)) == null ? undefined : f
   };
 
-  /**
-   * Static version of the {@see toObject} method.
-   * @param {boolean|undefined} includeInstance Deprecated. Whether to include
-   *     the JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @param {!proto.Value.Number} msg The msg instance to transform.
-   * @return {!Object}
-   * @suppress {unusedLocalVariables} f is only used for nested messages
-   */
-  proto.Value.Number.toObject = function (includeInstance, msg) {
-    let f,
-      obj = {
-        value: jspb.Message.getFloatingPointFieldWithDefault(msg, 1, 0.0),
-        numeratorsList:
-          (f = jspb.Message.getRepeatedField(msg, 2)) == null ? undefined : f,
-        denominatorsList:
-          (f = jspb.Message.getRepeatedField(msg, 3)) == null ? undefined : f,
-      };
-
-    if (includeInstance) {
-      obj.$jspbMessageInstance = msg;
-    }
-    return obj;
-  };
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
 }
+
 
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
  * @return {!proto.Value.Number}
  */
-proto.Value.Number.deserializeBinary = function (bytes) {
-  const reader = new jspb.BinaryReader(bytes);
-  const msg = new proto.Value.Number();
+proto.Value.Number.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.Value.Number;
   return proto.Value.Number.deserializeBinaryFromReader(msg, reader);
 };
+
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
@@ -7306,42 +6883,44 @@ proto.Value.Number.deserializeBinary = function (bytes) {
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
  * @return {!proto.Value.Number}
  */
-proto.Value.Number.deserializeBinaryFromReader = function (msg, reader) {
+proto.Value.Number.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
     }
-    const field = reader.getFieldNumber();
+    var field = reader.getFieldNumber();
     switch (field) {
-      case 1:
-        var value = /** @type {number} */ (reader.readDouble());
-        msg.setValue(value);
-        break;
-      case 2:
-        var value = /** @type {string} */ (reader.readString());
-        msg.addNumerators(value);
-        break;
-      case 3:
-        var value = /** @type {string} */ (reader.readString());
-        msg.addDenominators(value);
-        break;
-      default:
-        reader.skipField();
-        break;
+    case 1:
+      var value = /** @type {number} */ (reader.readDouble());
+      msg.setValue(value);
+      break;
+    case 2:
+      var value = /** @type {string} */ (reader.readString());
+      msg.addNumerators(value);
+      break;
+    case 3:
+      var value = /** @type {string} */ (reader.readString());
+      msg.addDenominators(value);
+      break;
+    default:
+      reader.skipField();
+      break;
     }
   }
   return msg;
 };
 
+
 /**
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.Value.Number.prototype.serializeBinary = function () {
-  const writer = new jspb.BinaryWriter();
+proto.Value.Number.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
   proto.Value.Number.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
+
 
 /**
  * Serializes the given message to binary data (in protobuf wire
@@ -7350,160 +6929,181 @@ proto.Value.Number.prototype.serializeBinary = function () {
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.Value.Number.serializeBinaryToWriter = function (message, writer) {
-  let f = undefined;
+proto.Value.Number.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
   f = message.getValue();
   if (f !== 0.0) {
-    writer.writeDouble(1, f);
+    writer.writeDouble(
+      1,
+      f
+    );
   }
   f = message.getNumeratorsList();
   if (f.length > 0) {
-    writer.writeRepeatedString(2, f);
+    writer.writeRepeatedString(
+      2,
+      f
+    );
   }
   f = message.getDenominatorsList();
   if (f.length > 0) {
-    writer.writeRepeatedString(3, f);
+    writer.writeRepeatedString(
+      3,
+      f
+    );
   }
 };
+
 
 /**
  * optional double value = 1;
  * @return {number}
  */
-proto.Value.Number.prototype.getValue = function () {
-  return /** @type {number} */ (jspb.Message.getFloatingPointFieldWithDefault(
-    this,
-    1,
-    0.0
-  ));
+proto.Value.Number.prototype.getValue = function() {
+  return /** @type {number} */ (jspb.Message.getFloatingPointFieldWithDefault(this, 1, 0.0));
 };
+
 
 /**
  * @param {number} value
  * @return {!proto.Value.Number} returns this
  */
-proto.Value.Number.prototype.setValue = function (value) {
+proto.Value.Number.prototype.setValue = function(value) {
   return jspb.Message.setProto3FloatField(this, 1, value);
 };
+
 
 /**
  * repeated string numerators = 2;
  * @return {!Array<string>}
  */
-proto.Value.Number.prototype.getNumeratorsList = function () {
+proto.Value.Number.prototype.getNumeratorsList = function() {
   return /** @type {!Array<string>} */ (jspb.Message.getRepeatedField(this, 2));
 };
+
 
 /**
  * @param {!Array<string>} value
  * @return {!proto.Value.Number} returns this
  */
-proto.Value.Number.prototype.setNumeratorsList = function (value) {
+proto.Value.Number.prototype.setNumeratorsList = function(value) {
   return jspb.Message.setField(this, 2, value || []);
 };
+
 
 /**
  * @param {string} value
  * @param {number=} opt_index
  * @return {!proto.Value.Number} returns this
  */
-proto.Value.Number.prototype.addNumerators = function (value, opt_index) {
+proto.Value.Number.prototype.addNumerators = function(value, opt_index) {
   return jspb.Message.addToRepeatedField(this, 2, value, opt_index);
 };
+
 
 /**
  * Clears the list making it empty but non-null.
  * @return {!proto.Value.Number} returns this
  */
-proto.Value.Number.prototype.clearNumeratorsList = function () {
+proto.Value.Number.prototype.clearNumeratorsList = function() {
   return this.setNumeratorsList([]);
 };
+
 
 /**
  * repeated string denominators = 3;
  * @return {!Array<string>}
  */
-proto.Value.Number.prototype.getDenominatorsList = function () {
+proto.Value.Number.prototype.getDenominatorsList = function() {
   return /** @type {!Array<string>} */ (jspb.Message.getRepeatedField(this, 3));
 };
+
 
 /**
  * @param {!Array<string>} value
  * @return {!proto.Value.Number} returns this
  */
-proto.Value.Number.prototype.setDenominatorsList = function (value) {
+proto.Value.Number.prototype.setDenominatorsList = function(value) {
   return jspb.Message.setField(this, 3, value || []);
 };
+
 
 /**
  * @param {string} value
  * @param {number=} opt_index
  * @return {!proto.Value.Number} returns this
  */
-proto.Value.Number.prototype.addDenominators = function (value, opt_index) {
+proto.Value.Number.prototype.addDenominators = function(value, opt_index) {
   return jspb.Message.addToRepeatedField(this, 3, value, opt_index);
 };
+
 
 /**
  * Clears the list making it empty but non-null.
  * @return {!proto.Value.Number} returns this
  */
-proto.Value.Number.prototype.clearDenominatorsList = function () {
+proto.Value.Number.prototype.clearDenominatorsList = function() {
   return this.setDenominatorsList([]);
 };
 
+
+
+
+
 if (jspb.Message.GENERATE_TO_OBJECT) {
-  /**
-   * Creates an object representation of this proto.
-   * Field names that are reserved in JavaScript and will be renamed to pb_name.
-   * Optional fields that are not set will be set to undefined.
-   * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
-   * For the list of reserved names please see:
-   *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
-   * @param {boolean=} opt_includeInstance Deprecated. whether to include the
-   *     JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @return {!Object}
-   */
-  proto.Value.RgbColor.prototype.toObject = function (opt_includeInstance) {
-    return proto.Value.RgbColor.toObject(opt_includeInstance, this);
+/**
+ * Creates an object representation of this proto.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * Optional fields that are not set will be set to undefined.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
+ * @param {boolean=} opt_includeInstance Deprecated. whether to include the
+ *     JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.Value.RgbColor.prototype.toObject = function(opt_includeInstance) {
+  return proto.Value.RgbColor.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Deprecated. Whether to include
+ *     the JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.Value.RgbColor} msg The msg instance to transform.
+ * @return {!Object}
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.Value.RgbColor.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    red: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    green: jspb.Message.getFieldWithDefault(msg, 2, 0),
+    blue: jspb.Message.getFieldWithDefault(msg, 3, 0),
+    alpha: jspb.Message.getFloatingPointFieldWithDefault(msg, 4, 0.0)
   };
 
-  /**
-   * Static version of the {@see toObject} method.
-   * @param {boolean|undefined} includeInstance Deprecated. Whether to include
-   *     the JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @param {!proto.Value.RgbColor} msg The msg instance to transform.
-   * @return {!Object}
-   * @suppress {unusedLocalVariables} f is only used for nested messages
-   */
-  proto.Value.RgbColor.toObject = function (includeInstance, msg) {
-    let f,
-      obj = {
-        red: jspb.Message.getFieldWithDefault(msg, 1, 0),
-        green: jspb.Message.getFieldWithDefault(msg, 2, 0),
-        blue: jspb.Message.getFieldWithDefault(msg, 3, 0),
-        alpha: jspb.Message.getFloatingPointFieldWithDefault(msg, 4, 0.0),
-      };
-
-    if (includeInstance) {
-      obj.$jspbMessageInstance = msg;
-    }
-    return obj;
-  };
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
 }
+
 
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
  * @return {!proto.Value.RgbColor}
  */
-proto.Value.RgbColor.deserializeBinary = function (bytes) {
-  const reader = new jspb.BinaryReader(bytes);
-  const msg = new proto.Value.RgbColor();
+proto.Value.RgbColor.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.Value.RgbColor;
   return proto.Value.RgbColor.deserializeBinaryFromReader(msg, reader);
 };
+
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
@@ -7512,46 +7112,48 @@ proto.Value.RgbColor.deserializeBinary = function (bytes) {
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
  * @return {!proto.Value.RgbColor}
  */
-proto.Value.RgbColor.deserializeBinaryFromReader = function (msg, reader) {
+proto.Value.RgbColor.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
     }
-    const field = reader.getFieldNumber();
+    var field = reader.getFieldNumber();
     switch (field) {
-      case 1:
-        var value = /** @type {number} */ (reader.readUint32());
-        msg.setRed(value);
-        break;
-      case 2:
-        var value = /** @type {number} */ (reader.readUint32());
-        msg.setGreen(value);
-        break;
-      case 3:
-        var value = /** @type {number} */ (reader.readUint32());
-        msg.setBlue(value);
-        break;
-      case 4:
-        var value = /** @type {number} */ (reader.readDouble());
-        msg.setAlpha(value);
-        break;
-      default:
-        reader.skipField();
-        break;
+    case 1:
+      var value = /** @type {number} */ (reader.readUint32());
+      msg.setRed(value);
+      break;
+    case 2:
+      var value = /** @type {number} */ (reader.readUint32());
+      msg.setGreen(value);
+      break;
+    case 3:
+      var value = /** @type {number} */ (reader.readUint32());
+      msg.setBlue(value);
+      break;
+    case 4:
+      var value = /** @type {number} */ (reader.readDouble());
+      msg.setAlpha(value);
+      break;
+    default:
+      reader.skipField();
+      break;
     }
   }
   return msg;
 };
 
+
 /**
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.Value.RgbColor.prototype.serializeBinary = function () {
-  const writer = new jspb.BinaryWriter();
+proto.Value.RgbColor.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
   proto.Value.RgbColor.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
+
 
 /**
  * Serializes the given message to binary data (in protobuf wire
@@ -7560,146 +7162,168 @@ proto.Value.RgbColor.prototype.serializeBinary = function () {
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.Value.RgbColor.serializeBinaryToWriter = function (message, writer) {
-  let f = undefined;
+proto.Value.RgbColor.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
   f = message.getRed();
   if (f !== 0) {
-    writer.writeUint32(1, f);
+    writer.writeUint32(
+      1,
+      f
+    );
   }
   f = message.getGreen();
   if (f !== 0) {
-    writer.writeUint32(2, f);
+    writer.writeUint32(
+      2,
+      f
+    );
   }
   f = message.getBlue();
   if (f !== 0) {
-    writer.writeUint32(3, f);
+    writer.writeUint32(
+      3,
+      f
+    );
   }
   f = message.getAlpha();
   if (f !== 0.0) {
-    writer.writeDouble(4, f);
+    writer.writeDouble(
+      4,
+      f
+    );
   }
 };
+
 
 /**
  * optional uint32 red = 1;
  * @return {number}
  */
-proto.Value.RgbColor.prototype.getRed = function () {
+proto.Value.RgbColor.prototype.getRed = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
 };
+
 
 /**
  * @param {number} value
  * @return {!proto.Value.RgbColor} returns this
  */
-proto.Value.RgbColor.prototype.setRed = function (value) {
+proto.Value.RgbColor.prototype.setRed = function(value) {
   return jspb.Message.setProto3IntField(this, 1, value);
 };
+
 
 /**
  * optional uint32 green = 2;
  * @return {number}
  */
-proto.Value.RgbColor.prototype.getGreen = function () {
+proto.Value.RgbColor.prototype.getGreen = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
 };
+
 
 /**
  * @param {number} value
  * @return {!proto.Value.RgbColor} returns this
  */
-proto.Value.RgbColor.prototype.setGreen = function (value) {
+proto.Value.RgbColor.prototype.setGreen = function(value) {
   return jspb.Message.setProto3IntField(this, 2, value);
 };
+
 
 /**
  * optional uint32 blue = 3;
  * @return {number}
  */
-proto.Value.RgbColor.prototype.getBlue = function () {
+proto.Value.RgbColor.prototype.getBlue = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 3, 0));
 };
+
 
 /**
  * @param {number} value
  * @return {!proto.Value.RgbColor} returns this
  */
-proto.Value.RgbColor.prototype.setBlue = function (value) {
+proto.Value.RgbColor.prototype.setBlue = function(value) {
   return jspb.Message.setProto3IntField(this, 3, value);
 };
+
 
 /**
  * optional double alpha = 4;
  * @return {number}
  */
-proto.Value.RgbColor.prototype.getAlpha = function () {
-  return /** @type {number} */ (jspb.Message.getFloatingPointFieldWithDefault(
-    this,
-    4,
-    0.0
-  ));
+proto.Value.RgbColor.prototype.getAlpha = function() {
+  return /** @type {number} */ (jspb.Message.getFloatingPointFieldWithDefault(this, 4, 0.0));
 };
+
 
 /**
  * @param {number} value
  * @return {!proto.Value.RgbColor} returns this
  */
-proto.Value.RgbColor.prototype.setAlpha = function (value) {
+proto.Value.RgbColor.prototype.setAlpha = function(value) {
   return jspb.Message.setProto3FloatField(this, 4, value);
 };
 
+
+
+
+
 if (jspb.Message.GENERATE_TO_OBJECT) {
-  /**
-   * Creates an object representation of this proto.
-   * Field names that are reserved in JavaScript and will be renamed to pb_name.
-   * Optional fields that are not set will be set to undefined.
-   * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
-   * For the list of reserved names please see:
-   *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
-   * @param {boolean=} opt_includeInstance Deprecated. whether to include the
-   *     JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @return {!Object}
-   */
-  proto.Value.HslColor.prototype.toObject = function (opt_includeInstance) {
-    return proto.Value.HslColor.toObject(opt_includeInstance, this);
+/**
+ * Creates an object representation of this proto.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * Optional fields that are not set will be set to undefined.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
+ * @param {boolean=} opt_includeInstance Deprecated. whether to include the
+ *     JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.Value.HslColor.prototype.toObject = function(opt_includeInstance) {
+  return proto.Value.HslColor.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Deprecated. Whether to include
+ *     the JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.Value.HslColor} msg The msg instance to transform.
+ * @return {!Object}
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.Value.HslColor.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    hue: jspb.Message.getFloatingPointFieldWithDefault(msg, 1, 0.0),
+    saturation: jspb.Message.getFloatingPointFieldWithDefault(msg, 2, 0.0),
+    lightness: jspb.Message.getFloatingPointFieldWithDefault(msg, 3, 0.0),
+    alpha: jspb.Message.getFloatingPointFieldWithDefault(msg, 4, 0.0)
   };
 
-  /**
-   * Static version of the {@see toObject} method.
-   * @param {boolean|undefined} includeInstance Deprecated. Whether to include
-   *     the JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @param {!proto.Value.HslColor} msg The msg instance to transform.
-   * @return {!Object}
-   * @suppress {unusedLocalVariables} f is only used for nested messages
-   */
-  proto.Value.HslColor.toObject = function (includeInstance, msg) {
-    let f,
-      obj = {
-        hue: jspb.Message.getFloatingPointFieldWithDefault(msg, 1, 0.0),
-        saturation: jspb.Message.getFloatingPointFieldWithDefault(msg, 2, 0.0),
-        lightness: jspb.Message.getFloatingPointFieldWithDefault(msg, 3, 0.0),
-        alpha: jspb.Message.getFloatingPointFieldWithDefault(msg, 4, 0.0),
-      };
-
-    if (includeInstance) {
-      obj.$jspbMessageInstance = msg;
-    }
-    return obj;
-  };
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
 }
+
 
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
  * @return {!proto.Value.HslColor}
  */
-proto.Value.HslColor.deserializeBinary = function (bytes) {
-  const reader = new jspb.BinaryReader(bytes);
-  const msg = new proto.Value.HslColor();
+proto.Value.HslColor.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.Value.HslColor;
   return proto.Value.HslColor.deserializeBinaryFromReader(msg, reader);
 };
+
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
@@ -7708,46 +7332,48 @@ proto.Value.HslColor.deserializeBinary = function (bytes) {
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
  * @return {!proto.Value.HslColor}
  */
-proto.Value.HslColor.deserializeBinaryFromReader = function (msg, reader) {
+proto.Value.HslColor.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
     }
-    const field = reader.getFieldNumber();
+    var field = reader.getFieldNumber();
     switch (field) {
-      case 1:
-        var value = /** @type {number} */ (reader.readDouble());
-        msg.setHue(value);
-        break;
-      case 2:
-        var value = /** @type {number} */ (reader.readDouble());
-        msg.setSaturation(value);
-        break;
-      case 3:
-        var value = /** @type {number} */ (reader.readDouble());
-        msg.setLightness(value);
-        break;
-      case 4:
-        var value = /** @type {number} */ (reader.readDouble());
-        msg.setAlpha(value);
-        break;
-      default:
-        reader.skipField();
-        break;
+    case 1:
+      var value = /** @type {number} */ (reader.readDouble());
+      msg.setHue(value);
+      break;
+    case 2:
+      var value = /** @type {number} */ (reader.readDouble());
+      msg.setSaturation(value);
+      break;
+    case 3:
+      var value = /** @type {number} */ (reader.readDouble());
+      msg.setLightness(value);
+      break;
+    case 4:
+      var value = /** @type {number} */ (reader.readDouble());
+      msg.setAlpha(value);
+      break;
+    default:
+      reader.skipField();
+      break;
     }
   }
   return msg;
 };
 
+
 /**
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.Value.HslColor.prototype.serializeBinary = function () {
-  const writer = new jspb.BinaryWriter();
+proto.Value.HslColor.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
   proto.Value.HslColor.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
+
 
 /**
  * Serializes the given message to binary data (in protobuf wire
@@ -7756,105 +7382,111 @@ proto.Value.HslColor.prototype.serializeBinary = function () {
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.Value.HslColor.serializeBinaryToWriter = function (message, writer) {
-  let f = undefined;
+proto.Value.HslColor.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
   f = message.getHue();
   if (f !== 0.0) {
-    writer.writeDouble(1, f);
+    writer.writeDouble(
+      1,
+      f
+    );
   }
   f = message.getSaturation();
   if (f !== 0.0) {
-    writer.writeDouble(2, f);
+    writer.writeDouble(
+      2,
+      f
+    );
   }
   f = message.getLightness();
   if (f !== 0.0) {
-    writer.writeDouble(3, f);
+    writer.writeDouble(
+      3,
+      f
+    );
   }
   f = message.getAlpha();
   if (f !== 0.0) {
-    writer.writeDouble(4, f);
+    writer.writeDouble(
+      4,
+      f
+    );
   }
 };
+
 
 /**
  * optional double hue = 1;
  * @return {number}
  */
-proto.Value.HslColor.prototype.getHue = function () {
-  return /** @type {number} */ (jspb.Message.getFloatingPointFieldWithDefault(
-    this,
-    1,
-    0.0
-  ));
+proto.Value.HslColor.prototype.getHue = function() {
+  return /** @type {number} */ (jspb.Message.getFloatingPointFieldWithDefault(this, 1, 0.0));
 };
+
 
 /**
  * @param {number} value
  * @return {!proto.Value.HslColor} returns this
  */
-proto.Value.HslColor.prototype.setHue = function (value) {
+proto.Value.HslColor.prototype.setHue = function(value) {
   return jspb.Message.setProto3FloatField(this, 1, value);
 };
+
 
 /**
  * optional double saturation = 2;
  * @return {number}
  */
-proto.Value.HslColor.prototype.getSaturation = function () {
-  return /** @type {number} */ (jspb.Message.getFloatingPointFieldWithDefault(
-    this,
-    2,
-    0.0
-  ));
+proto.Value.HslColor.prototype.getSaturation = function() {
+  return /** @type {number} */ (jspb.Message.getFloatingPointFieldWithDefault(this, 2, 0.0));
 };
+
 
 /**
  * @param {number} value
  * @return {!proto.Value.HslColor} returns this
  */
-proto.Value.HslColor.prototype.setSaturation = function (value) {
+proto.Value.HslColor.prototype.setSaturation = function(value) {
   return jspb.Message.setProto3FloatField(this, 2, value);
 };
+
 
 /**
  * optional double lightness = 3;
  * @return {number}
  */
-proto.Value.HslColor.prototype.getLightness = function () {
-  return /** @type {number} */ (jspb.Message.getFloatingPointFieldWithDefault(
-    this,
-    3,
-    0.0
-  ));
+proto.Value.HslColor.prototype.getLightness = function() {
+  return /** @type {number} */ (jspb.Message.getFloatingPointFieldWithDefault(this, 3, 0.0));
 };
+
 
 /**
  * @param {number} value
  * @return {!proto.Value.HslColor} returns this
  */
-proto.Value.HslColor.prototype.setLightness = function (value) {
+proto.Value.HslColor.prototype.setLightness = function(value) {
   return jspb.Message.setProto3FloatField(this, 3, value);
 };
+
 
 /**
  * optional double alpha = 4;
  * @return {number}
  */
-proto.Value.HslColor.prototype.getAlpha = function () {
-  return /** @type {number} */ (jspb.Message.getFloatingPointFieldWithDefault(
-    this,
-    4,
-    0.0
-  ));
+proto.Value.HslColor.prototype.getAlpha = function() {
+  return /** @type {number} */ (jspb.Message.getFloatingPointFieldWithDefault(this, 4, 0.0));
 };
+
 
 /**
  * @param {number} value
  * @return {!proto.Value.HslColor} returns this
  */
-proto.Value.HslColor.prototype.setAlpha = function (value) {
+proto.Value.HslColor.prototype.setAlpha = function(value) {
   return jspb.Message.setProto3FloatField(this, 4, value);
 };
+
+
 
 /**
  * List of repeated fields within this message type.
@@ -7863,61 +7495,62 @@ proto.Value.HslColor.prototype.setAlpha = function (value) {
  */
 proto.Value.List.repeatedFields_ = [3];
 
+
+
 if (jspb.Message.GENERATE_TO_OBJECT) {
-  /**
-   * Creates an object representation of this proto.
-   * Field names that are reserved in JavaScript and will be renamed to pb_name.
-   * Optional fields that are not set will be set to undefined.
-   * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
-   * For the list of reserved names please see:
-   *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
-   * @param {boolean=} opt_includeInstance Deprecated. whether to include the
-   *     JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @return {!Object}
-   */
-  proto.Value.List.prototype.toObject = function (opt_includeInstance) {
-    return proto.Value.List.toObject(opt_includeInstance, this);
+/**
+ * Creates an object representation of this proto.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * Optional fields that are not set will be set to undefined.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
+ * @param {boolean=} opt_includeInstance Deprecated. whether to include the
+ *     JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.Value.List.prototype.toObject = function(opt_includeInstance) {
+  return proto.Value.List.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Deprecated. Whether to include
+ *     the JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.Value.List} msg The msg instance to transform.
+ * @return {!Object}
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.Value.List.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    separator: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    hasBrackets: jspb.Message.getBooleanFieldWithDefault(msg, 2, false),
+    contentsList: jspb.Message.toObjectList(msg.getContentsList(),
+    proto.Value.toObject, includeInstance)
   };
 
-  /**
-   * Static version of the {@see toObject} method.
-   * @param {boolean|undefined} includeInstance Deprecated. Whether to include
-   *     the JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @param {!proto.Value.List} msg The msg instance to transform.
-   * @return {!Object}
-   * @suppress {unusedLocalVariables} f is only used for nested messages
-   */
-  proto.Value.List.toObject = function (includeInstance, msg) {
-    let f,
-      obj = {
-        separator: jspb.Message.getFieldWithDefault(msg, 1, 0),
-        hasBrackets: jspb.Message.getBooleanFieldWithDefault(msg, 2, false),
-        contentsList: jspb.Message.toObjectList(
-          msg.getContentsList(),
-          proto.Value.toObject,
-          includeInstance
-        ),
-      };
-
-    if (includeInstance) {
-      obj.$jspbMessageInstance = msg;
-    }
-    return obj;
-  };
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
 }
+
 
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
  * @return {!proto.Value.List}
  */
-proto.Value.List.deserializeBinary = function (bytes) {
-  const reader = new jspb.BinaryReader(bytes);
-  const msg = new proto.Value.List();
+proto.Value.List.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.Value.List;
   return proto.Value.List.deserializeBinaryFromReader(msg, reader);
 };
+
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
@@ -7926,43 +7559,45 @@ proto.Value.List.deserializeBinary = function (bytes) {
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
  * @return {!proto.Value.List}
  */
-proto.Value.List.deserializeBinaryFromReader = function (msg, reader) {
+proto.Value.List.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
     }
-    const field = reader.getFieldNumber();
+    var field = reader.getFieldNumber();
     switch (field) {
-      case 1:
-        var value = /** @type {!proto.Value.List.Separator} */ (reader.readEnum());
-        msg.setSeparator(value);
-        break;
-      case 2:
-        var value = /** @type {boolean} */ (reader.readBool());
-        msg.setHasBrackets(value);
-        break;
-      case 3:
-        var value = new proto.Value();
-        reader.readMessage(value, proto.Value.deserializeBinaryFromReader);
-        msg.addContents(value);
-        break;
-      default:
-        reader.skipField();
-        break;
+    case 1:
+      var value = /** @type {!proto.Value.List.Separator} */ (reader.readEnum());
+      msg.setSeparator(value);
+      break;
+    case 2:
+      var value = /** @type {boolean} */ (reader.readBool());
+      msg.setHasBrackets(value);
+      break;
+    case 3:
+      var value = new proto.Value;
+      reader.readMessage(value,proto.Value.deserializeBinaryFromReader);
+      msg.addContents(value);
+      break;
+    default:
+      reader.skipField();
+      break;
     }
   }
   return msg;
 };
 
+
 /**
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.Value.List.prototype.serializeBinary = function () {
-  const writer = new jspb.BinaryWriter();
+proto.Value.List.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
   proto.Value.List.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
+
 
 /**
  * Serializes the given message to binary data (in protobuf wire
@@ -7971,21 +7606,32 @@ proto.Value.List.prototype.serializeBinary = function () {
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.Value.List.serializeBinaryToWriter = function (message, writer) {
-  let f = undefined;
+proto.Value.List.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
   f = message.getSeparator();
   if (f !== 0.0) {
-    writer.writeEnum(1, f);
+    writer.writeEnum(
+      1,
+      f
+    );
   }
   f = message.getHasBrackets();
   if (f) {
-    writer.writeBool(2, f);
+    writer.writeBool(
+      2,
+      f
+    );
   }
   f = message.getContentsList();
   if (f.length > 0) {
-    writer.writeRepeatedMessage(3, f, proto.Value.serializeBinaryToWriter);
+    writer.writeRepeatedMessage(
+      3,
+      f,
+      proto.Value.serializeBinaryToWriter
+    );
   }
 };
+
 
 /**
  * @enum {number}
@@ -7994,91 +7640,83 @@ proto.Value.List.Separator = {
   COMMA: 0,
   SPACE: 1,
   SLASH: 2,
-  UNDECIDED: 3,
+  UNDECIDED: 3
 };
 
 /**
  * optional Separator separator = 1;
  * @return {!proto.Value.List.Separator}
  */
-proto.Value.List.prototype.getSeparator = function () {
-  return /** @type {!proto.Value.List.Separator} */ (jspb.Message.getFieldWithDefault(
-    this,
-    1,
-    0
-  ));
+proto.Value.List.prototype.getSeparator = function() {
+  return /** @type {!proto.Value.List.Separator} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
 };
+
 
 /**
  * @param {!proto.Value.List.Separator} value
  * @return {!proto.Value.List} returns this
  */
-proto.Value.List.prototype.setSeparator = function (value) {
+proto.Value.List.prototype.setSeparator = function(value) {
   return jspb.Message.setProto3EnumField(this, 1, value);
 };
+
 
 /**
  * optional bool has_brackets = 2;
  * @return {boolean}
  */
-proto.Value.List.prototype.getHasBrackets = function () {
-  return /** @type {boolean} */ (jspb.Message.getBooleanFieldWithDefault(
-    this,
-    2,
-    false
-  ));
+proto.Value.List.prototype.getHasBrackets = function() {
+  return /** @type {boolean} */ (jspb.Message.getBooleanFieldWithDefault(this, 2, false));
 };
+
 
 /**
  * @param {boolean} value
  * @return {!proto.Value.List} returns this
  */
-proto.Value.List.prototype.setHasBrackets = function (value) {
+proto.Value.List.prototype.setHasBrackets = function(value) {
   return jspb.Message.setProto3BooleanField(this, 2, value);
 };
+
 
 /**
  * repeated Value contents = 3;
  * @return {!Array<!proto.Value>}
  */
-proto.Value.List.prototype.getContentsList = function () {
-  return /** @type{!Array<!proto.Value>} */ (jspb.Message.getRepeatedWrapperField(
-    this,
-    proto.Value,
-    3
-  ));
+proto.Value.List.prototype.getContentsList = function() {
+  return /** @type{!Array<!proto.Value>} */ (
+    jspb.Message.getRepeatedWrapperField(this, proto.Value, 3));
 };
+
 
 /**
  * @param {!Array<!proto.Value>} value
  * @return {!proto.Value.List} returns this
- */
-proto.Value.List.prototype.setContentsList = function (value) {
+*/
+proto.Value.List.prototype.setContentsList = function(value) {
   return jspb.Message.setRepeatedWrapperField(this, 3, value);
 };
+
 
 /**
  * @param {!proto.Value=} opt_value
  * @param {number=} opt_index
  * @return {!proto.Value}
  */
-proto.Value.List.prototype.addContents = function (opt_value, opt_index) {
-  return jspb.Message.addToRepeatedWrapperField(
-    this,
-    3,
-    opt_value,
-    proto.Value,
-    opt_index
-  );
+proto.Value.List.prototype.addContents = function(opt_value, opt_index) {
+  return jspb.Message.addToRepeatedWrapperField(this, 3, opt_value, proto.Value, opt_index);
 };
+
 
 /**
  * Clears the list making it empty but non-null.
  * @return {!proto.Value.List} returns this
  */
-proto.Value.List.prototype.clearContentsList = function () {
+proto.Value.List.prototype.clearContentsList = function() {
   return this.setContentsList([]);
 };
+
+
 
 /**
  * List of repeated fields within this message type.
@@ -8087,59 +7725,60 @@ proto.Value.List.prototype.clearContentsList = function () {
  */
 proto.Value.Map.repeatedFields_ = [1];
 
+
+
 if (jspb.Message.GENERATE_TO_OBJECT) {
-  /**
-   * Creates an object representation of this proto.
-   * Field names that are reserved in JavaScript and will be renamed to pb_name.
-   * Optional fields that are not set will be set to undefined.
-   * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
-   * For the list of reserved names please see:
-   *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
-   * @param {boolean=} opt_includeInstance Deprecated. whether to include the
-   *     JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @return {!Object}
-   */
-  proto.Value.Map.prototype.toObject = function (opt_includeInstance) {
-    return proto.Value.Map.toObject(opt_includeInstance, this);
+/**
+ * Creates an object representation of this proto.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * Optional fields that are not set will be set to undefined.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
+ * @param {boolean=} opt_includeInstance Deprecated. whether to include the
+ *     JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.Value.Map.prototype.toObject = function(opt_includeInstance) {
+  return proto.Value.Map.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Deprecated. Whether to include
+ *     the JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.Value.Map} msg The msg instance to transform.
+ * @return {!Object}
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.Value.Map.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    entriesList: jspb.Message.toObjectList(msg.getEntriesList(),
+    proto.Value.Map.Entry.toObject, includeInstance)
   };
 
-  /**
-   * Static version of the {@see toObject} method.
-   * @param {boolean|undefined} includeInstance Deprecated. Whether to include
-   *     the JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @param {!proto.Value.Map} msg The msg instance to transform.
-   * @return {!Object}
-   * @suppress {unusedLocalVariables} f is only used for nested messages
-   */
-  proto.Value.Map.toObject = function (includeInstance, msg) {
-    let f,
-      obj = {
-        entriesList: jspb.Message.toObjectList(
-          msg.getEntriesList(),
-          proto.Value.Map.Entry.toObject,
-          includeInstance
-        ),
-      };
-
-    if (includeInstance) {
-      obj.$jspbMessageInstance = msg;
-    }
-    return obj;
-  };
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
 }
+
 
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
  * @return {!proto.Value.Map}
  */
-proto.Value.Map.deserializeBinary = function (bytes) {
-  const reader = new jspb.BinaryReader(bytes);
-  const msg = new proto.Value.Map();
+proto.Value.Map.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.Value.Map;
   return proto.Value.Map.deserializeBinaryFromReader(msg, reader);
 };
+
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
@@ -8148,38 +7787,37 @@ proto.Value.Map.deserializeBinary = function (bytes) {
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
  * @return {!proto.Value.Map}
  */
-proto.Value.Map.deserializeBinaryFromReader = function (msg, reader) {
+proto.Value.Map.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
     }
-    const field = reader.getFieldNumber();
+    var field = reader.getFieldNumber();
     switch (field) {
-      case 1:
-        var value = new proto.Value.Map.Entry();
-        reader.readMessage(
-          value,
-          proto.Value.Map.Entry.deserializeBinaryFromReader
-        );
-        msg.addEntries(value);
-        break;
-      default:
-        reader.skipField();
-        break;
+    case 1:
+      var value = new proto.Value.Map.Entry;
+      reader.readMessage(value,proto.Value.Map.Entry.deserializeBinaryFromReader);
+      msg.addEntries(value);
+      break;
+    default:
+      reader.skipField();
+      break;
     }
   }
   return msg;
 };
 
+
 /**
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.Value.Map.prototype.serializeBinary = function () {
-  const writer = new jspb.BinaryWriter();
+proto.Value.Map.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
   proto.Value.Map.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
+
 
 /**
  * Serializes the given message to binary data (in protobuf wire
@@ -8188,8 +7826,8 @@ proto.Value.Map.prototype.serializeBinary = function () {
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.Value.Map.serializeBinaryToWriter = function (message, writer) {
-  let f = undefined;
+proto.Value.Map.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
   f = message.getEntriesList();
   if (f.length > 0) {
     writer.writeRepeatedMessage(
@@ -8200,56 +7838,62 @@ proto.Value.Map.serializeBinaryToWriter = function (message, writer) {
   }
 };
 
+
+
+
+
 if (jspb.Message.GENERATE_TO_OBJECT) {
-  /**
-   * Creates an object representation of this proto.
-   * Field names that are reserved in JavaScript and will be renamed to pb_name.
-   * Optional fields that are not set will be set to undefined.
-   * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
-   * For the list of reserved names please see:
-   *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
-   * @param {boolean=} opt_includeInstance Deprecated. whether to include the
-   *     JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @return {!Object}
-   */
-  proto.Value.Map.Entry.prototype.toObject = function (opt_includeInstance) {
-    return proto.Value.Map.Entry.toObject(opt_includeInstance, this);
+/**
+ * Creates an object representation of this proto.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * Optional fields that are not set will be set to undefined.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
+ * @param {boolean=} opt_includeInstance Deprecated. whether to include the
+ *     JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.Value.Map.Entry.prototype.toObject = function(opt_includeInstance) {
+  return proto.Value.Map.Entry.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Deprecated. Whether to include
+ *     the JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.Value.Map.Entry} msg The msg instance to transform.
+ * @return {!Object}
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.Value.Map.Entry.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    key: (f = msg.getKey()) && proto.Value.toObject(includeInstance, f),
+    value: (f = msg.getValue()) && proto.Value.toObject(includeInstance, f)
   };
 
-  /**
-   * Static version of the {@see toObject} method.
-   * @param {boolean|undefined} includeInstance Deprecated. Whether to include
-   *     the JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @param {!proto.Value.Map.Entry} msg The msg instance to transform.
-   * @return {!Object}
-   * @suppress {unusedLocalVariables} f is only used for nested messages
-   */
-  proto.Value.Map.Entry.toObject = function (includeInstance, msg) {
-    let f,
-      obj = {
-        key: (f = msg.getKey()) && proto.Value.toObject(includeInstance, f),
-        value: (f = msg.getValue()) && proto.Value.toObject(includeInstance, f),
-      };
-
-    if (includeInstance) {
-      obj.$jspbMessageInstance = msg;
-    }
-    return obj;
-  };
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
 }
+
 
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
  * @return {!proto.Value.Map.Entry}
  */
-proto.Value.Map.Entry.deserializeBinary = function (bytes) {
-  const reader = new jspb.BinaryReader(bytes);
-  const msg = new proto.Value.Map.Entry();
+proto.Value.Map.Entry.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.Value.Map.Entry;
   return proto.Value.Map.Entry.deserializeBinaryFromReader(msg, reader);
 };
+
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
@@ -8258,40 +7902,42 @@ proto.Value.Map.Entry.deserializeBinary = function (bytes) {
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
  * @return {!proto.Value.Map.Entry}
  */
-proto.Value.Map.Entry.deserializeBinaryFromReader = function (msg, reader) {
+proto.Value.Map.Entry.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
     }
-    const field = reader.getFieldNumber();
+    var field = reader.getFieldNumber();
     switch (field) {
-      case 1:
-        var value = new proto.Value();
-        reader.readMessage(value, proto.Value.deserializeBinaryFromReader);
-        msg.setKey(value);
-        break;
-      case 2:
-        var value = new proto.Value();
-        reader.readMessage(value, proto.Value.deserializeBinaryFromReader);
-        msg.setValue(value);
-        break;
-      default:
-        reader.skipField();
-        break;
+    case 1:
+      var value = new proto.Value;
+      reader.readMessage(value,proto.Value.deserializeBinaryFromReader);
+      msg.setKey(value);
+      break;
+    case 2:
+      var value = new proto.Value;
+      reader.readMessage(value,proto.Value.deserializeBinaryFromReader);
+      msg.setValue(value);
+      break;
+    default:
+      reader.skipField();
+      break;
     }
   }
   return msg;
 };
 
+
 /**
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.Value.Map.Entry.prototype.serializeBinary = function () {
-  const writer = new jspb.BinaryWriter();
+proto.Value.Map.Entry.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
   proto.Value.Map.Entry.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
+
 
 /**
  * Serializes the given message to binary data (in protobuf wire
@@ -8300,184 +7946,193 @@ proto.Value.Map.Entry.prototype.serializeBinary = function () {
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.Value.Map.Entry.serializeBinaryToWriter = function (message, writer) {
-  let f = undefined;
+proto.Value.Map.Entry.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
   f = message.getKey();
   if (f != null) {
-    writer.writeMessage(1, f, proto.Value.serializeBinaryToWriter);
+    writer.writeMessage(
+      1,
+      f,
+      proto.Value.serializeBinaryToWriter
+    );
   }
   f = message.getValue();
   if (f != null) {
-    writer.writeMessage(2, f, proto.Value.serializeBinaryToWriter);
+    writer.writeMessage(
+      2,
+      f,
+      proto.Value.serializeBinaryToWriter
+    );
   }
 };
+
 
 /**
  * optional Value key = 1;
  * @return {?proto.Value}
  */
-proto.Value.Map.Entry.prototype.getKey = function () {
-  return /** @type{?proto.Value} */ (jspb.Message.getWrapperField(
-    this,
-    proto.Value,
-    1
-  ));
+proto.Value.Map.Entry.prototype.getKey = function() {
+  return /** @type{?proto.Value} */ (
+    jspb.Message.getWrapperField(this, proto.Value, 1));
 };
+
 
 /**
  * @param {?proto.Value|undefined} value
  * @return {!proto.Value.Map.Entry} returns this
- */
-proto.Value.Map.Entry.prototype.setKey = function (value) {
+*/
+proto.Value.Map.Entry.prototype.setKey = function(value) {
   return jspb.Message.setWrapperField(this, 1, value);
 };
+
 
 /**
  * Clears the message field making it undefined.
  * @return {!proto.Value.Map.Entry} returns this
  */
-proto.Value.Map.Entry.prototype.clearKey = function () {
+proto.Value.Map.Entry.prototype.clearKey = function() {
   return this.setKey(undefined);
 };
+
 
 /**
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.Value.Map.Entry.prototype.hasKey = function () {
+proto.Value.Map.Entry.prototype.hasKey = function() {
   return jspb.Message.getField(this, 1) != null;
 };
+
 
 /**
  * optional Value value = 2;
  * @return {?proto.Value}
  */
-proto.Value.Map.Entry.prototype.getValue = function () {
-  return /** @type{?proto.Value} */ (jspb.Message.getWrapperField(
-    this,
-    proto.Value,
-    2
-  ));
+proto.Value.Map.Entry.prototype.getValue = function() {
+  return /** @type{?proto.Value} */ (
+    jspb.Message.getWrapperField(this, proto.Value, 2));
 };
+
 
 /**
  * @param {?proto.Value|undefined} value
  * @return {!proto.Value.Map.Entry} returns this
- */
-proto.Value.Map.Entry.prototype.setValue = function (value) {
+*/
+proto.Value.Map.Entry.prototype.setValue = function(value) {
   return jspb.Message.setWrapperField(this, 2, value);
 };
+
 
 /**
  * Clears the message field making it undefined.
  * @return {!proto.Value.Map.Entry} returns this
  */
-proto.Value.Map.Entry.prototype.clearValue = function () {
+proto.Value.Map.Entry.prototype.clearValue = function() {
   return this.setValue(undefined);
 };
+
 
 /**
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.Value.Map.Entry.prototype.hasValue = function () {
+proto.Value.Map.Entry.prototype.hasValue = function() {
   return jspb.Message.getField(this, 2) != null;
 };
+
 
 /**
  * repeated Entry entries = 1;
  * @return {!Array<!proto.Value.Map.Entry>}
  */
-proto.Value.Map.prototype.getEntriesList = function () {
-  return /** @type{!Array<!proto.Value.Map.Entry>} */ (jspb.Message.getRepeatedWrapperField(
-    this,
-    proto.Value.Map.Entry,
-    1
-  ));
+proto.Value.Map.prototype.getEntriesList = function() {
+  return /** @type{!Array<!proto.Value.Map.Entry>} */ (
+    jspb.Message.getRepeatedWrapperField(this, proto.Value.Map.Entry, 1));
 };
+
 
 /**
  * @param {!Array<!proto.Value.Map.Entry>} value
  * @return {!proto.Value.Map} returns this
- */
-proto.Value.Map.prototype.setEntriesList = function (value) {
+*/
+proto.Value.Map.prototype.setEntriesList = function(value) {
   return jspb.Message.setRepeatedWrapperField(this, 1, value);
 };
+
 
 /**
  * @param {!proto.Value.Map.Entry=} opt_value
  * @param {number=} opt_index
  * @return {!proto.Value.Map.Entry}
  */
-proto.Value.Map.prototype.addEntries = function (opt_value, opt_index) {
-  return jspb.Message.addToRepeatedWrapperField(
-    this,
-    1,
-    opt_value,
-    proto.Value.Map.Entry,
-    opt_index
-  );
+proto.Value.Map.prototype.addEntries = function(opt_value, opt_index) {
+  return jspb.Message.addToRepeatedWrapperField(this, 1, opt_value, proto.Value.Map.Entry, opt_index);
 };
+
 
 /**
  * Clears the list making it empty but non-null.
  * @return {!proto.Value.Map} returns this
  */
-proto.Value.Map.prototype.clearEntriesList = function () {
+proto.Value.Map.prototype.clearEntriesList = function() {
   return this.setEntriesList([]);
 };
 
+
+
+
+
 if (jspb.Message.GENERATE_TO_OBJECT) {
-  /**
-   * Creates an object representation of this proto.
-   * Field names that are reserved in JavaScript and will be renamed to pb_name.
-   * Optional fields that are not set will be set to undefined.
-   * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
-   * For the list of reserved names please see:
-   *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
-   * @param {boolean=} opt_includeInstance Deprecated. whether to include the
-   *     JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @return {!Object}
-   */
-  proto.Value.CompilerFunction.prototype.toObject = function (
-    opt_includeInstance
-  ) {
-    return proto.Value.CompilerFunction.toObject(opt_includeInstance, this);
+/**
+ * Creates an object representation of this proto.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * Optional fields that are not set will be set to undefined.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
+ * @param {boolean=} opt_includeInstance Deprecated. whether to include the
+ *     JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.Value.CompilerFunction.prototype.toObject = function(opt_includeInstance) {
+  return proto.Value.CompilerFunction.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Deprecated. Whether to include
+ *     the JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.Value.CompilerFunction} msg The msg instance to transform.
+ * @return {!Object}
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.Value.CompilerFunction.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    id: jspb.Message.getFieldWithDefault(msg, 1, 0)
   };
 
-  /**
-   * Static version of the {@see toObject} method.
-   * @param {boolean|undefined} includeInstance Deprecated. Whether to include
-   *     the JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @param {!proto.Value.CompilerFunction} msg The msg instance to transform.
-   * @return {!Object}
-   * @suppress {unusedLocalVariables} f is only used for nested messages
-   */
-  proto.Value.CompilerFunction.toObject = function (includeInstance, msg) {
-    let f,
-      obj = {
-        id: jspb.Message.getFieldWithDefault(msg, 1, 0),
-      };
-
-    if (includeInstance) {
-      obj.$jspbMessageInstance = msg;
-    }
-    return obj;
-  };
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
 }
+
 
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
  * @return {!proto.Value.CompilerFunction}
  */
-proto.Value.CompilerFunction.deserializeBinary = function (bytes) {
-  const reader = new jspb.BinaryReader(bytes);
-  const msg = new proto.Value.CompilerFunction();
+proto.Value.CompilerFunction.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.Value.CompilerFunction;
   return proto.Value.CompilerFunction.deserializeBinaryFromReader(msg, reader);
 };
+
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
@@ -8486,37 +8141,36 @@ proto.Value.CompilerFunction.deserializeBinary = function (bytes) {
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
  * @return {!proto.Value.CompilerFunction}
  */
-proto.Value.CompilerFunction.deserializeBinaryFromReader = function (
-  msg,
-  reader
-) {
+proto.Value.CompilerFunction.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
     }
-    const field = reader.getFieldNumber();
+    var field = reader.getFieldNumber();
     switch (field) {
-      case 1:
-        var value = /** @type {number} */ (reader.readUint32());
-        msg.setId(value);
-        break;
-      default:
-        reader.skipField();
-        break;
+    case 1:
+      var value = /** @type {number} */ (reader.readUint32());
+      msg.setId(value);
+      break;
+    default:
+      reader.skipField();
+      break;
     }
   }
   return msg;
 };
 
+
 /**
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.Value.CompilerFunction.prototype.serializeBinary = function () {
-  const writer = new jspb.BinaryWriter();
+proto.Value.CompilerFunction.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
   proto.Value.CompilerFunction.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
+
 
 /**
  * Serializes the given message to binary data (in protobuf wire
@@ -8525,83 +8179,91 @@ proto.Value.CompilerFunction.prototype.serializeBinary = function () {
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.Value.CompilerFunction.serializeBinaryToWriter = function (
-  message,
-  writer
-) {
-  let f = undefined;
+proto.Value.CompilerFunction.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
   f = message.getId();
   if (f !== 0) {
-    writer.writeUint32(1, f);
+    writer.writeUint32(
+      1,
+      f
+    );
   }
 };
+
 
 /**
  * optional uint32 id = 1;
  * @return {number}
  */
-proto.Value.CompilerFunction.prototype.getId = function () {
+proto.Value.CompilerFunction.prototype.getId = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
 };
+
 
 /**
  * @param {number} value
  * @return {!proto.Value.CompilerFunction} returns this
  */
-proto.Value.CompilerFunction.prototype.setId = function (value) {
+proto.Value.CompilerFunction.prototype.setId = function(value) {
   return jspb.Message.setProto3IntField(this, 1, value);
 };
 
+
+
+
+
 if (jspb.Message.GENERATE_TO_OBJECT) {
-  /**
-   * Creates an object representation of this proto.
-   * Field names that are reserved in JavaScript and will be renamed to pb_name.
-   * Optional fields that are not set will be set to undefined.
-   * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
-   * For the list of reserved names please see:
-   *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
-   * @param {boolean=} opt_includeInstance Deprecated. whether to include the
-   *     JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @return {!Object}
-   */
-  proto.Value.HostFunction.prototype.toObject = function (opt_includeInstance) {
-    return proto.Value.HostFunction.toObject(opt_includeInstance, this);
+/**
+ * Creates an object representation of this proto.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * Optional fields that are not set will be set to undefined.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     net/proto2/compiler/js/internal/generator.cc#kKeyword.
+ * @param {boolean=} opt_includeInstance Deprecated. whether to include the
+ *     JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.Value.HostFunction.prototype.toObject = function(opt_includeInstance) {
+  return proto.Value.HostFunction.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Deprecated. Whether to include
+ *     the JSPB instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.Value.HostFunction} msg The msg instance to transform.
+ * @return {!Object}
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.Value.HostFunction.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    id: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    signature: jspb.Message.getFieldWithDefault(msg, 2, "")
   };
 
-  /**
-   * Static version of the {@see toObject} method.
-   * @param {boolean|undefined} includeInstance Deprecated. Whether to include
-   *     the JSPB instance for transitional soy proto support:
-   *     http://goto/soy-param-migration
-   * @param {!proto.Value.HostFunction} msg The msg instance to transform.
-   * @return {!Object}
-   * @suppress {unusedLocalVariables} f is only used for nested messages
-   */
-  proto.Value.HostFunction.toObject = function (includeInstance, msg) {
-    let f,
-      obj = {
-        id: jspb.Message.getFieldWithDefault(msg, 1, 0),
-        signature: jspb.Message.getFieldWithDefault(msg, 2, ''),
-      };
-
-    if (includeInstance) {
-      obj.$jspbMessageInstance = msg;
-    }
-    return obj;
-  };
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
 }
+
 
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
  * @return {!proto.Value.HostFunction}
  */
-proto.Value.HostFunction.deserializeBinary = function (bytes) {
-  const reader = new jspb.BinaryReader(bytes);
-  const msg = new proto.Value.HostFunction();
+proto.Value.HostFunction.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.Value.HostFunction;
   return proto.Value.HostFunction.deserializeBinaryFromReader(msg, reader);
 };
+
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
@@ -8610,38 +8272,40 @@ proto.Value.HostFunction.deserializeBinary = function (bytes) {
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
  * @return {!proto.Value.HostFunction}
  */
-proto.Value.HostFunction.deserializeBinaryFromReader = function (msg, reader) {
+proto.Value.HostFunction.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
     }
-    const field = reader.getFieldNumber();
+    var field = reader.getFieldNumber();
     switch (field) {
-      case 1:
-        var value = /** @type {number} */ (reader.readUint32());
-        msg.setId(value);
-        break;
-      case 2:
-        var value = /** @type {string} */ (reader.readString());
-        msg.setSignature(value);
-        break;
-      default:
-        reader.skipField();
-        break;
+    case 1:
+      var value = /** @type {number} */ (reader.readUint32());
+      msg.setId(value);
+      break;
+    case 2:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setSignature(value);
+      break;
+    default:
+      reader.skipField();
+      break;
     }
   }
   return msg;
 };
 
+
 /**
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.Value.HostFunction.prototype.serializeBinary = function () {
-  const writer = new jspb.BinaryWriter();
+proto.Value.HostFunction.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
   proto.Value.HostFunction.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
+
 
 /**
  * Serializes the given message to binary data (in protobuf wire
@@ -8650,422 +8314,391 @@ proto.Value.HostFunction.prototype.serializeBinary = function () {
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.Value.HostFunction.serializeBinaryToWriter = function (message, writer) {
-  let f = undefined;
+proto.Value.HostFunction.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
   f = message.getId();
   if (f !== 0) {
-    writer.writeUint32(1, f);
+    writer.writeUint32(
+      1,
+      f
+    );
   }
   f = message.getSignature();
   if (f.length > 0) {
-    writer.writeString(2, f);
+    writer.writeString(
+      2,
+      f
+    );
   }
 };
+
 
 /**
  * optional uint32 id = 1;
  * @return {number}
  */
-proto.Value.HostFunction.prototype.getId = function () {
+proto.Value.HostFunction.prototype.getId = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
 };
+
 
 /**
  * @param {number} value
  * @return {!proto.Value.HostFunction} returns this
  */
-proto.Value.HostFunction.prototype.setId = function (value) {
+proto.Value.HostFunction.prototype.setId = function(value) {
   return jspb.Message.setProto3IntField(this, 1, value);
 };
+
 
 /**
  * optional string signature = 2;
  * @return {string}
  */
-proto.Value.HostFunction.prototype.getSignature = function () {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ''));
+proto.Value.HostFunction.prototype.getSignature = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
+
 
 /**
  * @param {string} value
  * @return {!proto.Value.HostFunction} returns this
  */
-proto.Value.HostFunction.prototype.setSignature = function (value) {
+proto.Value.HostFunction.prototype.setSignature = function(value) {
   return jspb.Message.setProto3StringField(this, 2, value);
 };
+
 
 /**
  * optional String string = 1;
  * @return {?proto.Value.String}
  */
-proto.Value.prototype.getString = function () {
-  return /** @type{?proto.Value.String} */ (jspb.Message.getWrapperField(
-    this,
-    proto.Value.String,
-    1
-  ));
+proto.Value.prototype.getString = function() {
+  return /** @type{?proto.Value.String} */ (
+    jspb.Message.getWrapperField(this, proto.Value.String, 1));
 };
+
 
 /**
  * @param {?proto.Value.String|undefined} value
  * @return {!proto.Value} returns this
- */
-proto.Value.prototype.setString = function (value) {
-  return jspb.Message.setOneofWrapperField(
-    this,
-    1,
-    proto.Value.oneofGroups_[0],
-    value
-  );
+*/
+proto.Value.prototype.setString = function(value) {
+  return jspb.Message.setOneofWrapperField(this, 1, proto.Value.oneofGroups_[0], value);
 };
+
 
 /**
  * Clears the message field making it undefined.
  * @return {!proto.Value} returns this
  */
-proto.Value.prototype.clearString = function () {
+proto.Value.prototype.clearString = function() {
   return this.setString(undefined);
 };
+
 
 /**
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.Value.prototype.hasString = function () {
+proto.Value.prototype.hasString = function() {
   return jspb.Message.getField(this, 1) != null;
 };
+
 
 /**
  * optional Number number = 2;
  * @return {?proto.Value.Number}
  */
-proto.Value.prototype.getNumber = function () {
-  return /** @type{?proto.Value.Number} */ (jspb.Message.getWrapperField(
-    this,
-    proto.Value.Number,
-    2
-  ));
+proto.Value.prototype.getNumber = function() {
+  return /** @type{?proto.Value.Number} */ (
+    jspb.Message.getWrapperField(this, proto.Value.Number, 2));
 };
+
 
 /**
  * @param {?proto.Value.Number|undefined} value
  * @return {!proto.Value} returns this
- */
-proto.Value.prototype.setNumber = function (value) {
-  return jspb.Message.setOneofWrapperField(
-    this,
-    2,
-    proto.Value.oneofGroups_[0],
-    value
-  );
+*/
+proto.Value.prototype.setNumber = function(value) {
+  return jspb.Message.setOneofWrapperField(this, 2, proto.Value.oneofGroups_[0], value);
 };
+
 
 /**
  * Clears the message field making it undefined.
  * @return {!proto.Value} returns this
  */
-proto.Value.prototype.clearNumber = function () {
+proto.Value.prototype.clearNumber = function() {
   return this.setNumber(undefined);
 };
+
 
 /**
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.Value.prototype.hasNumber = function () {
+proto.Value.prototype.hasNumber = function() {
   return jspb.Message.getField(this, 2) != null;
 };
+
 
 /**
  * optional RgbColor rgb_color = 3;
  * @return {?proto.Value.RgbColor}
  */
-proto.Value.prototype.getRgbColor = function () {
-  return /** @type{?proto.Value.RgbColor} */ (jspb.Message.getWrapperField(
-    this,
-    proto.Value.RgbColor,
-    3
-  ));
+proto.Value.prototype.getRgbColor = function() {
+  return /** @type{?proto.Value.RgbColor} */ (
+    jspb.Message.getWrapperField(this, proto.Value.RgbColor, 3));
 };
+
 
 /**
  * @param {?proto.Value.RgbColor|undefined} value
  * @return {!proto.Value} returns this
- */
-proto.Value.prototype.setRgbColor = function (value) {
-  return jspb.Message.setOneofWrapperField(
-    this,
-    3,
-    proto.Value.oneofGroups_[0],
-    value
-  );
+*/
+proto.Value.prototype.setRgbColor = function(value) {
+  return jspb.Message.setOneofWrapperField(this, 3, proto.Value.oneofGroups_[0], value);
 };
+
 
 /**
  * Clears the message field making it undefined.
  * @return {!proto.Value} returns this
  */
-proto.Value.prototype.clearRgbColor = function () {
+proto.Value.prototype.clearRgbColor = function() {
   return this.setRgbColor(undefined);
 };
+
 
 /**
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.Value.prototype.hasRgbColor = function () {
+proto.Value.prototype.hasRgbColor = function() {
   return jspb.Message.getField(this, 3) != null;
 };
+
 
 /**
  * optional HslColor hsl_color = 4;
  * @return {?proto.Value.HslColor}
  */
-proto.Value.prototype.getHslColor = function () {
-  return /** @type{?proto.Value.HslColor} */ (jspb.Message.getWrapperField(
-    this,
-    proto.Value.HslColor,
-    4
-  ));
+proto.Value.prototype.getHslColor = function() {
+  return /** @type{?proto.Value.HslColor} */ (
+    jspb.Message.getWrapperField(this, proto.Value.HslColor, 4));
 };
+
 
 /**
  * @param {?proto.Value.HslColor|undefined} value
  * @return {!proto.Value} returns this
- */
-proto.Value.prototype.setHslColor = function (value) {
-  return jspb.Message.setOneofWrapperField(
-    this,
-    4,
-    proto.Value.oneofGroups_[0],
-    value
-  );
+*/
+proto.Value.prototype.setHslColor = function(value) {
+  return jspb.Message.setOneofWrapperField(this, 4, proto.Value.oneofGroups_[0], value);
 };
+
 
 /**
  * Clears the message field making it undefined.
  * @return {!proto.Value} returns this
  */
-proto.Value.prototype.clearHslColor = function () {
+proto.Value.prototype.clearHslColor = function() {
   return this.setHslColor(undefined);
 };
+
 
 /**
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.Value.prototype.hasHslColor = function () {
+proto.Value.prototype.hasHslColor = function() {
   return jspb.Message.getField(this, 4) != null;
 };
+
 
 /**
  * optional List list = 5;
  * @return {?proto.Value.List}
  */
-proto.Value.prototype.getList = function () {
-  return /** @type{?proto.Value.List} */ (jspb.Message.getWrapperField(
-    this,
-    proto.Value.List,
-    5
-  ));
+proto.Value.prototype.getList = function() {
+  return /** @type{?proto.Value.List} */ (
+    jspb.Message.getWrapperField(this, proto.Value.List, 5));
 };
+
 
 /**
  * @param {?proto.Value.List|undefined} value
  * @return {!proto.Value} returns this
- */
-proto.Value.prototype.setList = function (value) {
-  return jspb.Message.setOneofWrapperField(
-    this,
-    5,
-    proto.Value.oneofGroups_[0],
-    value
-  );
+*/
+proto.Value.prototype.setList = function(value) {
+  return jspb.Message.setOneofWrapperField(this, 5, proto.Value.oneofGroups_[0], value);
 };
+
 
 /**
  * Clears the message field making it undefined.
  * @return {!proto.Value} returns this
  */
-proto.Value.prototype.clearList = function () {
+proto.Value.prototype.clearList = function() {
   return this.setList(undefined);
 };
+
 
 /**
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.Value.prototype.hasList = function () {
+proto.Value.prototype.hasList = function() {
   return jspb.Message.getField(this, 5) != null;
 };
+
 
 /**
  * optional Map map = 6;
  * @return {?proto.Value.Map}
  */
-proto.Value.prototype.getMap = function () {
-  return /** @type{?proto.Value.Map} */ (jspb.Message.getWrapperField(
-    this,
-    proto.Value.Map,
-    6
-  ));
+proto.Value.prototype.getMap = function() {
+  return /** @type{?proto.Value.Map} */ (
+    jspb.Message.getWrapperField(this, proto.Value.Map, 6));
 };
+
 
 /**
  * @param {?proto.Value.Map|undefined} value
  * @return {!proto.Value} returns this
- */
-proto.Value.prototype.setMap = function (value) {
-  return jspb.Message.setOneofWrapperField(
-    this,
-    6,
-    proto.Value.oneofGroups_[0],
-    value
-  );
+*/
+proto.Value.prototype.setMap = function(value) {
+  return jspb.Message.setOneofWrapperField(this, 6, proto.Value.oneofGroups_[0], value);
 };
+
 
 /**
  * Clears the message field making it undefined.
  * @return {!proto.Value} returns this
  */
-proto.Value.prototype.clearMap = function () {
+proto.Value.prototype.clearMap = function() {
   return this.setMap(undefined);
 };
+
 
 /**
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.Value.prototype.hasMap = function () {
+proto.Value.prototype.hasMap = function() {
   return jspb.Message.getField(this, 6) != null;
 };
+
 
 /**
  * optional Singleton singleton = 7;
  * @return {!proto.Value.Singleton}
  */
-proto.Value.prototype.getSingleton = function () {
-  return /** @type {!proto.Value.Singleton} */ (jspb.Message.getFieldWithDefault(
-    this,
-    7,
-    0
-  ));
+proto.Value.prototype.getSingleton = function() {
+  return /** @type {!proto.Value.Singleton} */ (jspb.Message.getFieldWithDefault(this, 7, 0));
 };
+
 
 /**
  * @param {!proto.Value.Singleton} value
  * @return {!proto.Value} returns this
  */
-proto.Value.prototype.setSingleton = function (value) {
-  return jspb.Message.setOneofField(
-    this,
-    7,
-    proto.Value.oneofGroups_[0],
-    value
-  );
+proto.Value.prototype.setSingleton = function(value) {
+  return jspb.Message.setOneofField(this, 7, proto.Value.oneofGroups_[0], value);
 };
+
 
 /**
  * Clears the field making it undefined.
  * @return {!proto.Value} returns this
  */
-proto.Value.prototype.clearSingleton = function () {
-  return jspb.Message.setOneofField(
-    this,
-    7,
-    proto.Value.oneofGroups_[0],
-    undefined
-  );
+proto.Value.prototype.clearSingleton = function() {
+  return jspb.Message.setOneofField(this, 7, proto.Value.oneofGroups_[0], undefined);
 };
+
 
 /**
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.Value.prototype.hasSingleton = function () {
+proto.Value.prototype.hasSingleton = function() {
   return jspb.Message.getField(this, 7) != null;
 };
+
 
 /**
  * optional CompilerFunction compiler_function = 8;
  * @return {?proto.Value.CompilerFunction}
  */
-proto.Value.prototype.getCompilerFunction = function () {
-  return /** @type{?proto.Value.CompilerFunction} */ (jspb.Message.getWrapperField(
-    this,
-    proto.Value.CompilerFunction,
-    8
-  ));
+proto.Value.prototype.getCompilerFunction = function() {
+  return /** @type{?proto.Value.CompilerFunction} */ (
+    jspb.Message.getWrapperField(this, proto.Value.CompilerFunction, 8));
 };
+
 
 /**
  * @param {?proto.Value.CompilerFunction|undefined} value
  * @return {!proto.Value} returns this
- */
-proto.Value.prototype.setCompilerFunction = function (value) {
-  return jspb.Message.setOneofWrapperField(
-    this,
-    8,
-    proto.Value.oneofGroups_[0],
-    value
-  );
+*/
+proto.Value.prototype.setCompilerFunction = function(value) {
+  return jspb.Message.setOneofWrapperField(this, 8, proto.Value.oneofGroups_[0], value);
 };
+
 
 /**
  * Clears the message field making it undefined.
  * @return {!proto.Value} returns this
  */
-proto.Value.prototype.clearCompilerFunction = function () {
+proto.Value.prototype.clearCompilerFunction = function() {
   return this.setCompilerFunction(undefined);
 };
+
 
 /**
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.Value.prototype.hasCompilerFunction = function () {
+proto.Value.prototype.hasCompilerFunction = function() {
   return jspb.Message.getField(this, 8) != null;
 };
+
 
 /**
  * optional HostFunction host_function = 9;
  * @return {?proto.Value.HostFunction}
  */
-proto.Value.prototype.getHostFunction = function () {
-  return /** @type{?proto.Value.HostFunction} */ (jspb.Message.getWrapperField(
-    this,
-    proto.Value.HostFunction,
-    9
-  ));
+proto.Value.prototype.getHostFunction = function() {
+  return /** @type{?proto.Value.HostFunction} */ (
+    jspb.Message.getWrapperField(this, proto.Value.HostFunction, 9));
 };
+
 
 /**
  * @param {?proto.Value.HostFunction|undefined} value
  * @return {!proto.Value} returns this
- */
-proto.Value.prototype.setHostFunction = function (value) {
-  return jspb.Message.setOneofWrapperField(
-    this,
-    9,
-    proto.Value.oneofGroups_[0],
-    value
-  );
+*/
+proto.Value.prototype.setHostFunction = function(value) {
+  return jspb.Message.setOneofWrapperField(this, 9, proto.Value.oneofGroups_[0], value);
 };
+
 
 /**
  * Clears the message field making it undefined.
  * @return {!proto.Value} returns this
  */
-proto.Value.prototype.clearHostFunction = function () {
+proto.Value.prototype.clearHostFunction = function() {
   return this.setHostFunction(undefined);
 };
+
 
 /**
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.Value.prototype.hasHostFunction = function () {
+proto.Value.prototype.hasHostFunction = function() {
   return jspb.Message.getField(this, 9) != null;
 };
+
 
 goog.object.extend(exports, proto);

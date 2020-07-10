@@ -6,8 +6,9 @@
     "strict": true
   },
   "include": [
-    "index.ts",
-    "src/**/*.ts",
-    "test/**/*.ts"
-  ]
+    "lib/**/*.ts",
+  ],
+  "exclude": [
+    "**/*.test.ts",
+  ],
 }

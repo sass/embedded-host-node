@@ -9,26 +9,31 @@
   "files": [
     "lib/**/*"
   ],
+  "engines": {
+    "node": ">=12.18.2"
+  },
   "scripts": {
     "check": "gts check",
     "compile": "tsc",
     "fix": "gts fix",
-    "postinstall": "node tool/post-install.js",
+    "init": "ts-node ./tool/init.ts",
     "test": "ts-node ./node_modules/jasmine/bin/jasmine"
   },
   "dependencies": {
     "google-protobuf": "^3.11.4",
     "immutable": "^4.0.0-rc.12",
-    "protoc": "^1.0.4",
+    "node-fetch": "^2.6.0",
     "rxjs": "^6.5.5"
   },
   "devDependencies": {
     "@types/google-protobuf": "^3.7.2",
     "@types/jasmine": "^3.5.11",
     "@types/node": "^10.0.3",
+    "@types/node-fetch": "^2.5.7",
     "gts": "^2.0.2",
     "jasmine": "^3.5.0",
     "jasmine-spec-reporter": "^5.0.2",
+    "protoc": "^1.0.4",
     "ts-node": "^8.10.2",
     "ts-protoc-gen": "^0.12.0",
     "typescript": "~3.8.0"

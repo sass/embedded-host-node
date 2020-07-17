@@ -21,26 +21,26 @@ export class EmbeddedProcess {
 
   // These Subjects are written to by the child process's stdio. They are
   // publicly exposed as readonly Observables to prevent memory leaks.
-  private readonly rawStdout$ = new Subject<Buffer>();
-  private readonly rawStderr$ = new Subject<Buffer>();
-  private readonly rawExit$ = new Subject<number | null>();
+  private readonly stdoutInternal$ = new Subject<Buffer>();
+  private readonly stderrInternal$ = new Subject<Buffer>();
+  private readonly exitInternal$ = new Subject<number | null>();
 
   /** Sends the buffers it receives to the child process's stdin. */
   readonly stdin$ = new Subject<Buffer>();
 
   /** The buffers emitted by the child process's stdout. */
-  readonly stdout$ = this.rawStdout$.pipe(takeUntil(this.rawExit$));
+  readonly stdout$ = this.stdoutInternal$.pipe(takeUntil(this.exitInternal$));
 
   /** The buffers emitted by the child process's stderr. */
-  readonly stderr$ = this.rawStderr$.pipe(takeUntil(this.rawExit$));
+  readonly stderr$ = this.stderrInternal$.pipe(takeUntil(this.exitInternal$));
 
   /** The child process's exit event. */
-  readonly exit$ = this.rawExit$.pipe(takeUntil(this.rawExit$));
+  readonly exit$ = this.exitInternal$.pipe(takeUntil(this.exitInternal$));
 
   constructor() {
     this.stdin$.subscribe(buffer => this.process.stdin.write(buffer));
-    this.process.stdout.on('data', buffer => this.rawStdout$.next(buffer));
-    this.process.stderr.on('data', buffer => this.rawStderr$.next(buffer));
+    this.process.stdout.on('data', buffer => this.stdoutInternal$.next(buffer));
+    this.process.stderr.on('data', buffer => this.stderrInternal$.next(buffer));
     this.process.on('exit', () => this.close());
   }
 
@@ -48,8 +48,8 @@ export class EmbeddedProcess {
    * Kills the child process and cleans up all associated Observables.
    */
   close() {
-    this.rawExit$.next();
-    this.rawExit$.complete();
+    this.exitInternal$.next();
+    this.exitInternal$.complete();
     this.stdin$.complete();
     this.process.stdin.end();
   }

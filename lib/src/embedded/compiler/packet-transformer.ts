@@ -19,10 +19,14 @@ import {filter} from 'rxjs/operators';
  * Encodes payloads by attaching a header that describes the payload's length.
  */
 export class PacketTransformer {
-  private readonly _read$ = new Subject<Buffer>();
+  // The decoded payloads are written to this Subject. This is publicly exposed
+  // as a readonly Observable to prevent memory leaks.
+  private readonly readInternal$ = new Subject<Buffer>();
 
   /** The payloads (decoded from buffers). */
-  readonly read$ = this._read$.pipe(filter(payload => payload.length > 0));
+  readonly read$ = this.readInternal$.pipe(
+    filter(payload => payload.length > 0)
+  );
 
   /** Receives payloads and encodes them into packets. */
   readonly write$ = new Subject<Buffer>();
@@ -44,7 +48,7 @@ export class PacketTransformer {
     while (decodedBytes < buffer.length) {
       decodedBytes += this.packet.write(buffer.slice(decodedBytes));
       if (this.packet.isComplete()) {
-        this._read$.next(this.packet.payload);
+        this.readInternal$.next(this.packet.payload);
         this.packet = new Packet();
       }
     }
@@ -68,7 +72,7 @@ export class PacketTransformer {
    * Cleans up all Observables.
    */
   close() {
-    this._read$.complete();
+    this.readInternal$.complete();
     this.write$.complete();
   }
 }

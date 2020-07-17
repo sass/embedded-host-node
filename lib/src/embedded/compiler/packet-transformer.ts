@@ -57,6 +57,7 @@ export class PacketTransformer {
   private encode(payload: Buffer) {
     const packet = Buffer.alloc(Packet.headerByteSize + payload.length);
 
+    // Construct the header.
     let remainder = payload.length;
     for (let i = 0; i < Packet.headerByteSize; i++) {
       packet.set([remainder % 256], i);
@@ -64,7 +65,6 @@ export class PacketTransformer {
     }
 
     packet.set(payload, Packet.headerByteSize);
-
     this.rawWrite$.next(packet);
   }
 
@@ -110,9 +110,8 @@ class Packet {
     if (this.headerOffset < this.header.length) {
       bytesWritten = writeBuffer(source, this.header, this.headerOffset);
       this.headerOffset += bytesWritten;
+      if (this.headerOffset < this.header.length) return bytesWritten;
     }
-
-    if (this.headerOffset < this.header.length) return bytesWritten;
 
     if (!this.payload) {
       let payloadLength = 0;

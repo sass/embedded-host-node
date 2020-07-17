@@ -5,24 +5,48 @@
   "repository": "sass/embedded-host-node",
   "author": "Google Inc.",
   "license": "MIT",
-  "main": "index.ts",
+  "main": "dist/lib/index.js",
+  "files": [
+    "lib/**/*"
+  ],
+  "engines": {
+    "node": ">=12.18.2"
+  },
   "scripts": {
     "check": "gts check",
-    "clean": "gts clean",
     "compile": "tsc",
     "fix": "gts fix",
-    "prepare": "npm run compile",
-    "pretest": "npm run compile",
-    "posttest": "npm run check"
+    "init": "ts-node ./tool/init.ts",
+    "test": "ts-node ./node_modules/jasmine/bin/jasmine"
   },
   "dependencies": {
     "google-protobuf": "^3.11.4",
-    "immutable": "^4.0.0-rc.12"
+    "immutable": "^4.0.0-rc.12",
+    "node-fetch": "^2.6.0",
+    "rxjs": "^6.5.5"
   },
   "devDependencies": {
+    "@types/google-protobuf": "^3.7.2",
+    "@types/jasmine": "^3.5.11",
     "@types/node": "^10.0.3",
+    "@types/node-fetch": "^2.5.7",
+    "gts": "^2.0.2",
     "jasmine": "^3.5.0",
-    "gts": "^2.0.0",
+    "jasmine-spec-reporter": "^5.0.2",
+    "protoc": "^1.0.4",
+    "ts-node": "^8.10.2",
+    "ts-protoc-gen": "^0.12.0",
     "typescript": "~3.8.0"
+  },
+  "prettier": "gts/.prettierrc.json",
+  "eslintConfig": {
+    "env": {
+      "jasmine": true
+    },
+    "extends": "./node_modules/gts/",
+    "ignorePatterns": [
+      "dist/**/*",
+      "lib/src/vendor/**/*"
+    ]
   }
 }

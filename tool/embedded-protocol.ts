@@ -3,7 +3,7 @@
 // https://opensource.org/licenses/MIT.
 
 import {execSync} from 'child_process';
-import {promises} from 'fs';
+import {promises as fs} from 'fs';
 import fetch from 'node-fetch';
 
 /**
@@ -15,7 +15,7 @@ export async function getEmbeddedProtocol() {
   const protoName = 'embedded_sass.proto';
   let proto: string;
 
-  await promises.mkdir(outPath, {recursive: true});
+  await fs.mkdir(outPath, {recursive: true});
 
   console.log('Downloading Embedded Sass Protocol');
   try {
@@ -33,7 +33,7 @@ export async function getEmbeddedProtocol() {
 
   console.log('Writing proto to pbjs');
   try {
-    await promises.writeFile(`${outPath}/${protoName}`, proto);
+    await fs.writeFile(`${outPath}/${protoName}`, proto);
     execSync(
       `npx protoc \
           --plugin="protoc-gen-ts=node_modules/.bin/protoc-gen-ts" \

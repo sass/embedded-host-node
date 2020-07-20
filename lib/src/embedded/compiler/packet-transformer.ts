@@ -23,7 +23,7 @@ export class PacketTransformer {
   // as a readonly Observable to prevent memory leaks.
   private readonly readInternal$ = new Subject<Buffer>();
 
-  /** The payloads (decoded from buffers). */
+  /** The decoded, non-empty payloads. */
   readonly read$ = this.readInternal$.pipe(
     filter(payload => payload.length > 0)
   );
@@ -31,8 +31,7 @@ export class PacketTransformer {
   /** Receives payloads and encodes them into packets. */
   readonly write$ = new Subject<Buffer>();
 
-  // The packet that is actively being decoded as buffers come in. When the
-  // packet is completed, its payload gets emitted.
+  // The packet that is actively being decoded as buffers come in.
   private packet = new Packet();
 
   constructor(
@@ -43,27 +42,23 @@ export class PacketTransformer {
     this.write$.subscribe(buffer => this.encode(buffer));
   }
 
+  // Decodes a buffer into the current packet. If the packet is completed,
+  // emits the packet's payload and starts a new packet.
   private decode(buffer: Buffer) {
     let decodedBytes = 0;
     while (decodedBytes < buffer.length) {
       decodedBytes += this.packet.write(buffer.slice(decodedBytes));
-      if (this.packet.isComplete()) {
+      if (this.packet.isComplete) {
         this.readInternal$.next(this.packet.payload);
         this.packet = new Packet();
       }
     }
   }
 
+  // Encodes a payload by attaching a header that describes its length.
   private encode(payload: Buffer) {
     const packet = Buffer.alloc(Packet.headerByteSize + payload.length);
-
-    // Construct the header.
-    let remainder = payload.length;
-    for (let i = 0; i < Packet.headerByteSize; i++) {
-      packet.set([remainder % 256], i);
-      remainder = Math.floor(remainder / 256);
-    }
-
+    packet.writeInt32LE(payload.length, 0);
     packet.set(payload, Packet.headerByteSize);
     this.rawWrite$.next(packet);
   }
@@ -78,19 +73,33 @@ export class PacketTransformer {
 }
 
 /**
- * A length-delimited packet comprised of a header and payload. The header is a
- * 4-byte little-endian number that indicates the payload's length.
+ * A length-delimited packet comprised of a header and payload.
  */
 class Packet {
+  /**
+   * The length of a packet header--the 4-byte little-endian number that
+   * indicates the payload's length.
+   */
   static headerByteSize = 4;
 
-  header = Buffer.alloc(Packet.headerByteSize);
+  // The packet's header, indicating the payload's length. Constructed by calls
+  // to write().
+  private header = Buffer.alloc(Packet.headerByteSize);
+
+  /**
+   * The packet's payload. Constructed by calls to write().
+   * @see write
+   */
   payload?: Buffer;
 
+  // These track the progress of constructing the packet.
   private headerOffset = 0;
   private payloadOffset = 0;
 
-  isComplete() {
+  /**
+   * Whether the packet construction is complete.
+   */
+  get isComplete() {
     return (
       this.headerOffset >= this.header.length &&
       this.payload &&
@@ -105,6 +114,10 @@ class Packet {
    * up the packet until it is complete.
    */
   write(source: Buffer): number {
+    if (this.isComplete) {
+      throw Error('Cannot write to a completed Packet.');
+    }
+
     let bytesWritten = 0;
 
     if (this.headerOffset < this.header.length) {
@@ -114,10 +127,7 @@ class Packet {
     }
 
     if (!this.payload) {
-      let payloadLength = 0;
-      for (let i = 0; i < Packet.headerByteSize; i++) {
-        payloadLength += this.header[i] * Math.pow(256, i);
-      }
+      const payloadLength = this.header.readUInt32LE(0);
       this.payload = Buffer.alloc(payloadLength);
     }
 
@@ -132,6 +142,9 @@ class Packet {
   }
 }
 
+// Fills the destination buffer, starting at the offset index, with bytes from
+// the source buffer. Returns the number of bytes written. Does not write beyond
+// the length of the destination.
 function writeBuffer(
   source: Buffer,
   destination: Buffer,

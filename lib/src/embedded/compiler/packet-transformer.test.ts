@@ -69,14 +69,14 @@ describe('decode', () => {
     it('decodes a single chunk', async () => {
       toDecode$.next(Buffer.from([0, 0, 0, 0]));
       transformer.close();
-      expect(await decoded).toEqual([]);
+      expect(await decoded).toEqual([Buffer.from([])]);
     });
 
     it('decodes multiple chunks', async () => {
       toDecode$.next(Buffer.from([0, 0]));
       toDecode$.next(Buffer.from([0, 0]));
       transformer.close();
-      expect(await decoded).toEqual([]);
+      expect(await decoded).toEqual([Buffer.from([])]);
     });
 
     it('decodes one chunk per byte', async () => {
@@ -85,13 +85,13 @@ describe('decode', () => {
       toDecode$.next(Buffer.from([0]));
       toDecode$.next(Buffer.from([0]));
       transformer.close();
-      expect(await decoded).toEqual([]);
+      expect(await decoded).toEqual([Buffer.from([])]);
     });
 
     it('decodes a chunk that contains more data', async () => {
       toDecode$.next(Buffer.from([0, 0, 0, 0, 1, 0, 0, 0, 100]));
       transformer.close();
-      expect(await decoded).toEqual([Buffer.from([100])]);
+      expect(await decoded).toEqual([Buffer.from([]), Buffer.from([100])]);
     });
   });
 

@@ -3,7 +3,6 @@
 // https://opensource.org/licenses/MIT.
 
 import {Observable, Subject} from 'rxjs';
-import {filter} from 'rxjs/operators';
 
 /**
  * Decodes arbitrarily-chunked buffers, for example
@@ -23,10 +22,8 @@ export class PacketTransformer {
   // as a readonly Observable to prevent memory leaks.
   private readonly readInternal$ = new Subject<Buffer>();
 
-  /** The decoded, non-empty payloads. */
-  readonly read$ = this.readInternal$.pipe(
-    filter(payload => payload.length > 0)
-  );
+  /** The payloads (decoded from buffers). */
+  readonly read$ = this.readInternal$.pipe();
 
   /** Receives payloads and encodes them into packets. */
   readonly write$ = new Subject<Buffer>();
@@ -63,18 +60,14 @@ export class PacketTransformer {
     this.rawWrite$.next(packet);
   }
 
-  /**
-   * Cleans up all Observables.
-   */
+  /** Cleans up all Observables. */
   close() {
     this.readInternal$.complete();
     this.write$.complete();
   }
 }
 
-/**
- * A length-delimited packet comprised of a header and payload.
- */
+/** A length-delimited packet comprised of a header and payload. */
 class Packet {
   /**
    * The length of a packet header--the 4-byte little-endian number that
@@ -96,9 +89,7 @@ class Packet {
   private headerOffset = 0;
   private payloadOffset = 0;
 
-  /**
-   * Whether the packet construction is complete.
-   */
+  /** Whether the packet construction is complete. */
   get isComplete() {
     return (
       this.headerOffset >= this.header.length &&

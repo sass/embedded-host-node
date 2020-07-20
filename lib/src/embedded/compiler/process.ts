@@ -44,9 +44,7 @@ export class EmbeddedProcess {
     this.process.on('exit', () => this.close());
   }
 
-  /**
-   * Kills the child process and cleans up all associated Observables.
-   */
+  /** Kills the child process and cleans up all associated Observables. */
   close() {
     this.exitInternal$.next();
     this.exitInternal$.complete();

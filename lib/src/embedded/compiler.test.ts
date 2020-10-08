@@ -2,12 +2,12 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-import {Compiler} from './compiler';
+import {EmbeddedCompiler} from './compiler';
 import {InboundMessage} from '../vendor/embedded_sass_pb';
 
-describe('compiler', () => {
-  let compiler: Compiler;
-  beforeEach(() => (compiler = new Compiler()));
+describe('embedded compiler', () => {
+  let compiler: EmbeddedCompiler;
+  beforeEach(() => (compiler = new EmbeddedCompiler()));
   afterEach(() => compiler.close());
 
   it('compiles valid css input', async done => {
@@ -41,9 +41,9 @@ describe('compiler', () => {
     compiler.write$.next(new InboundMessage());
     compiler.read$.subscribe(
       // Response callback
-      () => {},
+      () => fail(),
       // Error callback
-      () => {},
+      () => fail(),
       // Completion callback
       () => done()
     );

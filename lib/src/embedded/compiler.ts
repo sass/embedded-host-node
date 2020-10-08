@@ -20,11 +20,11 @@ import {filter, first, map} from 'rxjs/operators';
  * If there is a ProtocolError, this shuts down the compiler process and cleans
  * up all Observables.
  */
-export class Compiler {
+export class EmbeddedCompiler {
   // The Node child process that invokes the Embedded Sass Compiler.
   private readonly embeddedProcess = new EmbeddedProcess();
 
-  // Transforms the embedded process's into delineated buffers.
+  // Transforms the embedded process's IO streams into delineated buffers.
   private readonly packetTransformer = new PacketTransformer(
     this.embeddedProcess.stdout$,
     this.embeddedProcess.stdin$
@@ -63,7 +63,7 @@ export class Compiler {
       process.stderr.write(buffer);
     });
 
-    // Shutdown the compiler if we detect a ProtocolError or the embedded
+    // Shut down the compiler if we detect a ProtocolError or the embedded
     // process exits.
     merge(this.error$, this.embeddedProcess.exit$)
       .pipe(first())

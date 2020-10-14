@@ -5,7 +5,7 @@
 import {EmbeddedProcess} from './process';
 import {take} from 'rxjs/operators';
 
-describe('embedded process invocation smoke test', () => {
+describe('embedded process smoke test', () => {
   it('spins up child process', () => {
     const process = new EmbeddedProcess();
     process.close();

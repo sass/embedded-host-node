@@ -6,8 +6,9 @@ import {InboundMessage, OutboundMessage} from '../vendor/embedded_sass_pb';
 import {EmbeddedProcess} from './compiler/process';
 import {PacketTransformer} from './compiler/packet-transformer';
 import {MessageTransformer} from './compiler/message-transformer';
-import {Observable, Subject, merge} from 'rxjs';
+import {Observable, merge} from 'rxjs';
 import {filter, first, map} from 'rxjs/operators';
+import {Dispatcher} from './dispatcher';
 
 /**
  * A facade to the Embedded Sass Compiler.
@@ -36,18 +37,8 @@ export class EmbeddedCompiler {
     this.packetTransformer.write$
   );
 
-  /** For sending InboundMessages to the Embedded Compiler. */
-  readonly write$: Subject<InboundMessage> = this.messageTransformer.write$;
-
-  /** OutboundMessages sent by the Embedded Compiler. */
-  readonly read$: Observable<
-    OutboundMessage
-  > = this.messageTransformer.read$.pipe(
-    filter(message => !message.hasError())
-  );
-
-  /** Emits an error if the Embedded Protocol is violated. */
-  readonly error$: Observable<Error> = merge(
+  // Emits an error if the Embedded Protocol is violated.
+  private readonly error$: Observable<Error> = merge(
     this.messageTransformer.error$,
     this.messageTransformer.read$.pipe(
       filter(message => message.hasError()),
@@ -57,7 +48,64 @@ export class EmbeddedCompiler {
     )
   );
 
-  constructor() {
+  constructor(private readonly dispatcher: Dispatcher) {
+    this.dispatcher.compileRequests$.subscribe(request => {
+      const message = new InboundMessage();
+      message.setCompilerequest(request);
+      this.messageTransformer.write$.next(message);
+    });
+
+    this.messageTransformer.read$
+      .pipe(filter(message => !message.hasError()))
+      .subscribe(message => {
+        switch (message.getMessageCase()) {
+          case OutboundMessage.MessageCase.LOGEVENT:
+            this.dispatcher.sendLogEvent(message.getLogevent()!);
+            break;
+          case OutboundMessage.MessageCase.COMPILERESPONSE:
+            this.dispatcher.sendCompileResponse(message.getCompileresponse()!);
+            break;
+          case OutboundMessage.MessageCase.IMPORTREQUEST:
+            this.dispatcher
+              .sendImportRequest(message.getImportrequest()!)
+              ?.then(response => {
+                const message = new InboundMessage();
+                message.setImportresponse(response);
+                this.messageTransformer.write$.next(message);
+              });
+            break;
+          case OutboundMessage.MessageCase.FILEIMPORTREQUEST:
+            this.dispatcher
+              .sendFileImportRequest(message.getFileimportrequest()!)
+              ?.then(response => {
+                const message = new InboundMessage();
+                message.setFileimportresponse(response);
+                this.messageTransformer.write$.next(message);
+              });
+            break;
+          case OutboundMessage.MessageCase.CANONICALIZEREQUEST:
+            this.dispatcher
+              .sendCanonicalizeRequest(message.getCanonicalizerequest()!)
+              ?.then(response => {
+                const message = new InboundMessage();
+                message.setCanonicalizeresponse(response);
+                this.messageTransformer.write$.next(message);
+              });
+            break;
+          case OutboundMessage.MessageCase.FUNCTIONCALLREQUEST:
+            this.dispatcher
+              .sendFunctionCallRequest(message.getFunctioncallrequest()!)
+              ?.then(response => {
+                const message = new InboundMessage();
+                message.setFunctioncallresponse(response);
+                this.messageTransformer.write$.next(message);
+              });
+            break;
+        }
+      });
+
+    this.error$.subscribe(error => this.dispatcher.sendError(error));
+
     // Pass the embedded process's stderr messages to the main process's stderr.
     this.embeddedProcess.stderr$.subscribe(buffer => {
       process.stderr.write(buffer);

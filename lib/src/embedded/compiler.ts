@@ -7,8 +7,21 @@ import {EmbeddedProcess} from './compiler/process';
 import {PacketTransformer} from './compiler/packet-transformer';
 import {MessageTransformer} from './compiler/message-transformer';
 import {Observable, merge} from 'rxjs';
-import {filter, first, map} from 'rxjs/operators';
-import {Dispatcher} from './dispatcher';
+import {filter, first, map, take, takeUntil, tap} from 'rxjs/operators';
+
+type Request =
+  | InboundMessage.CompileRequest
+  | OutboundMessage.ImportRequest
+  | OutboundMessage.FileImportRequest
+  | OutboundMessage.CanonicalizeRequest
+  | OutboundMessage.FunctionCallRequest;
+
+type Response =
+  | OutboundMessage.CompileResponse
+  | InboundMessage.ImportResponse
+  | InboundMessage.FileImportResponse
+  | InboundMessage.CanonicalizeResponse
+  | InboundMessage.FunctionCallResponse;
 
 /**
  * A facade to the Embedded Sass Compiler.
@@ -37,6 +50,10 @@ export class EmbeddedCompiler {
     this.packetTransformer.write$
   );
 
+  // Tracks the IDs of all outstanding requests. Dispatched responses with
+  // matching IDs clear the ID from this set.
+  private readonly outstandingRequests = new Set<number>();
+
   // Emits an error if the Embedded Protocol is violated.
   private readonly error$: Observable<Error> = merge(
     this.messageTransformer.error$,
@@ -48,64 +65,13 @@ export class EmbeddedCompiler {
     )
   );
 
-  constructor(private readonly dispatcher: Dispatcher) {
-    this.dispatcher.compileRequests$.subscribe(request => {
-      const message = new InboundMessage();
-      message.setCompilerequest(request);
-      this.messageTransformer.write$.next(message);
-    });
+  /** Log events. */
+  readonly logEvents$ = this.messageTransformer.read$.pipe(
+    filter(message => message.hasLogevent()),
+    takeUntil(this.error$)
+  );
 
-    this.messageTransformer.read$
-      .pipe(filter(message => !message.hasError()))
-      .subscribe(message => {
-        switch (message.getMessageCase()) {
-          case OutboundMessage.MessageCase.LOGEVENT:
-            this.dispatcher.sendLogEvent(message.getLogevent()!);
-            break;
-          case OutboundMessage.MessageCase.COMPILERESPONSE:
-            this.dispatcher.sendCompileResponse(message.getCompileresponse()!);
-            break;
-          case OutboundMessage.MessageCase.IMPORTREQUEST:
-            this.dispatcher
-              .sendImportRequest(message.getImportrequest()!)
-              ?.then(response => {
-                const message = new InboundMessage();
-                message.setImportresponse(response);
-                this.messageTransformer.write$.next(message);
-              });
-            break;
-          case OutboundMessage.MessageCase.FILEIMPORTREQUEST:
-            this.dispatcher
-              .sendFileImportRequest(message.getFileimportrequest()!)
-              ?.then(response => {
-                const message = new InboundMessage();
-                message.setFileimportresponse(response);
-                this.messageTransformer.write$.next(message);
-              });
-            break;
-          case OutboundMessage.MessageCase.CANONICALIZEREQUEST:
-            this.dispatcher
-              .sendCanonicalizeRequest(message.getCanonicalizerequest()!)
-              ?.then(response => {
-                const message = new InboundMessage();
-                message.setCanonicalizeresponse(response);
-                this.messageTransformer.write$.next(message);
-              });
-            break;
-          case OutboundMessage.MessageCase.FUNCTIONCALLREQUEST:
-            this.dispatcher
-              .sendFunctionCallRequest(message.getFunctioncallrequest()!)
-              ?.then(response => {
-                const message = new InboundMessage();
-                message.setFunctioncallresponse(response);
-                this.messageTransformer.write$.next(message);
-              });
-            break;
-        }
-      });
-
-    this.error$.subscribe(error => this.dispatcher.sendError(error));
-
+  constructor() {
     // Pass the embedded process's stderr messages to the main process's stderr.
     this.embeddedProcess.stderr$.subscribe(buffer => {
       process.stderr.write(buffer);
@@ -118,10 +84,132 @@ export class EmbeddedCompiler {
       .subscribe(() => process.nextTick(() => this.close()));
   }
 
+  /**
+   * Dispatches a compile request. Returns a promise that resolves when a
+   * compile response with a matching ID is received from the embedded compiler.
+   */
+  compile(request: InboundMessage.CompileRequest) {
+    const id = this.nextRequestId();
+    request.setId(id);
+    const message = new InboundMessage();
+    message.setCompilerequest(request);
+
+    this.recordRequest(id);
+    this.messageTransformer.write$.next(message);
+
+    return this.messageTransformer.read$
+      .pipe(
+        filter(message => {
+          return (
+            message.hasCompileresponse() &&
+            message.getCompileresponse()!.getId() === id
+          );
+        }),
+        map(message => message.getCompileresponse()!),
+        tap(response => this.recordResponse(response.getId())),
+        take(1),
+        takeUntil(this.error$)
+      )
+      .toPromise();
+  }
+
+  listen(
+    messageType: OutboundMessage.MessageCase,
+    processRequest: (request: Request) => Response
+  ) {
+    this.messageTransformer.read$
+      .pipe(
+        filter(message => message.getMessageCase() === messageType),
+        map(message => getRequest(message)),
+        tap(request => this.recordRequest(request.getId())),
+        map(request => processRequest(request)),
+        tap(response => this.recordResponse(response.getId())),
+        takeUntil(this.error$)
+      )
+      .subscribe(response => {
+        this.messageTransformer.write$.next(
+          inboundMessageWithResponse(messageType, response)
+        );
+      });
+  }
+
+  // Finds the next available slot in outstandingRequests.
+  private nextRequestId() {
+    for (let i = 0; i < this.outstandingRequests.size; i++) {
+      if (!this.outstandingRequests.has(i)) return i;
+    }
+    return this.outstandingRequests.size;
+  }
+
+  // Adds an ID to outstandingRequests. Throws an error if the ID already
+  // exists.
+  private recordRequest(id: number) {
+    if (this.outstandingRequests.has(id)) {
+      throw Error(
+        "Request ID overlaps with existing outstanding requests's ID"
+      );
+    }
+    this.outstandingRequests.add(id);
+  }
+
+  // Removes an ID from outstandingRequests. Throws an error if the ID does not
+  // exist.
+  private recordResponse(id: number) {
+    if (!this.outstandingRequests.has(id)) {
+      throw Error('Response id does not match any outstanding request ids.');
+    }
+    this.outstandingRequests.delete(id);
+  }
+
   /** Closes the Embedded Compiler and cleans up all associated Observables. */
   close() {
     this.messageTransformer.close();
     this.packetTransformer.close();
     this.embeddedProcess.close();
   }
+}
+
+function getRequest(message: OutboundMessage) {
+  switch (message.getMessageCase()) {
+    case OutboundMessage.MessageCase.IMPORTREQUEST:
+      return (message as OutboundMessage).getImportrequest()!;
+    case OutboundMessage.MessageCase.FILEIMPORTREQUEST:
+      return (message as OutboundMessage).getFileimportrequest()!;
+    case OutboundMessage.MessageCase.CANONICALIZEREQUEST:
+      return (message as OutboundMessage).getCanonicalizerequest()!;
+    case OutboundMessage.MessageCase.FUNCTIONCALLREQUEST:
+      return (message as OutboundMessage).getFunctioncallrequest()!;
+    default:
+      throw Error('Message type not supported');
+  }
+}
+
+function inboundMessageWithResponse(
+  messageType: OutboundMessage.MessageCase,
+  response: Response
+) {
+  const message = new InboundMessage();
+  switch (messageType) {
+    case OutboundMessage.MessageCase.IMPORTREQUEST:
+      message.setImportresponse(response as InboundMessage.ImportResponse);
+      break;
+    case OutboundMessage.MessageCase.FILEIMPORTREQUEST:
+      message.setFileimportresponse(
+        response as InboundMessage.FileImportResponse
+      );
+      break;
+    case OutboundMessage.MessageCase.CANONICALIZEREQUEST:
+      message.setCanonicalizeresponse(
+        response as InboundMessage.CanonicalizeResponse
+      );
+      break;
+    case OutboundMessage.MessageCase.FUNCTIONCALLREQUEST:
+      message.setFunctioncallresponse(
+        response as InboundMessage.FunctionCallResponse
+      );
+      break;
+    default:
+      throw Error('Message type not supported');
+  }
+  return message;
 }

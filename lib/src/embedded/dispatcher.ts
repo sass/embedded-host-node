@@ -9,15 +9,19 @@ import {MessageTransformer} from './compiler/message-transformer';
 import {Observable, merge} from 'rxjs';
 import {filter, first, map, take, takeUntil, tap} from 'rxjs/operators';
 
+type RequestType =
+  | OutboundMessage.MessageCase.IMPORTREQUEST
+  | OutboundMessage.MessageCase.FILEIMPORTREQUEST
+  | OutboundMessage.MessageCase.CANONICALIZEREQUEST
+  | OutboundMessage.MessageCase.FUNCTIONCALLREQUEST;
+
 type Request =
-  | InboundMessage.CompileRequest
   | OutboundMessage.ImportRequest
   | OutboundMessage.FileImportRequest
   | OutboundMessage.CanonicalizeRequest
   | OutboundMessage.FunctionCallRequest;
 
 type Response =
-  | OutboundMessage.CompileResponse
   | InboundMessage.ImportResponse
   | InboundMessage.FileImportResponse
   | InboundMessage.CanonicalizeResponse
@@ -26,16 +30,17 @@ type Response =
 /**
  * A facade to the Embedded Sass Compiler.
  *
- * Takes the compiler's raw stdin and stdout and transforms them into public
- * Observables of InboundMessages (write$) and OutboundMessages (read$). Also
- * exposes an Observable (error$) that emits if a ProtocolError occurs while
- * communicating with the compiler.
+ * Consumers can register callbacks for processing different types of compiler
+ * requests. This will run the appropriate callback when the compiler emits a
+ * request and then send the result back to the compiler.
+ *
+ * This also exposes an Observable of log events sent by the compiler.
  *
  * If there is a ProtocolError, this shuts down the compiler process and cleans
  * up all Observables.
  */
-export class EmbeddedCompiler {
-  // The Node child process that invokes the Embedded Sass Compiler.
+export class Dispatcher {
+  // The Node child process that invokes the compiler.
   private readonly embeddedProcess = new EmbeddedProcess();
 
   // Transforms the embedded process's IO streams into delineated buffers.
@@ -50,8 +55,8 @@ export class EmbeddedCompiler {
     this.packetTransformer.write$
   );
 
-  // Tracks the IDs of all outstanding requests. Dispatched responses with
-  // matching IDs clear the ID from this set.
+  // Tracks the IDs of all outstanding requests. A dispatched response with a
+  // matching ID clears the ID from this set.
   private readonly outstandingRequests = new Set<number>();
 
   // Emits an error if the Embedded Protocol is violated.
@@ -65,7 +70,7 @@ export class EmbeddedCompiler {
     )
   );
 
-  /** Log events. */
+  /** Log events sent by the compiler. */
   readonly logEvents$ = this.messageTransformer.read$.pipe(
     filter(message => message.hasLogevent()),
     takeUntil(this.error$)
@@ -85,58 +90,74 @@ export class EmbeddedCompiler {
   }
 
   /**
-   * Dispatches a compile request. Returns a promise that resolves when a
-   * compile response with a matching ID is received from the embedded compiler.
+   * Dispatches a compile request. Returns a promise that resolves when the
+   * compiler sends a response with matching ID.
    */
   compile(request: InboundMessage.CompileRequest) {
     const id = this.nextRequestId();
     request.setId(id);
+    this.recordRequest(id);
+
     const message = new InboundMessage();
     message.setCompilerequest(request);
-
-    this.recordRequest(id);
     this.messageTransformer.write$.next(message);
 
     return this.messageTransformer.read$
       .pipe(
-        filter(message => {
-          return (
-            message.hasCompileresponse() &&
-            message.getCompileresponse()!.getId() === id
-          );
-        }),
+        filter(message => message.hasCompileresponse()),
         map(message => message.getCompileresponse()!),
+        filter(response => response.getId() === id),
         tap(response => this.recordResponse(response.getId())),
-        take(1),
-        takeUntil(this.error$)
+        takeUntil(this.error$),
+        take(1)
       )
       .toPromise();
   }
 
+  /**
+   * Registers a callback for processing all requests of type requestType.
+   *
+   * Runs the callback when the compiler emits a matching request, and sends the
+   * result back to the compiler. The callback must return a response
+   * that corresponds to the requestType. The callback can be synchronous
+   * (handleRequest) or asynchronous (handleRequestAsync).
+   */
   listen(
-    messageType: OutboundMessage.MessageCase,
-    processRequest: (request: Request) => Response
+    requestType: RequestType,
+    handleRequest?: (request: Request) => Response,
+    handleRequestAsync?: (request: Request) => Promise<Response>
   ) {
+    if (
+      (handleRequest && handleRequestAsync) ||
+      (!handleRequest && !handleRequestAsync)
+    ) {
+      throw Error('Pass either handleRequest or handleRequestAsync.');
+    }
+
     this.messageTransformer.read$
       .pipe(
-        filter(message => message.getMessageCase() === messageType),
-        map(message => getRequest(message)),
-        tap(request => this.recordRequest(request.getId())),
-        map(request => processRequest(request)),
-        tap(response => this.recordResponse(response.getId())),
+        filter(message => message.getMessageCase() === requestType),
+        map(message => unwrapRequest(message)),
+        tap(message => this.recordRequest(message.getId())),
         takeUntil(this.error$)
       )
-      .subscribe(response => {
-        this.messageTransformer.write$.next(
-          inboundMessageWithResponse(messageType, response)
-        );
+      .subscribe(request => {
+        if (handleRequest) {
+          this.dispatchResponse(handleRequest(request), requestType);
+        } else {
+          handleRequestAsync!(request).then(response =>
+            this.dispatchResponse(response, requestType)
+          );
+        }
       });
   }
 
   // Finds the next available slot in outstandingRequests.
   private nextRequestId() {
     for (let i = 0; i < this.outstandingRequests.size; i++) {
-      if (!this.outstandingRequests.has(i)) return i;
+      if (!this.outstandingRequests.has(i)) {
+        return i;
+      }
     }
     return this.outstandingRequests.size;
   }
@@ -161,6 +182,35 @@ export class EmbeddedCompiler {
     this.outstandingRequests.delete(id);
   }
 
+  // Dispatches an InboundMessage containing the given response.
+  private dispatchResponse(response: Response, requestType: RequestType) {
+    const message = new InboundMessage();
+    switch (requestType) {
+      case OutboundMessage.MessageCase.IMPORTREQUEST:
+        message.setImportresponse(response as InboundMessage.ImportResponse);
+        break;
+      case OutboundMessage.MessageCase.FILEIMPORTREQUEST:
+        message.setFileimportresponse(
+          response as InboundMessage.FileImportResponse
+        );
+        break;
+      case OutboundMessage.MessageCase.CANONICALIZEREQUEST:
+        message.setCanonicalizeresponse(
+          response as InboundMessage.CanonicalizeResponse
+        );
+        break;
+      case OutboundMessage.MessageCase.FUNCTIONCALLREQUEST:
+        message.setFunctioncallresponse(
+          response as InboundMessage.FunctionCallResponse
+        );
+        break;
+      default:
+        throw Error(`Request type ${requestType} is not supported.`);
+    }
+    this.recordResponse(response.getId());
+    this.messageTransformer.write$.next(message);
+  }
+
   /** Closes the Embedded Compiler and cleans up all associated Observables. */
   close() {
     this.messageTransformer.close();
@@ -169,7 +219,8 @@ export class EmbeddedCompiler {
   }
 }
 
-function getRequest(message: OutboundMessage) {
+// Returns the request that is contained within the given OutboundMessage.
+function unwrapRequest(message: OutboundMessage): Request {
   switch (message.getMessageCase()) {
     case OutboundMessage.MessageCase.IMPORTREQUEST:
       return (message as OutboundMessage).getImportrequest()!;
@@ -180,36 +231,6 @@ function getRequest(message: OutboundMessage) {
     case OutboundMessage.MessageCase.FUNCTIONCALLREQUEST:
       return (message as OutboundMessage).getFunctioncallrequest()!;
     default:
-      throw Error('Message type not supported');
+      throw Error(`Request type ${message.getMessageCase()} is not supported.`);
   }
-}
-
-function inboundMessageWithResponse(
-  messageType: OutboundMessage.MessageCase,
-  response: Response
-) {
-  const message = new InboundMessage();
-  switch (messageType) {
-    case OutboundMessage.MessageCase.IMPORTREQUEST:
-      message.setImportresponse(response as InboundMessage.ImportResponse);
-      break;
-    case OutboundMessage.MessageCase.FILEIMPORTREQUEST:
-      message.setFileimportresponse(
-        response as InboundMessage.FileImportResponse
-      );
-      break;
-    case OutboundMessage.MessageCase.CANONICALIZEREQUEST:
-      message.setCanonicalizeresponse(
-        response as InboundMessage.CanonicalizeResponse
-      );
-      break;
-    case OutboundMessage.MessageCase.FUNCTIONCALLREQUEST:
-      message.setFunctioncallresponse(
-        response as InboundMessage.FunctionCallResponse
-      );
-      break;
-    default:
-      throw Error('Message type not supported');
-  }
-  return message;
 }

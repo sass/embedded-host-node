@@ -17,6 +17,12 @@ import {
   tap,
 } from 'rxjs/operators';
 
+type InboundRequestType = InboundMessage.MessageCase.COMPILEREQUEST;
+
+type InboundRequest = InboundMessage.CompileRequest;
+
+type OutboundResponse = OutboundMessage.CompileResponse;
+
 type OutboundRequestType =
   | OutboundMessage.MessageCase.IMPORTREQUEST
   | OutboundMessage.MessageCase.FILEIMPORTREQUEST
@@ -112,24 +118,10 @@ export class Dispatcher {
   compile(
     request: InboundMessage.CompileRequest
   ): Promise<OutboundMessage.CompileResponse> {
-    setId(this.outstandingInboundRequests, request);
-    const message = new InboundMessage();
-    message.setCompilerequest(request);
-    this.messageTransformer.write$.next(message);
-    recordRequest(this.outstandingInboundRequests, request.getId());
-
-    return this.messageTransformer.read$
-      .pipe(
-        filter(message => message.hasCompileresponse()),
-        map(message => message.getCompileresponse()!),
-        filter(response => response.getId() === request.getId()),
-        tap(response =>
-          recordResponse(this.outstandingInboundRequests, response.getId())
-        ),
-        takeUntil(this.error$),
-        take(1)
-      )
-      .toPromise();
+    return this.handleInboundRequest(
+      InboundMessage.MessageCase.COMPILEREQUEST,
+      request
+    );
   }
 
   /**
@@ -141,7 +133,7 @@ export class Dispatcher {
       request: OutboundMessage.ImportRequest
     ) => Promise<InboundMessage.ImportResponse>
   ) {
-    this.resolveOutboundRequest(
+    this.onOutboundRequest(
       OutboundMessage.MessageCase.IMPORTREQUEST,
       handler as OutboundRequestHandler
     );
@@ -156,7 +148,7 @@ export class Dispatcher {
       request: OutboundMessage.FileImportRequest
     ) => Promise<InboundMessage.FileImportResponse>
   ) {
-    this.resolveOutboundRequest(
+    this.onOutboundRequest(
       OutboundMessage.MessageCase.FILEIMPORTREQUEST,
       handler as OutboundRequestHandler
     );
@@ -171,7 +163,7 @@ export class Dispatcher {
       request: OutboundMessage.CanonicalizeRequest
     ) => Promise<InboundMessage.CanonicalizeResponse>
   ) {
-    this.resolveOutboundRequest(
+    this.onOutboundRequest(
       OutboundMessage.MessageCase.CANONICALIZEREQUEST,
       handler as OutboundRequestHandler
     );
@@ -186,7 +178,7 @@ export class Dispatcher {
       request: OutboundMessage.FunctionCallRequest
     ) => Promise<InboundMessage.FunctionCallResponse>
   ) {
-    this.resolveOutboundRequest(
+    this.onOutboundRequest(
       OutboundMessage.MessageCase.FUNCTIONCALLREQUEST,
       handler as OutboundRequestHandler
     );
@@ -199,15 +191,45 @@ export class Dispatcher {
     this.embeddedProcess.close();
   }
 
+  // Dispatches `request` to the compiler, and returns a promise that resolves
+  // when the compiler emits a response that matches `type`.
+  private handleInboundRequest(
+    type: InboundRequestType,
+    request: InboundRequest
+  ): Promise<OutboundResponse> {
+    // Send request to the compiler.
+    setId(this.outstandingInboundRequests, request);
+    recordRequest(this.outstandingInboundRequests, request.getId());
+    const message = wrapInboundRequest(request, type);
+    this.messageTransformer.write$.next(message);
+
+    return this.messageTransformer.read$
+      .pipe(
+        // Filter out irrelevant responses.
+        map(message => unwrapOutboundResponse(message, type)),
+        filter(
+          (response): response is OutboundResponse =>
+            response !== null && response.getId() === request.getId()
+        ),
+        // Resolve the outstanding request.
+        tap(response =>
+          recordResponse(this.outstandingInboundRequests, response.getId())
+        ),
+        takeUntil(this.error$),
+        take(1)
+      )
+      .toPromise();
+  }
+
   // Registers a callback `handler` that runs whenever the compiler emits
   // a request that matches `type`. Dispatches the result to the compiler.
-  private resolveOutboundRequest(
+  private onOutboundRequest(
     type: OutboundRequestType,
     handler: OutboundRequestHandler
   ) {
     this.messageTransformer.read$.pipe(
       // Filter out irrelevant requests.
-      map(message => unwrapRequest(message, type)),
+      map(message => unwrapOutboundRequest(message, type)),
       filter((request): request is OutboundRequest => request !== null),
       // Record the outstanding request.
       tap(request =>
@@ -224,7 +246,7 @@ export class Dispatcher {
         recordResponse(this.outstandingOutboundRequests, response.getId())
       ),
       // Create an InboundMessage containing the response.
-      map(response => wrapResponse(response, type)),
+      map(response => wrapInboundResponse(response, type)),
       // Send the response to the compiler.
       tap(message => this.messageTransformer.write$.next(message)),
       takeUntil(this.error$)
@@ -234,10 +256,7 @@ export class Dispatcher {
 
 // Finds the next available id in `outstandingRequests`, and sets `request`'s
 // id to it.
-function setId(
-  outstandingRequests: Set<number>,
-  request: InboundMessage.CompileRequest
-) {
+function setId(outstandingRequests: Set<number>, request: InboundRequest) {
   for (let i = 0; i < outstandingRequests.size; i++) {
     if (!outstandingRequests.has(i)) {
       request.setId(i);
@@ -251,7 +270,7 @@ function setId(
 // exists.
 function recordRequest(outstandingRequests: Set<number>, id: number) {
   if (outstandingRequests.has(id)) {
-    throw Error("Request ID overlaps with existing outstanding requests's ID");
+    throw Error('Request ID overlaps with existing outstanding request ID.');
   }
   outstandingRequests.add(id);
 }
@@ -260,38 +279,29 @@ function recordRequest(outstandingRequests: Set<number>, id: number) {
 // exist.
 function recordResponse(outstandingRequests: Set<number>, id: number) {
   if (!outstandingRequests.has(id)) {
-    throw Error('Response id does not match any outstanding request ids.');
+    throw Error('Response id does not match any outstanding request IDs.');
   }
   outstandingRequests.delete(id);
 }
 
-// If `message` contains a message that matches `type`, unwraps and returns it.
-function unwrapRequest(
-  message: OutboundMessage,
-  type: OutboundRequestType
-): OutboundRequest | null {
+// Wraps `request` (which is of type `type`) inside an OutboundMessage and
+// returns the message.
+function wrapInboundRequest(
+  request: InboundRequest,
+  type: InboundRequestType
+): InboundMessage {
+  const message = new InboundMessage();
   switch (type) {
-    case OutboundMessage.MessageCase.IMPORTREQUEST:
-      if (message.hasImportrequest()) return message.getImportrequest()!;
+    case InboundMessage.MessageCase.COMPILEREQUEST:
+      message.setCompilerequest(request as InboundMessage.CompileRequest);
       break;
-    case OutboundMessage.MessageCase.FILEIMPORTREQUEST:
-      if (message.hasFileimportrequest())
-        return message.getFileimportrequest()!;
-      break;
-    case OutboundMessage.MessageCase.CANONICALIZEREQUEST:
-      if (message.hasCanonicalizerequest())
-        return message.getCanonicalizerequest()!;
-      break;
-    case OutboundMessage.MessageCase.FUNCTIONCALLREQUEST:
-      if (message.hasFunctioncallrequest())
-        return message.getFunctioncallrequest()!;
   }
-  return null;
+  return message;
 }
 
-// Wraps `response` inside an InboundMessage, using the request type `type` to
-// determine how to interact with the InboundMessage.
-function wrapResponse(
+// Wraps the `response` (which resolves requests of type `type`) into an
+// InboundMessage and returns the message.
+function wrapInboundResponse(
   response: InboundResponse,
   type: OutboundRequestType
 ): InboundMessage {
@@ -317,4 +327,43 @@ function wrapResponse(
       break;
   }
   return message;
+}
+
+// If `message` contains a response that resolves a request of type `type`,
+// unwraps and returns the response.
+function unwrapOutboundResponse(
+  message: OutboundMessage,
+  type: InboundRequestType
+): OutboundResponse | null {
+  switch (type) {
+    case InboundMessage.MessageCase.COMPILEREQUEST:
+      if (message.hasCompileresponse()) return message.getCompileresponse()!;
+      break;
+  }
+  return null;
+}
+
+// If `message` contains a request of type `type`, unwraps and returns the
+// request.
+function unwrapOutboundRequest(
+  message: OutboundMessage,
+  type: OutboundRequestType
+): OutboundRequest | null {
+  switch (type) {
+    case OutboundMessage.MessageCase.IMPORTREQUEST:
+      if (message.hasImportrequest()) return message.getImportrequest()!;
+      break;
+    case OutboundMessage.MessageCase.FILEIMPORTREQUEST:
+      if (message.hasFileimportrequest())
+        return message.getFileimportrequest()!;
+      break;
+    case OutboundMessage.MessageCase.CANONICALIZEREQUEST:
+      if (message.hasCanonicalizerequest())
+        return message.getCanonicalizerequest()!;
+      break;
+    case OutboundMessage.MessageCase.FUNCTIONCALLREQUEST:
+      if (message.hasFunctioncallrequest())
+        return message.getFunctioncallrequest()!;
+  }
+  return null;
 }

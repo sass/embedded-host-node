@@ -7,25 +7,37 @@ import {EmbeddedProcess} from './compiler/process';
 import {PacketTransformer} from './compiler/packet-transformer';
 import {MessageTransformer} from './compiler/message-transformer';
 import {Observable, merge} from 'rxjs';
-import {filter, first, map, take, takeUntil, tap} from 'rxjs/operators';
+import {
+  filter,
+  first,
+  map,
+  switchMap,
+  take,
+  takeUntil,
+  tap,
+} from 'rxjs/operators';
 
-type RequestType =
+type OutboundRequestType =
   | OutboundMessage.MessageCase.IMPORTREQUEST
   | OutboundMessage.MessageCase.FILEIMPORTREQUEST
   | OutboundMessage.MessageCase.CANONICALIZEREQUEST
   | OutboundMessage.MessageCase.FUNCTIONCALLREQUEST;
 
-type Request =
+type OutboundRequest =
   | OutboundMessage.ImportRequest
   | OutboundMessage.FileImportRequest
   | OutboundMessage.CanonicalizeRequest
   | OutboundMessage.FunctionCallRequest;
 
-type Response =
+type InboundResponse =
   | InboundMessage.ImportResponse
   | InboundMessage.FileImportResponse
   | InboundMessage.CanonicalizeResponse
   | InboundMessage.FunctionCallResponse;
+
+type OutboundRequestHandler = (
+  request: OutboundRequest
+) => Promise<InboundResponse>;
 
 /**
  * A facade to the Embedded Sass Compiler.
@@ -55,9 +67,13 @@ export class Dispatcher {
     this.packetTransformer.write$
   );
 
-  // Tracks the IDs of all outstanding requests. A dispatched response with a
-  // matching ID clears the ID from this set.
-  private readonly outstandingRequests = new Set<number>();
+  // Tracks the IDs of all requests sent by the compiler. A dispatched inbound
+  // response with a matching ID clears the ID from this set.
+  private readonly outstandingOutboundRequests = new Set<number>();
+
+  // Tracks the IDs of all requests sent to the compiler. A dispatched outbound
+  // response with a matching ID clears the ID from this set.
+  private readonly outstandingInboundRequests = new Set<number>();
 
   // Emits an error if the Embedded Protocol is violated.
   private readonly error$: Observable<Error> = merge(
@@ -70,7 +86,7 @@ export class Dispatcher {
     )
   );
 
-  /** Log events sent by the compiler. */
+  /** All log events emitted by the compiler. */
   readonly logEvents$ = this.messageTransformer.read$.pipe(
     filter(message => message.hasLogevent()),
     takeUntil(this.error$)
@@ -90,24 +106,26 @@ export class Dispatcher {
   }
 
   /**
-   * Dispatches a compile request. Returns a promise that resolves when the
-   * compiler sends a response with matching ID.
+   * Dispatches a CompileRequest. Returns a promise that resolves when the
+   * compiler emits a CompileResponse with matching ID.
    */
-  compile(request: InboundMessage.CompileRequest) {
-    const id = this.nextRequestId();
-    request.setId(id);
-    this.recordRequest(id);
-
+  compile(
+    request: InboundMessage.CompileRequest
+  ): Promise<OutboundMessage.CompileResponse> {
+    setId(this.outstandingInboundRequests, request);
     const message = new InboundMessage();
     message.setCompilerequest(request);
     this.messageTransformer.write$.next(message);
+    recordRequest(this.outstandingInboundRequests, request.getId());
 
     return this.messageTransformer.read$
       .pipe(
         filter(message => message.hasCompileresponse()),
         map(message => message.getCompileresponse()!),
-        filter(response => response.getId() === id),
-        tap(response => this.recordResponse(response.getId())),
+        filter(response => response.getId() === request.getId()),
+        tap(response =>
+          recordResponse(this.outstandingInboundRequests, response.getId())
+        ),
         takeUntil(this.error$),
         take(1)
       )
@@ -115,100 +133,63 @@ export class Dispatcher {
   }
 
   /**
-   * Registers a callback for processing all requests of type requestType.
-   *
-   * Runs the callback when the compiler emits a matching request, and sends the
-   * result back to the compiler. The callback must return a response
-   * that corresponds to the requestType. The callback can be synchronous
-   * (handleRequest) or asynchronous (handleRequestAsync).
+   * Registers a callback `handler` that runs whenever the compiler emits an
+   * ImportRequest. Dispatches the result to the compiler.
    */
-  listen(
-    requestType: RequestType,
-    handleRequest?: (request: Request) => Response,
-    handleRequestAsync?: (request: Request) => Promise<Response>
+  onImportRequest(
+    handler: (
+      request: OutboundMessage.ImportRequest
+    ) => Promise<InboundMessage.ImportResponse>
   ) {
-    if (
-      (handleRequest && handleRequestAsync) ||
-      (!handleRequest && !handleRequestAsync)
-    ) {
-      throw Error('Pass either handleRequest or handleRequestAsync.');
-    }
-
-    this.messageTransformer.read$
-      .pipe(
-        filter(message => message.getMessageCase() === requestType),
-        map(message => unwrapRequest(message)),
-        tap(message => this.recordRequest(message.getId())),
-        takeUntil(this.error$)
-      )
-      .subscribe(request => {
-        if (handleRequest) {
-          this.dispatchResponse(handleRequest(request), requestType);
-        } else {
-          handleRequestAsync!(request).then(response =>
-            this.dispatchResponse(response, requestType)
-          );
-        }
-      });
+    this.resolveOutboundRequest(
+      OutboundMessage.MessageCase.IMPORTREQUEST,
+      handler as OutboundRequestHandler
+    );
   }
 
-  // Finds the next available slot in outstandingRequests.
-  private nextRequestId() {
-    for (let i = 0; i < this.outstandingRequests.size; i++) {
-      if (!this.outstandingRequests.has(i)) {
-        return i;
-      }
-    }
-    return this.outstandingRequests.size;
+  /**
+   * Registers a callback `handler` that runs whenever the compiler emits a
+   * FileImportRequest. Dispatches the result to the compiler.
+   */
+  onFileImportRequest(
+    handler: (
+      request: OutboundMessage.FileImportRequest
+    ) => Promise<InboundMessage.FileImportResponse>
+  ) {
+    this.resolveOutboundRequest(
+      OutboundMessage.MessageCase.FILEIMPORTREQUEST,
+      handler as OutboundRequestHandler
+    );
   }
 
-  // Adds an ID to outstandingRequests. Throws an error if the ID already
-  // exists.
-  private recordRequest(id: number) {
-    if (this.outstandingRequests.has(id)) {
-      throw Error(
-        "Request ID overlaps with existing outstanding requests's ID"
-      );
-    }
-    this.outstandingRequests.add(id);
+  /**
+   * Registers a callback `handler` that runs whenever the compiler emits a
+   * CanonicalizeRequest. Dispatches the result to the compiler.
+   */
+  onCanonicalizeRequest(
+    handler: (
+      request: OutboundMessage.CanonicalizeRequest
+    ) => Promise<InboundMessage.CanonicalizeResponse>
+  ) {
+    this.resolveOutboundRequest(
+      OutboundMessage.MessageCase.CANONICALIZEREQUEST,
+      handler as OutboundRequestHandler
+    );
   }
 
-  // Removes an ID from outstandingRequests. Throws an error if the ID does not
-  // exist.
-  private recordResponse(id: number) {
-    if (!this.outstandingRequests.has(id)) {
-      throw Error('Response id does not match any outstanding request ids.');
-    }
-    this.outstandingRequests.delete(id);
-  }
-
-  // Dispatches an InboundMessage containing the given response.
-  private dispatchResponse(response: Response, requestType: RequestType) {
-    const message = new InboundMessage();
-    switch (requestType) {
-      case OutboundMessage.MessageCase.IMPORTREQUEST:
-        message.setImportresponse(response as InboundMessage.ImportResponse);
-        break;
-      case OutboundMessage.MessageCase.FILEIMPORTREQUEST:
-        message.setFileimportresponse(
-          response as InboundMessage.FileImportResponse
-        );
-        break;
-      case OutboundMessage.MessageCase.CANONICALIZEREQUEST:
-        message.setCanonicalizeresponse(
-          response as InboundMessage.CanonicalizeResponse
-        );
-        break;
-      case OutboundMessage.MessageCase.FUNCTIONCALLREQUEST:
-        message.setFunctioncallresponse(
-          response as InboundMessage.FunctionCallResponse
-        );
-        break;
-      default:
-        throw Error(`Request type ${requestType} is not supported.`);
-    }
-    this.recordResponse(response.getId());
-    this.messageTransformer.write$.next(message);
+  /**
+   * Registers a callback `handler` that runs whenever the compiler emits a
+   * FunctionCallRequest. Dispatches the result to the compiler.
+   */
+  onFunctionCallRequest(
+    handler: (
+      request: OutboundMessage.FunctionCallRequest
+    ) => Promise<InboundMessage.FunctionCallResponse>
+  ) {
+    this.resolveOutboundRequest(
+      OutboundMessage.MessageCase.FUNCTIONCALLREQUEST,
+      handler as OutboundRequestHandler
+    );
   }
 
   /** Closes the Embedded Compiler and cleans up all associated Observables. */
@@ -217,20 +198,123 @@ export class Dispatcher {
     this.packetTransformer.close();
     this.embeddedProcess.close();
   }
+
+  // Registers a callback `handler` that runs whenever the compiler emits
+  // a request that matches `type`. Dispatches the result to the compiler.
+  private resolveOutboundRequest(
+    type: OutboundRequestType,
+    handler: OutboundRequestHandler
+  ) {
+    this.messageTransformer.read$.pipe(
+      // Filter out irrelevant requests.
+      map(message => unwrapRequest(message, type)),
+      filter((request): request is OutboundRequest => request !== null),
+      // Record the outstanding request.
+      tap(request =>
+        recordRequest(this.outstandingOutboundRequests, request.getId())
+      ),
+      // Run the callback to process the request.
+      switchMap(async request => {
+        const response = await handler(request);
+        response.setId(request.getId());
+        return response;
+      }),
+      // Resolve the outstanding request.
+      tap(response =>
+        recordResponse(this.outstandingOutboundRequests, response.getId())
+      ),
+      // Create an InboundMessage containing the response.
+      map(response => wrapResponse(response, type)),
+      // Send the response to the compiler.
+      tap(message => this.messageTransformer.write$.next(message)),
+      takeUntil(this.error$)
+    );
+  }
 }
 
-// Returns the request that is contained within the given OutboundMessage.
-function unwrapRequest(message: OutboundMessage): Request {
-  switch (message.getMessageCase()) {
-    case OutboundMessage.MessageCase.IMPORTREQUEST:
-      return (message as OutboundMessage).getImportrequest()!;
-    case OutboundMessage.MessageCase.FILEIMPORTREQUEST:
-      return (message as OutboundMessage).getFileimportrequest()!;
-    case OutboundMessage.MessageCase.CANONICALIZEREQUEST:
-      return (message as OutboundMessage).getCanonicalizerequest()!;
-    case OutboundMessage.MessageCase.FUNCTIONCALLREQUEST:
-      return (message as OutboundMessage).getFunctioncallrequest()!;
-    default:
-      throw Error(`Request type ${message.getMessageCase()} is not supported.`);
+// Finds the next available id in `outstandingRequests`, and sets `request`'s
+// id to it.
+function setId(
+  outstandingRequests: Set<number>,
+  request: InboundMessage.CompileRequest
+) {
+  for (let i = 0; i < outstandingRequests.size; i++) {
+    if (!outstandingRequests.has(i)) {
+      request.setId(i);
+      return;
+    }
   }
+  request.setId(outstandingRequests.size);
+}
+
+// Adds an ID to `outstandingRequests`. Throws an error if the ID already
+// exists.
+function recordRequest(outstandingRequests: Set<number>, id: number) {
+  if (outstandingRequests.has(id)) {
+    throw Error("Request ID overlaps with existing outstanding requests's ID");
+  }
+  outstandingRequests.add(id);
+}
+
+// Removes an ID from `outstandingRequests`. Throws an error if the ID does not
+// exist.
+function recordResponse(outstandingRequests: Set<number>, id: number) {
+  if (!outstandingRequests.has(id)) {
+    throw Error('Response id does not match any outstanding request ids.');
+  }
+  outstandingRequests.delete(id);
+}
+
+// If `message` contains a message that matches `type`, unwraps and returns it.
+function unwrapRequest(
+  message: OutboundMessage,
+  type: OutboundRequestType
+): OutboundRequest | null {
+  switch (type) {
+    case OutboundMessage.MessageCase.IMPORTREQUEST:
+      if (message.hasImportrequest()) return message.getImportrequest()!;
+      break;
+    case OutboundMessage.MessageCase.FILEIMPORTREQUEST:
+      if (message.hasFileimportrequest())
+        return message.getFileimportrequest()!;
+      break;
+    case OutboundMessage.MessageCase.CANONICALIZEREQUEST:
+      if (message.hasCanonicalizerequest())
+        return message.getCanonicalizerequest()!;
+      break;
+    case OutboundMessage.MessageCase.FUNCTIONCALLREQUEST:
+      if (message.hasFunctioncallrequest())
+        return message.getFunctioncallrequest()!;
+  }
+  return null;
+}
+
+// Wraps `response` inside an InboundMessage, using the request type `type` to
+// determine how to interact with the InboundMessage.
+function wrapResponse(
+  response: InboundResponse,
+  type: OutboundRequestType
+): InboundMessage {
+  const message = new InboundMessage();
+  switch (type) {
+    case OutboundMessage.MessageCase.IMPORTREQUEST:
+      message.setImportresponse(response as InboundMessage.ImportResponse);
+      break;
+    case OutboundMessage.MessageCase.FILEIMPORTREQUEST:
+      message.setFileimportresponse(
+        response as InboundMessage.FileImportResponse
+      );
+      break;
+    case OutboundMessage.MessageCase.CANONICALIZEREQUEST:
+      message.setCanonicalizeresponse(
+        response as InboundMessage.CanonicalizeResponse
+      );
+      break;
+    case OutboundMessage.MessageCase.FUNCTIONCALLREQUEST:
+      message.setFunctioncallresponse(
+        response as InboundMessage.FunctionCallResponse
+      );
+      break;
+  }
+  return message;
 }

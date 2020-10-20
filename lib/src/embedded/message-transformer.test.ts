@@ -5,7 +5,7 @@
 import {MessageTransformer} from './message-transformer';
 import {Subject, Observable} from 'rxjs';
 import {take, toArray} from 'rxjs/operators';
-import {InboundMessage, OutboundMessage} from '../../vendor/embedded_sass_pb';
+import {InboundMessage, OutboundMessage} from '../vendor/embedded_sass_pb';
 
 describe('message transformer', () => {
   describe('encode', () => {

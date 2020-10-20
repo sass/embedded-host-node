@@ -3,7 +3,7 @@
 // https://opensource.org/licenses/MIT.
 
 import {from, Subject, Observable} from 'rxjs';
-import {InboundMessage, OutboundMessage} from '../../vendor/embedded_sass_pb';
+import {InboundMessage, OutboundMessage} from '../vendor/embedded_sass_pb';
 
 /**
  * Encodes InboundMessages into protocol buffers and decodes protocol buffers

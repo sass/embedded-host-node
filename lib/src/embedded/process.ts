@@ -13,7 +13,7 @@ import {takeUntil} from 'rxjs/operators';
  */
 export class EmbeddedProcess {
   private readonly process = spawn(
-    resolve(__dirname, '../../vendor/dart-sass-embedded'),
+    resolve(__dirname, '../vendor/dart-sass-embedded'),
     {
       windowsHide: true,
     }

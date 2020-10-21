@@ -4,115 +4,146 @@
 
 import {MessageTransformer} from './message-transformer';
 import {Subject, Observable} from 'rxjs';
-import {take, toArray} from 'rxjs/operators';
-import {InboundMessage, OutboundMessage} from '../vendor/embedded_sass_pb';
+import {
+  InboundMessage,
+  OutboundMessage,
+  ProtocolError,
+} from '../vendor/embedded_sass_pb';
 
 describe('message transformer', () => {
   describe('encode', () => {
     let encoded$: Subject<Buffer>;
     let transformer: MessageTransformer;
-    let encoded: Promise<Buffer[]>;
 
     beforeEach(() => {
       encoded$ = new Subject<Buffer>();
       transformer = new MessageTransformer(new Observable<Buffer>(), encoded$);
-      encoded = encoded$.pipe(toArray()).pipe(take(1)).toPromise();
     });
 
-    afterEach(() => transformer.close());
-
-    it('encodes an InboundMessage to buffer', async () => {
-      const input = new InboundMessage.CompileRequest.StringInput();
-      input.setSource('a {b: c}');
-      const request = new InboundMessage.CompileRequest();
-      request.setString(input);
-      const message = new InboundMessage();
-      message.setCompilerequest(request);
-
-      transformer.write$.next(message);
+    afterEach(() => {
       encoded$.complete();
-      expect(await encoded).toEqual([Buffer.from(message.serializeBinary())]);
+      transformer.close();
+    });
+
+    it('encodes an InboundMessage to buffer', async done => {
+      const message = validInboundMessage('a {b: c}');
+      encoded$.subscribe(buffer => {
+        expect(buffer).toEqual(Buffer.from(message.serializeBinary()));
+        done();
+      });
+      transformer.write$.next({
+        payload: message.getCompilerequest()!,
+        type: InboundMessage.MessageCase.COMPILEREQUEST,
+      });
     });
   });
 
   describe('decode', () => {
     let toDecode$: Subject<Buffer>;
     let transformer: MessageTransformer;
-    let decoded: Promise<OutboundMessage>;
 
     beforeEach(() => {
       toDecode$ = new Subject<Buffer>();
       transformer = new MessageTransformer(toDecode$, new Subject<Buffer>());
-      decoded = transformer.read$
-        .pipe(toArray())
-        .pipe(take(1))
-        .toPromise()
-        .then(messages => messages[0]);
     });
 
-    afterEach(() => toDecode$.complete());
-
-    it('decodes buffer to OutboundMessage', async () => {
-      const input = new InboundMessage.CompileRequest.StringInput();
-      input.setSource('a {b: c}');
-      const request = new InboundMessage.CompileRequest();
-      request.setString(input);
-      const message = new InboundMessage();
-      message.setCompilerequest(request);
-
-      toDecode$.next(Buffer.from(message.serializeBinary()));
+    afterEach(() => {
+      toDecode$.complete();
       transformer.close();
-      expect(
-        (await decoded).getCompileresponse()?.getSuccess()?.getCss()
-      ).toEqual('a {b: c}');
+    });
+
+    it('decodes buffer to OutboundMessage', async done => {
+      const message = validInboundMessage('a {b: c}');
+      transformer.read$.subscribe(message => {
+        const response = message.payload as OutboundMessage.CompileResponse;
+        expect(response.getSuccess()?.getCss()).toBe('a {b: c}');
+        const type = message.type;
+        expect(type).toEqual(OutboundMessage.MessageCase.COMPILERESPONSE);
+        done();
+      });
+      toDecode$.next(Buffer.from(message.serializeBinary()));
     });
 
     describe('protocol error', () => {
-      let error: Promise<string>;
-
-      beforeEach(async () => {
-        error = transformer.error$
-          .pipe(toArray())
-          .pipe(take(1))
-          .toPromise()
-          .then(errors => errors[0].message);
-      });
-
-      it('fails on invalid buffer', async () => {
-        toDecode$.next(Buffer.from([-1]));
-        transformer.close();
-        expect(await error).toEqual('Compiler caused error: Invalid buffer.');
-      });
-
-      it('fails on empty message', async () => {
-        toDecode$.next(Buffer.from(new OutboundMessage().serializeBinary()));
-        transformer.close();
-        expect(await error).toEqual(
-          'Compiler caused error: OutboundMessage.message is not set.'
+      it('fails on invalid buffer', async done => {
+        expectError(
+          transformer,
+          'Compiler caused error: Invalid buffer.',
+          done
         );
+        toDecode$.next(Buffer.from([-1]));
       });
 
-      it('fails on compile response with missing result', async () => {
+      it('fails on empty message', async done => {
+        expectError(
+          transformer,
+          'Compiler caused error: OutboundMessage.message is not set.',
+          done
+        );
+        toDecode$.next(Buffer.from(new OutboundMessage().serializeBinary()));
+      });
+
+      it('fails on compile response with missing result', async done => {
         const response = new OutboundMessage.CompileResponse();
         const message = new OutboundMessage();
         message.setCompileresponse(response);
-        toDecode$.next(Buffer.from(message.serializeBinary()));
-        transformer.close();
-        expect(await error).toEqual(
-          'Compiler caused error: OutboundMessage.CompileResponse.result is not set.'
+        expectError(
+          transformer,
+          'Compiler caused error: OutboundMessage.CompileResponse.result is not set.',
+          done
         );
+        toDecode$.next(Buffer.from(message.serializeBinary()));
       });
 
-      it('fails on function call request with missing identifier', async () => {
+      it('fails on function call request with missing identifier', async done => {
         const request = new OutboundMessage.FunctionCallRequest();
         const message = new OutboundMessage();
         message.setFunctioncallrequest(request);
-        toDecode$.next(Buffer.from(message.serializeBinary()));
-        transformer.close();
-        expect(await error).toEqual(
-          'Compiler caused error: OutboundMessage.FunctionCallRequest.identifier is not set.'
+        expectError(
+          transformer,
+          'Compiler caused error: OutboundMessage.FunctionCallRequest.identifier is not set.',
+          done
         );
+        toDecode$.next(Buffer.from(message.serializeBinary()));
+      });
+
+      it('fails if message contains a protocol error', async done => {
+        const errorMessage = 'sad';
+        const error = new ProtocolError();
+        error.setMessage(errorMessage);
+        const message = new OutboundMessage();
+        message.setError(error);
+        expectError(
+          transformer,
+          `Compiler reported error: ${errorMessage}`,
+          done
+        );
+        toDecode$.next(Buffer.from(message.serializeBinary()));
       });
     });
   });
 });
+
+function validInboundMessage(source: string): InboundMessage {
+  const input = new InboundMessage.CompileRequest.StringInput();
+  input.setSource(source);
+  const request = new InboundMessage.CompileRequest();
+  request.setString(input);
+  const message = new InboundMessage();
+  message.setCompilerequest(request);
+  return message;
+}
+
+function expectError(
+  transformer: MessageTransformer,
+  errorMessage: string,
+  done: Function
+) {
+  transformer.read$.subscribe(
+    () => fail('expected error'),
+    error => {
+      expect(error.message).toEqual(errorMessage);
+      done();
+    }
+  );
+}

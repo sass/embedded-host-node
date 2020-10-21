@@ -2,69 +2,92 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-import {from, Subject, Observable} from 'rxjs';
+import {Subject, Observable} from 'rxjs';
+import {map} from 'rxjs/operators';
+
 import {InboundMessage, OutboundMessage} from '../vendor/embedded_sass_pb';
 
+export type InboundRequestType = InboundMessage.MessageCase.COMPILEREQUEST;
+
+export type InboundRequest = InboundMessage.CompileRequest;
+
+export type InboundResponseType =
+  | InboundMessage.MessageCase.IMPORTRESPONSE
+  | InboundMessage.MessageCase.FILEIMPORTRESPONSE
+  | InboundMessage.MessageCase.CANONICALIZERESPONSE
+  | InboundMessage.MessageCase.FUNCTIONCALLRESPONSE;
+
+export type InboundResponse =
+  | InboundMessage.ImportResponse
+  | InboundMessage.FileImportResponse
+  | InboundMessage.CanonicalizeResponse
+  | InboundMessage.FunctionCallResponse;
+
+export type OutboundRequestType =
+  | OutboundMessage.MessageCase.IMPORTREQUEST
+  | OutboundMessage.MessageCase.FILEIMPORTREQUEST
+  | OutboundMessage.MessageCase.CANONICALIZEREQUEST
+  | OutboundMessage.MessageCase.FUNCTIONCALLREQUEST;
+
+export type OutboundRequest =
+  | OutboundMessage.ImportRequest
+  | OutboundMessage.FileImportRequest
+  | OutboundMessage.CanonicalizeRequest
+  | OutboundMessage.FunctionCallRequest;
+
+export type OutboundResponseType = OutboundMessage.MessageCase.COMPILERESPONSE;
+
+export type OutboundResponse = OutboundMessage.CompileResponse;
+
+export type OutboundEventType = OutboundMessage.MessageCase.LOGEVENT;
+
+export type OutboundEvent = OutboundMessage.LogEvent;
+
+export type InboundTypedMessage = {
+  payload: InboundRequest | InboundResponse;
+  type: InboundRequestType | InboundResponseType;
+};
+
+export type OutboundTypedMessage = {
+  payload: OutboundRequest | OutboundResponse | OutboundEvent;
+  type: OutboundRequestType | OutboundResponseType | OutboundEventType;
+};
+
 /**
- * Encodes InboundMessages into protocol buffers and decodes protocol buffers
- * into OutboundMessages. Any Embedded Protocol violations that can be detected
- * at the message level are encapsulated here and reported as errors.
+ * Encodes InboundTypedMessages into protocol buffers and decodes protocol
+ * buffers into OutboundTypedMssages. Any Embedded Protocol violations that can
+ * be detected at the message level are encapsulated here and reported as
+ * errors.
  */
 export class MessageTransformer {
-  // The decoded messages and errors are written to these Subjects. They are
-  // publicly exposed as readonly Observables to prevent memory leaks.
-  private readonly readInternal$ = new Subject<OutboundMessage>();
-  private readonly errorInternal$ = new Subject<Error>();
+  /**
+   * The OutboundTypedMessages (decoded from protocol buffers). Throws an error
+   * if a Protocol Error is detected.
+   */
+  readonly read$ = this.rawRead$.pipe(
+    map(buffer => toOutboundTypedMessage(buffer))
+  );
 
-  /** The OutboundMessages (decoded from protocol buffers). */
-  readonly read$ = from(this.readInternal$);
-
-  /** Receives InboundMessages and encodes them into protocol buffers. */
-  readonly write$ = new Subject<InboundMessage>();
-
-  /** Any errors encountered while encoding/decoding messages. */
-  readonly error$ = from(this.errorInternal$);
+  /** Receives InboundTypedMessages and encodes them into protocol buffers. */
+  readonly write$ = new Subject<InboundTypedMessage>();
 
   constructor(
     private readonly rawRead$: Observable<Buffer>,
     private readonly rawWrite$: Subject<Buffer>
   ) {
-    this.rawRead$.subscribe(buffer => this.decode(buffer));
-    this.write$.subscribe(message => this.encode(message));
-  }
-
-  // Decodes a buffer into an OutboundMessage.
-  private decode(buffer: Buffer) {
-    try {
-      const message = toMessage(buffer);
-      this.readInternal$.next(message);
-    } catch (error) {
-      this.errorInternal$.next(error);
-    }
-  }
-
-  // Encodes an InboundMessage into a buffer.
-  private encode(message: InboundMessage) {
-    try {
-      const buffer = Buffer.from(message.serializeBinary());
-      this.rawWrite$.next(buffer);
-    } catch (error) {
-      this.errorInternal$.next(error);
-    }
+    this.write$.subscribe(message => this.rawWrite$.next(toBuffer(message)));
   }
 
   /** Cleans up all Observables. */
   close() {
-    this.readInternal$.complete();
     this.write$.complete();
-    this.errorInternal$.complete();
   }
 }
 
-// Decodes a protocol buffer into an OutboundMessage, ensuring that all
+// Decodes a protocol buffer into an OutboundTypedMessage, ensuring that all
 // mandatory message fields are populated. Throws if buffer cannot be decoded
-// into a valid message.
-function toMessage(buffer: Buffer): OutboundMessage {
+// into a valid message, of if the message itself contains a Protocol Error.
+function toOutboundTypedMessage(buffer: Buffer): OutboundTypedMessage {
   let message;
   try {
     message = OutboundMessage.deserializeBinary(buffer);
@@ -72,14 +95,13 @@ function toMessage(buffer: Buffer): OutboundMessage {
     throw compilerError('Invalid buffer.');
   }
 
-  switch (message.getMessageCase()) {
-    case OutboundMessage.MessageCase.ERROR:
-    case OutboundMessage.MessageCase.LOGEVENT:
-    case OutboundMessage.MessageCase.CANONICALIZEREQUEST:
-    case OutboundMessage.MessageCase.IMPORTREQUEST:
-    case OutboundMessage.MessageCase.FILEIMPORTREQUEST:
-      break;
+  let payload;
+  const type = message.getMessageCase();
 
+  switch (type) {
+    case OutboundMessage.MessageCase.LOGEVENT:
+      payload = message.getLogevent()!;
+      break;
     case OutboundMessage.MessageCase.COMPILERESPONSE: {
       if (
         message.getCompileresponse()!.getResultCase() ===
@@ -89,9 +111,18 @@ function toMessage(buffer: Buffer): OutboundMessage {
           'OutboundMessage.CompileResponse.result is not set.'
         );
       }
+      payload = message.getCompileresponse()!;
       break;
     }
-
+    case OutboundMessage.MessageCase.IMPORTREQUEST:
+      payload = message.getImportrequest()!;
+      break;
+    case OutboundMessage.MessageCase.FILEIMPORTREQUEST:
+      payload = message.getFileimportrequest()!;
+      break;
+    case OutboundMessage.MessageCase.CANONICALIZEREQUEST:
+      payload = message.getCanonicalizerequest()!;
+      break;
     case OutboundMessage.MessageCase.FUNCTIONCALLREQUEST: {
       if (
         message.getFunctioncallrequest()!.getIdentifierCase() ===
@@ -101,21 +132,62 @@ function toMessage(buffer: Buffer): OutboundMessage {
           'OutboundMessage.FunctionCallRequest.identifier is not set.'
         );
       }
+      payload = message.getFunctioncallrequest()!;
       break;
     }
-
+    case OutboundMessage.MessageCase.ERROR:
+      throw hostError(`${message.getError()!.getMessage()}`);
     case OutboundMessage.MessageCase.MESSAGE_NOT_SET: {
       throw compilerError('OutboundMessage.message is not set.');
     }
-
     default: {
       throw compilerError(`Unknown message type ${message.toString()}.`);
     }
   }
 
-  return message;
+  return {
+    payload,
+    type,
+  };
+}
+
+// Converts the given inbound message to a protocol buffer.
+function toBuffer(message: InboundTypedMessage): Buffer {
+  const inboundMessage = new InboundMessage();
+  switch (message.type) {
+    case InboundMessage.MessageCase.COMPILEREQUEST:
+      inboundMessage.setCompilerequest(
+        message.payload as InboundMessage.CompileRequest
+      );
+      break;
+    case InboundMessage.MessageCase.IMPORTRESPONSE:
+      inboundMessage.setImportresponse(
+        message.payload as InboundMessage.ImportResponse
+      );
+      break;
+    case InboundMessage.MessageCase.FILEIMPORTRESPONSE:
+      inboundMessage.setFileimportresponse(
+        message.payload as InboundMessage.FileImportResponse
+      );
+      break;
+    case InboundMessage.MessageCase.CANONICALIZERESPONSE:
+      inboundMessage.setCanonicalizeresponse(
+        message.payload as InboundMessage.CanonicalizeResponse
+      );
+      break;
+    case InboundMessage.MessageCase.FUNCTIONCALLRESPONSE:
+      inboundMessage.setFunctioncallresponse(
+        message.payload as InboundMessage.FunctionCallResponse
+      );
+      break;
+  }
+  return Buffer.from(inboundMessage.serializeBinary());
+}
+
+function hostError(message: string) {
+  return Error(`Compiler reported error: ${message}`);
 }
 
 function compilerError(message: string) {
-  return new Error(`Compiler caused error: ${message}`);
+  return Error(`Compiler caused error: ${message}`);
 }

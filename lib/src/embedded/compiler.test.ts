@@ -6,28 +6,28 @@ import {take} from 'rxjs/operators';
 
 import {EmbeddedCompiler} from './compiler';
 
-describe('embedded process smoke test', () => {
+describe('embedded compiler smoke test', () => {
   it('spins up child process', () => {
-    const process = new EmbeddedCompiler();
-    process.close();
+    const compiler = new EmbeddedCompiler();
+    compiler.close();
   });
 
   it('writes to stdin', () => {
-    const process = new EmbeddedCompiler();
-    process.writeStdin(Buffer.from([0]));
-    process.close();
+    const compiler = new EmbeddedCompiler();
+    compiler.writeStdin(Buffer.from([0]));
+    compiler.close();
   });
 
   it('writes to stdin repeatedly', () => {
-    const process = new EmbeddedCompiler();
-    process.writeStdin(Buffer.from([0]));
-    process.writeStdin(Buffer.from([0]));
-    process.writeStdin(Buffer.from([0]));
-    process.close();
+    const compiler = new EmbeddedCompiler();
+    compiler.writeStdin(Buffer.from([0]));
+    compiler.writeStdin(Buffer.from([0]));
+    compiler.writeStdin(Buffer.from([0]));
+    compiler.close();
   });
 
   it('listens to stdout', async () => {
-    const process = new EmbeddedCompiler();
+    const compiler = new EmbeddedCompiler();
     const buffer = Buffer.from([
       20,
       0,
@@ -54,21 +54,21 @@ describe('embedded process smoke test', () => {
       99,
       125,
     ]); // valid message
-    process.writeStdin(buffer);
-    await process.stdout$.pipe(take(1)).toPromise();
-    process.close();
+    compiler.writeStdin(buffer);
+    await compiler.stdout$.pipe(take(1)).toPromise();
+    compiler.close();
   });
 
   it('listens to stderr', async () => {
-    const process = new EmbeddedCompiler();
-    process.writeStdin(Buffer.from([0, 0, 0, 0, 1])); // invalid message
-    await process.stderr$.pipe(take(1)).toPromise();
-    process.close();
+    const compiler = new EmbeddedCompiler();
+    compiler.writeStdin(Buffer.from([0, 0, 0, 0, 1])); // invalid message
+    await compiler.stderr$.pipe(take(1)).toPromise();
+    compiler.close();
   });
 
   it('listens to exit event', async () => {
-    const process = new EmbeddedCompiler();
-    process.close();
-    await process.exit$.pipe(take(1)).toPromise();
+    const compiler = new EmbeddedCompiler();
+    compiler.close();
+    await compiler.exit$.pipe(take(1)).toPromise();
   });
 });

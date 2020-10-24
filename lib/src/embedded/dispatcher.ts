@@ -203,9 +203,13 @@ export class Dispatcher {
         map(message => message.payload as OutboundRequest)
       )
       .subscribe(async request => {
-        const response = await handler(request as T1);
-        response.setId(request.getId());
-        this.sendInboundMessage(response, responseType);
+        try {
+          const response = await handler(request as T1);
+          response.setId(request.getId());
+          this.sendInboundMessage(response, responseType);
+        } catch (error) {
+          this.error$.next(error);
+        }
       });
   }
 

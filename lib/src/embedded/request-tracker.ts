@@ -18,7 +18,7 @@ export class RequestTracker {
   /** The next available request ID. */
   get nextId() {
     for (let i = 0; i < this.requests.length; i++) {
-      if (this.requests[i] === null) {
+      if (this.requests[i] === undefined || this.requests[i] === null) {
         return i;
       }
     }
@@ -33,7 +33,9 @@ export class RequestTracker {
     id: number,
     expectedResponseType: InboundResponseType | OutboundResponseType
   ) {
-    if (this.requests[id]) {
+    if (id < 0) {
+      throw Error(`Invalid request ID ${id}.`);
+    } else if (this.requests[id]) {
       throw Error(
         `Request ID ${id} is already in use by an in-flight request.`
       );
@@ -48,8 +50,7 @@ export class RequestTracker {
   resolve(id: number, type: InboundResponseType | OutboundResponseType) {
     if (this.requests[id] === undefined || this.requests[id] === null) {
       throw Error(`Response ID ${id} does not match any pending requests.`);
-    }
-    if (this.requests[id] !== type) {
+    } else if (this.requests[id] !== type) {
       throw Error("Response type does not match the pending request's type.");
     }
     this.requests[id] = null;

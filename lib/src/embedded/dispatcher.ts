@@ -49,26 +49,13 @@ export class Dispatcher {
   // ID and type will remove the ID.
   private readonly pendingOutboundRequests = new RequestTracker();
 
-  // Collects all errors that we might encounter.
+  // All outbound messages. If we detect any errors while dispatching messages,
+  // this completes.
+  private readonly messages$ = new Subject<OutboundTypedMessage>();
+
+  // Collects all errors that we might encounter. An emitted error shuts down
+  // all promises awaiting an outbound response.
   private readonly error$ = new Subject<Error>();
-
-  // Outbound messages are routed through here to keep track of all pending
-  // outbound requests. If any errors are detected while dispatching messages,
-  // this Observable will close.
-  private readonly messages$ = new Observable<OutboundTypedMessage>(
-    observer => {
-      this.outboundMessages$.subscribe(
-        message => {
-          this.registerOutboundMessage(message);
-          observer.next(message);
-        },
-        error => this.error$.next(error),
-        () => observer.complete()
-      );
-
-      this.error$.subscribe(() => observer.complete());
-    }
-  );
 
   /** All outbound log events. */
   readonly logEvents$ = this.messages$.pipe(
@@ -80,7 +67,19 @@ export class Dispatcher {
     private readonly outboundMessages$: Observable<OutboundTypedMessage>,
     private readonly writeInboundMessage: (message: InboundTypedMessage) => void
   ) {
-    this.error$.subscribe(() => process.nextTick(() => this.error$.complete()));
+    this.outboundMessages$.subscribe(
+      message => {
+        this.registerOutboundMessage(message);
+        this.messages$.next(message);
+      },
+      error => this.error$.next(error),
+      () => this.messages$.complete()
+    );
+
+    this.error$.subscribe(() => {
+      this.messages$.complete();
+      process.nextTick(() => this.error$.complete());
+    });
   }
 
   /**

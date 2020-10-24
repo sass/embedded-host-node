@@ -162,6 +162,43 @@ describe('dispatcher', () => {
     });
   });
 
+  describe('multiple request listeners', () => {
+    it('supports multiple request callbacks', async done => {
+      const receivedRequests: number[] = [];
+
+      const dispatcher = new Dispatcher(outbound$, message => {
+        if (message.type === InboundMessage.MessageCase.FUNCTIONCALLRESPONSE) {
+          expect(receivedRequests).toEqual([1, 2]);
+          done();
+        }
+      });
+
+      dispatcher.onCanonicalizeRequest(request => {
+        receivedRequests.push(request.getId());
+        return new InboundMessage.CanonicalizeResponse();
+      });
+
+      dispatcher.onFunctionCallRequest(request => {
+        receivedRequests.push(request.getId());
+        return new InboundMessage.FunctionCallResponse();
+      });
+
+      const request = new OutboundMessage.CanonicalizeRequest();
+      request.setId(1);
+      outbound$.next({
+        payload: request,
+        type: OutboundMessage.MessageCase.CANONICALIZEREQUEST,
+      });
+
+      const request1 = new OutboundMessage.FunctionCallRequest();
+      request1.setId(2);
+      outbound$.next({
+        payload: request1,
+        type: OutboundMessage.MessageCase.FUNCTIONCALLREQUEST,
+      });
+    });
+  });
+
   describe('protocol errors', () => {
     beforeEach(() => {
       dispatcher = new Dispatcher(outbound$, () => {});

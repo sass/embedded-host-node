@@ -73,7 +73,10 @@ export class Dispatcher {
         this.messages$.next(message);
       },
       error => this.error$.next(error),
-      () => this.messages$.complete()
+      () => {
+        this.messages$.complete();
+        this.error$.complete();
+      }
     );
 
     this.error$.subscribe(() => {

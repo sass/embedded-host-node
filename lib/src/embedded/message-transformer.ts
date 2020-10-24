@@ -67,33 +67,41 @@ export class MessageTransformer {
   // Collects all errors that we might encounter.
   private readonly error$ = new Subject<Error>();
 
+  // The decoded messages are written to this Subject. It is publicly exposed
+  // as a readonly Observable.
+  private readonly outboundMessagesInternal$ = new Subject<
+    OutboundTypedMessage
+  >();
+
   /**
    * The OutboundTypedMessages, decoded from protocol buffers. If any errors are
    * detected while encoding/decoding, this Observable will error out.
    */
-  readonly outboundMessages$ = new Observable<OutboundTypedMessage>(
-    observer => {
-      this.outboundProtobufs$.subscribe(
-        buffer => {
-          try {
-            observer.next(decode(buffer));
-          } catch (error) {
-            this.error$.next(error);
-          }
-        },
-        error => this.error$.next(error),
-        () => observer.complete()
-      );
-
-      this.error$.subscribe(error => observer.error(error));
-    }
-  );
+  readonly outboundMessages$ = this.outboundMessagesInternal$.pipe();
 
   constructor(
     private readonly outboundProtobufs$: Observable<Buffer>,
     private readonly writeInboundProtobuf: (buffer: Buffer) => void
   ) {
-    this.error$.subscribe(() => process.nextTick(() => this.error$.complete()));
+    this.outboundProtobufs$.subscribe(
+      buffer => {
+        try {
+          this.outboundMessagesInternal$.next(decode(buffer));
+        } catch (error) {
+          this.error$.next(error);
+        }
+      },
+      error => this.error$.next(error),
+      () => {
+        this.outboundMessagesInternal$.complete();
+        this.error$.complete();
+      }
+    );
+
+    this.error$.subscribe(error => {
+      this.outboundMessagesInternal$.error(error);
+      process.nextTick(() => this.error$.complete());
+    });
   }
 
   /**

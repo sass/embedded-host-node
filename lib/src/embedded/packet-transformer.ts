@@ -19,44 +19,39 @@ import {Observable, Subject} from 'rxjs';
  * protobuf's length.
  */
 export class PacketTransformer {
+  // The packet that is actively being decoded as buffers come in.
+  private packet = new Packet();
+
   // Collects all errors that we might encounter.
   private readonly error$ = new Subject<Error>();
 
-  // The packet that is actively being decoded as buffers come in.
-  private packet = new Packet();
+  // The decoded protobufs are written to this Subject. It is publicly exposed
+  // as a readonly Observable.
+  private readonly outboundProtobufsInternal$ = new Subject<Buffer>();
 
   /**
    * The fully-decoded, outbound protobufs. If any errors are encountered
    * during encoding/decoding, this Observable will error out.
    */
-  readonly outboundProtobufs$ = new Observable<Buffer>(observer => {
-    this.outboundBuffers$.subscribe(
-      buffer => {
-        try {
-          let decodedBytes = 0;
-          while (decodedBytes < buffer.length) {
-            decodedBytes += this.packet.write(buffer.slice(decodedBytes));
-            if (this.packet.isComplete) {
-              observer.next(this.packet.payload);
-              this.packet = new Packet();
-            }
-          }
-        } catch (error) {
-          this.error$.next(error);
-        }
-      },
-      error => this.error$.next(error),
-      () => observer.complete()
-    );
-
-    this.error$.subscribe(error => observer.error(error));
-  });
+  readonly outboundProtobufs$ = this.outboundProtobufsInternal$.pipe();
 
   constructor(
     private readonly outboundBuffers$: Observable<Buffer>,
     private readonly writeInboundBuffer: (buffer: Buffer) => void
   ) {
-    this.error$.subscribe(() => process.nextTick(() => this.error$.complete()));
+    this.outboundBuffers$.subscribe(
+      buffer => this.decode(buffer),
+      error => this.error$.next(error),
+      () => {
+        this.outboundProtobufsInternal$.complete();
+        this.error$.complete();
+      }
+    );
+
+    this.error$.subscribe(error => {
+      this.outboundProtobufsInternal$.error(error);
+      process.nextTick(() => this.error$.complete());
+    });
   }
 
   /**
@@ -69,6 +64,23 @@ export class PacketTransformer {
       packet.writeInt32LE(protobuf.length, 0);
       packet.set(protobuf, Packet.headerByteSize);
       this.writeInboundBuffer(packet);
+    } catch (error) {
+      this.error$.next(error);
+    }
+  }
+
+  // Decodes a buffer, filling up the packet that is actively being decoded.
+  // When the packet is complete, emits it to outboundProtobufsInternal$.
+  private decode(buffer: Buffer): void {
+    try {
+      let decodedBytes = 0;
+      while (decodedBytes < buffer.length) {
+        decodedBytes += this.packet.write(buffer.slice(decodedBytes));
+        if (this.packet.isComplete) {
+          this.outboundProtobufsInternal$.next(this.packet.payload);
+          this.packet = new Packet();
+        }
+      }
     } catch (error) {
       this.error$.next(error);
     }

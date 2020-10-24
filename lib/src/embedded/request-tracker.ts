@@ -51,7 +51,9 @@ export class RequestTracker {
     if (this.requests[id] === undefined || this.requests[id] === null) {
       throw Error(`Response ID ${id} does not match any pending requests.`);
     } else if (this.requests[id] !== type) {
-      throw Error("Response type does not match the pending request's type.");
+      throw Error(
+        `Response with ID ${id} does not match pending request's type. Expected ${this.requests[id]} but received ${type}.`
+      );
     }
     this.requests[id] = null;
   }

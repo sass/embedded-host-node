@@ -85,7 +85,7 @@ describe('request tracker', () => {
       expect(() =>
         tracker.resolve(0, InboundMessage.MessageCase.FILEIMPORTRESPONSE)
       ).toThrowError(
-        "Response type does not match the pending request's type."
+        "Response with ID 0 does not match pending request's type. Expected 4 but received 5."
       );
     });
   });

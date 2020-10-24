@@ -3,28 +3,24 @@
 // https://opensource.org/licenses/MIT.
 
 import {Subject} from 'rxjs';
-import {filter, map} from 'rxjs/operators';
+
 import {InboundMessage, OutboundMessage} from '../vendor/embedded_sass_pb';
 import {Dispatcher} from './dispatcher';
-import {InboundTypedMessage, OutboundTypedMessage} from './message-transformer';
+import {OutboundTypedMessage} from './message-transformer';
 
 describe('dispatcher', () => {
-  let outbound$: Subject<OutboundTypedMessage>;
-  let inbound$: Subject<InboundTypedMessage>;
   let dispatcher: Dispatcher;
+  let outbound$: Subject<OutboundTypedMessage>;
 
   beforeEach(() => {
     outbound$ = new Subject();
-    inbound$ = new Subject();
-    dispatcher = new Dispatcher(outbound$, inbound$);
-  });
-
-  afterEach(() => {
-    outbound$.complete();
-    inbound$.complete();
   });
 
   describe('events', () => {
+    beforeEach(() => {
+      dispatcher = new Dispatcher(outbound$, () => {});
+    });
+
     it('exposes log events', async done => {
       const message = 'This is a log!';
       const log = new OutboundMessage.LogEvent();
@@ -46,26 +42,18 @@ describe('dispatcher', () => {
     it('dispatches a compile request and returns the response', async done => {
       const expectedCss = 'a {b: c}';
 
-      // Answer compile request.
-      inbound$
-        .pipe(
-          filter(
-            message =>
-              message.type === InboundMessage.MessageCase.COMPILEREQUEST
-          ),
-          map(message => message.payload)
-        )
-        .subscribe(request => {
-          const success = new OutboundMessage.CompileResponse.CompileSuccess();
-          success.setCss(expectedCss);
-          const response = new OutboundMessage.CompileResponse();
-          response.setSuccess(success);
-          response.setId(request.getId());
-          outbound$.next({
-            payload: response,
-            type: OutboundMessage.MessageCase.COMPILERESPONSE,
-          });
+      dispatcher = new Dispatcher(outbound$, message => {
+        if (message.type !== InboundMessage.MessageCase.COMPILEREQUEST) return;
+        const success = new OutboundMessage.CompileResponse.CompileSuccess();
+        success.setCss(expectedCss);
+        const response = new OutboundMessage.CompileResponse();
+        response.setSuccess(success);
+        response.setId(message.payload.getId());
+        outbound$.next({
+          payload: response,
+          type: OutboundMessage.MessageCase.COMPILERESPONSE,
         });
+      });
 
       dispatcher
         .sendCompileRequest(new InboundMessage.CompileRequest())
@@ -79,12 +67,8 @@ describe('dispatcher', () => {
   describe('outbound requests', () => {
     it('triggers the import request callback', async done => {
       const id = 1;
-      const request = new OutboundMessage.ImportRequest();
-      request.setId(id);
 
-      dispatcher.onImportRequest(() => new InboundMessage.ImportResponse());
-
-      inbound$.subscribe(message => {
+      const dispatcher = new Dispatcher(outbound$, message => {
         const expectedResponse = new InboundMessage.ImportResponse();
         expectedResponse.setId(id);
         expect(message.payload).toEqual(expectedResponse);
@@ -92,6 +76,10 @@ describe('dispatcher', () => {
         done();
       });
 
+      dispatcher.onImportRequest(() => new InboundMessage.ImportResponse());
+
+      const request = new OutboundMessage.ImportRequest();
+      request.setId(id);
       outbound$.next({
         payload: request,
         type: OutboundMessage.MessageCase.IMPORTREQUEST,
@@ -100,14 +88,8 @@ describe('dispatcher', () => {
 
     it('triggers the file import request callback', async done => {
       const id = 1;
-      const request = new OutboundMessage.FileImportRequest();
-      request.setId(id);
 
-      dispatcher.onFileImportRequest(
-        () => new InboundMessage.FileImportResponse()
-      );
-
-      inbound$.subscribe(message => {
+      const dispatcher = new Dispatcher(outbound$, message => {
         const expectedResponse = new InboundMessage.FileImportResponse();
         expectedResponse.setId(id);
         expect(message.payload).toEqual(expectedResponse);
@@ -117,6 +99,12 @@ describe('dispatcher', () => {
         done();
       });
 
+      dispatcher.onFileImportRequest(
+        () => new InboundMessage.FileImportResponse()
+      );
+
+      const request = new OutboundMessage.FileImportRequest();
+      request.setId(id);
       outbound$.next({
         payload: request,
         type: OutboundMessage.MessageCase.FILEIMPORTREQUEST,
@@ -125,14 +113,8 @@ describe('dispatcher', () => {
 
     it('triggers the canonicalize request callback', async done => {
       const id = 1;
-      const request = new OutboundMessage.CanonicalizeRequest();
-      request.setId(id);
 
-      dispatcher.onCanonicalizeRequest(
-        () => new InboundMessage.CanonicalizeResponse()
-      );
-
-      inbound$.subscribe(message => {
+      const dispatcher = new Dispatcher(outbound$, message => {
         const expectedResponse = new InboundMessage.CanonicalizeResponse();
         expectedResponse.setId(id);
         expect(message.payload).toEqual(expectedResponse);
@@ -142,6 +124,12 @@ describe('dispatcher', () => {
         done();
       });
 
+      dispatcher.onCanonicalizeRequest(
+        () => new InboundMessage.CanonicalizeResponse()
+      );
+
+      const request = new OutboundMessage.CanonicalizeRequest();
+      request.setId(id);
       outbound$.next({
         payload: request,
         type: OutboundMessage.MessageCase.CANONICALIZEREQUEST,
@@ -150,14 +138,8 @@ describe('dispatcher', () => {
 
     it('triggers the function call request callback', async done => {
       const id = 1;
-      const request = new OutboundMessage.FunctionCallRequest();
-      request.setId(id);
 
-      dispatcher.onFunctionCallRequest(
-        () => new InboundMessage.FunctionCallResponse()
-      );
-
-      inbound$.subscribe(message => {
+      const dispatcher = new Dispatcher(outbound$, message => {
         const expectedResponse = new InboundMessage.FunctionCallResponse();
         expectedResponse.setId(id);
         expect(message.payload).toEqual(expectedResponse);
@@ -167,6 +149,12 @@ describe('dispatcher', () => {
         done();
       });
 
+      dispatcher.onFunctionCallRequest(
+        () => new InboundMessage.FunctionCallResponse()
+      );
+
+      const request = new OutboundMessage.FunctionCallRequest();
+      request.setId(id);
       outbound$.next({
         payload: request,
         type: OutboundMessage.MessageCase.FUNCTIONCALLREQUEST,
@@ -175,6 +163,10 @@ describe('dispatcher', () => {
   });
 
   describe('protocol errors', () => {
+    beforeEach(() => {
+      dispatcher = new Dispatcher(outbound$, () => {});
+    });
+
     it('throws if a request ID overlaps with that of an in-flight request', async done => {
       dispatcher
         .sendCompileRequest(new InboundMessage.CompileRequest())

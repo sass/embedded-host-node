@@ -2,8 +2,7 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-import {Subject, Observable} from 'rxjs';
-import {map} from 'rxjs/operators';
+import {Observable, Subject} from 'rxjs';
 
 import {InboundMessage, OutboundMessage} from '../vendor/embedded_sass_pb';
 
@@ -55,49 +54,68 @@ export type OutboundTypedMessage = {
 
 /**
  * Encodes InboundTypedMessages into protocol buffers and decodes protocol
- * buffers into OutboundTypedMssages. Any Embedded Protocol violations that can
+ * buffers into OutboundTypedMessages. Any Embedded Protocol violations that can
  * be detected at the message level are encapsulated here and reported as
  * errors.
  */
 export class MessageTransformer {
+  // Collects all errors that we might encounter.
+  private readonly error$ = new Subject<Error>();
+
   /**
-   * The OutboundTypedMessages (decoded from protocol buffers). Throws an error
-   * if a Protocol Error is detected.
+   * The OutboundTypedMessages, decoded from protocol buffers. If any errors are
+   * detected while encoding/decoding, this Observable will error out.
    */
-  readonly read$ = this.rawRead$.pipe(
-    map(buffer => toOutboundTypedMessage(buffer))
+  readonly outboundMessages$ = new Observable<OutboundTypedMessage>(
+    observer => {
+      this.outboundProtobufs$.subscribe(
+        buffer => {
+          try {
+            observer.next(decode(buffer));
+          } catch (error) {
+            this.error$.next(error);
+          }
+        },
+        error => this.error$.next(error),
+        () => observer.complete()
+      );
+
+      this.error$.subscribe(error => observer.error(error));
+    }
   );
 
-  /** Receives InboundTypedMessages and encodes them into protocol buffers. */
-  readonly write$ = new Subject<InboundTypedMessage>();
-
   constructor(
-    private readonly rawRead$: Observable<Buffer>,
-    private readonly rawWrite$: Subject<Buffer>
+    private readonly outboundProtobufs$: Observable<Buffer>,
+    private readonly writeInboundProtobuf: (buffer: Buffer) => void
   ) {
-    this.write$.subscribe(message => this.rawWrite$.next(toBuffer(message)));
+    this.error$.subscribe(() => process.nextTick(() => this.error$.complete()));
   }
 
-  /** Cleans up all Observables. */
-  close() {
-    this.write$.complete();
+  /**
+   * Converts the inbound `message` to a protocol buffer.
+   */
+  writeInboundMessage(message: InboundTypedMessage): void {
+    try {
+      this.writeInboundProtobuf(encode(message));
+    } catch (error) {
+      this.error$.next(error);
+    }
   }
 }
 
-// Decodes a protocol buffer into an OutboundTypedMessage, ensuring that all
-// mandatory message fields are populated. Throws if buffer cannot be decoded
-// into a valid message, of if the message itself contains a Protocol Error.
-function toOutboundTypedMessage(buffer: Buffer): OutboundTypedMessage {
+// Decodes a protobuf `buffer` into an OutboundTypedMessage, ensuring that all
+// mandatory message fields are populated. Throws if `buffer` cannot be decoded
+// into a valid message, or if the message itself contains a Protocol Error.
+function decode(buffer: Buffer): OutboundTypedMessage {
   let message;
   try {
     message = OutboundMessage.deserializeBinary(buffer);
-  } catch {
+  } catch (error) {
     throw compilerError('Invalid buffer.');
   }
 
   let payload;
   const type = message.getMessageCase();
-
   switch (type) {
     case OutboundMessage.MessageCase.LOGEVENT:
       payload = message.getLogevent()!;
@@ -151,8 +169,8 @@ function toOutboundTypedMessage(buffer: Buffer): OutboundTypedMessage {
   };
 }
 
-// Converts the given inbound message to a protocol buffer.
-function toBuffer(message: InboundTypedMessage): Buffer {
+// Encodes an InboundTypedMessage into a protocol buffer.
+function encode(message: InboundTypedMessage): Buffer {
   const inboundMessage = new InboundMessage();
   switch (message.type) {
     case InboundMessage.MessageCase.COMPILEREQUEST:
@@ -184,10 +202,10 @@ function toBuffer(message: InboundTypedMessage): Buffer {
   return Buffer.from(inboundMessage.serializeBinary());
 }
 
-function hostError(message: string) {
-  return Error(`Compiler reported error: ${message}`);
+function compilerError(message: string): Error {
+  return Error(`Compiler caused error: ${message}`);
 }
 
-function compilerError(message: string) {
-  return Error(`Compiler caused error: ${message}`);
+function hostError(message: string): Error {
+  return Error(`Compiler reported error: ${message}`);
 }

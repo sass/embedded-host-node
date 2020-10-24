@@ -57,6 +57,11 @@ export type OutboundTypedMessage = {
  * buffers into OutboundTypedMessages. Any Embedded Protocol violations that can
  * be detected at the message level are encapsulated here and reported as
  * errors.
+ *
+ * This transformer communicates via In/OutboundTypedMessages instead of raw
+ * In/OutboundMessages in order to expose more type information to consumers.
+ * This makes the stream of messages from the transformer easier to interact
+ * with.
  */
 export class MessageTransformer {
   // Collects all errors that we might encounter.

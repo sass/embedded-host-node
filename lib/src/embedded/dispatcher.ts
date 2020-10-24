@@ -19,6 +19,8 @@ import {
   OutboundTypedMessage,
 } from './message-transformer';
 
+type PromiseOr<T> = T | Promise<T>;
+
 /**
  * Dispatches requests, responses, and events.
  *
@@ -101,7 +103,7 @@ export class Dispatcher {
   onImportRequest(
     handler: (
       request: OutboundMessage.ImportRequest
-    ) => InboundMessage.ImportResponse | Promise<InboundMessage.ImportResponse>
+    ) => PromiseOr<InboundMessage.ImportResponse>
   ): void {
     this.onOutboundRequest(
       handler,
@@ -117,9 +119,7 @@ export class Dispatcher {
   onFileImportRequest(
     handler: (
       request: OutboundMessage.FileImportRequest
-    ) =>
-      | InboundMessage.FileImportResponse
-      | Promise<InboundMessage.FileImportResponse>
+    ) => PromiseOr<InboundMessage.FileImportResponse>
   ): void {
     this.onOutboundRequest(
       handler,
@@ -135,9 +135,7 @@ export class Dispatcher {
   onCanonicalizeRequest(
     handler: (
       request: OutboundMessage.CanonicalizeRequest
-    ) =>
-      | InboundMessage.CanonicalizeResponse
-      | Promise<InboundMessage.CanonicalizeResponse>
+    ) => PromiseOr<InboundMessage.CanonicalizeResponse>
   ): void {
     this.onOutboundRequest(
       handler,
@@ -153,9 +151,7 @@ export class Dispatcher {
   onFunctionCallRequest(
     handler: (
       request: OutboundMessage.FunctionCallRequest
-    ) =>
-      | InboundMessage.FunctionCallResponse
-      | Promise<InboundMessage.FunctionCallResponse>
+    ) => PromiseOr<InboundMessage.FunctionCallResponse>
   ): void {
     this.onOutboundRequest(
       handler,
@@ -173,6 +169,8 @@ export class Dispatcher {
     responseType: OutboundResponseType
   ): Promise<OutboundResponse> {
     request.setId(this.pendingInboundRequests.nextId);
+    // Avoid the race condition in which the response arrives before we even
+    // start listening for it.
     process.nextTick(() => this.sendInboundMessage(request, requestType));
 
     return new Promise((resolve, reject) => {
@@ -194,7 +192,7 @@ export class Dispatcher {
     T1 extends OutboundRequest,
     T2 extends InboundResponse
   >(
-    handler: (request: T1) => T2 | Promise<T2>,
+    handler: (request: T1) => PromiseOr<T2>,
     requestType: OutboundRequestType,
     responseType: InboundResponseType
   ): Subscription {

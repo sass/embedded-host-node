@@ -101,14 +101,15 @@ export class Dispatcher {
   }
 
   /**
-   * Registers a callback `handler` that listens for outbound ImportRequests.
+   * Subscribes to outbound ImportRequests, registering a callback `handler`
+   * that runs when a request arrives. Returns the subscription.
    */
   onImportRequest(
     handler: (
       request: OutboundMessage.ImportRequest
     ) => PromiseOr<InboundMessage.ImportResponse>
-  ): void {
-    this.onOutboundRequest(
+  ): Subscription {
+    return this.onOutboundRequest(
       handler,
       OutboundMessage.MessageCase.IMPORTREQUEST,
       InboundMessage.MessageCase.IMPORTRESPONSE
@@ -116,15 +117,15 @@ export class Dispatcher {
   }
 
   /**
-   * Registers a callback `handler` that listens for outbound
-   * FileImportRequests.
+   * Subscribes to outbound FileImportRequests, registering a callback `handler`
+   * that runs when a request arrives. Returns the subscription.
    */
   onFileImportRequest(
     handler: (
       request: OutboundMessage.FileImportRequest
     ) => PromiseOr<InboundMessage.FileImportResponse>
-  ): void {
-    this.onOutboundRequest(
+  ): Subscription {
+    return this.onOutboundRequest(
       handler,
       OutboundMessage.MessageCase.FILEIMPORTREQUEST,
       InboundMessage.MessageCase.FILEIMPORTRESPONSE
@@ -132,15 +133,15 @@ export class Dispatcher {
   }
 
   /**
-   * Registers a callback `handler` that listens for outbound
-   * CanonicalizeRequests.
+   * Subscribes to outbound CanonicalizeRequests, registering a callback
+   * `handler` that runs when a request arrives. Returns the subscription.
    */
   onCanonicalizeRequest(
     handler: (
       request: OutboundMessage.CanonicalizeRequest
     ) => PromiseOr<InboundMessage.CanonicalizeResponse>
-  ): void {
-    this.onOutboundRequest(
+  ): Subscription {
+    return this.onOutboundRequest(
       handler,
       OutboundMessage.MessageCase.CANONICALIZEREQUEST,
       InboundMessage.MessageCase.CANONICALIZERESPONSE
@@ -148,15 +149,15 @@ export class Dispatcher {
   }
 
   /**
-   * Registers a callback `handler` that listens for outbound
-   * FunctionCallRequests.
+   * Subscribes to outbound FunctionCallRequests, registering a callback
+   * `handler` that runs when a request arrives. Returns the subscription.
    */
   onFunctionCallRequest(
     handler: (
       request: OutboundMessage.FunctionCallRequest
     ) => PromiseOr<InboundMessage.FunctionCallResponse>
-  ): void {
-    this.onOutboundRequest(
+  ): Subscription {
+    return this.onOutboundRequest(
       handler,
       OutboundMessage.MessageCase.FUNCTIONCALLREQUEST,
       InboundMessage.MessageCase.FUNCTIONCALLRESPONSE
@@ -189,8 +190,10 @@ export class Dispatcher {
     });
   }
 
-  // Registers a callback `handler` that listens for outbound requests of type
-  // `requestType`. Sends the result (which is of type `responseType`) inbound.
+  // Subscribes to outbound requests of type `requestType`, registering a
+  // callback that runs when a request arrives. Sends the result of running the
+  // callback (which is of type `responseType`) inbound. Returns the
+  // subscription so that consumers can unsubscribe.
   private onOutboundRequest<
     T1 extends OutboundRequest,
     T2 extends InboundResponse

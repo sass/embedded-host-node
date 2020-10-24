@@ -18,6 +18,7 @@ import {
   OutboundResponseType,
   OutboundTypedMessage,
 } from './message-transformer';
+import {RequestTracker} from './request-tracker';
 
 type PromiseOr<T> = T | Promise<T>;
 
@@ -276,57 +277,5 @@ export class Dispatcher {
     } catch (error) {
       this.error$.next(error);
     }
-  }
-}
-
-/**
- * Manages pending inbound and outbound requests. Ensures that requests and
- * responses interact correctly and obey the Embedded Protocol.
- */
-class RequestTracker {
-  // The indices of this array correspond to each pending request's ID. Stores
-  // the response type expected by each request.
-  private readonly requests: Array<
-    InboundResponseType | OutboundResponseType | null
-  > = [];
-
-  /** The next available request ID. */
-  get nextId() {
-    for (let i = 0; i < this.requests.length; i++) {
-      if (this.requests[i] === null) {
-        return i;
-      }
-    }
-    return this.requests.length;
-  }
-
-  /**
-   * Adds an entry for a pending request with ID `id`. The entry stores the
-   * expected response type. Throws an error if the Protocol Error is violated.
-   */
-  add(
-    id: number,
-    expectedResponseType: InboundResponseType | OutboundResponseType
-  ) {
-    if (this.requests[id]) {
-      throw Error(
-        `Request ID ${id} is already in use by an in-flight request.`
-      );
-    }
-    this.requests[id] = expectedResponseType;
-  }
-
-  /**
-   * Resolves a pending request with matching ID `id` and expected response type
-   * `type`. Throws an error if the Protocol Error is violated.
-   */
-  resolve(id: number, type: InboundResponseType | OutboundResponseType) {
-    if (this.requests[id] === undefined || this.requests[id] === null) {
-      throw Error(`Response ID ${id} does not match any pending requests.`);
-    }
-    if (this.requests[id] !== type) {
-      throw Error("Response type does not match the pending request's type.");
-    }
-    this.requests[id] = null;
   }
 }

@@ -69,8 +69,12 @@ export class Dispatcher {
   ) {
     this.outboundMessages$.subscribe(
       message => {
-        this.registerOutboundMessage(message);
-        this.messages$.next(message);
+        try {
+          this.registerOutboundMessage(message);
+          this.messages$.next(message);
+        } catch (error) {
+          this.error$.next(error);
+        }
       },
       error => this.error$.next(error),
       () => {
@@ -223,68 +227,60 @@ export class Dispatcher {
     payload: InboundRequest | InboundResponse,
     type: InboundRequestType | InboundResponseType
   ): void {
-    try {
-      if (type === InboundMessage.MessageCase.COMPILEREQUEST) {
-        this.pendingInboundRequests.add(
-          payload.getId(),
-          OutboundMessage.MessageCase.COMPILERESPONSE
-        );
-      } else if (
-        type === InboundMessage.MessageCase.IMPORTRESPONSE ||
-        type === InboundMessage.MessageCase.FILEIMPORTRESPONSE ||
-        type === InboundMessage.MessageCase.CANONICALIZERESPONSE ||
-        type === InboundMessage.MessageCase.FUNCTIONCALLRESPONSE
-      ) {
-        this.pendingOutboundRequests.resolve(payload.getId(), type);
-      }
-
-      this.writeInboundMessage({
-        payload,
-        type,
-      });
-    } catch (error) {
-      this.error$.next(error);
+    if (type === InboundMessage.MessageCase.COMPILEREQUEST) {
+      this.pendingInboundRequests.add(
+        payload.getId(),
+        OutboundMessage.MessageCase.COMPILERESPONSE
+      );
+    } else if (
+      type === InboundMessage.MessageCase.IMPORTRESPONSE ||
+      type === InboundMessage.MessageCase.FILEIMPORTRESPONSE ||
+      type === InboundMessage.MessageCase.CANONICALIZERESPONSE ||
+      type === InboundMessage.MessageCase.FUNCTIONCALLRESPONSE
+    ) {
+      this.pendingOutboundRequests.resolve(payload.getId(), type);
     }
+
+    this.writeInboundMessage({
+      payload,
+      type,
+    });
   }
 
   // If the outbound `message` contains a request or response, registers it with
   // pendingOutboundRequests.
   private registerOutboundMessage(message: OutboundTypedMessage): void {
-    try {
-      switch (message.type) {
-        case OutboundMessage.MessageCase.COMPILERESPONSE:
-          this.pendingInboundRequests.resolve(
-            (message.payload as OutboundResponse).getId(),
-            message.type
-          );
-          break;
-        case OutboundMessage.MessageCase.IMPORTREQUEST:
-          this.pendingOutboundRequests.add(
-            (message.payload as OutboundRequest).getId(),
-            InboundMessage.MessageCase.IMPORTRESPONSE
-          );
-          break;
-        case OutboundMessage.MessageCase.FILEIMPORTREQUEST:
-          this.pendingOutboundRequests.add(
-            (message.payload as OutboundRequest).getId(),
-            InboundMessage.MessageCase.FILEIMPORTRESPONSE
-          );
-          break;
-        case OutboundMessage.MessageCase.CANONICALIZEREQUEST:
-          this.pendingOutboundRequests.add(
-            (message.payload as OutboundRequest).getId(),
-            InboundMessage.MessageCase.CANONICALIZERESPONSE
-          );
-          break;
-        case OutboundMessage.MessageCase.FUNCTIONCALLREQUEST:
-          this.pendingOutboundRequests.add(
-            (message.payload as OutboundRequest).getId(),
-            InboundMessage.MessageCase.FUNCTIONCALLRESPONSE
-          );
-          break;
-      }
-    } catch (error) {
-      this.error$.next(error);
+    switch (message.type) {
+      case OutboundMessage.MessageCase.COMPILERESPONSE:
+        this.pendingInboundRequests.resolve(
+          (message.payload as OutboundResponse).getId(),
+          message.type
+        );
+        break;
+      case OutboundMessage.MessageCase.IMPORTREQUEST:
+        this.pendingOutboundRequests.add(
+          (message.payload as OutboundRequest).getId(),
+          InboundMessage.MessageCase.IMPORTRESPONSE
+        );
+        break;
+      case OutboundMessage.MessageCase.FILEIMPORTREQUEST:
+        this.pendingOutboundRequests.add(
+          (message.payload as OutboundRequest).getId(),
+          InboundMessage.MessageCase.FILEIMPORTRESPONSE
+        );
+        break;
+      case OutboundMessage.MessageCase.CANONICALIZEREQUEST:
+        this.pendingOutboundRequests.add(
+          (message.payload as OutboundRequest).getId(),
+          InboundMessage.MessageCase.CANONICALIZERESPONSE
+        );
+        break;
+      case OutboundMessage.MessageCase.FUNCTIONCALLREQUEST:
+        this.pendingOutboundRequests.add(
+          (message.payload as OutboundRequest).getId(),
+          InboundMessage.MessageCase.FUNCTIONCALLRESPONSE
+        );
+        break;
     }
   }
 }

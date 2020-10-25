@@ -40,7 +40,13 @@ export class PacketTransformer {
     private readonly writeInboundBuffer: (buffer: Buffer) => void
   ) {
     this.outboundBuffers$.subscribe(
-      buffer => this.decode(buffer),
+      buffer => {
+        try {
+          this.decode(buffer);
+        } catch (error) {
+          this.error$.next(error);
+        }
+      },
       error => this.error$.next(error),
       () => {
         this.outboundProtobufsInternal$.complete();
@@ -72,17 +78,13 @@ export class PacketTransformer {
   // Decodes a buffer, filling up the packet that is actively being decoded.
   // When the packet is complete, emits it to outboundProtobufsInternal$.
   private decode(buffer: Buffer): void {
-    try {
-      let decodedBytes = 0;
-      while (decodedBytes < buffer.length) {
-        decodedBytes += this.packet.write(buffer.slice(decodedBytes));
-        if (this.packet.isComplete) {
-          this.outboundProtobufsInternal$.next(this.packet.payload);
-          this.packet = new Packet();
-        }
+    let decodedBytes = 0;
+    while (decodedBytes < buffer.length) {
+      decodedBytes += this.packet.write(buffer.slice(decodedBytes));
+      if (this.packet.isComplete) {
+        this.outboundProtobufsInternal$.next(this.packet.payload);
+        this.packet = new Packet();
       }
-    } catch (error) {
-      this.error$.next(error);
     }
   }
 }

@@ -204,15 +204,14 @@ describe('dispatcher', () => {
       dispatcher = new Dispatcher(outbound$, () => {});
     });
 
-    it('throws if a request ID overlaps with that of an in-flight request', async done => {
-      dispatcher
-        .sendCompileRequest(new InboundMessage.CompileRequest())
-        .catch(error => {
-          expect(error.message).toEqual(
+    it('throws if a request ID overlaps with that of an in-flight request', () => {
+      dispatcher.error$.subscribe(
+        () => fail('expected error'),
+        error =>
+          expect(error.message).toBe(
             'Request ID 0 is already in use by an in-flight request.'
-          );
-          done();
-        });
+          )
+      );
 
       const request = new OutboundMessage.ImportRequest();
       outbound$.next({
@@ -225,15 +224,14 @@ describe('dispatcher', () => {
       });
     });
 
-    it('throws if a response ID does not match any in-flight request IDs', async done => {
-      dispatcher
-        .sendCompileRequest(new InboundMessage.CompileRequest())
-        .catch(error => {
-          expect(error.message).toEqual(
+    it('throws if a response ID does not match any in-flight request IDs', () => {
+      dispatcher.error$.subscribe(
+        () => fail('expected error'),
+        error =>
+          expect(error.message).toBe(
             'Response ID 1 does not match any pending requests.'
-          );
-          done();
-        });
+          )
+      );
 
       const response = new OutboundMessage.CompileResponse();
       response.setId(1);
@@ -241,6 +239,48 @@ describe('dispatcher', () => {
         payload: response,
         type: OutboundMessage.MessageCase.COMPILERESPONSE,
       });
+    });
+
+    it('throws error to compile request senders', async done => {
+      dispatcher
+        .sendCompileRequest(new InboundMessage.CompileRequest())
+        .then(() => fail('expected error'))
+        .catch(() => done());
+
+      outbound$.error('');
+    });
+
+    it('cleans up log event subscriptions upon error', async done => {
+      dispatcher.logEvents$.subscribe(
+        () => fail('expected silent completion'),
+        () => fail('expected silent completion'),
+        () => done()
+      );
+
+      outbound$.error('');
+    });
+
+    it('cleans up all request subscriptions upon error', () => {
+      const importSubscription = dispatcher.onImportRequest(
+        () => new InboundMessage.ImportResponse()
+      );
+      const fileImportSubscription = dispatcher.onFileImportRequest(
+        () => new InboundMessage.FileImportResponse()
+      );
+      const canonicalizeSubscription = dispatcher.onCanonicalizeRequest(
+        () => new InboundMessage.CanonicalizeResponse()
+      );
+      const functionCallSubscription = dispatcher.onFunctionCallRequest(
+        () => new InboundMessage.FunctionCallResponse()
+      );
+
+      outbound$.error('');
+      expect(
+        importSubscription.closed &&
+          fileImportSubscription.closed &&
+          canonicalizeSubscription.closed &&
+          functionCallSubscription.closed
+      ).toBe(true);
     });
   });
 });

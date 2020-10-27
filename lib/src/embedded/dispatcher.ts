@@ -25,20 +25,22 @@ type PromiseOr<T> = T | Promise<T>;
 /**
  * Dispatches requests, responses, and events.
  *
- * Consumers can send an inbound request. This returns a promise that resolves
- * with the corresponding outbound response, or errors if any Protocol Errors
- * were encountered.
+ * Consumers can send an inbound request. This returns a promise that will
+ * either resolve with the corresponding outbound response, or error if any
+ * Protocol Errors were encountered.
  *
- * Consumers can also register callbacks for processing different types of
- * outbound requests. When an outbound request arrives, this runs the
- * appropriate callback to process it, then sends the result inbound. Errors
- * are not thrown to outbound request listeners; outbound request streams die
- * quietly.
+ * Consumers can register callbacks for processing different types of outbound
+ * requests. When an outbound request arrives, this runs the appropriate
+ * registered callback to process it, then sends the result inbound. After
+ * registering a callback, consumers receive a subscription to an Observable
+ * that emits each request. If any Protocol Errors are encountered, these
+ * subscriptions close quietly, and the error is not thrown to the consumer.
  *
  * Requests and responses do not need to have their ID set, since the dispatcher
  * handles setting the ID on all messages.
  *
- * Detects ProtocolErrors caused by mismatched requests and responses.
+ * Errors are exposed as an Observable that consumers may choose to subscribe
+ * to. Subscribers must perform proper error handling.
  */
 export class Dispatcher {
   // Tracks the IDs of all inbound requests. An outbound response with matching
@@ -55,12 +57,12 @@ export class Dispatcher {
 
   // If the dispatcher encounters an error, this errors out. It is publicly
   // exposed as a readonly Observable.
-  private readonly errorInternal$ = new Subject<void>();
+  private readonly errorInternal$ = new Subject<Error>();
 
   /**
    * If the dispatcher encounters an error, this errors out. Upon error, the
    * dispatcher rejects all promises awaiting an outbound response, and silently
-   * closes all Observables awaiting outbound requests and events.
+   * closes all subscriptions awaiting outbound requests and events.
    */
   readonly error$ = this.errorInternal$.pipe();
 
@@ -81,10 +83,7 @@ export class Dispatcher {
       .pipe(tap(message => this.registerOutboundMessage(message)))
       .subscribe(
         message => this.messages$.next(message),
-        error => {
-          this.messages$.complete();
-          this.errorInternal$.error(error);
-        },
+        error => this.throwAndClose(error),
         () => {
           this.messages$.complete();
           this.errorInternal$.complete();
@@ -171,6 +170,13 @@ export class Dispatcher {
     );
   }
 
+  // Rejects with `error` all promises awaiting an outbound response, and
+  // silently closes all subscriptions awaiting outbound requests and events.
+  private throwAndClose(error: Error) {
+    this.errorInternal$.error(error);
+    this.messages$.complete();
+  }
+
   // Sends a `request` of type `requestType` inbound. Returns a promise that
   // resolves with an outbound response of type `responseType` answers the
   // request, or errors if any errors were encountered.
@@ -193,8 +199,12 @@ export class Dispatcher {
         error => reject(error)
       );
 
-      request.setId(this.pendingInboundRequests.nextId);
-      this.sendInboundMessage(request, requestType);
+      try {
+        request.setId(this.pendingInboundRequests.nextId);
+        this.sendInboundMessage(request, requestType);
+      } catch (error) {
+        this.throwAndClose(error);
+      }
     });
   }
 
@@ -221,8 +231,7 @@ export class Dispatcher {
           response.setId(request.getId());
           this.sendInboundMessage(response, responseType);
         } catch (error) {
-          this.errorInternal$.error(error);
-          this.messages$.complete();
+          this.throwAndClose(error);
         }
       });
   }

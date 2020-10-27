@@ -57,7 +57,7 @@ export class Dispatcher {
 
   // If the dispatcher encounters an error, this errors out. It is publicly
   // exposed as a readonly Observable.
-  private readonly errorInternal$ = new Subject<Error>();
+  private readonly errorInternal$ = new Subject<void>();
 
   /**
    * If the dispatcher encounters an error, this errors out. Upon error, the

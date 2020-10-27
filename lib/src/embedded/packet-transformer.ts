@@ -3,6 +3,7 @@
 // https://opensource.org/licenses/MIT.
 
 import {Observable, Subject} from 'rxjs';
+import {tap} from 'rxjs/operators';
 
 /**
  * Decodes arbitrarily-chunked buffers, for example
@@ -22,9 +23,6 @@ export class PacketTransformer {
   // The packet that is actively being decoded as buffers come in.
   private packet = new Packet();
 
-  // Collects all errors that we might encounter.
-  private readonly error$ = new Subject<Error>();
-
   // The decoded protobufs are written to this Subject. It is publicly exposed
   // as a readonly Observable.
   private readonly outboundProtobufsInternal$ = new Subject<Buffer>();
@@ -39,25 +37,11 @@ export class PacketTransformer {
     private readonly outboundBuffers$: Observable<Buffer>,
     private readonly writeInboundBuffer: (buffer: Buffer) => void
   ) {
-    this.outboundBuffers$.subscribe(
-      buffer => {
-        try {
-          this.decode(buffer);
-        } catch (error) {
-          this.error$.next(error);
-        }
-      },
-      error => this.error$.next(error),
-      () => {
-        this.outboundProtobufsInternal$.complete();
-        this.error$.complete();
-      }
+    this.outboundBuffers$.pipe(tap(buffer => this.decode(buffer))).subscribe(
+      () => {},
+      error => this.outboundProtobufsInternal$.error(error),
+      () => this.outboundProtobufsInternal$.complete()
     );
-
-    this.error$.subscribe(error => {
-      this.outboundProtobufsInternal$.error(error);
-      process.nextTick(() => this.error$.complete());
-    });
   }
 
   /**
@@ -71,7 +55,7 @@ export class PacketTransformer {
       packet.set(protobuf, Packet.headerByteSize);
       this.writeInboundBuffer(packet);
     } catch (error) {
-      this.error$.next(error);
+      this.outboundProtobufsInternal$.error(error);
     }
   }
 

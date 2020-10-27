@@ -3,7 +3,7 @@
 // https://opensource.org/licenses/MIT.
 
 import {Observable, Subject, Subscription} from 'rxjs';
-import {filter, map} from 'rxjs/operators';
+import {filter, map, tap} from 'rxjs/operators';
 
 import {InboundMessage, OutboundMessage} from '../vendor/embedded_sass_pb';
 import {
@@ -53,11 +53,21 @@ export class Dispatcher {
   // this completes.
   private readonly messages$ = new Subject<OutboundTypedMessage>();
 
-  // Collects all errors that we might encounter. An emitted error shuts down
-  // all promises awaiting an outbound response.
-  private readonly error$ = new Subject<Error>();
+  // If the dispatcher encounters an error, this errors out. It is publicly
+  // exposed as a readonly Observable.
+  private readonly errorInternal$ = new Subject<void>();
 
-  /** All outbound log events. */
+  /**
+   * If the dispatcher encounters an error, this errors out. Upon error, the
+   * dispatcher rejects all promises awaiting an outbound response, and silently
+   * closes all Observables awaiting outbound requests and events.
+   */
+  readonly error$ = this.errorInternal$.pipe();
+
+  /**
+   * Outbound log events. If an error occurs, the dispatcher closes this
+   * silently.
+   */
   readonly logEvents$ = this.messages$.pipe(
     filter(message => message.type === OutboundMessage.MessageCase.LOGEVENT),
     map(message => message.payload as OutboundMessage.LogEvent)
@@ -67,26 +77,19 @@ export class Dispatcher {
     private readonly outboundMessages$: Observable<OutboundTypedMessage>,
     private readonly writeInboundMessage: (message: InboundTypedMessage) => void
   ) {
-    this.outboundMessages$.subscribe(
-      message => {
-        try {
-          this.registerOutboundMessage(message);
-          this.messages$.next(message);
-        } catch (error) {
-          this.error$.next(error);
+    this.outboundMessages$
+      .pipe(tap(message => this.registerOutboundMessage(message)))
+      .subscribe(
+        message => this.messages$.next(message),
+        error => {
+          this.messages$.complete();
+          this.errorInternal$.error(error);
+        },
+        () => {
+          this.messages$.complete();
+          this.errorInternal$.complete();
         }
-      },
-      error => this.error$.next(error),
-      () => {
-        this.messages$.complete();
-        this.error$.complete();
-      }
-    );
-
-    this.error$.subscribe(() => {
-      this.messages$.complete();
-      process.nextTick(() => this.error$.complete());
-    });
+      );
   }
 
   /**
@@ -176,11 +179,6 @@ export class Dispatcher {
     requestType: InboundRequestType,
     responseType: OutboundResponseType
   ): Promise<OutboundResponse> {
-    request.setId(this.pendingInboundRequests.nextId);
-    // Avoid the race condition in which the response arrives before we even
-    // start listening for it.
-    process.nextTick(() => this.sendInboundMessage(request, requestType));
-
     return new Promise((resolve, reject) => {
       this.messages$
         .pipe(
@@ -190,7 +188,13 @@ export class Dispatcher {
         )
         .subscribe(response => resolve(response));
 
-      this.error$.subscribe(error => reject(error));
+      this.error$.subscribe(
+        () => {},
+        error => reject(error)
+      );
+
+      request.setId(this.pendingInboundRequests.nextId);
+      this.sendInboundMessage(request, requestType);
     });
   }
 
@@ -217,7 +221,8 @@ export class Dispatcher {
           response.setId(request.getId());
           this.sendInboundMessage(response, responseType);
         } catch (error) {
-          this.error$.next(error);
+          this.errorInternal$.error(error);
+          this.messages$.complete();
         }
       });
   }
@@ -239,6 +244,8 @@ export class Dispatcher {
       type === InboundMessage.MessageCase.FUNCTIONCALLRESPONSE
     ) {
       this.pendingOutboundRequests.resolve(payload.getId(), type);
+    } else {
+      throw Error(`Unknown message type ${type}`);
     }
 
     this.writeInboundMessage({
@@ -251,6 +258,8 @@ export class Dispatcher {
   // pendingOutboundRequests.
   private registerOutboundMessage(message: OutboundTypedMessage): void {
     switch (message.type) {
+      case OutboundMessage.MessageCase.LOGEVENT:
+        break;
       case OutboundMessage.MessageCase.COMPILERESPONSE:
         this.pendingInboundRequests.resolve(
           (message.payload as OutboundResponse).getId(),
@@ -281,6 +290,8 @@ export class Dispatcher {
           InboundMessage.MessageCase.FUNCTIONCALLRESPONSE
         );
         break;
+      default:
+        throw Error(`Unknown message type ${message.type}`);
     }
   }
 }

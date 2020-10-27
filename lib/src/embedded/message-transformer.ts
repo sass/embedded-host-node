@@ -3,6 +3,7 @@
 // https://opensource.org/licenses/MIT.
 
 import {Observable, Subject} from 'rxjs';
+import {map} from 'rxjs/operators';
 
 import {InboundMessage, OutboundMessage} from '../vendor/embedded_sass_pb';
 
@@ -64,9 +65,6 @@ export type OutboundTypedMessage = {
  * with.
  */
 export class MessageTransformer {
-  // Collects all errors that we might encounter.
-  private readonly error$ = new Subject<Error>();
-
   // The decoded messages are written to this Subject. It is publicly exposed
   // as a readonly Observable.
   private readonly outboundMessagesInternal$ = new Subject<
@@ -83,25 +81,11 @@ export class MessageTransformer {
     private readonly outboundProtobufs$: Observable<Buffer>,
     private readonly writeInboundProtobuf: (buffer: Buffer) => void
   ) {
-    this.outboundProtobufs$.subscribe(
-      buffer => {
-        try {
-          this.outboundMessagesInternal$.next(decode(buffer));
-        } catch (error) {
-          this.error$.next(error);
-        }
-      },
-      error => this.error$.next(error),
-      () => {
-        this.outboundMessagesInternal$.complete();
-        this.error$.complete();
-      }
+    this.outboundProtobufs$.pipe(map(buffer => decode(buffer))).subscribe(
+      buffer => this.outboundMessagesInternal$.next(buffer),
+      error => this.outboundMessagesInternal$.error(error),
+      () => this.outboundMessagesInternal$.complete()
     );
-
-    this.error$.subscribe(error => {
-      this.outboundMessagesInternal$.error(error);
-      process.nextTick(() => this.error$.complete());
-    });
   }
 
   /**
@@ -111,7 +95,7 @@ export class MessageTransformer {
     try {
       this.writeInboundProtobuf(encode(message));
     } catch (error) {
-      this.error$.next(error);
+      this.outboundMessagesInternal$.error(error);
     }
   }
 }

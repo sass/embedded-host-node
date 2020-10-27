@@ -11,8 +11,18 @@ import {
   ProtocolError,
 } from '../vendor/embedded_sass_pb';
 
-describe('message messages', () => {
+describe('message transformer', () => {
   let messages: MessageTransformer;
+
+  function validInboundMessage(source: string): InboundMessage {
+    const input = new InboundMessage.CompileRequest.StringInput();
+    input.setSource(source);
+    const request = new InboundMessage.CompileRequest();
+    request.setString(input);
+    const message = new InboundMessage();
+    message.setCompilerequest(request);
+    return message;
+  }
 
   describe('encode', () => {
     let encodedProtobufs: Buffer[];
@@ -26,10 +36,12 @@ describe('message messages', () => {
 
     it('encodes an InboundMessage to buffer', () => {
       const message = validInboundMessage('a {b: c}');
+
       messages.writeInboundMessage({
         payload: message.getCompilerequest()!,
         type: InboundMessage.MessageCase.COMPILEREQUEST,
       });
+
       expect(encodedProtobufs).toEqual([
         Buffer.from(message.serializeBinary()),
       ]);
@@ -48,6 +60,7 @@ describe('message messages', () => {
 
     it('decodes buffer to OutboundMessage', async done => {
       const message = validInboundMessage('a {b: c}');
+
       messages.outboundMessages$.subscribe(
         message => decodedMessages.push(message),
         () => {},
@@ -61,6 +74,7 @@ describe('message messages', () => {
           done();
         }
       );
+
       protobufs$.next(Buffer.from(message.serializeBinary()));
       protobufs$.complete();
     });
@@ -76,6 +90,7 @@ describe('message messages', () => {
             done();
           }
         );
+
         protobufs$.next(Buffer.from([-1]));
       });
 
@@ -89,6 +104,7 @@ describe('message messages', () => {
             done();
           }
         );
+
         protobufs$.next(Buffer.from(new OutboundMessage().serializeBinary()));
       });
 
@@ -96,6 +112,7 @@ describe('message messages', () => {
         const response = new OutboundMessage.CompileResponse();
         const message = new OutboundMessage();
         message.setCompileresponse(response);
+
         messages.outboundMessages$.subscribe(
           () => fail('expected error'),
           error => {
@@ -105,6 +122,7 @@ describe('message messages', () => {
             done();
           }
         );
+
         protobufs$.next(Buffer.from(message.serializeBinary()));
       });
 
@@ -112,6 +130,7 @@ describe('message messages', () => {
         const request = new OutboundMessage.FunctionCallRequest();
         const message = new OutboundMessage();
         message.setFunctioncallrequest(request);
+
         messages.outboundMessages$.subscribe(
           () => fail('expected error'),
           error => {
@@ -121,6 +140,7 @@ describe('message messages', () => {
             done();
           }
         );
+
         protobufs$.next(Buffer.from(message.serializeBinary()));
       });
 
@@ -130,6 +150,7 @@ describe('message messages', () => {
         error.setMessage(errorMessage);
         const message = new OutboundMessage();
         message.setError(error);
+
         messages.outboundMessages$.subscribe(
           () => fail('expected error'),
           error => {
@@ -139,18 +160,9 @@ describe('message messages', () => {
             done();
           }
         );
+
         protobufs$.next(Buffer.from(message.serializeBinary()));
       });
     });
   });
 });
-
-function validInboundMessage(source: string): InboundMessage {
-  const input = new InboundMessage.CompileRequest.StringInput();
-  input.setSource(source);
-  const request = new InboundMessage.CompileRequest();
-  request.setString(input);
-  const message = new InboundMessage();
-  message.setCompilerequest(request);
-  return message;
-}

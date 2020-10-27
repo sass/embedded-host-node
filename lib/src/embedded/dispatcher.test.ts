@@ -204,13 +204,15 @@ describe('dispatcher', () => {
       dispatcher = new Dispatcher(outbound$, () => {});
     });
 
-    it('throws if a request ID overlaps with that of an in-flight request', () => {
+    it('throws if a request ID overlaps with that of an in-flight request', async done => {
       dispatcher.error$.subscribe(
         () => fail('expected error'),
-        error =>
+        error => {
           expect(error.message).toBe(
             'Request ID 0 is already in use by an in-flight request.'
-          )
+          );
+          done();
+        }
       );
 
       const request = new OutboundMessage.ImportRequest();
@@ -224,13 +226,15 @@ describe('dispatcher', () => {
       });
     });
 
-    it('throws if a response ID does not match any in-flight request IDs', () => {
+    it('throws if a response ID does not match any in-flight request IDs', async done => {
       dispatcher.error$.subscribe(
         () => fail('expected error'),
-        error =>
+        error => {
           expect(error.message).toBe(
             'Response ID 1 does not match any pending requests.'
-          )
+          );
+          done();
+        }
       );
 
       const response = new OutboundMessage.CompileResponse();
@@ -241,13 +245,13 @@ describe('dispatcher', () => {
       });
     });
 
-    it('throws error to compile request senders', async done => {
-      dispatcher
-        .sendCompileRequest(new InboundMessage.CompileRequest())
-        .then(() => fail('expected error'))
-        .catch(() => done());
+    it('throws error to compile request senders', async () => {
+      const error = 'fail';
+      outbound$.error(error);
 
-      outbound$.error('');
+      await expectAsync(
+        dispatcher.sendCompileRequest(new InboundMessage.CompileRequest())
+      ).toBeRejectedWith(error);
     });
 
     it('cleans up log event subscriptions upon error', async done => {
@@ -260,7 +264,7 @@ describe('dispatcher', () => {
       outbound$.error('');
     });
 
-    it('cleans up all request subscriptions upon error', () => {
+    it('cleans up all request subscriptions upon error', async done => {
       const importSubscription = dispatcher.onImportRequest(
         () => new InboundMessage.ImportResponse()
       );
@@ -274,13 +278,20 @@ describe('dispatcher', () => {
         () => new InboundMessage.FunctionCallResponse()
       );
 
+      dispatcher.error$.subscribe(
+        () => fail('expected error'),
+        () => {
+          expect(
+            importSubscription.closed &&
+              fileImportSubscription.closed &&
+              canonicalizeSubscription.closed &&
+              functionCallSubscription.closed
+          ).toBe(true);
+          done();
+        }
+      );
+
       outbound$.error('');
-      expect(
-        importSubscription.closed &&
-          fileImportSubscription.closed &&
-          canonicalizeSubscription.closed &&
-          functionCallSubscription.closed
-      ).toBe(true);
     });
   });
 });

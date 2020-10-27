@@ -19,27 +19,31 @@ describe('packet transformer', () => {
       );
     });
 
-    it('encodes an empty message', async () => {
+    it('encodes an empty message', () => {
       packets.writeInboundProtobuf(Buffer.from([]));
+
       expect(encodedBuffers).toEqual([Buffer.from([0, 0, 0, 0])]);
     });
 
-    it('encodes a message of length 1', async () => {
+    it('encodes a message of length 1', () => {
       packets.writeInboundProtobuf(Buffer.from([123]));
+
       expect(encodedBuffers).toEqual([Buffer.from([1, 0, 0, 0, 123])]);
     });
 
-    it('encodes a message of length greater than 256', async () => {
+    it('encodes a message of length greater than 256', () => {
       packets.writeInboundProtobuf(Buffer.alloc(300, 1));
+
       expect(encodedBuffers).toEqual([
         Buffer.from([44, 1, 0, 0, ...new Array(300).fill(1)]),
       ]);
     });
 
-    it('encodes multiple messages', async () => {
+    it('encodes multiple messages', () => {
       packets.writeInboundProtobuf(Buffer.from([10]));
       packets.writeInboundProtobuf(Buffer.from([20, 30]));
       packets.writeInboundProtobuf(Buffer.from([40, 50, 60]));
+
       expect(encodedBuffers).toEqual([
         Buffer.from([1, 0, 0, 0, 10]),
         Buffer.from([2, 0, 0, 0, 20, 30]),
@@ -68,6 +72,7 @@ describe('packet transformer', () => {
             done();
           }
         );
+
         rawBuffers$.next(Buffer.from([0, 0, 0, 0]));
         rawBuffers$.complete();
       });
@@ -81,6 +86,7 @@ describe('packet transformer', () => {
             done();
           }
         );
+
         rawBuffers$.next(Buffer.from([0, 0]));
         rawBuffers$.next(Buffer.from([0, 0]));
         rawBuffers$.complete();
@@ -95,6 +101,7 @@ describe('packet transformer', () => {
             done();
           }
         );
+
         rawBuffers$.next(Buffer.from([0]));
         rawBuffers$.next(Buffer.from([0]));
         rawBuffers$.next(Buffer.from([0]));
@@ -114,6 +121,7 @@ describe('packet transformer', () => {
             done();
           }
         );
+
         rawBuffers$.next(Buffer.from([0, 0, 0, 0, 1, 0, 0, 0, 100]));
         rawBuffers$.complete();
       });
@@ -129,6 +137,7 @@ describe('packet transformer', () => {
             done();
           }
         );
+
         rawBuffers$.next(Buffer.from([4, 0, 0, 0, 1, 2, 3, 4]));
         rawBuffers$.complete();
       });
@@ -142,6 +151,7 @@ describe('packet transformer', () => {
             done();
           }
         );
+
         rawBuffers$.next(Buffer.from([4, 0]));
         rawBuffers$.next(Buffer.from([0, 0, 1, 2]));
         rawBuffers$.next(Buffer.from([3, 4]));
@@ -157,6 +167,7 @@ describe('packet transformer', () => {
             done();
           }
         );
+
         for (const byte of [4, 0, 0, 0, 1, 2, 3, 4]) {
           rawBuffers$.next(Buffer.from([byte]));
         }
@@ -172,6 +183,7 @@ describe('packet transformer', () => {
             done();
           }
         );
+
         rawBuffers$.next(Buffer.from([4, 0, 0, 0, 1, 2, 3, 4, 1, 0, 0, 0]));
         rawBuffers$.complete();
       });
@@ -187,6 +199,7 @@ describe('packet transformer', () => {
             done();
           }
         );
+
         rawBuffers$.next(Buffer.from([44, 1, 0, 0, ...new Array(300).fill(1)]));
         rawBuffers$.complete();
       });
@@ -205,6 +218,7 @@ describe('packet transformer', () => {
             done();
           }
         );
+
         rawBuffers$.next(
           Buffer.from([4, 0, 0, 0, 1, 2, 3, 4, 2, 0, 0, 0, 101, 102])
         );
@@ -223,6 +237,7 @@ describe('packet transformer', () => {
             done();
           }
         );
+
         rawBuffers$.next(Buffer.from([4, 0]));
         rawBuffers$.next(Buffer.from([0, 0, 1, 2, 3, 4, 2, 0]));
         rawBuffers$.next(Buffer.from([0, 0, 101, 102]));
@@ -241,6 +256,7 @@ describe('packet transformer', () => {
             done();
           }
         );
+
         for (const byte of [4, 0, 0, 0, 1, 2, 3, 4, 2, 0, 0, 0, 101, 102]) {
           rawBuffers$.next(Buffer.from([byte]));
         }

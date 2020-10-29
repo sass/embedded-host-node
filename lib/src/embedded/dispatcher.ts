@@ -192,12 +192,9 @@ export class Dispatcher {
           map(message => message.payload as OutboundResponse),
           filter(response => response.getId() === request.getId())
         )
-        .subscribe(response => resolve(response));
+        .subscribe({next: resolve});
 
-      this.error$.subscribe(
-        () => {},
-        error => reject(error)
-      );
+      this.error$.subscribe({error: reject});
 
       try {
         request.setId(this.pendingInboundRequests.nextId);

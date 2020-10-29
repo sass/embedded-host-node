@@ -81,11 +81,9 @@ export class MessageTransformer {
     private readonly outboundProtobufs$: Observable<Buffer>,
     private readonly writeInboundProtobuf: (buffer: Buffer) => void
   ) {
-    this.outboundProtobufs$.pipe(map(buffer => decode(buffer))).subscribe(
-      buffer => this.outboundMessagesInternal$.next(buffer),
-      error => this.outboundMessagesInternal$.error(error),
-      () => this.outboundMessagesInternal$.complete()
-    );
+    this.outboundProtobufs$
+      .pipe(map(decode))
+      .subscribe(this.outboundMessagesInternal$);
   }
 
   /**

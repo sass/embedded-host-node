@@ -3,7 +3,7 @@
 // https://opensource.org/licenses/MIT.
 
 import {Observable, Subject} from 'rxjs';
-import {tap} from 'rxjs/operators';
+import {mergeMap} from 'rxjs/operators';
 
 /**
  * Decodes arbitrarily-chunked buffers, for example
@@ -37,11 +37,9 @@ export class PacketTransformer {
     private readonly outboundBuffers$: Observable<Buffer>,
     private readonly writeInboundBuffer: (buffer: Buffer) => void
   ) {
-    this.outboundBuffers$.pipe(tap(buffer => this.decode(buffer))).subscribe(
-      () => {},
-      error => this.outboundProtobufsInternal$.error(error),
-      () => this.outboundProtobufsInternal$.complete()
-    );
+    this.outboundBuffers$
+      .pipe(mergeMap(buffer => this.decode(buffer)))
+      .subscribe(this.outboundProtobufsInternal$);
   }
 
   /**
@@ -60,16 +58,18 @@ export class PacketTransformer {
   }
 
   // Decodes a buffer, filling up the packet that is actively being decoded.
-  // When the packet is complete, emits it to outboundProtobufsInternal$.
-  private decode(buffer: Buffer): void {
+  // Returns a list of decoded payloads.
+  private decode(buffer: Buffer): Buffer[] {
+    const payloads: Buffer[] = [];
     let decodedBytes = 0;
     while (decodedBytes < buffer.length) {
       decodedBytes += this.packet.write(buffer.slice(decodedBytes));
       if (this.packet.isComplete) {
-        this.outboundProtobufsInternal$.next(this.packet.payload);
+        payloads.push(this.packet.payload!);
         this.packet = new Packet();
       }
     }
+    return payloads;
   }
 }
 

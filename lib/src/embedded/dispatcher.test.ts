@@ -4,6 +4,7 @@
 
 import {Subject} from 'rxjs';
 
+import {expectError} from '../../../spec/helpers/utils';
 import {InboundMessage, OutboundMessage} from '../vendor/embedded_sass_pb';
 import {Dispatcher} from './dispatcher';
 import {OutboundTypedMessage} from './message-transformer';
@@ -205,14 +206,10 @@ describe('dispatcher', () => {
     });
 
     it('throws if a request ID overlaps with that of an in-flight request', async done => {
-      dispatcher.error$.subscribe(
-        () => fail('expected error'),
-        error => {
-          expect(error.message).toBe(
-            'Request ID 0 is already in use by an in-flight request.'
-          );
-          done();
-        }
+      expectError(
+        dispatcher.error$,
+        'Request ID 0 is already in use by an in-flight request.',
+        done
       );
 
       const request = new OutboundMessage.ImportRequest();
@@ -227,14 +224,10 @@ describe('dispatcher', () => {
     });
 
     it('throws if a response ID does not match any in-flight request IDs', async done => {
-      dispatcher.error$.subscribe(
-        () => fail('expected error'),
-        error => {
-          expect(error.message).toBe(
-            'Response ID 1 does not match any pending requests.'
-          );
-          done();
-        }
+      expectError(
+        dispatcher.error$,
+        'Response ID 1 does not match any pending requests.',
+        done
       );
 
       const response = new OutboundMessage.CompileResponse();

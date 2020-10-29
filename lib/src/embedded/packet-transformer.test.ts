@@ -54,38 +54,34 @@ describe('packet transformer', () => {
 
   describe('decode', () => {
     let rawBuffers$: Subject<Buffer>;
-    let decodedProtobufs: Buffer[];
+
+    function expectDecoding(expected: Buffer[], done: () => void) {
+      const actual: Buffer[] = [];
+      packets.outboundProtobufs$.subscribe(
+        protobuf => actual.push(protobuf),
+        () => fail('expected correct decoding'),
+        () => {
+          expect(actual).toEqual(expected);
+          done();
+        }
+      );
+    }
 
     beforeEach(() => {
       rawBuffers$ = new Subject();
       packets = new PacketTransformer(rawBuffers$, () => {});
-      decodedProtobufs = [];
     });
 
     describe('empty message', () => {
       it('decodes a single chunk', async done => {
-        packets.outboundProtobufs$.subscribe(
-          protobuf => decodedProtobufs.push(protobuf),
-          () => {},
-          () => {
-            expect(decodedProtobufs).toEqual([Buffer.from([])]);
-            done();
-          }
-        );
+        expectDecoding([Buffer.from([])], done);
 
         rawBuffers$.next(Buffer.from([0, 0, 0, 0]));
         rawBuffers$.complete();
       });
 
       it('decodes multiple chunks', async done => {
-        packets.outboundProtobufs$.subscribe(
-          protobuf => decodedProtobufs.push(protobuf),
-          () => {},
-          () => {
-            expect(decodedProtobufs).toEqual([Buffer.from([])]);
-            done();
-          }
-        );
+        expectDecoding([Buffer.from([])], done);
 
         rawBuffers$.next(Buffer.from([0, 0]));
         rawBuffers$.next(Buffer.from([0, 0]));
@@ -93,14 +89,7 @@ describe('packet transformer', () => {
       });
 
       it('decodes one chunk per byte', async done => {
-        packets.outboundProtobufs$.subscribe(
-          protobuf => decodedProtobufs.push(protobuf),
-          () => {},
-          () => {
-            expect(decodedProtobufs).toEqual([Buffer.from([])]);
-            done();
-          }
-        );
+        expectDecoding([Buffer.from([])], done);
 
         rawBuffers$.next(Buffer.from([0]));
         rawBuffers$.next(Buffer.from([0]));
@@ -110,17 +99,7 @@ describe('packet transformer', () => {
       });
 
       it('decodes a chunk that contains more data', async done => {
-        packets.outboundProtobufs$.subscribe(
-          protobuf => decodedProtobufs.push(protobuf),
-          () => {},
-          () => {
-            expect(decodedProtobufs).toEqual([
-              Buffer.from([]),
-              Buffer.from([100]),
-            ]);
-            done();
-          }
-        );
+        expectDecoding([Buffer.from([]), Buffer.from([100])], done);
 
         rawBuffers$.next(Buffer.from([0, 0, 0, 0, 1, 0, 0, 0, 100]));
         rawBuffers$.complete();
@@ -129,28 +108,14 @@ describe('packet transformer', () => {
 
     describe('longer message', () => {
       it('decodes a single chunk', async done => {
-        packets.outboundProtobufs$.subscribe(
-          protobuf => decodedProtobufs.push(protobuf),
-          () => {},
-          () => {
-            expect(decodedProtobufs).toEqual([Buffer.from([1, 2, 3, 4])]);
-            done();
-          }
-        );
+        expectDecoding([Buffer.from(Buffer.from([1, 2, 3, 4]))], done);
 
         rawBuffers$.next(Buffer.from([4, 0, 0, 0, 1, 2, 3, 4]));
         rawBuffers$.complete();
       });
 
       it('decodes multiple chunks', async done => {
-        packets.outboundProtobufs$.subscribe(
-          protobuf => decodedProtobufs.push(protobuf),
-          () => {},
-          () => {
-            expect(decodedProtobufs).toEqual([Buffer.from([1, 2, 3, 4])]);
-            done();
-          }
-        );
+        expectDecoding([Buffer.from([1, 2, 3, 4])], done);
 
         rawBuffers$.next(Buffer.from([4, 0]));
         rawBuffers$.next(Buffer.from([0, 0, 1, 2]));
@@ -159,14 +124,7 @@ describe('packet transformer', () => {
       });
 
       it('decodes one chunk per byte', async done => {
-        packets.outboundProtobufs$.subscribe(
-          protobuf => decodedProtobufs.push(protobuf),
-          () => {},
-          () => {
-            expect(decodedProtobufs).toEqual([Buffer.from([1, 2, 3, 4])]);
-            done();
-          }
-        );
+        expectDecoding([Buffer.from([1, 2, 3, 4])], done);
 
         for (const byte of [4, 0, 0, 0, 1, 2, 3, 4]) {
           rawBuffers$.next(Buffer.from([byte]));
@@ -175,30 +133,14 @@ describe('packet transformer', () => {
       });
 
       it('decodes a chunk that contains more data', async done => {
-        packets.outboundProtobufs$.subscribe(
-          protobuf => decodedProtobufs.push(protobuf),
-          () => {},
-          () => {
-            expect(decodedProtobufs).toEqual([Buffer.from([1, 2, 3, 4])]);
-            done();
-          }
-        );
+        expectDecoding([Buffer.from([1, 2, 3, 4])], done);
 
         rawBuffers$.next(Buffer.from([4, 0, 0, 0, 1, 2, 3, 4, 1, 0, 0, 0]));
         rawBuffers$.complete();
       });
 
       it('decodes a chunk of length greater than 256', async done => {
-        packets.outboundProtobufs$.subscribe(
-          protobuf => decodedProtobufs.push(protobuf),
-          () => {},
-          () => {
-            expect(decodedProtobufs).toEqual([
-              Buffer.from(new Array(300).fill(1)),
-            ]);
-            done();
-          }
-        );
+        expectDecoding([Buffer.from(new Array(300).fill(1))], done);
 
         rawBuffers$.next(Buffer.from([44, 1, 0, 0, ...new Array(300).fill(1)]));
         rawBuffers$.complete();
@@ -207,16 +149,9 @@ describe('packet transformer', () => {
 
     describe('multiple messages', () => {
       it('decodes a single chunk', async done => {
-        packets.outboundProtobufs$.subscribe(
-          protobuf => decodedProtobufs.push(protobuf),
-          () => {},
-          () => {
-            expect(decodedProtobufs).toEqual([
-              Buffer.from([1, 2, 3, 4]),
-              Buffer.from([101, 102]),
-            ]);
-            done();
-          }
+        expectDecoding(
+          [Buffer.from([1, 2, 3, 4]), Buffer.from([101, 102])],
+          done
         );
 
         rawBuffers$.next(
@@ -226,16 +161,9 @@ describe('packet transformer', () => {
       });
 
       it('decodes multiple chunks', async done => {
-        packets.outboundProtobufs$.subscribe(
-          protobuf => decodedProtobufs.push(protobuf),
-          () => {},
-          () => {
-            expect(decodedProtobufs).toEqual([
-              Buffer.from([1, 2, 3, 4]),
-              Buffer.from([101, 102]),
-            ]);
-            done();
-          }
+        expectDecoding(
+          [Buffer.from([1, 2, 3, 4]), Buffer.from([101, 102])],
+          done
         );
 
         rawBuffers$.next(Buffer.from([4, 0]));
@@ -245,16 +173,9 @@ describe('packet transformer', () => {
       });
 
       it('decodes one chunk per byte', async done => {
-        packets.outboundProtobufs$.subscribe(
-          protobuf => decodedProtobufs.push(protobuf),
-          () => {},
-          () => {
-            expect(decodedProtobufs).toEqual([
-              Buffer.from([1, 2, 3, 4]),
-              Buffer.from([101, 102]),
-            ]);
-            done();
-          }
+        expectDecoding(
+          [Buffer.from([1, 2, 3, 4]), Buffer.from([101, 102])],
+          done
         );
 
         for (const byte of [4, 0, 0, 0, 1, 2, 3, 4, 2, 0, 0, 0, 101, 102]) {

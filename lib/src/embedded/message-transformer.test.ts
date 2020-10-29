@@ -4,6 +4,7 @@
 
 import {Subject, Observable} from 'rxjs';
 
+import {expectError} from '../../../spec/helpers/utils';
 import {MessageTransformer, OutboundTypedMessage} from './message-transformer';
 import {
   InboundMessage,
@@ -81,86 +82,63 @@ describe('message transformer', () => {
 
     describe('protocol error', () => {
       it('fails on invalid buffer', async done => {
-        messages.outboundMessages$.subscribe(
-          () => fail('expected error'),
-          error => {
-            expect(error.message).toEqual(
-              'Compiler caused error: Invalid buffer.'
-            );
-            done();
-          }
+        expectError(
+          messages.outboundMessages$,
+          'Compiler caused error: Invalid buffer.',
+          done
         );
 
         protobufs$.next(Buffer.from([-1]));
       });
 
       it('fails on empty message', async done => {
-        messages.outboundMessages$.subscribe(
-          () => fail('expected error'),
-          error => {
-            expect(error.message).toEqual(
-              'Compiler caused error: OutboundMessage.message is not set.'
-            );
-            done();
-          }
+        expectError(
+          messages.outboundMessages$,
+          'Compiler caused error: OutboundMessage.message is not set.',
+          done
         );
 
         protobufs$.next(Buffer.from(new OutboundMessage().serializeBinary()));
       });
 
       it('fails on compile response with missing result', async done => {
+        expectError(
+          messages.outboundMessages$,
+          'Compiler caused error: OutboundMessage.CompileResponse.result is not set.',
+          done
+        );
+
         const response = new OutboundMessage.CompileResponse();
         const message = new OutboundMessage();
         message.setCompileresponse(response);
-
-        messages.outboundMessages$.subscribe(
-          () => fail('expected error'),
-          error => {
-            expect(error.message).toEqual(
-              'Compiler caused error: OutboundMessage.CompileResponse.result is not set.'
-            );
-            done();
-          }
-        );
-
         protobufs$.next(Buffer.from(message.serializeBinary()));
       });
 
       it('fails on function call request with missing identifier', async done => {
+        expectError(
+          messages.outboundMessages$,
+          'Compiler caused error: OutboundMessage.FunctionCallRequest.identifier is not set.',
+          done
+        );
+
         const request = new OutboundMessage.FunctionCallRequest();
         const message = new OutboundMessage();
         message.setFunctioncallrequest(request);
-
-        messages.outboundMessages$.subscribe(
-          () => fail('expected error'),
-          error => {
-            expect(error.message).toEqual(
-              'Compiler caused error: OutboundMessage.FunctionCallRequest.identifier is not set.'
-            );
-            done();
-          }
-        );
-
         protobufs$.next(Buffer.from(message.serializeBinary()));
       });
 
       it('fails if message contains a protocol error', async done => {
         const errorMessage = 'sad';
+        expectError(
+          messages.outboundMessages$,
+          `Compiler reported error: ${errorMessage}.`,
+          done
+        );
+
         const error = new ProtocolError();
         error.setMessage(errorMessage);
         const message = new OutboundMessage();
         message.setError(error);
-
-        messages.outboundMessages$.subscribe(
-          () => fail('expected error'),
-          error => {
-            expect(error.message).toEqual(
-              `Compiler reported error: ${errorMessage}.`
-            );
-            done();
-          }
-        );
-
         protobufs$.next(Buffer.from(message.serializeBinary()));
       });
     });

@@ -155,7 +155,7 @@ describe('message transformer', () => {
           () => fail('expected error'),
           error => {
             expect(error.message).toEqual(
-              `Compiler reported error: ${errorMessage}`
+              `Compiler reported error: ${errorMessage}.`
             );
             done();
           }

@@ -108,7 +108,7 @@ function decode(buffer: Buffer): OutboundTypedMessage {
   try {
     message = OutboundMessage.deserializeBinary(buffer);
   } catch (error) {
-    throw compilerError('Invalid buffer.');
+    throw compilerError('Invalid buffer');
   }
 
   let payload;
@@ -123,7 +123,7 @@ function decode(buffer: Buffer): OutboundTypedMessage {
         OutboundMessage.CompileResponse.ResultCase.RESULT_NOT_SET
       ) {
         throw compilerError(
-          'OutboundMessage.CompileResponse.result is not set.'
+          'OutboundMessage.CompileResponse.result is not set'
         );
       }
       payload = message.getCompileresponse()!;
@@ -144,7 +144,7 @@ function decode(buffer: Buffer): OutboundTypedMessage {
         OutboundMessage.FunctionCallRequest.IdentifierCase.IDENTIFIER_NOT_SET
       ) {
         throw compilerError(
-          'OutboundMessage.FunctionCallRequest.identifier is not set.'
+          'OutboundMessage.FunctionCallRequest.identifier is not set'
         );
       }
       payload = message.getFunctioncallrequest()!;
@@ -153,10 +153,10 @@ function decode(buffer: Buffer): OutboundTypedMessage {
     case OutboundMessage.MessageCase.ERROR:
       throw hostError(`${message.getError()!.getMessage()}`);
     case OutboundMessage.MessageCase.MESSAGE_NOT_SET: {
-      throw compilerError('OutboundMessage.message is not set.');
+      throw compilerError('OutboundMessage.message is not set');
     }
     default: {
-      throw compilerError(`Unknown message type ${message.toString()}.`);
+      throw compilerError(`Unknown message type ${message.toString()}`);
     }
   }
 
@@ -200,9 +200,9 @@ function encode(message: InboundTypedMessage): Buffer {
 }
 
 function compilerError(message: string): Error {
-  return Error(`Compiler caused error: ${message}`);
+  return Error(`Compiler caused error: ${message}.`);
 }
 
 function hostError(message: string): Error {
-  return Error(`Compiler reported error: ${message}`);
+  return Error(`Compiler reported error: ${message}.`);
 }

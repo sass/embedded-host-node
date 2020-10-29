@@ -2,8 +2,8 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-import {Observable, Subject, Subscription} from 'rxjs';
-import {filter, map, tap} from 'rxjs/operators';
+import {Observable, Subject} from 'rxjs';
+import {filter, map} from 'rxjs/operators';
 
 import {InboundMessage, OutboundMessage} from '../vendor/embedded_sass_pb';
 import {
@@ -12,35 +12,32 @@ import {
   InboundResponse,
   InboundResponseType,
   InboundTypedMessage,
-  OutboundRequest,
-  OutboundRequestType,
   OutboundResponse,
   OutboundResponseType,
   OutboundTypedMessage,
 } from './message-transformer';
 import {RequestTracker} from './request-tracker';
-
-type PromiseOr<T> = T | Promise<T>;
+import {PromiseOr} from '../utils';
 
 /**
  * Dispatches requests, responses, and events.
  *
+ * Accepts callbacks for processing different types of outbound requests. When
+ * an outbound request arrives, this runs the appropriate callback to process
+ * it, and then sends the result inbound. A single callback must be provided for
+ * each outbound request type. The callback does not need to set the response
+ * ID; the dispatcher handles it.
+ *
  * Consumers can send an inbound request. This returns a promise that will
  * either resolve with the corresponding outbound response, or error if any
- * Protocol Errors were encountered.
+ * Protocol Errors were encountered. The consumer does not need to set the
+ * request ID; the dispatcher handles it.
  *
- * Consumers can register callbacks for processing different types of outbound
- * requests. When an outbound request arrives, this runs the appropriate
- * registered callback to process it, then sends the result inbound. After
- * registering a callback, consumers receive a subscription to an Observable
- * that emits each request. If any Protocol Errors are encountered, these
- * subscriptions close quietly, and the error is not thrown to the consumer.
+ * Outbound events are exposed as Observables.
  *
- * Requests and responses do not need to have their ID set, since the dispatcher
- * handles setting the ID on all messages.
- *
- * Errors are exposed as an Observable that consumers may choose to subscribe
- * to. Subscribers must perform proper error handling.
+ * Errors are not otherwise exposed to the top-level. Instead, they are surfaced
+ * as an Observable that consumers may choose to subscribe to. Subscribers must
+ * perform proper error handling.
  */
 export class Dispatcher {
   // Tracks the IDs of all inbound requests. An outbound response with matching
@@ -62,7 +59,7 @@ export class Dispatcher {
   /**
    * If the dispatcher encounters an error, this errors out. Upon error, the
    * dispatcher rejects all promises awaiting an outbound response, and silently
-   * closes all subscriptions awaiting outbound requests and events.
+   * closes all subscriptions to outbound events.
    */
   readonly error$ = this.errorInternal$.pipe();
 
@@ -77,24 +74,43 @@ export class Dispatcher {
 
   constructor(
     private readonly outboundMessages$: Observable<OutboundTypedMessage>,
-    private readonly writeInboundMessage: (message: InboundTypedMessage) => void
+    private readonly writeInboundMessage: (
+      message: InboundTypedMessage
+    ) => void,
+    private readonly handleImportRequest: (
+      request: OutboundMessage.ImportRequest
+    ) => PromiseOr<InboundMessage.ImportResponse>,
+    private readonly handleFileImportRequest: (
+      request: OutboundMessage.FileImportRequest
+    ) => PromiseOr<InboundMessage.FileImportResponse>,
+    private readonly handleCanonicalizeRequest: (
+      request: OutboundMessage.CanonicalizeRequest
+    ) => PromiseOr<InboundMessage.CanonicalizeResponse>,
+    private readonly handleFunctionCallRequest: (
+      request: OutboundMessage.FunctionCallRequest
+    ) => PromiseOr<InboundMessage.FunctionCallResponse>
   ) {
-    this.outboundMessages$
-      .pipe(tap(message => this.registerOutboundMessage(message)))
-      .subscribe(
-        message => this.messages$.next(message),
-        error => this.throwAndClose(error),
-        () => {
-          this.messages$.complete();
-          this.errorInternal$.complete();
+    this.outboundMessages$.subscribe(
+      async message => {
+        try {
+          await this.handleOutboundMessage(message);
+          this.messages$.next(message);
+        } catch (error) {
+          this.throwAndClose(error);
         }
-      );
+      },
+      error => this.throwAndClose(error),
+      () => {
+        this.messages$.complete();
+        this.errorInternal$.complete();
+      }
+    );
   }
 
   /**
-   * Sends a CompileRequest inbound. Returns a promise that resolves with an
-   * outbound CompileResponse that answers the request, or errors if any
-   * Protocol Errors were encountered.
+   * Sends a CompileRequest inbound. Returns a promise that will either resolve
+   * with the corresponding outbound CompileResponse, or error if any Protocol
+   * Errors were encountered.
    */
   sendCompileRequest(
     request: InboundMessage.CompileRequest
@@ -106,80 +122,79 @@ export class Dispatcher {
     );
   }
 
-  /**
-   * Subscribes to outbound ImportRequests, registering a callback `handler`
-   * that runs when a request arrives. Returns the subscription.
-   */
-  onImportRequest(
-    handler: (
-      request: OutboundMessage.ImportRequest
-    ) => PromiseOr<InboundMessage.ImportResponse>
-  ): Subscription {
-    return this.onOutboundRequest(
-      handler,
-      OutboundMessage.MessageCase.IMPORTREQUEST,
-      InboundMessage.MessageCase.IMPORTRESPONSE
-    );
-  }
-
-  /**
-   * Subscribes to outbound FileImportRequests, registering a callback `handler`
-   * that runs when a request arrives. Returns the subscription.
-   */
-  onFileImportRequest(
-    handler: (
-      request: OutboundMessage.FileImportRequest
-    ) => PromiseOr<InboundMessage.FileImportResponse>
-  ): Subscription {
-    return this.onOutboundRequest(
-      handler,
-      OutboundMessage.MessageCase.FILEIMPORTREQUEST,
-      InboundMessage.MessageCase.FILEIMPORTRESPONSE
-    );
-  }
-
-  /**
-   * Subscribes to outbound CanonicalizeRequests, registering a callback
-   * `handler` that runs when a request arrives. Returns the subscription.
-   */
-  onCanonicalizeRequest(
-    handler: (
-      request: OutboundMessage.CanonicalizeRequest
-    ) => PromiseOr<InboundMessage.CanonicalizeResponse>
-  ): Subscription {
-    return this.onOutboundRequest(
-      handler,
-      OutboundMessage.MessageCase.CANONICALIZEREQUEST,
-      InboundMessage.MessageCase.CANONICALIZERESPONSE
-    );
-  }
-
-  /**
-   * Subscribes to outbound FunctionCallRequests, registering a callback
-   * `handler` that runs when a request arrives. Returns the subscription.
-   */
-  onFunctionCallRequest(
-    handler: (
-      request: OutboundMessage.FunctionCallRequest
-    ) => PromiseOr<InboundMessage.FunctionCallResponse>
-  ): Subscription {
-    return this.onOutboundRequest(
-      handler,
-      OutboundMessage.MessageCase.FUNCTIONCALLREQUEST,
-      InboundMessage.MessageCase.FUNCTIONCALLRESPONSE
-    );
-  }
-
   // Rejects with `error` all promises awaiting an outbound response, and
-  // silently closes all subscriptions awaiting outbound requests and events.
+  // silently closes all subscriptions awaiting outbound events.
   private throwAndClose(error: Error) {
     this.messages$.complete();
     this.errorInternal$.error(error);
   }
 
+  // Keeps track of all outbound messages. If the outbound `message` contains a
+  // request or response, registers it with pendingOutboundRequests. If it
+  // contains a request, runs the appropriate callback to generate an inbound
+  // response, and then sends it inbound.
+  private async handleOutboundMessage(
+    message: OutboundTypedMessage
+  ): Promise<void> {
+    switch (message.type) {
+      case OutboundMessage.MessageCase.LOGEVENT:
+        break;
+
+      case OutboundMessage.MessageCase.COMPILERESPONSE:
+        this.pendingInboundRequests.resolve(
+          (message.payload as OutboundResponse).getId(),
+          message.type
+        );
+        break;
+
+      case OutboundMessage.MessageCase.IMPORTREQUEST: {
+        const request = message.payload as OutboundMessage.ImportRequest;
+        const id = request.getId();
+        const type = InboundMessage.MessageCase.IMPORTRESPONSE;
+        this.pendingOutboundRequests.add(id, type);
+        const response = await this.handleImportRequest(request);
+        this.sendInboundMessage(id, response, type);
+        break;
+      }
+
+      case OutboundMessage.MessageCase.FILEIMPORTREQUEST: {
+        const request = message.payload as OutboundMessage.FileImportRequest;
+        const id = request.getId();
+        const type = InboundMessage.MessageCase.FILEIMPORTRESPONSE;
+        this.pendingOutboundRequests.add(id, type);
+        const response = await this.handleFileImportRequest(request);
+        this.sendInboundMessage(id, response, type);
+        break;
+      }
+
+      case OutboundMessage.MessageCase.CANONICALIZEREQUEST: {
+        const request = message.payload as OutboundMessage.CanonicalizeRequest;
+        const id = request.getId();
+        const type = InboundMessage.MessageCase.CANONICALIZERESPONSE;
+        this.pendingOutboundRequests.add(id, type);
+        const response = await this.handleCanonicalizeRequest(request);
+        this.sendInboundMessage(id, response, type);
+        break;
+      }
+
+      case OutboundMessage.MessageCase.FUNCTIONCALLREQUEST: {
+        const request = message.payload as OutboundMessage.FunctionCallRequest;
+        const id = request.getId();
+        const type = InboundMessage.MessageCase.FUNCTIONCALLRESPONSE;
+        this.pendingOutboundRequests.add(id, type);
+        const response = await this.handleFunctionCallRequest(request);
+        this.sendInboundMessage(id, response, type);
+        break;
+      }
+
+      default:
+        throw Error(`Unknown message type ${message.type}`);
+    }
+  }
+
   // Sends a `request` of type `requestType` inbound. Returns a promise that
-  // resolves with an outbound response of type `responseType` answers the
-  // request, or errors if any errors were encountered.
+  // will either resolve with the corresponding outbound response of type
+  // `responseType`, or error if any Protocol Errors were encountered.
   private handleInboundRequest(
     request: InboundRequest,
     requestType: InboundRequestType,
@@ -197,50 +212,28 @@ export class Dispatcher {
       this.error$.subscribe({error: reject});
 
       try {
-        request.setId(this.pendingInboundRequests.nextId);
-        this.sendInboundMessage(request, requestType);
+        this.sendInboundMessage(
+          this.pendingInboundRequests.nextId,
+          request,
+          requestType
+        );
       } catch (error) {
         this.throwAndClose(error);
       }
     });
   }
 
-  // Subscribes to outbound requests of type `requestType`, registering a
-  // callback that runs when a request arrives. Sends the result of running the
-  // callback (which is of type `responseType`) inbound. Returns the
-  // subscription so that consumers can unsubscribe.
-  private onOutboundRequest<
-    T1 extends OutboundRequest,
-    T2 extends InboundResponse
-  >(
-    handler: (request: T1) => PromiseOr<T2>,
-    requestType: OutboundRequestType,
-    responseType: InboundResponseType
-  ): Subscription {
-    return this.messages$
-      .pipe(
-        filter(message => message.type === requestType),
-        map(message => message.payload as OutboundRequest)
-      )
-      .subscribe(async request => {
-        try {
-          const response = await handler(request as T1);
-          response.setId(request.getId());
-          this.sendInboundMessage(response, responseType);
-        } catch (error) {
-          this.throwAndClose(error);
-        }
-      });
-  }
-
   // Sends a message inbound. Keeps track of all pending inbound requests.
   private sendInboundMessage(
+    id: number,
     payload: InboundRequest | InboundResponse,
     type: InboundRequestType | InboundResponseType
   ): void {
+    payload.setId(id);
+
     if (type === InboundMessage.MessageCase.COMPILEREQUEST) {
       this.pendingInboundRequests.add(
-        payload.getId(),
+        id,
         OutboundMessage.MessageCase.COMPILERESPONSE
       );
     } else if (
@@ -249,7 +242,7 @@ export class Dispatcher {
       type === InboundMessage.MessageCase.CANONICALIZERESPONSE ||
       type === InboundMessage.MessageCase.FUNCTIONCALLRESPONSE
     ) {
-      this.pendingOutboundRequests.resolve(payload.getId(), type);
+      this.pendingOutboundRequests.resolve(id, type);
     } else {
       throw Error(`Unknown message type ${type}`);
     }
@@ -258,46 +251,5 @@ export class Dispatcher {
       payload,
       type,
     });
-  }
-
-  // If the outbound `message` contains a request or response, registers it with
-  // pendingOutboundRequests.
-  private registerOutboundMessage(message: OutboundTypedMessage): void {
-    switch (message.type) {
-      case OutboundMessage.MessageCase.LOGEVENT:
-        break;
-      case OutboundMessage.MessageCase.COMPILERESPONSE:
-        this.pendingInboundRequests.resolve(
-          (message.payload as OutboundResponse).getId(),
-          message.type
-        );
-        break;
-      case OutboundMessage.MessageCase.IMPORTREQUEST:
-        this.pendingOutboundRequests.add(
-          (message.payload as OutboundRequest).getId(),
-          InboundMessage.MessageCase.IMPORTRESPONSE
-        );
-        break;
-      case OutboundMessage.MessageCase.FILEIMPORTREQUEST:
-        this.pendingOutboundRequests.add(
-          (message.payload as OutboundRequest).getId(),
-          InboundMessage.MessageCase.FILEIMPORTRESPONSE
-        );
-        break;
-      case OutboundMessage.MessageCase.CANONICALIZEREQUEST:
-        this.pendingOutboundRequests.add(
-          (message.payload as OutboundRequest).getId(),
-          InboundMessage.MessageCase.CANONICALIZERESPONSE
-        );
-        break;
-      case OutboundMessage.MessageCase.FUNCTIONCALLREQUEST:
-        this.pendingOutboundRequests.add(
-          (message.payload as OutboundRequest).getId(),
-          InboundMessage.MessageCase.FUNCTIONCALLRESPONSE
-        );
-        break;
-      default:
-        throw Error(`Unknown message type ${message.type}`);
-    }
   }
 }

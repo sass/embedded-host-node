@@ -2,7 +2,7 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-import {getDartSassEmbedded, getEmbeddedProtocol} from './embedded-protocol';
+import {getDartSassEmbedded, getEmbeddedProtocol} from './embedded-binaries';
 
 async function main() {
   const outPath = 'lib/src/vendor';

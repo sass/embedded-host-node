@@ -17,29 +17,38 @@ describe('dispatcher', () => {
   function createDispatcher(
     outboundMessages$: Subject<OutboundTypedMessage>,
     writeInboundMessage?: (message: InboundTypedMessage) => void,
-    handleImportRequest?: (
-      request: OutboundMessage.ImportRequest
-    ) => PromiseOr<InboundMessage.ImportResponse>,
-    handleFileImportRequest?: (
-      request: OutboundMessage.FileImportRequest
-    ) => PromiseOr<InboundMessage.FileImportResponse>,
-    handleCanonicalizeRequest?: (
-      request: OutboundMessage.CanonicalizeRequest
-    ) => PromiseOr<InboundMessage.CanonicalizeResponse>,
-    handleFunctionCallRequest?: (
-      request: OutboundMessage.FunctionCallRequest
-    ) => PromiseOr<InboundMessage.FunctionCallResponse>
+    outboundRequestHandlers?: {
+      handleImportRequest?: (
+        request: OutboundMessage.ImportRequest
+      ) => PromiseOr<InboundMessage.ImportResponse>;
+      handleFileImportRequest?: (
+        request: OutboundMessage.FileImportRequest
+      ) => PromiseOr<InboundMessage.FileImportResponse>;
+      handleCanonicalizeRequest?: (
+        request: OutboundMessage.CanonicalizeRequest
+      ) => PromiseOr<InboundMessage.CanonicalizeResponse>;
+      handleFunctionCallRequest?: (
+        request: OutboundMessage.FunctionCallRequest
+      ) => PromiseOr<InboundMessage.FunctionCallResponse>;
+    }
   ) {
     return new Dispatcher(
       outboundMessages$,
       writeInboundMessage ?? (() => {}),
-      handleImportRequest ?? (() => new InboundMessage.ImportResponse()),
-      handleFileImportRequest ??
-        (() => new InboundMessage.FileImportResponse()),
-      handleCanonicalizeRequest ??
-        (() => new InboundMessage.CanonicalizeResponse()),
-      handleFunctionCallRequest ??
-        (() => new InboundMessage.FunctionCallResponse())
+      {
+        handleImportRequest:
+          outboundRequestHandlers?.handleImportRequest ??
+          (() => new InboundMessage.ImportResponse()),
+        handleFileImportRequest:
+          outboundRequestHandlers?.handleFileImportRequest ??
+          (() => new InboundMessage.FileImportResponse()),
+        handleCanonicalizeRequest:
+          outboundRequestHandlers?.handleCanonicalizeRequest ??
+          (() => new InboundMessage.CanonicalizeResponse()),
+        handleFunctionCallRequest:
+          outboundRequestHandlers?.handleFunctionCallRequest ??
+          (() => new InboundMessage.FunctionCallResponse()),
+      }
     );
   }
 
@@ -195,13 +204,15 @@ describe('dispatcher', () => {
             done();
           }
         },
-        importRequest => {
-          receivedRequests.push(importRequest.getId());
-          return new InboundMessage.ImportResponse();
-        },
-        fileImportRequest => {
-          receivedRequests.push(fileImportRequest.getId());
-          return new InboundMessage.FileImportResponse();
+        {
+          handleImportRequest: importRequest => {
+            receivedRequests.push(importRequest.getId());
+            return new InboundMessage.ImportResponse();
+          },
+          handleFileImportRequest: fileImportRequest => {
+            receivedRequests.push(fileImportRequest.getId());
+            return new InboundMessage.FileImportResponse();
+          },
         }
       );
 

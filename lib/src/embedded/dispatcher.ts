@@ -3,7 +3,7 @@
 // https://opensource.org/licenses/MIT.
 
 import {Observable, Subject} from 'rxjs';
-import {filter, map} from 'rxjs/operators';
+import {filter, map, mergeMap} from 'rxjs/operators';
 
 import {InboundMessage, OutboundMessage} from '../vendor/embedded_sass_pb';
 import {
@@ -77,34 +77,36 @@ export class Dispatcher {
     private readonly writeInboundMessage: (
       message: InboundTypedMessage
     ) => void,
-    private readonly handleImportRequest: (
-      request: OutboundMessage.ImportRequest
-    ) => PromiseOr<InboundMessage.ImportResponse>,
-    private readonly handleFileImportRequest: (
-      request: OutboundMessage.FileImportRequest
-    ) => PromiseOr<InboundMessage.FileImportResponse>,
-    private readonly handleCanonicalizeRequest: (
-      request: OutboundMessage.CanonicalizeRequest
-    ) => PromiseOr<InboundMessage.CanonicalizeResponse>,
-    private readonly handleFunctionCallRequest: (
-      request: OutboundMessage.FunctionCallRequest
-    ) => PromiseOr<InboundMessage.FunctionCallResponse>
+    private readonly outboundRequestHandlers: {
+      handleImportRequest: (
+        request: OutboundMessage.ImportRequest
+      ) => PromiseOr<InboundMessage.ImportResponse>;
+      handleFileImportRequest: (
+        request: OutboundMessage.FileImportRequest
+      ) => PromiseOr<InboundMessage.FileImportResponse>;
+      handleCanonicalizeRequest: (
+        request: OutboundMessage.CanonicalizeRequest
+      ) => PromiseOr<InboundMessage.CanonicalizeResponse>;
+      handleFunctionCallRequest: (
+        request: OutboundMessage.FunctionCallRequest
+      ) => PromiseOr<InboundMessage.FunctionCallResponse>;
+    }
   ) {
-    this.outboundMessages$.subscribe(
-      async message => {
-        try {
+    this.outboundMessages$
+      .pipe(
+        mergeMap(async message => {
           await this.handleOutboundMessage(message);
-          this.messages$.next(message);
-        } catch (error) {
-          this.throwAndClose(error);
+          return message;
+        })
+      )
+      .subscribe(
+        message => this.messages$.next(message),
+        error => this.throwAndClose(error),
+        () => {
+          this.messages$.complete();
+          this.errorInternal$.complete();
         }
-      },
-      error => this.throwAndClose(error),
-      () => {
-        this.messages$.complete();
-        this.errorInternal$.complete();
-      }
-    );
+      );
   }
 
   /**
@@ -152,7 +154,9 @@ export class Dispatcher {
         const id = request.getId();
         const type = InboundMessage.MessageCase.IMPORTRESPONSE;
         this.pendingOutboundRequests.add(id, type);
-        const response = await this.handleImportRequest(request);
+        const response = await this.outboundRequestHandlers.handleImportRequest(
+          request
+        );
         this.sendInboundMessage(id, response, type);
         break;
       }
@@ -162,7 +166,9 @@ export class Dispatcher {
         const id = request.getId();
         const type = InboundMessage.MessageCase.FILEIMPORTRESPONSE;
         this.pendingOutboundRequests.add(id, type);
-        const response = await this.handleFileImportRequest(request);
+        const response = await this.outboundRequestHandlers.handleFileImportRequest(
+          request
+        );
         this.sendInboundMessage(id, response, type);
         break;
       }
@@ -172,7 +178,9 @@ export class Dispatcher {
         const id = request.getId();
         const type = InboundMessage.MessageCase.CANONICALIZERESPONSE;
         this.pendingOutboundRequests.add(id, type);
-        const response = await this.handleCanonicalizeRequest(request);
+        const response = await this.outboundRequestHandlers.handleCanonicalizeRequest(
+          request
+        );
         this.sendInboundMessage(id, response, type);
         break;
       }
@@ -182,7 +190,9 @@ export class Dispatcher {
         const id = request.getId();
         const type = InboundMessage.MessageCase.FUNCTIONCALLRESPONSE;
         this.pendingOutboundRequests.add(id, type);
-        const response = await this.handleFunctionCallRequest(request);
+        const response = await this.outboundRequestHandlers.handleFunctionCallRequest(
+          request
+        );
         this.sendInboundMessage(id, response, type);
         break;
       }

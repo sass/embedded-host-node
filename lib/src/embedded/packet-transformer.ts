@@ -3,6 +3,7 @@
 // https://opensource.org/licenses/MIT.
 
 import {Observable, Subject} from 'rxjs';
+import {mergeMap} from 'rxjs/operators';
 
 /**
  * Decodes arbitrarily-chunked buffers, for example
@@ -11,59 +12,64 @@ import {Observable, Subject} from 'rxjs';
  *   +---------+------------- ...
  *   | 0 1 2 3 | 4 5 6 7 ...
  *   +---------+------------- ...
- *   | HEADER  | PAYLOAD
+ *   | HEADER  | PAYLOAD (PROTOBUF)
  *   +---------+------------- ...
  * and emits the payload of each packet.
  *
- * Encodes payloads by attaching a header that describes the payload's length.
+ * Encodes packets by attaching a header to a protobuf that describes the
+ * protobuf's length.
  */
 export class PacketTransformer {
-  // The decoded payloads are written to this Subject. This is publicly exposed
-  // as a readonly Observable to prevent memory leaks.
-  private readonly readInternal$ = new Subject<Buffer>();
-
-  /** The payloads (decoded from buffers). */
-  readonly read$ = this.readInternal$.pipe();
-
-  /** Receives payloads and encodes them into packets. */
-  readonly write$ = new Subject<Buffer>();
-
   // The packet that is actively being decoded as buffers come in.
   private packet = new Packet();
 
+  // The decoded protobufs are written to this Subject. It is publicly exposed
+  // as a readonly Observable.
+  private readonly outboundProtobufsInternal$ = new Subject<Buffer>();
+
+  /**
+   * The fully-decoded, outbound protobufs. If any errors are encountered
+   * during encoding/decoding, this Observable will error out.
+   */
+  readonly outboundProtobufs$ = this.outboundProtobufsInternal$.pipe();
+
   constructor(
-    private readonly rawRead$: Observable<Buffer>,
-    private readonly rawWrite$: Subject<Buffer>
+    private readonly outboundBuffers$: Observable<Buffer>,
+    private readonly writeInboundBuffer: (buffer: Buffer) => void
   ) {
-    this.rawRead$.subscribe(buffer => this.decode(buffer));
-    this.write$.subscribe(buffer => this.encode(buffer));
+    this.outboundBuffers$
+      .pipe(mergeMap(buffer => this.decode(buffer)))
+      .subscribe(this.outboundProtobufsInternal$);
   }
 
-  // Decodes a buffer into the current packet. If the packet is completed,
-  // emits the packet's payload and starts a new packet.
-  private decode(buffer: Buffer) {
+  /**
+   * Encodes a packet by pre-fixing `protobuf` with a header that describes its
+   * length.
+   */
+  writeInboundProtobuf(protobuf: Buffer): void {
+    try {
+      const packet = Buffer.alloc(Packet.headerByteSize + protobuf.length);
+      packet.writeInt32LE(protobuf.length, 0);
+      packet.set(protobuf, Packet.headerByteSize);
+      this.writeInboundBuffer(packet);
+    } catch (error) {
+      this.outboundProtobufsInternal$.error(error);
+    }
+  }
+
+  // Decodes a buffer, filling up the packet that is actively being decoded.
+  // Returns a list of decoded payloads.
+  private decode(buffer: Buffer): Buffer[] {
+    const payloads: Buffer[] = [];
     let decodedBytes = 0;
     while (decodedBytes < buffer.length) {
       decodedBytes += this.packet.write(buffer.slice(decodedBytes));
       if (this.packet.isComplete) {
-        this.readInternal$.next(this.packet.payload);
+        payloads.push(this.packet.payload!);
         this.packet = new Packet();
       }
     }
-  }
-
-  // Encodes a payload by attaching a header that describes its length.
-  private encode(payload: Buffer) {
-    const packet = Buffer.alloc(Packet.headerByteSize + payload.length);
-    packet.writeInt32LE(payload.length, 0);
-    packet.set(payload, Packet.headerByteSize);
-    this.rawWrite$.next(packet);
-  }
-
-  /** Cleans up all Observables. */
-  close() {
-    this.readInternal$.complete();
-    this.write$.complete();
+    return payloads;
   }
 }
 
@@ -140,7 +146,7 @@ function writeBuffer(
   source: Buffer,
   destination: Buffer,
   destinationOffset: number
-) {
+): number {
   const bytesToWrite = Math.min(
     source.length,
     destination.length - destinationOffset

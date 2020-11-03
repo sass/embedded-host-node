@@ -2,78 +2,45 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-import {InboundMessage, OutboundMessage} from '../vendor/embedded_sass_pb';
-import {EmbeddedProcess} from './compiler/process';
-import {PacketTransformer} from './compiler/packet-transformer';
-import {MessageTransformer} from './compiler/message-transformer';
-import {Observable, Subject, merge} from 'rxjs';
-import {filter, first, map} from 'rxjs/operators';
+import {spawn} from 'child_process';
+import {resolve} from 'path';
+import {Observable} from 'rxjs';
+import {takeUntil} from 'rxjs/operators';
 
 /**
- * A facade to the Embedded Sass Compiler.
- *
- * Takes the compiler's raw stdin and stdout and transforms them into public
- * Observables of InboundMessages (write$) and OutboundMessages (read$). Also
- * exposes an Observable (error$) that emits if a ProtocolError occurs while
- * communicating with the compiler.
- *
- * If there is a ProtocolError, this shuts down the compiler process and cleans
- * up all Observables.
+ * Invokes the Embedded Sass Compiler as a Node child process, exposing its
+ * stdio as Observables.
  */
 export class EmbeddedCompiler {
-  // The Node child process that invokes the Embedded Sass Compiler.
-  private readonly embeddedProcess = new EmbeddedProcess();
-
-  // Transforms the embedded process's IO streams into delineated buffers.
-  private readonly packetTransformer = new PacketTransformer(
-    this.embeddedProcess.stdout$,
-    this.embeddedProcess.stdin$
+  private readonly process = spawn(
+    resolve(__dirname, '../vendor/dart-sass-embedded'),
+    {
+      windowsHide: true,
+    }
   );
 
-  // Transforms the delineated buffers into Inbound/OutboundMessages.
-  private readonly messageTransformer = new MessageTransformer(
-    this.packetTransformer.read$,
-    this.packetTransformer.write$
-  );
+  /** The child process's exit event. */
+  readonly exit$ = new Observable<number | null>(observer => {
+    this.process.on('exit', code => observer.next(code));
+  });
 
-  /** For sending InboundMessages to the Embedded Compiler. */
-  readonly write$: Subject<InboundMessage> = this.messageTransformer.write$;
+  /** The buffers emitted by the child process's stdout. */
+  readonly stdout$ = new Observable<Buffer>(observer => {
+    this.process.stdout.on('data', buffer => observer.next(buffer));
+  }).pipe(takeUntil(this.exit$));
 
-  /** OutboundMessages sent by the Embedded Compiler. */
-  readonly read$: Observable<
-    OutboundMessage
-  > = this.messageTransformer.read$.pipe(
-    filter(message => !message.hasError())
-  );
+  /** The buffers emitted by the child process's stderr. */
+  readonly stderr$ = new Observable<Buffer>(observer => {
+    this.process.stderr.on('data', buffer => observer.next(buffer));
+  }).pipe(takeUntil(this.exit$));
 
-  /** Emits an error if the Embedded Protocol is violated. */
-  readonly error$: Observable<Error> = merge(
-    this.messageTransformer.error$,
-    this.messageTransformer.read$.pipe(
-      filter(message => message.hasError()),
-      map(message =>
-        Error(`Compiler reported error: ${message.getError()?.getMessage()}`)
-      )
-    )
-  );
-
-  constructor() {
-    // Pass the embedded process's stderr messages to the main process's stderr.
-    this.embeddedProcess.stderr$.subscribe(buffer => {
-      process.stderr.write(buffer);
-    });
-
-    // Shut down the compiler if we detect a ProtocolError or the embedded
-    // process exits.
-    merge(this.error$, this.embeddedProcess.exit$)
-      .pipe(first())
-      .subscribe(() => process.nextTick(() => this.close()));
+  /** Writes `buffer` to the child process's stdin. */
+  writeStdin(buffer: Buffer): void {
+    this.process.stdin.write(buffer);
   }
 
-  /** Closes the Embedded Compiler and cleans up all associated Observables. */
+  /** Kills the child process, cleaning up all associated Observables. */
   close() {
-    this.messageTransformer.close();
-    this.packetTransformer.close();
-    this.embeddedProcess.close();
+    this.process.stdin.end();
   }
 }

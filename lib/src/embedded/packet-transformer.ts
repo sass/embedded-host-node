@@ -64,8 +64,8 @@ export class PacketTransformer {
     let decodedBytes = 0;
     while (decodedBytes < buffer.length) {
       decodedBytes += this.packet.write(buffer.slice(decodedBytes));
-      if (this.packet.isComplete) {
-        payloads.push(this.packet.payload!);
+      if (this.packet.isComplete && this.packet.payload) {
+        payloads.push(this.packet.payload);
         this.packet = new Packet();
       }
     }

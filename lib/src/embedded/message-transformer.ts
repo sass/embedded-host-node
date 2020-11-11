@@ -113,51 +113,48 @@ function decode(buffer: Buffer): OutboundTypedMessage {
   const type = message.getMessageCase();
   switch (type) {
     case OutboundMessage.MessageCase.LOGEVENT:
-      payload = message.getLogevent()!;
+      payload = message.getLogevent();
       break;
-    case OutboundMessage.MessageCase.COMPILERESPONSE: {
+    case OutboundMessage.MessageCase.COMPILERESPONSE:
       if (
-        message.getCompileresponse()!.getResultCase() ===
+        message.getCompileresponse()?.getResultCase() ===
         OutboundMessage.CompileResponse.ResultCase.RESULT_NOT_SET
       ) {
         throw compilerError(
           'OutboundMessage.CompileResponse.result is not set'
         );
       }
-      payload = message.getCompileresponse()!;
+      payload = message.getCompileresponse();
       break;
-    }
     case OutboundMessage.MessageCase.IMPORTREQUEST:
-      payload = message.getImportrequest()!;
+      payload = message.getImportrequest();
       break;
     case OutboundMessage.MessageCase.FILEIMPORTREQUEST:
-      payload = message.getFileimportrequest()!;
+      payload = message.getFileimportrequest();
       break;
     case OutboundMessage.MessageCase.CANONICALIZEREQUEST:
-      payload = message.getCanonicalizerequest()!;
+      payload = message.getCanonicalizerequest();
       break;
-    case OutboundMessage.MessageCase.FUNCTIONCALLREQUEST: {
+    case OutboundMessage.MessageCase.FUNCTIONCALLREQUEST:
       if (
-        message.getFunctioncallrequest()!.getIdentifierCase() ===
+        message.getFunctioncallrequest()?.getIdentifierCase() ===
         OutboundMessage.FunctionCallRequest.IdentifierCase.IDENTIFIER_NOT_SET
       ) {
         throw compilerError(
           'OutboundMessage.FunctionCallRequest.identifier is not set'
         );
       }
-      payload = message.getFunctioncallrequest()!;
+      payload = message.getFunctioncallrequest();
       break;
-    }
     case OutboundMessage.MessageCase.ERROR:
-      throw hostError(`${message.getError()!.getMessage()}`);
-    case OutboundMessage.MessageCase.MESSAGE_NOT_SET: {
+      throw hostError(`${message.getError()?.getMessage()}`);
+    case OutboundMessage.MessageCase.MESSAGE_NOT_SET:
       throw compilerError('OutboundMessage.message is not set');
-    }
-    default: {
+    default:
       throw compilerError(`Unknown message type ${message.toString()}`);
-    }
   }
 
+  if (!payload) throw compilerError('OutboundMessage missing payload');
   return {
     payload,
     type,

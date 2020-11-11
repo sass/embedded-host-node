@@ -5,6 +5,16 @@ branches:
 
 language: node_js
 
+node_js:
+- node
+- lts/fermium
+- lts/erbium
+
+os:
+- linux
+- osx
+- windows
+
 env:
   global:
   - PROTOBUF_VERSION=3.13.0
@@ -24,19 +34,3 @@ install:
 
 script:
 - npm test
-
-jobs:
-  include:
-  ## Testing
-  - node_js: "14"
-    os: linux
-  - node_js: "14"
-    os: osx
-  - node_js: "13"
-    os: linux
-  - node_js: "13"
-    os: osx
-  - node_js: "12"
-    os: linux
-  - node_js: "12"
-    os: osx

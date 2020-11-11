@@ -31,7 +31,7 @@ export async function getEmbeddedProtocol(outPath: string): Promise<void> {
   try {
     await fs.writeFile(`${outPath}/${protoName}`, proto);
     execSync(
-      `npx protoc \
+      `protoc \
           --plugin="protoc-gen-ts=node_modules/.bin/protoc-gen-ts" \
           --js_out="import_style=commonjs,binary:." \
           --ts_out="." \

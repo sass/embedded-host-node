@@ -6,8 +6,9 @@
   "author": "Google Inc.",
   "license": "MIT",
   "main": "dist/lib/index.js",
+  "types": "dist/lib/index.d.ts",
   "files": [
-    "lib/**/*"
+    "dist/**/*"
   ],
   "engines": {
     "node": ">=12.18.2"
@@ -34,7 +35,6 @@
     "jasmine": "^3.5.0",
     "jasmine-spec-reporter": "^5.0.2",
     "node-fetch": "^2.6.0",
-    "protoc": "^1.0.4",
     "tar": "^6.0.5",
     "ts-node": "^8.10.2",
     "ts-protoc-gen": "^0.12.0",

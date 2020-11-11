@@ -61,20 +61,26 @@ export async function getDartSassEmbedded(outPath: string): Promise<void> {
     // the Github API instead of manually piecing together the asset URL. The
     // API exposes only the latest *non*-pre-release versions.
     // https://docs.github.com/en/free-pro-team@latest/rest/reference/repos#get-the-latest-release
-    let response = await fetch(
-      'https://api.github.com/repos/sass/dart-sass-embedded/releases'
-    );
-    if (!response.ok) throw Error(response.statusText);
-    const latestRelease = JSON.parse(await response.text())[0];
+    //
+    // Mock the latest release version for now. Travis can't call the Github API
+    // because Github seems to be throttling all calls from the osx instance.
+    const latestRelease = {
+      tag_name: '1.0.0-beta.5',
+      name: 'sass_embedded 1.0.0-beta.5',
+    };
+    // let response = await fetch(
+    //   'https://api.github.com/repos/sass/dart-sass-embedded/releases'
+    // );
+    // if (!response.ok) throw Error(response.statusText);
+    // const latestRelease = JSON.parse(await response.text())[0];
     const downloadUrl =
       'https://github.com/sass/dart-sass-embedded/releases/download';
     const tagName = latestRelease.tag_name;
     const releaseName = latestRelease.name.replace(' ', '-');
-    const extension = 'tar.gz';
-    const assetUrl = `${downloadUrl}/${tagName}/${releaseName}-${getOs()}-${getArch()}.${extension}`;
+    const assetUrl = `${downloadUrl}/${tagName}/${releaseName}-${getOs()}-${getArch()}.tar.gz`;
 
     // Download the release asset.
-    response = await fetch(assetUrl);
+    const response = await fetch(assetUrl);
     if (!response.ok) throw Error(response.statusText);
     releaseTarball = await response.buffer();
   } catch (error) {

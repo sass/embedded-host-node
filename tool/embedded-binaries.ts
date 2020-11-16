@@ -5,7 +5,8 @@
 import {execSync} from 'child_process';
 import {promises as fs} from 'fs';
 import fetch, {RequestInit, RequestRedirect} from 'node-fetch';
-import {extract} from 'tar';
+import {extract as extractTar} from 'tar';
+import extractZip = require('extract-zip');
 
 /**
  * Gets the latest version of the Embedded Protocol and writes it to pbjs with
@@ -35,10 +36,14 @@ export async function getEmbeddedProtocol(outPath: string): Promise<void> {
     await fs.writeFile(`${outPath}/${protoName}`, proto);
     execSync(
       `protoc \
-          --plugin="protoc-gen-ts=node_modules/.bin/protoc-gen-ts" \
-          --js_out="import_style=commonjs,binary:." \
-          --ts_out="." \
-          ${outPath}/${protoName}`,
+        --plugin="protoc-gen-ts=${
+          getOs() === 'windows'
+            ? '%CD%/node_modules/.bin/protoc-gen-ts.cmd'
+            : 'node_modules/.bin/protoc-gen-ts'
+        }" \
+        --js_out="import_style=commonjs,binary:." \
+        --ts_out="." \
+        ${outPath}/${protoName}`,
       {
         windowsHide: true,
       }
@@ -88,7 +93,7 @@ export async function getDartSassEmbedded(outPath: string): Promise<void> {
     );
   }
 
-  let releaseTarball: Buffer;
+  let releaseAsset: Buffer;
 
   console.log('Downloading Dart Sass Embedded.');
   try {
@@ -97,26 +102,30 @@ export async function getDartSassEmbedded(outPath: string): Promise<void> {
       `/${latestRelease.tag_name}` +
       `/${latestRelease.name.replace(' ', '-')}` +
       `-${getOs()}-${getArch()}` +
-      '.tar.gz';
+      getArchiveFileExtension();
     const response = await fetch(assetUrl, {
       redirect: 'follow' as RequestRedirect,
     });
     if (!response.ok) throw Error(response.statusText);
-    releaseTarball = await response.buffer();
+    releaseAsset = await response.buffer();
   } catch (error) {
     throw Error(`Failed to download Dart Sass Embedded: ${error.message}.`);
   }
 
   console.log('Writing Dart Sass Embedded binary.');
   try {
-    const tarballPath = `${outPath}/dart-sass-embedded.tar.gz`;
-    await fs.writeFile(tarballPath, releaseTarball);
-    extract({
-      file: tarballPath,
-      cwd: outPath,
-      sync: true,
-    });
-    await fs.unlink(tarballPath);
+    const archivePath = `${outPath}/dart-sass-embedded${getArchiveFileExtension()}`;
+    await fs.writeFile(archivePath, releaseAsset);
+    if (getOs() === 'windows') {
+      await extractZip(archivePath, {dir: `${process.cwd()}/${outPath}`});
+    } else {
+      extractTar({
+        file: archivePath,
+        cwd: outPath,
+        sync: true,
+      });
+    }
+    await fs.unlink(archivePath);
   } catch (error) {
     throw Error(`Failed to write Dart Sass Embedded binary: ${error.message}.`);
   }
@@ -150,4 +159,8 @@ function getArch(): string {
     default:
       throw Error(`Architecure ${process.arch} is not supported.`);
   }
+}
+
+function getArchiveFileExtension(): string {
+  return getOs() === 'windows' ? '.zip' : '.tar.gz';
 }

@@ -4,7 +4,7 @@
 
 import {execSync} from 'child_process';
 import {promises as fs} from 'fs';
-import fetch from 'node-fetch';
+import fetch, {RequestInit, RequestRedirect} from 'node-fetch';
 import {extract} from 'tar';
 
 /**
@@ -19,7 +19,10 @@ export async function getEmbeddedProtocol(outPath: string): Promise<void> {
   console.log('Downloading Embedded Sass Protocol.');
   try {
     const response = await fetch(
-      `https://raw.githubusercontent.com/sass/embedded-protocol/master/${protoName}`
+      `https://raw.githubusercontent.com/sass/embedded-protocol/master/${protoName}`,
+      {
+        redirect: 'follow' as RequestRedirect,
+      }
     );
     if (!response.ok) throw Error(response.statusText);
     proto = await response.text();
@@ -51,36 +54,53 @@ export async function getEmbeddedProtocol(outPath: string): Promise<void> {
  */
 export async function getDartSassEmbedded(outPath: string): Promise<void> {
   await fs.mkdir(outPath, {recursive: true});
+
+  let latestRelease: {
+    tag_name: string;
+    name: string;
+  };
+
+  // TODO(awjin): Once dart-sass-embedded is no longer under pre-release, call
+  // the Github API instead of manually piecing together the asset URL. The
+  // API exposes only the latest *non*-pre-release versions.
+  // https://docs.github.com/en/free-pro-team@latest/rest/reference/repos#get-the-latest-release
+  console.log('Getting Dart Sass Embedded release info.');
+  try {
+    const fetchOptions = {
+      redirect: 'follow' as RequestRedirect,
+    } as RequestInit;
+    if (process.env.TRAVIS === 'true') {
+      fetchOptions['headers'] = {
+        Authorization:
+          'Basic ' +
+          Buffer.from(`sassbot:${process.env.GITHUB_AUTH}`).toString('base64'),
+      };
+    }
+    const response = await fetch(
+      'https://api.github.com/repos/sass/dart-sass-embedded/releases',
+      fetchOptions
+    );
+    if (!response.ok) throw Error(response.statusText);
+    latestRelease = JSON.parse(await response.text())[0];
+  } catch (error) {
+    throw Error(
+      `Failed to get Dart Sass Embedded release info: ${error.message}.`
+    );
+  }
+
   let releaseTarball: Buffer;
 
   console.log('Downloading Dart Sass Embedded.');
   try {
-    // Get the URL of the release asset.
-    //
-    // TODO(awjin): Once dart-sass-embedded is no longer under pre-release, call
-    // the Github API instead of manually piecing together the asset URL. The
-    // API exposes only the latest *non*-pre-release versions.
-    // https://docs.github.com/en/free-pro-team@latest/rest/reference/repos#get-the-latest-release
-    //
-    // Mock the latest release version for now. Travis can't call the Github API
-    // because Github seems to be throttling all calls from the osx instance.
-    const latestRelease = {
-      tag_name: '1.0.0-beta.5',
-      name: 'sass_embedded 1.0.0-beta.5',
-    };
-    // let response = await fetch(
-    //   'https://api.github.com/repos/sass/dart-sass-embedded/releases'
-    // );
-    // if (!response.ok) throw Error(response.statusText);
-    // const latestRelease = JSON.parse(await response.text())[0];
-    const downloadUrl =
-      'https://github.com/sass/dart-sass-embedded/releases/download';
-    const tagName = latestRelease.tag_name;
-    const releaseName = latestRelease.name.replace(' ', '-');
-    const assetUrl = `${downloadUrl}/${tagName}/${releaseName}-${getOs()}-${getArch()}.tar.gz`;
-
-    // Download the release asset.
-    const response = await fetch(assetUrl);
+    const assetUrl =
+      'https://github.com/sass/dart-sass-embedded/releases/download' +
+      `/${latestRelease.tag_name}` +
+      `/${latestRelease.name.replace(' ', '-')}` +
+      `-${getOs()}-${getArch()}` +
+      '.tar.gz';
+    const response = await fetch(assetUrl, {
+      redirect: 'follow' as RequestRedirect,
+    });
     if (!response.ok) throw Error(response.statusText);
     releaseTarball = await response.buffer();
   } catch (error) {

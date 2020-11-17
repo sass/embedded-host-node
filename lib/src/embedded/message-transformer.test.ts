@@ -4,7 +4,7 @@
 
 import {Subject, Observable} from 'rxjs';
 
-import {expectError} from '../../../spec/helpers/utils';
+import {expectObservableToError} from '../../../spec/helpers/utils';
 import {MessageTransformer, OutboundTypedMessage} from './message-transformer';
 import {
   InboundMessage,
@@ -82,7 +82,7 @@ describe('message transformer', () => {
 
     describe('protocol error', () => {
       it('fails on invalid buffer', async done => {
-        expectError(
+        expectObservableToError(
           messages.outboundMessages$,
           'Compiler caused error: Invalid buffer.',
           done
@@ -92,7 +92,7 @@ describe('message transformer', () => {
       });
 
       it('fails on empty message', async done => {
-        expectError(
+        expectObservableToError(
           messages.outboundMessages$,
           'Compiler caused error: OutboundMessage.message is not set.',
           done
@@ -102,7 +102,7 @@ describe('message transformer', () => {
       });
 
       it('fails on compile response with missing result', async done => {
-        expectError(
+        expectObservableToError(
           messages.outboundMessages$,
           'Compiler caused error: OutboundMessage.CompileResponse.result is not set.',
           done
@@ -115,7 +115,7 @@ describe('message transformer', () => {
       });
 
       it('fails on function call request with missing identifier', async done => {
-        expectError(
+        expectObservableToError(
           messages.outboundMessages$,
           'Compiler caused error: OutboundMessage.FunctionCallRequest.identifier is not set.',
           done
@@ -129,7 +129,7 @@ describe('message transformer', () => {
 
       it('fails if message contains a protocol error', async done => {
         const errorMessage = 'sad';
-        expectError(
+        expectObservableToError(
           messages.outboundMessages$,
           `Compiler reported error: ${errorMessage}.`,
           done

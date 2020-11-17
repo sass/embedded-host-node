@@ -6,13 +6,8 @@ import {getDartSassEmbedded, getEmbeddedProtocol} from './embedded-binaries';
 
 async function main() {
   const outPath = 'lib/src/vendor';
-
-  try {
-    await getEmbeddedProtocol(outPath);
-    await getDartSassEmbedded(outPath);
-  } catch (error) {
-    console.error(error);
-  }
+  await getEmbeddedProtocol(outPath);
+  await getDartSassEmbedded(outPath);
 }
 
 main();

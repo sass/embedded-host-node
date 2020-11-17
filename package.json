@@ -6,8 +6,9 @@
   "author": "Google Inc.",
   "license": "MIT",
   "main": "dist/lib/index.js",
+  "types": "dist/lib/index.d.ts",
   "files": [
-    "lib/**/*"
+    "dist/**/*"
   ],
   "engines": {
     "node": ">=12.18.2"
@@ -20,9 +21,11 @@
     "test": "ts-node ./node_modules/jasmine/bin/jasmine"
   },
   "dependencies": {
+    "extract-zip": "^2.0.1",
     "google-protobuf": "^3.11.4",
     "immutable": "^4.0.0-rc.12",
-    "rxjs": "^6.5.5"
+    "rxjs": "^6.5.5",
+    "tar": "^6.0.5"
   },
   "devDependencies": {
     "@types/google-protobuf": "^3.7.2",
@@ -35,7 +38,6 @@
     "jasmine-spec-reporter": "^5.0.2",
     "node-fetch": "^2.6.0",
     "protoc": "^1.0.4",
-    "tar": "^6.0.5",
     "ts-node": "^8.10.2",
     "ts-protoc-gen": "^0.12.0",
     "typescript": "~3.8.0"

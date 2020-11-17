@@ -13,7 +13,12 @@ import {takeUntil} from 'rxjs/operators';
  */
 export class EmbeddedCompiler {
   private readonly process = spawn(
-    resolve(__dirname, '../vendor/sass_embedded/dart-sass-embedded'),
+    resolve(
+      __dirname,
+      `../vendor/sass_embedded/dart-sass-embedded${
+        process.platform === 'win32' ? '.bat' : ''
+      }`
+    ),
     {
       windowsHide: true,
     }

@@ -15,20 +15,9 @@ os:
 - osx
 - windows
 
-env:
-  global:
-  - PROTOBUF_VERSION=3.13.0
-  - PATH="$HOME/protoc/bin:$PATH"
-
 cache: npm
 
 install:
-- if [[ "$TRAVIS_OS_NAME" = windows ]]; then
-    curl -Lo protoc.zip https://github.com/protocolbuffers/protobuf/releases/download/v${PROTOBUF_VERSION}/protoc-${PROTOBUF_VERSION}-win64.zip;
-  else
-    curl -Lo protoc.zip https://github.com/protocolbuffers/protobuf/releases/download/v${PROTOBUF_VERSION}/protoc-${PROTOBUF_VERSION}-${TRAVIS_OS_NAME}-x86_64.zip;
-  fi
-- unzip -d "$HOME/protoc" protoc.zip
 - npm install
 - npm run init
 

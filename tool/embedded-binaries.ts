@@ -4,7 +4,7 @@
 
 import {execSync} from 'child_process';
 import {promises as fs} from 'fs';
-import fetch, {RequestInit, RequestRedirect} from 'node-fetch';
+import fetch, {RequestInit} from 'node-fetch';
 import {extract as extractTar} from 'tar';
 import extractZip = require('extract-zip');
 
@@ -22,7 +22,7 @@ export async function getEmbeddedProtocol(outPath: string): Promise<void> {
     const response = await fetch(
       `https://raw.githubusercontent.com/sass/embedded-protocol/master/${protoName}`,
       {
-        redirect: 'follow' as RequestRedirect,
+        redirect: 'follow',
       }
     );
     if (!response.ok) throw Error(response.statusText);
@@ -34,13 +34,17 @@ export async function getEmbeddedProtocol(outPath: string): Promise<void> {
   console.log('Writing proto to pbjs.');
   try {
     await fs.writeFile(`${outPath}/${protoName}`, proto);
+    const protocPath =
+      getOs() === 'windows'
+        ? '%CD%/node_modules/protoc/protoc/bin/protoc.exe'
+        : 'node_modules/protoc/protoc/bin/protoc';
+    const pluginPath =
+      getOs() === 'windows'
+        ? '%CD%/node_modules/.bin/protoc-gen-ts.cmd'
+        : 'node_modules/.bin/protoc-gen-ts';
     execSync(
-      `protoc \
-        --plugin="protoc-gen-ts=${
-          getOs() === 'windows'
-            ? '%CD%/node_modules/.bin/protoc-gen-ts.cmd'
-            : 'node_modules/.bin/protoc-gen-ts'
-        }" \
+      `${protocPath} \
+        --plugin="protoc-gen-ts=${pluginPath}" \
         --js_out="import_style=commonjs,binary:." \
         --ts_out="." \
         ${outPath}/${protoName}`,
@@ -71,10 +75,10 @@ export async function getDartSassEmbedded(outPath: string): Promise<void> {
   // https://docs.github.com/en/free-pro-team@latest/rest/reference/repos#get-the-latest-release
   console.log('Getting Dart Sass Embedded release info.');
   try {
-    const fetchOptions = {
-      redirect: 'follow' as RequestRedirect,
-    } as RequestInit;
-    if (process.env.TRAVIS === 'true') {
+    const fetchOptions: RequestInit = {
+      redirect: 'follow',
+    };
+    if (process.env.TRAVIS === 'true' && process.env.GITHUB_AUTH) {
       fetchOptions['headers'] = {
         Authorization:
           'Basic ' +
@@ -104,7 +108,7 @@ export async function getDartSassEmbedded(outPath: string): Promise<void> {
       `-${getOs()}-${getArch()}` +
       getArchiveFileExtension();
     const response = await fetch(assetUrl, {
-      redirect: 'follow' as RequestRedirect,
+      redirect: 'follow',
     });
     if (!response.ok) throw Error(response.statusText);
     releaseAsset = await response.buffer();

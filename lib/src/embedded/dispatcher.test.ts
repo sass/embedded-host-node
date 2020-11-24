@@ -8,7 +8,7 @@ import {InboundMessage, OutboundMessage} from '../vendor/embedded_sass_pb';
 import {InboundTypedMessage, OutboundTypedMessage} from './message-transformer';
 import {Dispatcher} from './dispatcher';
 import {PromiseOr} from '../utils';
-import {expectError} from '../../../spec/helpers/utils';
+import {expectObservableToError} from '../../../spec/helpers/utils';
 
 describe('dispatcher', () => {
   let dispatcher: Dispatcher;
@@ -238,7 +238,7 @@ describe('dispatcher', () => {
     });
 
     it('throws if a request ID overlaps with that of an in-flight request', async done => {
-      expectError(
+      expectObservableToError(
         dispatcher.error$,
         'Request ID 0 is already in use by an in-flight request.',
         done
@@ -256,7 +256,7 @@ describe('dispatcher', () => {
     });
 
     it('throws if a response ID does not match any in-flight request IDs', async done => {
-      expectError(
+      expectObservableToError(
         dispatcher.error$,
         'Response ID 1 does not match any pending requests.',
         done

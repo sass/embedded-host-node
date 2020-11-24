@@ -5,6 +5,7 @@
 import {Observable, Subject} from 'rxjs';
 import {map} from 'rxjs/operators';
 
+import {compilerError, hostError} from '../utils';
 import {InboundMessage, OutboundMessage} from '../vendor/embedded_sass_pb';
 
 export type InboundRequestType = InboundMessage.MessageCase.COMPILEREQUEST;
@@ -192,12 +193,4 @@ function encode(message: InboundTypedMessage): Buffer {
       break;
   }
   return Buffer.from(inboundMessage.serializeBinary());
-}
-
-function compilerError(message: string): Error {
-  return Error(`Compiler caused error: ${message}.`);
-}
-
-function hostError(message: string): Error {
-  return Error(`Compiler reported error: ${message}.`);
 }

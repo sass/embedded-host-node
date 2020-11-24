@@ -3,7 +3,6 @@
 // https://opensource.org/licenses/MIT.
 
 import {SourceSpan} from './span';
-import {compilerError} from '../utils';
 import * as proto from '../vendor/embedded_sass_pb';
 
 /**
@@ -34,16 +33,12 @@ export class SassException extends Error {
   static fromProto(
     buffer: proto.OutboundMessage.CompileResponse.CompileFailure
   ) {
-    try {
-      const span = buffer.getSpan();
-      return new SassException(
-        buffer.getMessage(),
-        span ? SourceSpan.fromProto(span) : undefined,
-        buffer.getStackTrace()
-      );
-    } catch (error) {
-      throw compilerError(error.message);
-    }
+    const span = buffer.getSpan();
+    return new SassException(
+      buffer.getMessage(),
+      span ? SourceSpan.fromProto(span) : undefined,
+      buffer.getStackTrace()
+    );
   }
 
   // TODO(awjin): toString()

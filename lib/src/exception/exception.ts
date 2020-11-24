@@ -3,21 +3,48 @@
 // https://opensource.org/licenses/MIT.
 
 import {SourceSpan} from './span';
+import {compilerError} from '../utils';
+import * as proto from '../vendor/embedded_sass_pb';
 
+/**
+ * An exception thrown by Sass.
+ */
 export class SassException extends Error {
-  span?: SourceSpan;
-
-  constructor(options: {message: string; span?: SourceSpan; stack?: string}) {
-    super(options.message);
+  /**
+   * @param message - The error message.
+   * @param [span] - The source span associated with the error.
+   * @param [stack] - The stack trace associated with the error.
+   */
+  constructor(message?: string, readonly span?: SourceSpan, stack?: string) {
+    super(message);
 
     this.name = this.constructor.name;
 
-    this.span = options.span;
-
-    if (options.stack) {
-      this.stack = options.stack;
+    if (stack) {
+      this.stack = stack;
     } else {
       Error.captureStackTrace(this, this.constructor);
     }
   }
+
+  /**
+   * Creates a SassException from the given protocol `buffer`. Throws if the
+   * buffer has invalid fields.
+   */
+  static fromProto(
+    buffer: proto.OutboundMessage.CompileResponse.CompileFailure
+  ) {
+    try {
+      const span = buffer.getSpan();
+      return new SassException(
+        buffer.getMessage(),
+        span ? SourceSpan.fromProto(span) : undefined,
+        buffer.getStackTrace()
+      );
+    } catch (error) {
+      throw compilerError(error.message);
+    }
+  }
+
+  // TODO(awjin): toString()
 }

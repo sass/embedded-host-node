@@ -5,21 +5,12 @@
 import {URL} from 'url';
 
 import {SassException} from './exception';
+import {SourceLocation} from './location';
 import {SourceSpan} from './span';
 
 describe('SassException', () => {
-  it('has the correct type', () => {
-    const error = new SassException({message: ''});
-
-    try {
-      throw error;
-    } catch (error) {
-      expect(error instanceof SassException).toBe(true);
-    }
-  });
-
   it('has the correct name', () => {
-    const error = new SassException({message: ''});
+    const error = new SassException();
 
     try {
       throw error;
@@ -31,7 +22,7 @@ describe('SassException', () => {
 
   it('has the correct message', () => {
     const message = 'sad';
-    const error = new SassException({message});
+    const error = new SassException(message);
 
     try {
       throw error;
@@ -41,22 +32,16 @@ describe('SassException', () => {
   });
 
   it('has the given span', () => {
-    const span: SourceSpan = {
-      text: 'text',
-      start: {
-        offset: 0,
-        line: 0,
-        column: 0,
-      },
-      end: {
-        offset: 1,
-        line: 1,
-        column: 1,
-      },
-      url: new URL('https://url'),
-      context: 'context',
-    };
-    const error = new SassException({message: '', span});
+    const start = new SourceLocation(0, 0, 0);
+    const end = new SourceLocation(1, 1, 1);
+    const span = new SourceSpan(
+      'text',
+      start,
+      end,
+      new URL('https://url'),
+      'context'
+    );
+    const error = new SassException('', span);
 
     try {
       throw error;
@@ -67,7 +52,7 @@ describe('SassException', () => {
 
   it('has the default stack trace', () => {
     const message = 'default';
-    const error = new SassException({message});
+    const error = new SassException(message);
 
     try {
       throw error;
@@ -79,7 +64,7 @@ describe('SassException', () => {
 
   it('overrides the default stack trace', () => {
     const stack = 'override';
-    const error = new SassException({message: '', stack});
+    const error = new SassException('', undefined, stack);
 
     try {
       throw error;

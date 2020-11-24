@@ -22,3 +22,15 @@ export function expectObservableToError<T>(
     () => fail('expected error')
   );
 }
+
+/**
+ * Asserts that the `actual` path is equal to the `expected` one, accounting for
+ * OS differences.
+ */
+export function expectEqualPaths(actual: string, expected: string): void {
+  if (process.platform === 'win32') {
+    expect(actual).toBe(expected.toLowerCase());
+  } else {
+    expect(actual).toBe(expected);
+  }
+}

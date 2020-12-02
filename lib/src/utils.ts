@@ -34,11 +34,9 @@ export function deprotifyException(
   );
 }
 
-/**
- * Creates a SourceSpan from the given protocol `buffer`. Throws if the buffer
- * has invalid fields.
- */
-export function deprotifySourceSpan(buffer: proto.SourceSpan): SourceSpan {
+// Creates a SourceSpan from the given protocol `buffer`. Throws if the buffer
+// has invalid fields.
+function deprotifySourceSpan(buffer: proto.SourceSpan): SourceSpan {
   const text = buffer.getText();
 
   if (buffer.getStart() === undefined) {
@@ -71,10 +69,8 @@ export function deprotifySourceSpan(buffer: proto.SourceSpan): SourceSpan {
   };
 }
 
-/**
- * Creates a SourceLocation from the given protocol `buffer`.
- */
-export function deprotifySourceLocation(
+// Creates a SourceLocation from the given protocol `buffer`.
+function deprotifySourceLocation(
   buffer: proto.SourceSpan.SourceLocation
 ): SourceLocation {
   return {

@@ -3,7 +3,6 @@
 // https://opensource.org/licenses/MIT.
 
 import {SourceSpan} from './span';
-import * as proto from '../vendor/embedded_sass_pb';
 
 /**
  * An exception thrown by Sass.
@@ -24,21 +23,6 @@ export class SassException extends Error {
     } else {
       Error.captureStackTrace(this, this.constructor);
     }
-  }
-
-  /**
-   * Creates a SassException from the given protocol `buffer`. Throws if the
-   * buffer has invalid fields.
-   */
-  static fromProto(
-    buffer: proto.OutboundMessage.CompileResponse.CompileFailure
-  ) {
-    const span = buffer.getSpan();
-    return new SassException(
-      buffer.getMessage(),
-      span ? SourceSpan.fromProto(span) : undefined,
-      buffer.getStackTrace()
-    );
   }
 
   // TODO(awjin): toString()

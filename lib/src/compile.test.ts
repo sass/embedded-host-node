@@ -24,7 +24,7 @@ describe('compile', () => {
       // TODO(awjin): compiles a plain CSS string
 
       it('compiles an absolute path', async () => {
-        const path = `${resolve('test.scss')}`;
+        const path = resolve('test.scss');
         await fs.writeFile(path, 'a {b: c}');
 
         expect(await compile({path})).toBe('a {\n  b: c;\n}');
@@ -130,6 +130,7 @@ describe('compile', () => {
           const message = error.message.split(': ');
           expect(message[0]).toBe('Cannot open file');
           expectEqualPaths(message[1], `${resolve('test.scss')}`);
+          expect(error.span).toBe(undefined);
         }
       });
 

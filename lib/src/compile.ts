@@ -10,7 +10,7 @@ import {Dispatcher} from './embedded/dispatcher';
 import {MessageTransformer} from './embedded/message-transformer';
 import {PacketTransformer} from './embedded/packet-transformer';
 import {SassException} from './exception/exception';
-import {deprotifySourceSpan} from './utils';
+import {deprotifyException} from './utils';
 import {InboundMessage} from './vendor/embedded_sass_pb';
 
 /**
@@ -29,8 +29,8 @@ export async function compile(options: {
   });
 
   const response = await compileRequest(request);
-  if (options.sourceMap && response.sourceMap) {
-    options.sourceMap(response.sourceMap);
+  if (options.sourceMap) {
+    options.sourceMap(response.sourceMap!);
   }
   return response.css;
 }
@@ -53,8 +53,8 @@ export async function compileString(options: {
   });
 
   const response = await compileRequest(request);
-  if (options.sourceMap && response.sourceMap) {
-    options.sourceMap(response.sourceMap);
+  if (options.sourceMap) {
+    options.sourceMap(response.sourceMap!);
   }
   return response.css;
 }
@@ -140,22 +140,17 @@ async function compileRequest(
     if (response.getSuccess()) {
       const success = response.getSuccess()!;
       const sourceMap = success.getSourceMap();
+      if (request.getSourceMap() && sourceMap === undefined) {
+        throw new SassException('Compiler did not provide sourceMap.');
+      }
       return {
         css: success.getCss(),
         sourceMap: sourceMap ? JSON.parse(sourceMap) : undefined,
       };
     } else if (response.getFailure()) {
-      const failure = response.getFailure()!;
-      const span = failure.getSpan();
-      throw new SassException({
-        message: failure.getMessage(),
-        span: span ? deprotifySourceSpan(span) : undefined,
-        stack: failure.getStackTrace(),
-      });
+      throw deprotifyException(response.getFailure()!);
     } else {
-      throw new SassException({
-        message: 'Compiler sent empty CompileResponse.',
-      });
+      throw new SassException('Compiler sent empty CompileResponse.');
     }
   } finally {
     embeddedCompiler.close();

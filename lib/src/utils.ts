@@ -53,7 +53,7 @@ export function deprotifySourceSpan(buffer: proto.SourceSpan): SourceSpan {
     }
   } else {
     end = deprotifySourceLocation(buffer.getEnd()!);
-    if (end.offset <= start.offset) {
+    if (end.offset < start.offset) {
       throw compilerError('Expected SourceSpan end to be after start.');
     }
   }

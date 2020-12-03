@@ -9,7 +9,6 @@ import {EmbeddedCompiler} from './embedded/compiler';
 import {Dispatcher} from './embedded/dispatcher';
 import {MessageTransformer} from './embedded/message-transformer';
 import {PacketTransformer} from './embedded/packet-transformer';
-import {SassException} from './exception/exception';
 import {deprotifyException} from './utils';
 import {InboundMessage} from './vendor/embedded_sass_pb';
 
@@ -93,8 +92,8 @@ function newCompileStringRequest(options: {
 }
 
 // Spins up a compiler, then sends it a compile request. Returns a promise that
-// resolves with the CompileResult. Throws a SassException if there were any
-// protocol or compilation errors. Shuts down the compiler after compilation.
+// resolves with the CompileResult. Throws if there were any protocol or
+// compilation errors. Shuts down the compiler after compilation.
 async function compileRequest(
   request: InboundMessage.CompileRequest
 ): Promise<{
@@ -114,7 +113,6 @@ async function compileRequest(
     packetTransformer.outboundProtobufs$,
     packet => packetTransformer.writeInboundProtobuf(packet)
   );
-
   const dispatcher = new Dispatcher(
     messageTransformer.outboundMessages$,
     message => messageTransformer.writeInboundMessage(message),
@@ -134,25 +132,25 @@ async function compileRequest(
     }
   );
 
-  try {
-    const response = await dispatcher.sendCompileRequest(request);
+  dispatcher.error$.subscribe(error => {
+    throw error;
+  });
+  const response = await dispatcher.sendCompileRequest(request);
+  embeddedCompiler.close();
 
-    if (response.getSuccess()) {
-      const success = response.getSuccess()!;
-      const sourceMap = success.getSourceMap();
-      if (request.getSourceMap() && sourceMap === undefined) {
-        throw new SassException('Compiler did not provide sourceMap.');
-      }
-      return {
-        css: success.getCss(),
-        sourceMap: sourceMap ? JSON.parse(sourceMap) : undefined,
-      };
-    } else if (response.getFailure()) {
-      throw deprotifyException(response.getFailure()!);
-    } else {
-      throw new SassException('Compiler sent empty CompileResponse.');
+  if (response.getSuccess()) {
+    const success = response.getSuccess()!;
+    const sourceMap = success.getSourceMap();
+    if (request.getSourceMap() && sourceMap === undefined) {
+      throw Error('Compiler did not provide sourceMap.');
     }
-  } finally {
-    embeddedCompiler.close();
+    return {
+      css: success.getCss(),
+      sourceMap: sourceMap ? JSON.parse(sourceMap) : undefined,
+    };
+  } else if (response.getFailure()) {
+    throw deprotifyException(response.getFailure()!);
+  } else {
+    throw Error('Compiler sent empty CompileResponse.');
   }
 }

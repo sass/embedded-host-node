@@ -211,6 +211,10 @@ export class Dispatcher {
     responseType: OutboundResponseType
   ): Promise<OutboundResponse> {
     return new Promise((resolve, reject) => {
+      if (this.messages$.isStopped) {
+        reject(Error('Tried writing to closed dispatcher'));
+      }
+
       this.messages$
         .pipe(
           filter(message => message.type === responseType),

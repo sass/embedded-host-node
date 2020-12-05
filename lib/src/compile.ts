@@ -100,40 +100,44 @@ async function compileRequest(
   css: string;
   sourceMap?: RawSourceMap;
 }> {
-  // TODO(awjin):
-  // - Subscribe logger to dispatcher's log events.
-  // - Pass import and function registries' handler functions to dispatcher.
-
   const embeddedCompiler = new EmbeddedCompiler();
-  const packetTransformer = new PacketTransformer(
-    embeddedCompiler.stdout$,
-    buffer => embeddedCompiler.writeStdin(buffer)
-  );
-  const messageTransformer = new MessageTransformer(
-    packetTransformer.outboundProtobufs$,
-    packet => packetTransformer.writeInboundProtobuf(packet)
-  );
-  const dispatcher = new Dispatcher(
-    messageTransformer.outboundMessages$,
-    message => messageTransformer.writeInboundMessage(message),
-    {
-      handleImportRequest: () => {
-        throw Error('Custom importers not yet implemented.');
-      },
-      handleFileImportRequest: () => {
-        throw Error('Custom file importers not yet implemented.');
-      },
-      handleCanonicalizeRequest: () => {
-        throw Error('Canonicalize not yet implemented.');
-      },
-      handleFunctionCallRequest: () => {
-        throw Error('Custom functions not yet implemented.');
-      },
-    }
-  );
 
   try {
+    const packetTransformer = new PacketTransformer(
+      embeddedCompiler.stdout$,
+      buffer => embeddedCompiler.writeStdin(buffer)
+    );
+
+    const messageTransformer = new MessageTransformer(
+      packetTransformer.outboundProtobufs$,
+      packet => packetTransformer.writeInboundProtobuf(packet)
+    );
+
+    // TODO(awjin): Pass import and function registries' handler functions to
+    // dispatcher.
+    const dispatcher = new Dispatcher(
+      messageTransformer.outboundMessages$,
+      message => messageTransformer.writeInboundMessage(message),
+      {
+        handleImportRequest: () => {
+          throw Error('Custom importers not yet implemented.');
+        },
+        handleFileImportRequest: () => {
+          throw Error('Custom file importers not yet implemented.');
+        },
+        handleCanonicalizeRequest: () => {
+          throw Error('Canonicalize not yet implemented.');
+        },
+        handleFunctionCallRequest: () => {
+          throw Error('Custom functions not yet implemented.');
+        },
+      }
+    );
+
+    // TODO(awjin): Subscribe logger to dispatcher's log events.
+
     const response = await dispatcher.sendCompileRequest(request);
+
     if (response.getSuccess()) {
       const success = response.getSuccess()!;
       const sourceMap = success.getSourceMap();

@@ -106,6 +106,15 @@ describe('dispatcher', () => {
           done();
         });
     });
+
+    it('errors if dispatcher is already closed', async () => {
+      dispatcher = createDispatcher(outbound$, () => {});
+      outbound$.complete();
+
+      await expectAsync(
+        dispatcher.sendCompileRequest(new InboundMessage.CompileRequest())
+      ).toBeRejectedWithError('Tried writing to closed dispatcher');
+    });
   });
 
   describe('outbound requests', () => {
@@ -272,7 +281,7 @@ describe('dispatcher', () => {
 
     it('throws error to compile request senders', async () => {
       const error = 'fail';
-      outbound$.error(error);
+      dispatcher = createDispatcher(outbound$, () => outbound$.error(error));
 
       await expectAsync(
         dispatcher.sendCompileRequest(new InboundMessage.CompileRequest())

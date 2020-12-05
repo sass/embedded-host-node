@@ -8,7 +8,7 @@ import {InboundMessage, OutboundMessage} from '../vendor/embedded_sass_pb';
 import {InboundTypedMessage, OutboundTypedMessage} from './message-transformer';
 import {Dispatcher} from './dispatcher';
 import {PromiseOr} from '../utils';
-import {expectError} from '../../../spec/helpers/utils';
+import {expectObservableToError} from '../../../spec/helpers/utils';
 
 describe('dispatcher', () => {
   let dispatcher: Dispatcher;
@@ -105,6 +105,15 @@ describe('dispatcher', () => {
           expect(response.getSuccess()?.getCss()).toEqual(expectedCss);
           done();
         });
+    });
+
+    it('errors if dispatcher is already closed', async () => {
+      dispatcher = createDispatcher(outbound$, () => {});
+      outbound$.complete();
+
+      await expectAsync(
+        dispatcher.sendCompileRequest(new InboundMessage.CompileRequest())
+      ).toBeRejectedWithError('Tried writing to closed dispatcher');
     });
   });
 
@@ -238,7 +247,7 @@ describe('dispatcher', () => {
     });
 
     it('throws if a request ID overlaps with that of an in-flight request', async done => {
-      expectError(
+      expectObservableToError(
         dispatcher.error$,
         'Request ID 0 is already in use by an in-flight request.',
         done
@@ -256,7 +265,7 @@ describe('dispatcher', () => {
     });
 
     it('throws if a response ID does not match any in-flight request IDs', async done => {
-      expectError(
+      expectObservableToError(
         dispatcher.error$,
         'Response ID 1 does not match any pending requests.',
         done
@@ -272,7 +281,7 @@ describe('dispatcher', () => {
 
     it('throws error to compile request senders', async () => {
       const error = 'fail';
-      outbound$.error(error);
+      dispatcher = createDispatcher(outbound$, () => outbound$.error(error));
 
       await expectAsync(
         dispatcher.sendCompileRequest(new InboundMessage.CompileRequest())

@@ -5,14 +5,14 @@
 import {Observable} from 'rxjs';
 
 /**
- * Subscribes to `observable` and ensures that it errors with the expected
+ * Subscribes to `observable` and asserts that it errors with the expected
  * `errorMessage`. Calls `done()` to complete the spec.
  */
-export function expectError<T>(
+export function expectObservableToError<T>(
   observable: Observable<T>,
   errorMessage: string,
   done: () => void
-) {
+): void {
   observable.subscribe(
     () => fail('expected error'),
     error => {
@@ -21,4 +21,16 @@ export function expectError<T>(
     },
     () => fail('expected error')
   );
+}
+
+/**
+ * Asserts that the `actual` path is equal to the `expected` one, accounting for
+ * OS differences.
+ */
+export function expectEqualPaths(actual: string, expected: string): void {
+  if (process.platform === 'win32') {
+    expect(actual).toBe(expected.toLowerCase());
+  } else {
+    expect(actual).toBe(expected);
+  }
 }

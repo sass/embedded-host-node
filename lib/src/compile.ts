@@ -132,25 +132,24 @@ async function compileRequest(
     }
   );
 
-  dispatcher.error$.subscribe(error => {
-    throw error;
-  });
-  const response = await dispatcher.sendCompileRequest(request);
-  embeddedCompiler.close();
-
-  if (response.getSuccess()) {
-    const success = response.getSuccess()!;
-    const sourceMap = success.getSourceMap();
-    if (request.getSourceMap() && sourceMap === undefined) {
-      throw Error('Compiler did not provide sourceMap.');
+  try {
+    const response = await dispatcher.sendCompileRequest(request);
+    if (response.getSuccess()) {
+      const success = response.getSuccess()!;
+      const sourceMap = success.getSourceMap();
+      if (request.getSourceMap() && sourceMap === undefined) {
+        throw Error('Compiler did not provide sourceMap.');
+      }
+      return {
+        css: success.getCss(),
+        sourceMap: sourceMap ? JSON.parse(sourceMap) : undefined,
+      };
+    } else if (response.getFailure()) {
+      throw deprotifyException(response.getFailure()!);
+    } else {
+      throw Error('Compiler sent empty CompileResponse.');
     }
-    return {
-      css: success.getCss(),
-      sourceMap: sourceMap ? JSON.parse(sourceMap) : undefined,
-    };
-  } else if (response.getFailure()) {
-    throw deprotifyException(response.getFailure()!);
-  } else {
-    throw Error('Compiler sent empty CompileResponse.');
+  } finally {
+    embeddedCompiler.close();
   }
 }

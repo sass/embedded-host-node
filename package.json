@@ -21,6 +21,7 @@
     "test": "ts-node ./node_modules/jasmine/bin/jasmine"
   },
   "dependencies": {
+    "buffer-builder": "^0.2.0",
     "extract-zip": "^2.0.1",
     "google-protobuf": "^3.11.4",
     "immutable": "^4.0.0-rc.12",

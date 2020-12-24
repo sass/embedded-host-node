@@ -5,6 +5,9 @@ branches:
 
 language: node_js
 
+env:
+- EMBEDDED_HOST_REF=master
+
 node_js:
 - node
 - lts/fermium
@@ -19,7 +22,7 @@ cache: npm
 
 install:
 - npm install
-- npm run init
+- npm run init -- --embedded-host-version="$EMBEDDED_HOST_REF"
 
 script:
 - npm test

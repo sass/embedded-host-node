@@ -68,9 +68,7 @@ export type OutboundTypedMessage = {
 export class MessageTransformer {
   // The decoded messages are written to this Subject. It is publicly exposed
   // as a readonly Observable.
-  private readonly outboundMessagesInternal$ = new Subject<
-    OutboundTypedMessage
-  >();
+  private readonly outboundMessagesInternal$ = new Subject<OutboundTypedMessage>();
 
   /**
    * The OutboundTypedMessages, decoded from protocol buffers. If any errors are

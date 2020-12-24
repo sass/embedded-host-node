@@ -31,18 +31,22 @@
   "devDependencies": {
     "@types/google-protobuf": "^3.7.2",
     "@types/jasmine": "^3.5.11",
-    "@types/node": "^10.0.3",
+    "@types/node": "^12.18.2",
     "@types/node-fetch": "^2.5.7",
+    "@types/shelljs": "^0.8.8",
     "@types/tar": "^4.0.3",
+    "@types/yargs": "^15.0.12",
     "gts": "^2.0.2",
     "jasmine": "^3.5.0",
     "jasmine-spec-reporter": "^5.0.2",
     "node-fetch": "^2.6.0",
     "protoc": "^1.0.4",
+    "shelljs": "^0.8.4",
     "source-map": "^0.6.1",
     "ts-node": "^8.10.2",
     "ts-protoc-gen": "^0.12.0",
-    "typescript": "~3.8.0"
+    "typescript": "~3.8.0",
+    "yargs": "^16.2.0"
   },
   "prettier": "gts/.prettierrc.json",
   "eslintConfig": {

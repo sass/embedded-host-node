@@ -2,7 +2,6 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-import '../buffer-builder';
 import {Observable, Subject} from 'rxjs';
 import {mergeMap} from 'rxjs/operators';
 import BufferBuilder = require('buffer-builder');

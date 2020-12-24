@@ -1,6 +1,8 @@
 {
   "spec_files": [
-    "**/*.test.ts"
+    "lib/src/*.test.ts",
+    "lib/src/embedded/*.test.ts",
+    "lib/src/exception/*.test.ts"
   ],
   "helpers": [
     "spec/helpers/**/*.ts"

@@ -29,6 +29,7 @@
     "tar": "^6.0.5"
   },
   "devDependencies": {
+    "@types/buffer-builder": "^0.2.0",
     "@types/google-protobuf": "^3.7.2",
     "@types/jasmine": "^3.5.11",
     "@types/node": "^12.18.2",

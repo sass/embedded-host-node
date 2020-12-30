@@ -29,7 +29,7 @@ export function expectObservableToError<T>(
  */
 export function expectEqualPaths(actual: string, expected: string): void {
   if (process.platform === 'win32') {
-    expect(actual).toBe(expected.toLowerCase());
+    expect(actual.toLowerCase()).toBe(expected.toLowerCase());
   } else {
     expect(actual).toBe(expected);
   }

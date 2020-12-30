@@ -22,20 +22,20 @@ describe('packet transformer', () => {
     it('encodes an empty message', () => {
       packets.writeInboundProtobuf(Buffer.from([]));
 
-      expect(encodedBuffers).toEqual([Buffer.from([0, 0, 0, 0])]);
+      expect(encodedBuffers).toEqual([Buffer.from([0])]);
     });
 
     it('encodes a message of length 1', () => {
       packets.writeInboundProtobuf(Buffer.from([123]));
 
-      expect(encodedBuffers).toEqual([Buffer.from([1, 0, 0, 0, 123])]);
+      expect(encodedBuffers).toEqual([Buffer.from([1, 123])]);
     });
 
     it('encodes a message of length greater than 256', () => {
       packets.writeInboundProtobuf(Buffer.alloc(300, 1));
 
       expect(encodedBuffers).toEqual([
-        Buffer.from([44, 1, 0, 0, ...new Array(300).fill(1)]),
+        Buffer.from([172, 2, ...new Array(300).fill(1)]),
       ]);
     });
 
@@ -45,9 +45,9 @@ describe('packet transformer', () => {
       packets.writeInboundProtobuf(Buffer.from([40, 50, 60]));
 
       expect(encodedBuffers).toEqual([
-        Buffer.from([1, 0, 0, 0, 10]),
-        Buffer.from([2, 0, 0, 0, 20, 30]),
-        Buffer.from([3, 0, 0, 0, 40, 50, 60]),
+        Buffer.from([1, 10]),
+        Buffer.from([2, 20, 30]),
+        Buffer.from([3, 40, 50, 60]),
       ]);
     });
   });
@@ -76,24 +76,6 @@ describe('packet transformer', () => {
       it('decodes a single chunk', async done => {
         expectDecoding([Buffer.from([])], done);
 
-        rawBuffers$.next(Buffer.from([0, 0, 0, 0]));
-        rawBuffers$.complete();
-      });
-
-      it('decodes multiple chunks', async done => {
-        expectDecoding([Buffer.from([])], done);
-
-        rawBuffers$.next(Buffer.from([0, 0]));
-        rawBuffers$.next(Buffer.from([0, 0]));
-        rawBuffers$.complete();
-      });
-
-      it('decodes one chunk per byte', async done => {
-        expectDecoding([Buffer.from([])], done);
-
-        rawBuffers$.next(Buffer.from([0]));
-        rawBuffers$.next(Buffer.from([0]));
-        rawBuffers$.next(Buffer.from([0]));
         rawBuffers$.next(Buffer.from([0]));
         rawBuffers$.complete();
       });
@@ -101,7 +83,7 @@ describe('packet transformer', () => {
       it('decodes a chunk that contains more data', async done => {
         expectDecoding([Buffer.from([]), Buffer.from([100])], done);
 
-        rawBuffers$.next(Buffer.from([0, 0, 0, 0, 1, 0, 0, 0, 100]));
+        rawBuffers$.next(Buffer.from([0, 1, 100]));
         rawBuffers$.complete();
       });
     });
@@ -110,39 +92,39 @@ describe('packet transformer', () => {
       it('decodes a single chunk', async done => {
         expectDecoding([Buffer.from(Buffer.from([1, 2, 3, 4]))], done);
 
-        rawBuffers$.next(Buffer.from([4, 0, 0, 0, 1, 2, 3, 4]));
+        rawBuffers$.next(Buffer.from([4, 1, 2, 3, 4]));
         rawBuffers$.complete();
       });
 
       it('decodes multiple chunks', async done => {
-        expectDecoding([Buffer.from([1, 2, 3, 4])], done);
+        expectDecoding([Buffer.alloc(300, 1)], done);
 
-        rawBuffers$.next(Buffer.from([4, 0]));
-        rawBuffers$.next(Buffer.from([0, 0, 1, 2]));
-        rawBuffers$.next(Buffer.from([3, 4]));
+        rawBuffers$.next(Buffer.from([172]));
+        rawBuffers$.next(Buffer.from([2, 1]));
+        rawBuffers$.next(Buffer.from(Buffer.alloc(299, 1)));
         rawBuffers$.complete();
       });
 
       it('decodes one chunk per byte', async done => {
-        expectDecoding([Buffer.from([1, 2, 3, 4])], done);
+        expectDecoding([Buffer.alloc(300, 1)], done);
 
-        for (const byte of [4, 0, 0, 0, 1, 2, 3, 4]) {
+        for (const byte of [172, 2, ...Buffer.alloc(300, 1)]) {
           rawBuffers$.next(Buffer.from([byte]));
         }
         rawBuffers$.complete();
       });
 
       it('decodes a chunk that contains more data', async done => {
-        expectDecoding([Buffer.from([1, 2, 3, 4])], done);
+        expectDecoding([Buffer.from([1, 2, 3, 4]), Buffer.from([0])], done);
 
-        rawBuffers$.next(Buffer.from([4, 0, 0, 0, 1, 2, 3, 4, 1, 0, 0, 0]));
+        rawBuffers$.next(Buffer.from([4, 1, 2, 3, 4, 1, 0]));
         rawBuffers$.complete();
       });
 
-      it('decodes a chunk of length greater than 256', async done => {
+      it('decodes a full chunk of length greater than 256', async done => {
         expectDecoding([Buffer.from(new Array(300).fill(1))], done);
 
-        rawBuffers$.next(Buffer.from([44, 1, 0, 0, ...new Array(300).fill(1)]));
+        rawBuffers$.next(Buffer.from([172, 2, ...new Array(300).fill(1)]));
         rawBuffers$.complete();
       });
     });
@@ -154,31 +136,23 @@ describe('packet transformer', () => {
           done
         );
 
-        rawBuffers$.next(
-          Buffer.from([4, 0, 0, 0, 1, 2, 3, 4, 2, 0, 0, 0, 101, 102])
-        );
+        rawBuffers$.next(Buffer.from([4, 1, 2, 3, 4, 2, 101, 102]));
         rawBuffers$.complete();
       });
 
       it('decodes multiple chunks', async done => {
-        expectDecoding(
-          [Buffer.from([1, 2, 3, 4]), Buffer.from([101, 102])],
-          done
-        );
+        expectDecoding([Buffer.from([1, 2, 3, 4]), Buffer.alloc(300, 1)], done);
 
-        rawBuffers$.next(Buffer.from([4, 0]));
-        rawBuffers$.next(Buffer.from([0, 0, 1, 2, 3, 4, 2, 0]));
-        rawBuffers$.next(Buffer.from([0, 0, 101, 102]));
+        rawBuffers$.next(Buffer.from([4]));
+        rawBuffers$.next(Buffer.from([1, 2, 3, 4, 172]));
+        rawBuffers$.next(Buffer.from([2, ...Buffer.alloc(300, 1)]));
         rawBuffers$.complete();
       });
 
       it('decodes one chunk per byte', async done => {
-        expectDecoding(
-          [Buffer.from([1, 2, 3, 4]), Buffer.from([101, 102])],
-          done
-        );
+        expectDecoding([Buffer.from([1, 2, 3, 4]), Buffer.alloc(300, 1)], done);
 
-        for (const byte of [4, 0, 0, 0, 1, 2, 3, 4, 2, 0, 0, 0, 101, 102]) {
+        for (const byte of [4, 1, 2, 3, 4, 172, 2, ...Buffer.alloc(300, 1)]) {
           rawBuffers$.next(Buffer.from([byte]));
         }
         rawBuffers$.complete();

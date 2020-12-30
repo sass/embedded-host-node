@@ -4,6 +4,7 @@
 
 import {Observable, Subject} from 'rxjs';
 import {mergeMap} from 'rxjs/operators';
+import BufferBuilder = require('buffer-builder');
 
 /**
  * Decodes arbitrarily-chunked buffers, for example
@@ -48,9 +49,26 @@ export class PacketTransformer {
    */
   writeInboundProtobuf(protobuf: Buffer): void {
     try {
-      const packet = Buffer.alloc(Packet.headerByteSize + protobuf.length);
-      packet.writeInt32LE(protobuf.length, 0);
-      packet.set(protobuf, Packet.headerByteSize);
+      let length = protobuf.length;
+      if (length === 0) {
+        this.writeInboundBuffer(Buffer.alloc(1));
+        return;
+      }
+
+      // Write the length in varint format, 7 bits at a time from least to most
+      // significant.
+      const header = new BufferBuilder(8);
+      while (length > 0) {
+        // The highest-order bit indicates whether more bytes are necessary to
+        // fully express the number. The lower 7 bits indicate the number's
+        // value.
+        header.appendUInt8((length > 0x7f ? 0x80 : 0) | (length & 0x7f));
+        length >>= 7;
+      }
+
+      const packet = Buffer.alloc(header.length + protobuf.length);
+      header.copy(packet);
+      packet.set(protobuf, header.length);
       this.writeInboundBuffer(packet);
     } catch (error) {
       this.outboundProtobufsInternal$.error(error);
@@ -75,15 +93,16 @@ export class PacketTransformer {
 
 /** A length-delimited packet comprised of a header and payload. */
 class Packet {
-  /**
-   * The length of a packet header--the 4-byte little-endian number that
-   * indicates the payload's length.
-   */
-  static headerByteSize = 4;
+  // The number of bits we've consumed so far to fill out `payloadLength`.
+  private payloadLengthBits = 0;
 
-  // The packet's header, indicating the payload's length. Constructed by calls
-  // to write().
-  private header = Buffer.alloc(Packet.headerByteSize);
+  // The length of the next message, in bytes.
+  //
+  // This is built up from a [varint]. Once it's fully consumed, `payload` is
+  // initialized and this is reset to 0.
+  //
+  // [varint]: https://developers.google.com/protocol-buffers/docs/encoding#varints
+  private payloadLength = 0;
 
   /**
    * The packet's payload. Constructed by calls to write().
@@ -91,17 +110,12 @@ class Packet {
    */
   payload?: Buffer;
 
-  // These track the progress of constructing the packet.
-  private headerOffset = 0;
+  // The offset in [payload] that should be written to next time data arrives.
   private payloadOffset = 0;
 
   /** Whether the packet construction is complete. */
-  get isComplete() {
-    return (
-      this.headerOffset >= this.header.length &&
-      this.payload &&
-      this.payloadOffset >= this.payload?.length
-    );
+  get isComplete(): boolean {
+    return !!(this.payload && this.payloadOffset >= this.payloadLength);
   }
 
   /**
@@ -115,42 +129,57 @@ class Packet {
       throw Error('Cannot write to a completed Packet.');
     }
 
-    let bytesWritten = 0;
+    // The index of the next byte to read from [source]. We have to track this
+    // because the source may contain the length *and* the message.
+    let i = 0;
 
-    if (this.headerOffset < this.header.length) {
-      bytesWritten = writeBuffer(source, this.header, this.headerOffset);
-      this.headerOffset += bytesWritten;
-      if (this.headerOffset < this.header.length) return bytesWritten;
-    }
-
+    // We can be in one of two states here:
+    //
+    // * [payload] is `null`, in which case we're adding data to [payloadLength]
+    //   until we reach a byte with its most significant bit set to 0.
+    //
+    // * [payload] is not `null`, in which case we're waiting for
+    //   [payloadOffset] to reach [payloadLength] bytes in it so this packet is
+    //   complete.
     if (!this.payload) {
-      const payloadLength = this.header.readUInt32LE(0);
-      this.payload = Buffer.alloc(payloadLength);
+      for (;;) {
+        const byte = source[i];
+
+        // Varints encode data in the 7 lower bits of each byte, which we access
+        // by masking with 0x7f = 0b01111111.
+        this.payloadLength += (byte & 0x7f) << this.payloadLengthBits;
+        this.payloadLengthBits += 7;
+        i++;
+
+        if (byte <= 0x7f) {
+          // If the byte is lower than 0x7f = 0b01111111, that means its high
+          // bit is unset which and we now know the full message length and can
+          // initialize [this.payload].
+          this.payload = Buffer.alloc(this.payloadLength);
+          break;
+        } else if (i === source.length) {
+          // If we've hit the end of the source chunk, we need to wait for the
+          // next chunk to arrive. Just return the number of bytes we've
+          // consumed so far.
+          return i;
+        } else {
+          // Otherwise, we continue reading bytes from the source data to fill
+          // in [this.payloadLength].
+        }
+      }
     }
 
-    const payloadBytesWritten = writeBuffer(
-      source.slice(bytesWritten),
-      this.payload,
-      this.payloadOffset
+    // Copy as many bytes as we can from [source] to [payload], making sure not
+    // to try to copy more than the payload can hold (if the source has another
+    // message after the current one) or more than the source has available (if
+    // the current message is split across multiple chunks).
+    const bytesToWrite = Math.min(
+      this.payload.length - this.payloadOffset,
+      source.length - i
     );
-    this.payloadOffset += payloadBytesWritten;
+    this.payload.set(source.subarray(i, i + bytesToWrite), this.payloadOffset);
+    this.payloadOffset += bytesToWrite;
 
-    return bytesWritten + payloadBytesWritten;
+    return i + bytesToWrite;
   }
-}
-
-// Fills the destination buffer, starting at the offset index, with bytes from
-// the source buffer. Returns the number of bytes written. Does not write beyond
-// the length of the destination.
-function writeBuffer(
-  source: Buffer,
-  destination: Buffer,
-  destinationOffset: number
-): number {
-  const bytesToWrite = Math.min(
-    source.length,
-    destination.length - destinationOffset
-  );
-  destination.set(source.slice(0, bytesToWrite), destinationOffset);
-  return bytesToWrite;
 }

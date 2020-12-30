@@ -103,7 +103,7 @@ describe('compile', () => {
         try {
           await compileString({source: 'a {b: 1px + 1em}'});
         } catch (error) {
-          expect(error.message).toBe('Incompatible units em and px.');
+          expect(error.message).toBe('1px and 1em have incompatible units.');
           expect(error.span).toEqual({
             text: '1px + 1em',
             start: {
@@ -129,7 +129,7 @@ describe('compile', () => {
         } catch (error) {
           const message = error.message.split(': ');
           expect(message[0]).toBe('Cannot open file');
-          expectEqualPaths(message[1], `${resolve('test.scss')}`);
+          expectEqualPaths(message[1], resolve('test.scss'));
           expect(error.span).toBe(undefined);
         }
       });
@@ -146,7 +146,7 @@ describe('compile', () => {
         try {
           await compileString({source});
         } catch (error) {
-          expect(error.message).toBe('Incompatible units em and px.');
+          expect(error.message).toBe('1px and 1em have incompatible units.');
           expect(error.span).toEqual({
             text: '1px +\n     1em',
             start: {

@@ -2,11 +2,14 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-import {execSync} from 'child_process';
-import {promises as fs} from 'fs';
+import * as p from 'path';
+import {promises as fs, existsSync} from 'fs';
 import fetch, {RequestInit} from 'node-fetch';
 import {extract as extractTar} from 'tar';
 import extractZip = require('extract-zip');
+import * as shell from 'shelljs';
+
+shell.config.fatal = true;
 
 /**
  * Gets the latest version of the Embedded Protocol and writes it to pbjs with
@@ -42,15 +45,13 @@ export async function getEmbeddedProtocol(outPath: string): Promise<void> {
       getOs() === 'windows'
         ? '%CD%/node_modules/.bin/protoc-gen-ts.cmd'
         : 'node_modules/.bin/protoc-gen-ts';
-    execSync(
+    shell.exec(
       `${protocPath} \
         --plugin="protoc-gen-ts=${pluginPath}" \
         --js_out="import_style=commonjs,binary:." \
         --ts_out="." \
         ${outPath}/${protoName}`,
-      {
-        windowsHide: true,
-      }
+      {silent: true}
     );
   } catch (error) {
     throw Error(`Failed to write proto to pbjs: ${error.message}.`);
@@ -60,9 +61,76 @@ export async function getEmbeddedProtocol(outPath: string): Promise<void> {
 /**
  * Gets the latest version of the Dart Sass wrapper for the Embedded Compiler.
  * Throws if an error occurs.
+ *
+ * @param release - Whether to download a release version of the Embedded
+ *   Compiler or build one from source.
+ * @param version - If `release` is `true`, the version of the Embedded Compiler
+ *   to download. If it's `false`, the Git ref to check out. Defaults to
+ *   the latest available version or `master`, respectively.
  */
-export async function getDartSassEmbedded(outPath: string): Promise<void> {
-  await fs.mkdir(outPath, {recursive: true});
+export async function getDartSassEmbedded(
+  outPath: string,
+  {release = false, version}: {release?: boolean; version?: string}
+): Promise<void> {
+  if (release) {
+    await downloadDartSassEmbedded(outPath, version);
+  } else {
+    await buildDartSassEmbedded(outPath, version);
+  }
+}
+
+// Clones the Embedded Dart Sass repo and build its executable from source.
+async function buildDartSassEmbedded(
+  outPath: string,
+  version = 'master'
+): Promise<void> {
+  await cleanEmbeddedDir(outPath);
+
+  const repoPath = 'build/dart-sass-embedded';
+  if (existsSync(repoPath)) {
+    console.log('Fetching latest Dart Sass Embedded.');
+    shell.exec(`git fetch --depth=1 origin ${version}`, {
+      silent: true,
+      cwd: repoPath,
+    });
+    shell.exec('git reset --hard FETCH_HEAD', {silent: true, cwd: repoPath});
+  } else {
+    console.log('Cloning Dart Sass Embedded.');
+    shell.exec(
+      `git clone \
+        --depth=1 \
+        git://github.com/sass/dart-sass-embedded \
+        ${repoPath}`,
+      {silent: true}
+    );
+  }
+
+  console.log('Downloading Dart Sass Embedded dependencies.');
+  shell.exec('pub upgrade', {silent: true, cwd: repoPath});
+
+  console.log('Building Dart Sass Embedded.');
+  shell.exec('pub run grinder protobuf pkg-standalone-dev', {
+    silent: true,
+    cwd: repoPath,
+  });
+
+  if (getOs() === 'windows') {
+    shell.cp('-R', p.join(repoPath, 'build'), p.join(outPath, 'sass_embedded'));
+  } else {
+    // Symlinking doesn't play nice with Jasmine's test globbing on Windows.
+    fs.symlink(
+      p.relative(outPath, p.join(repoPath, 'build')),
+      p.join(outPath, 'sass_embedded')
+    );
+  }
+}
+
+// Downloads the latest release version of the Embedded Dart Sass compiler.
+async function downloadDartSassEmbedded(
+  outPath: string,
+  version?: string
+): Promise<void> {
+  await cleanEmbeddedDir(outPath);
 
   let latestRelease: {
     tag_name: string;
@@ -85,12 +153,22 @@ export async function getDartSassEmbedded(outPath: string): Promise<void> {
           Buffer.from(`sassbot:${process.env.GITHUB_AUTH}`).toString('base64'),
       };
     }
-    const response = await fetch(
-      'https://api.github.com/repos/sass/dart-sass-embedded/releases',
-      fetchOptions
-    );
-    if (!response.ok) throw Error(response.statusText);
-    latestRelease = JSON.parse(await response.text())[0];
+
+    if (version) {
+      const response = await fetch(
+        'https://api.github.com/repos/sass/dart-sass-embedded/releases/tags/${version}',
+        fetchOptions
+      );
+      if (!response.ok) throw Error(response.statusText);
+      latestRelease = JSON.parse(await response.text());
+    } else {
+      const response = await fetch(
+        'https://api.github.com/repos/sass/dart-sass-embedded/releases',
+        fetchOptions
+      );
+      if (!response.ok) throw Error(response.statusText);
+      latestRelease = JSON.parse(await response.text())[0];
+    }
   } catch (error) {
     throw Error(
       `Failed to get Dart Sass Embedded release info: ${error.message}.`
@@ -132,6 +210,16 @@ export async function getDartSassEmbedded(outPath: string): Promise<void> {
     await fs.unlink(archivePath);
   } catch (error) {
     throw Error(`Failed to write Dart Sass Embedded binary: ${error.message}.`);
+  }
+}
+
+// Ensures that `outPath` exists and its `sass_embedded` subdirectory does not.
+async function cleanEmbeddedDir(outPath: string): Promise<void> {
+  await fs.mkdir(outPath, {recursive: true});
+  try {
+    await fs.rmdir(p.join(outPath, 'sass_embedded'), {recursive: true});
+  } catch (_) {
+    // If the path doesn't exist yet, that's fine.
   }
 }
 

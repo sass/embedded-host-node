@@ -2,8 +2,6 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-import {URL} from 'url';
-
 import {SassException} from './exception';
 
 describe('SassException', () => {
@@ -42,7 +40,7 @@ describe('SassException', () => {
         line: 1,
         column: 1,
       },
-      url: new URL('https://url'),
+      url: 'https://url',
       context: 'context',
     };
     const error = new SassException('', span);

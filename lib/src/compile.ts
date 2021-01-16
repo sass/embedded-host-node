@@ -41,14 +41,14 @@ export async function compile(options: {
 export async function compileString(options: {
   source: string;
   sourceMap?: (sourceMap: RawSourceMap) => void;
-  url?: URL;
+  url?: URL | string;
 }): Promise<string> {
   // TODO(awjin): Create logger, importer, function registries.
 
   const request = newCompileStringRequest({
     source: options.source,
     sourceMap: !!options.sourceMap,
-    url: options.url,
+    url: options.url instanceof URL ? options.url.toString() : options.url,
   });
 
   const response = await compileRequest(request);
@@ -76,7 +76,7 @@ function newCompileRequest(options: {
 function newCompileStringRequest(options: {
   source: string;
   sourceMap: boolean;
-  url?: URL;
+  url?: string;
 }): InboundMessage.CompileRequest {
   // TODO(awjin): Populate request with importer/function IDs.
 

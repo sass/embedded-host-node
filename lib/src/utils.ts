@@ -2,7 +2,6 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-import {URL} from 'url';
 import {SassException} from './exception/exception';
 import {SourceLocation} from './exception/location';
 import {SourceSpan} from './exception/span';
@@ -56,7 +55,7 @@ function deprotifySourceSpan(buffer: proto.SourceSpan): SourceSpan {
     }
   }
 
-  const url = buffer.getUrl() === '' ? undefined : new URL(buffer.getUrl());
+  const url = buffer.getUrl() === '' ? undefined : buffer.getUrl();
 
   const context = buffer.getContext() === '' ? undefined : buffer.getContext();
 

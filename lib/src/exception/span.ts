@@ -2,8 +2,6 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-import {URL} from 'url';
-
 import {SourceLocation} from './location';
 
 /**
@@ -29,7 +27,7 @@ export interface SourceSpan {
    * The URL of the file to which this span refers. If omitted, indicates that
    * the span refers to a string that doesn't specify a URL.
    */
-  readonly url?: URL;
+  readonly url?: string;
 
   /**
    * Additional source text surrounding the span. Usually contains the full

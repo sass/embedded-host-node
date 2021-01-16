@@ -4,7 +4,7 @@
 
 import {promises as fs} from 'fs';
 import {resolve} from 'path';
-import {fileURLToPath, URL} from 'url';
+import {fileURLToPath} from 'url';
 
 import {compile, compileString} from './compile';
 import {expectEqualPaths} from '../../spec/helpers/utils';
@@ -182,14 +182,15 @@ a {
       });
 
       it('displays URL of string input', async () => {
+        const url = 'foo://bar/baz';
         try {
           await compileString({
             source: 'a {b: 1px + 1em}',
-            url: new URL('foo://bar/baz'),
+            url,
           });
         } catch (error) {
-          expect(error.span.url).toEqual(new URL('foo://bar/baz'));
-          expect(error.stack).toBe('foo://bar/baz 1:7  root stylesheet\n');
+          expect(error.span.url).toEqual(url);
+          expect(error.stack).toBe(`${url} 1:7  root stylesheet\n`);
         }
       });
 

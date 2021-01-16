@@ -3,7 +3,6 @@
 // https://opensource.org/licenses/MIT.
 
 import {RawSourceMap} from 'source-map';
-import {URL} from 'url';
 
 import {EmbeddedCompiler} from './embedded/compiler';
 import {Dispatcher} from './embedded/dispatcher';
@@ -41,7 +40,7 @@ export async function compile(options: {
 export async function compileString(options: {
   source: string;
   sourceMap?: (sourceMap: RawSourceMap) => void;
-  url?: URL;
+  url?: string;
 }): Promise<string> {
   // TODO(awjin): Create logger, importer, function registries.
 
@@ -76,7 +75,7 @@ function newCompileRequest(options: {
 function newCompileStringRequest(options: {
   source: string;
   sourceMap: boolean;
-  url?: URL;
+  url?: string;
 }): InboundMessage.CompileRequest {
   // TODO(awjin): Populate request with importer/function IDs.
 

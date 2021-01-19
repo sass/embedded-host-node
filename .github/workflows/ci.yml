@@ -1,5 +1,8 @@
 name: CI
 
+env:
+  protoc_version: '3.x'
+
 on:
   push: {branches: [master]}
   pull_request: {branches: [master]}
@@ -16,7 +19,10 @@ jobs:
         node-version: 15.x
         check-latest: true
     - uses: arduino/setup-protoc@v1
-      with: {version: 3.x}
+      with: {
+        version: "${{env.protoc_version}}",
+        repo-token: "${{github.token}}"
+      }
     - run: npm install
     - run: npm run init -- --release
     - run: npm run check
@@ -38,7 +44,10 @@ jobs:
         node-version: ${{ matrix.node-version }}
         check-latest: true
     - uses: arduino/setup-protoc@v1
-      with: {version: 3.x}
+      with: {
+        version: "${{env.protoc_version}}",
+        repo-token: "${{github.token}}"
+      }
     - uses: cedx/setup-dart@v2
       with: {release-channel: stable}
     - run: dart --version

@@ -34,3 +34,17 @@ export function expectEqualPaths(actual: string, expected: string): void {
     expect(actual).toBe(expected);
   }
 }
+
+/**
+ * Asserts that `string1` is equal to `string2`, ignoring all whitespace in
+ * either string.
+ */
+export function expectEqualIgnoringWhitespace(
+  string1: string,
+  string2: string
+): void {
+  function strip(str: string) {
+    return str.replace(/\s+/g, '');
+  }
+  expect(strip(string1)).toBe(strip(string2));
+}

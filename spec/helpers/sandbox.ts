@@ -13,6 +13,7 @@ const root = 'sandbox';
 export async function run(
   test: Function,
   options: {
+    // Directories to put in the SASS_PATH env variable before running test.
     sassPathDirs?: string[];
   } = {}
 ): Promise<void> {

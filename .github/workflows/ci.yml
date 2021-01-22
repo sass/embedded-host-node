@@ -20,7 +20,7 @@ jobs:
         check-latest: true
     - uses: arduino/setup-protoc@v1
       with:
-        version: "${{env.protoc_version}}",
+        version: "${{env.protoc_version}}"
         repo-token: "${{github.token}}"
     - run: npm install
     - run: npm run init -- --release
@@ -44,7 +44,7 @@ jobs:
         check-latest: true
     - uses: arduino/setup-protoc@v1
       with:
-        version: "${{env.protoc_version}}",
+        version: "${{env.protoc_version}}"
         repo-token: "${{github.token}}"
     - uses: cedx/setup-dart@v2
       with: {release-channel: stable}

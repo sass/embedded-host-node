@@ -28,6 +28,7 @@ export function deprotifyException(
 
   return new SassException(
     buffer.getMessage(),
+    buffer.getFormatted(),
     span ? deprotifySourceSpan(span) : undefined,
     buffer.getStackTrace()
   );

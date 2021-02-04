@@ -95,7 +95,7 @@ describe('compile', () => {
             url: undefined,
             context: 'a {',
           });
-          expect(error.stack).toBe('- 1:4  root stylesheet\n');
+          expect(error.trace).toBe('- 1:4  root stylesheet\n');
         }
       });
 
@@ -119,7 +119,7 @@ describe('compile', () => {
             url: undefined,
             context: 'a {b: 1px + 1em}',
           });
-          expect(error.stack).toBe('- 1:7  root stylesheet\n');
+          expect(error.trace).toBe('- 1:7  root stylesheet\n');
         }
       });
 
@@ -131,6 +131,7 @@ describe('compile', () => {
           expect(message[0]).toBe('Cannot open file');
           expectEqualPaths(message[1], resolve('test.scss'));
           expect(error.span).toBe(undefined);
+          expect(error.trace).toBe(undefined);
         }
       });
 
@@ -138,6 +139,20 @@ describe('compile', () => {
     });
 
     describe('output', () => {
+      it('emits a nicely formatted message', async () => {
+        try {
+          await compileString({source: 'a {b: 1px + 1em}'});
+        } catch (error) {
+          expect(error.toString())
+            .toBe(`Error: 1px and 1em have incompatible units.
+  ╷
+1 │ a {b: 1px + 1em}
+  │       ^^^^^^^^^
+  ╵
+  - 1:7  root stylesheet`);
+        }
+      });
+
       it('emits multi-line source span', async () => {
         const source = `a {
   b: 1px +
@@ -162,7 +177,16 @@ describe('compile', () => {
             url: undefined,
             context: '  b: 1px +\n     1em;\n',
           });
-          expect(error.stack).toBe('- 2:6  root stylesheet\n');
+          expect(error.trace).toBe('- 2:6  root stylesheet\n');
+          expect(error.toString())
+            .toBe(`Error: 1px and 1em have incompatible units.
+  ╷
+2 │     b: 1px +
+  │ ┌──────^
+3 │ │      1em;
+  │ └────────^
+  ╵
+  - 2:6  root stylesheet`);
         }
       });
 
@@ -177,7 +201,7 @@ a {
         try {
           await compileString({source});
         } catch (error) {
-          expect(error.stack).toBe('- 2:11  fail()\n- 6:6   root stylesheet\n');
+          expect(error.trace).toBe('- 2:11  fail()\n- 6:6   root stylesheet\n');
         }
       });
 
@@ -189,8 +213,8 @@ a {
             url,
           });
         } catch (error) {
-          expect(error.span.url).toEqual(url);
-          expect(error.stack).toBe(`${url} 1:7  root stylesheet\n`);
+          expect(error.span.url).toBe(url);
+          expect(error.trace).toBe(`${url} 1:7  root stylesheet\n`);
         }
       });
 
@@ -203,7 +227,7 @@ a {
           });
         } catch (error) {
           expectEqualPaths(fileURLToPath(error.span.url), resolve(path));
-          expect(error.stack).toBe(`${path} 1:7  root stylesheet\n`);
+          expect(error.trace).toBe(`${path} 1:7  root stylesheet\n`);
         } finally {
           await fs.unlink(path);
         }

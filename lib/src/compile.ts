@@ -9,7 +9,7 @@ import {EmbeddedCompiler} from './embedded/compiler';
 import {Dispatcher} from './embedded/dispatcher';
 import {MessageTransformer} from './embedded/message-transformer';
 import {PacketTransformer} from './embedded/packet-transformer';
-import {deprotifyException} from './utils';
+import {deprotifyException} from './helpers/utils';
 import {InboundMessage} from './vendor/embedded_sass_pb';
 
 /**

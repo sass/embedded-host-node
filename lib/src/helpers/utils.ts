@@ -2,17 +2,24 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-import {SassException} from './exception/exception';
-import {SourceLocation} from './exception/location';
-import {SourceSpan} from './exception/span';
-import * as proto from './vendor/embedded_sass_pb';
+import {SassException} from '../exception/exception';
+import {SourceLocation} from '../exception/location';
+import {SourceSpan} from '../exception/span';
+import * as proto from '../vendor/embedded_sass_pb';
 
 export type PromiseOr<T> = T | Promise<T>;
 
+/** Checks for null or undefined. */
+export function isEmpty<T>(object: T): boolean {
+  return object === null || object === undefined;
+}
+
+/** Constructs a compiler-caused Error. */
 export function compilerError(message: string): Error {
   return Error(`Compiler caused error: ${message}.`);
 }
 
+/** Constructs a host-caused Error. */
 export function hostError(message: string): Error {
   return Error(`Compiler reported error: ${message}.`);
 }

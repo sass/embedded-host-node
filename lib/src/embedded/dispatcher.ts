@@ -17,7 +17,7 @@ import {
   OutboundTypedMessage,
 } from './message-transformer';
 import {RequestTracker} from './request-tracker';
-import {PromiseOr} from '../utils';
+import {PromiseOr} from '../helpers/utils';
 
 /**
  * Dispatches requests, responses, and events.

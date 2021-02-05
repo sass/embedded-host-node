@@ -7,7 +7,7 @@ import {Subject} from 'rxjs';
 import {InboundMessage, OutboundMessage} from '../vendor/embedded_sass_pb';
 import {InboundTypedMessage, OutboundTypedMessage} from './message-transformer';
 import {Dispatcher} from './dispatcher';
-import {PromiseOr} from '../utils';
+import {PromiseOr} from '../helpers/utils';
 import {expectObservableToError} from '../../../spec/helpers/utils';
 
 describe('dispatcher', () => {

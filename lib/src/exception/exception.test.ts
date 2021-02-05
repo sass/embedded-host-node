@@ -5,29 +5,15 @@
 import {SassException} from './exception';
 
 describe('SassException', () => {
-  it('has the correct name', () => {
-    const error = new SassException();
-
-    try {
-      throw error;
-    } catch (error) {
-      const stackTraceLine1 = error.stack.split('\n')[0];
-      expect(/SassException/.test(stackTraceLine1)).toBe(true);
-    }
-  });
-
   it('has the correct message', () => {
-    const message = 'sad';
-    const error = new SassException(message);
-
     try {
-      throw error;
+      throw new SassException('sad', '');
     } catch (error) {
-      expect(error.message).toBe(message);
+      expect(error.message).toBe('sad');
     }
   });
 
-  it('has the given span', () => {
+  it('has the correct span', () => {
     const span = {
       text: 'text',
       start: {
@@ -43,35 +29,36 @@ describe('SassException', () => {
       url: 'https://url',
       context: 'context',
     };
-    const error = new SassException('', span);
-
     try {
-      throw error;
+      throw new SassException('', '', span);
     } catch (error) {
       expect(error.span).toEqual(span);
     }
   });
 
-  it('has the default stack trace', () => {
-    const message = 'default';
-    const error = new SassException(message);
-
+  it('has the correct trace', () => {
     try {
-      throw error;
+      throw new SassException('', '', undefined, 'sherlock');
     } catch (error) {
-      const stackTraceLine1 = error.stack.split('\n')[0];
-      expect(stackTraceLine1).toBe(`SassException: ${message}`);
+      expect(error.trace).toBe('sherlock');
     }
   });
 
-  it('overrides the default stack trace', () => {
-    const stack = 'override';
-    const error = new SassException('', undefined, stack);
-
+  it('has a useful toString() method', () => {
     try {
-      throw error;
+      throw new SassException('', 'Error: aesthetically sad');
     } catch (error) {
-      expect(error.stack).toBe(stack);
+      expect(error.toString()).toBe('Error: aesthetically sad');
+    }
+  });
+
+  it('contains the Sass stack inside the JS stack', () => {
+    try {
+      throw new SassException('sad', 'Error: aesthetically\n  sad');
+    } catch (error) {
+      expect(/^Error: aesthetically\n\s\ssad\n\s+at/.test(error.stack)).toBe(
+        true
+      );
     }
   });
 });

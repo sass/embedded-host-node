@@ -10,20 +10,29 @@ import {SourceSpan} from './span';
 export class SassException extends Error {
   /**
    * @param message - The error message.
+   * @param formatted - The formatted error message. Includes the message, span,
+   *                    and trace.
    * @param [span] - The source span associated with the error.
-   * @param [stack] - The stack trace associated with the error.
+   * @param [trace] - The trace associated with the error.
    */
-  constructor(message?: string, readonly span?: SourceSpan, stack?: string) {
+  constructor(
+    readonly message: string,
+    private readonly formatted: string,
+    readonly span?: SourceSpan,
+    readonly trace?: string
+  ) {
     super(message);
 
-    this.name = this.constructor.name;
+    if (trace === '') this.trace = undefined;
 
-    if (stack) {
-      this.stack = stack;
-    } else {
-      Error.captureStackTrace(this, this.constructor);
-    }
+    // Inject the entire Sass error into the JS stack trace.
+    this.stack = this.stack?.replace(
+      new RegExp(`Error: ${message}`),
+      this.formatted
+    );
   }
 
-  // TODO(awjin): toString()
+  toString() {
+    return this.formatted;
+  }
 }

@@ -10,7 +10,7 @@ import * as proto from './vendor/embedded_sass_pb';
 export type PromiseOr<T> = T | Promise<T>;
 
 /** Checks for null or undefined. */
-export function isEmpty<T>(object: T): boolean {
+export function isNullOrUndefined<T>(object: T): boolean {
   return object === null || object === undefined;
 }
 

@@ -2,9 +2,10 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-import * as p from 'path';
 import {promises as fs} from 'fs';
+import * as p from 'path';
 import {RawSourceMap} from 'source-map';
+import {pathToFileURL} from 'url';
 
 import * as sandbox from '../../../spec/helpers/sandbox';
 import {expectEqualIgnoringWhitespace} from '../../../spec/helpers/utils';
@@ -44,7 +45,7 @@ describe('render', () => {
     });
 
     it('enforces that one of data and file must be set', async done => {
-      render({}, error => {
+      render({file: ''}, error => {
         expect(error!.message).toBe(
           'Either options.data or options.file must be set.'
         );
@@ -145,7 +146,7 @@ describe('render', () => {
       await sandbox.run(async () => {
         await fs.writeFile(sassPath, 'a {b: c}');
         await render(
-          {data: `@import "${p.resolve(sassPath)}"`},
+          {data: `@import "${pathToFileURL(p.resolve(sassPath))}"`},
           (_, result) => {
             expectEqualIgnoringWhitespace(result!.css.toString(), 'a {b: c;}');
           }
@@ -262,9 +263,9 @@ describe('render', () => {
 
     describe('basic invocation', () => {
       const outFile = 'out.css';
-      let expectedMap;
-      let map;
-      let css;
+      let expectedMap: RawSourceMap;
+      let map: RawSourceMap;
+      let css: string;
 
       beforeAll(async done => {
         const data = 'a {b: c}';

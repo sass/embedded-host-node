@@ -18,11 +18,11 @@ import {isNullOrUndefined} from '../utils';
  */
 export type RenderOptions = (FileOptions | StringOptions) & SharedOptions;
 
-interface FileOptions {
+interface FileOptions extends SharedOptions {
   file: string;
 }
 
-interface StringOptions {
+interface StringOptions extends SharedOptions {
   data: string;
   file?: string;
 }
@@ -87,8 +87,8 @@ export function render(
   options: RenderOptions,
   callback: (error?: RenderError, result?: RenderResult) => void
 ): void {
-  const fileRequest = options as FileOptions & SharedOptions;
-  const stringRequest = options as StringOptions & SharedOptions;
+  const fileRequest = options as FileOptions;
+  const stringRequest = options as StringOptions;
 
   if (!fileRequest.file && isNullOrUndefined(stringRequest.data)) {
     callback(
@@ -111,11 +111,10 @@ export function render(
       })
     : compile({path: fileRequest.file, sourceMap: getSourceMap});
 
-  compileSass
-    .then(css =>
-      callback(undefined, newRenderResult(options, start, css, sourceMap))
-    )
-    .catch(error => callback(newRenderError(error)));
+  compileSass.then(
+    css => callback(undefined, newRenderResult(options, start, css, sourceMap)),
+    error => callback(newRenderError(error))
+  );
 }
 
 // Determines whether a sourceMap was requested by the call to render().

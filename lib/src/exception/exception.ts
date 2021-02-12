@@ -23,11 +23,12 @@ export class SassException extends Error {
   ) {
     super(message);
 
+    if (formatted === '') this.formatted = `Error: ${message}`;
     if (trace === '') this.trace = undefined;
 
     // Inject the entire Sass error into the JS stack trace.
     this.stack = this.stack?.replace(
-      new RegExp(`Error: ${message}`),
+      new RegExp(`^Error: ${message}`),
       this.formatted
     );
   }

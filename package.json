@@ -1,5 +1,5 @@
 {
-  "name": "embedded-host-node",
+  "name": "sass-embedded",
   "version": "1.0.0-alpha.1",
   "description": "Node.js library that communicates with Embedded Dart Sass using the Embedded Sass protocol",
   "repository": "sass/embedded-host-node",

@@ -2,7 +2,10 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-import {InboundMessage, OutboundMessage} from '../vendor/embedded_sass_pb';
+import {
+  InboundMessage,
+  OutboundMessage,
+} from '../vendor/embedded-protocol/embedded_sass_pb';
 import {RequestTracker} from './request-tracker';
 
 describe('request tracker', () => {

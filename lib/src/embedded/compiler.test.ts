@@ -4,7 +4,7 @@
 
 import {take} from 'rxjs/operators';
 
-import {InboundMessage} from '../vendor/embedded_sass_pb';
+import {InboundMessage} from '../vendor/embedded-protocol/embedded_sass_pb';
 import {EmbeddedCompiler} from './compiler';
 
 describe('embedded compiler smoke test', () => {

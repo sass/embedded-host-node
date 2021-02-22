@@ -5,7 +5,7 @@
 import {SassException} from './exception/exception';
 import {SourceLocation} from './exception/location';
 import {SourceSpan} from './exception/span';
-import * as proto from './vendor/embedded_sass_pb';
+import * as proto from './vendor/embedded-protocol/embedded_sass_pb';
 
 export type PromiseOr<T> = T | Promise<T>;
 

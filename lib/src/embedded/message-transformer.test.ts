@@ -10,7 +10,7 @@ import {
   InboundMessage,
   OutboundMessage,
   ProtocolError,
-} from '../vendor/embedded_sass_pb';
+} from '../vendor/embedded-protocol/embedded_sass_pb';
 
 describe('message transformer', () => {
   let messages: MessageTransformer;

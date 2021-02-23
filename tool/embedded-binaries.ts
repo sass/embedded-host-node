@@ -156,8 +156,8 @@ async function downloadRelease(options: {
     redirect: 'follow',
   };
 
-  console.log(`Negotiating version for ${options.repo}.`);
-  let releaseInfo: ReleaseInfo | undefined;
+  console.log(`Getting version info for ${options.repo}.`);
+  let latestRelease: ReleaseInfo;
   try {
     const response = await fetch(
       'https://api.github.com/repos/sass/' +
@@ -166,31 +166,24 @@ async function downloadRelease(options: {
     );
     if (!response.ok) throw Error(response.statusText);
 
-    const releases = JSON.parse(await response.text());
+    latestRelease = JSON.parse(await response.text())[0];
     if (options.version) {
-      for (let i = 0; i < releases.length; i++) {
-        if (satisfies(releases[i].name, options.version)) {
-          releaseInfo = releases[i];
-          break;
-        }
+      if (!satisfies(latestRelease.name, options.version)) {
+        throw Error(
+          `Latest release is not compatible with ${options.version}.`
+        );
       }
-    } else {
-      releaseInfo = releases[0];
-    }
-
-    if (!releaseInfo) {
-      throw Error(`Could not satisfy constraint ${options.version}.`);
     }
   } catch (error) {
     throw Error(
-      `Failed to negotiate version for ${options.repo}: ${error.message}.`
+      `Failed to get version info for ${options.repo}: ${error.message}.`
     );
   }
 
   console.log(`Downloading ${options.repo} release asset.`);
   let releaseAsset;
   try {
-    const response = await fetch(options.assetUrl(releaseInfo), fetchOptions);
+    const response = await fetch(options.assetUrl(latestRelease), fetchOptions);
     if (!response.ok) throw Error(response.statusText);
     releaseAsset = await response.buffer();
   } catch (error) {
@@ -222,7 +215,7 @@ async function downloadRelease(options: {
     );
   }
 
-  return releaseInfo.name.replace(' ', '-');
+  return latestRelease.name.replace(' ', '-');
 }
 
 // Clones `repo` into `outPath`, then checks out the given Git `ref`.

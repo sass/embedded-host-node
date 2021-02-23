@@ -82,8 +82,8 @@ export async function getEmbeddedProtocol(
       outPath,
       version: options.version,
       assetUrl: releaseInfo =>
-        `https://github.com/sass/${repo}/archive` +
-        `/${releaseInfo.name.replace(' ', '-')}` +
+        `https://github.com/sass/${repo}/archive/` +
+        `${releaseInfo.name.replace(' ', '-')}` +
         ARCHIVE_EXTENSION,
       tags: true,
     });
@@ -120,10 +120,10 @@ export async function getDartSassEmbedded(
       repo,
       version: options.version,
       assetUrl: releaseInfo =>
-        `https://github.com/sass/${repo}/releases/download` +
-        `/${releaseInfo.tag_name}` +
-        `/${releaseInfo.name.replace(' ', '-')}` +
-        `-${OS}-${ARCH}` +
+        `https://github.com/sass/${repo}/releases/download/` +
+        `${releaseInfo.tag_name}/` +
+        `${releaseInfo.name.replace(' ', '-')}-` +
+        `${OS}-${ARCH}` +
         ARCHIVE_EXTENSION,
       outPath,
     });
@@ -136,13 +136,20 @@ export async function getDartSassEmbedded(
   }
 }
 
-// Downloads release asset into `outPath`. Returns the version that was
-// downloaded.
+// Downloads a release asset and returns the version that was downloaded.
 async function downloadRelease(options: {
+  // The Sass repo whose release we should download.
   repo: string;
+  // The directory to download the release into.
   outPath: string;
+  // Semver constraint for the release. This will always download the latest
+  // available version of the release, but will error if the latest version is
+  // not compatible with this version.
   version?: string;
+  // Given the ReleaseInfo of the latest release, this callback should return
+  // the URL at which to download the asset.
   assetUrl: (release: ReleaseInfo) => string;
+  // Whether to download the tag archive instead of a release asset.
   tags?: boolean;
 }): Promise<string> {
   const fetchOptions: RequestInit = {
@@ -153,9 +160,8 @@ async function downloadRelease(options: {
   let releaseInfo: ReleaseInfo | undefined;
   try {
     const response = await fetch(
-      `https://api.github.com/repos/sass/${options.repo}/${
-        options.tags ? 'tags' : 'releases'
-      }`,
+      'https://api.github.com/repos/sass/' +
+        `${options.repo}/${options.tags ? 'tags' : 'releases'}`,
       fetchOptions
     );
     if (!response.ok) throw Error(response.statusText);
@@ -195,17 +201,17 @@ async function downloadRelease(options: {
 
   console.log(`Unzipping ${options.repo} release asset to ${options.outPath}.`);
   try {
-    await cleanEmbeddedDir(options.outPath, options.repo);
+    await cleanDir(p.join(options.outPath, options.repo));
     const zippedAssetPath = `${options.outPath}/${options.repo}${ARCHIVE_EXTENSION}`;
     await fs.writeFile(zippedAssetPath, releaseAsset);
     if (OS === 'windows') {
       await extractZip(zippedAssetPath, {
-        dir: p.join(process.cwd()),
+        dir: process.cwd(),
       });
     } else {
       extractTar({
         file: zippedAssetPath,
-        cwd: p.join(options.outPath),
+        cwd: options.outPath,
         sync: true,
       });
     }
@@ -244,14 +250,14 @@ function fetchRepo(repo: string, outPath: string, ref?: string) {
   });
 }
 
-// Links the built files at `builtPath` into `outPath`.
+// Links the built files at `builtPath` into `outPath`/`repo`.
 async function linkBuiltFiles(
   repo: string,
   builtPath: string,
   outPath: string
 ) {
   console.log(`Linking built ${repo} into ${outPath}.`);
-  await cleanEmbeddedDir(outPath, repo);
+  await cleanDir(p.join(outPath, repo));
   if (OS === 'windows') {
     shell.cp('-R', builtPath, p.join(outPath, repo));
   } else {
@@ -301,15 +307,12 @@ function buildDartSassEmbedded(repoPath: string) {
   });
 }
 
-// Ensures that `outPath` exists and the `subdir` does not.
-async function cleanEmbeddedDir(
-  outPath: string,
-  subdir: string
-): Promise<void> {
-  await fs.mkdir(outPath, {recursive: true});
+// Ensures that `dir` does not exist, but its parent directory does.
+async function cleanDir(dir: string): Promise<void> {
+  await fs.mkdir(p.dirname(dir), {recursive: true});
   try {
-    await fs.rmdir(p.join(outPath, subdir), {recursive: true});
+    await fs.rmdir(dir, {recursive: true});
   } catch (_) {
-    // If the path doesn't exist yet, that's fine.
+    // If dir doesn't exist yet, that's fine.
   }
 }

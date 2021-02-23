@@ -2,13 +2,13 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
+import extractZip = require('extract-zip');
+import {promises as fs, existsSync} from 'fs';
+import fetch from 'node-fetch';
 import * as p from 'path';
 import {satisfies} from 'semver';
-import {promises as fs, existsSync} from 'fs';
-import fetch, {RequestInit} from 'node-fetch';
-import {extract as extractTar} from 'tar';
-import extractZip = require('extract-zip');
 import * as shell from 'shelljs';
+import {extract as extractTar} from 'tar';
 
 shell.config.fatal = true;
 
@@ -77,17 +77,22 @@ export async function getEmbeddedProtocol(
 ): Promise<void> {
   const repo = 'embedded-protocol';
   if (options.release) {
-    const version = await downloadRelease({
+    const latestRelease = await getLatestReleaseInfo(
       repo,
-      outPath,
-      version: options.version,
-      assetUrl: releaseInfo =>
-        `https://github.com/sass/${repo}/archive/` +
-        `${releaseInfo.name.replace(' ', '-')}` +
+      options.version,
+      true
+    );
+    await downloadRelease(
+      repo,
+      `https://github.com/sass/${repo}/archive/` +
+        `${latestRelease.name.replace(' ', '-')}` +
         ARCHIVE_EXTENSION,
-      tags: true,
-    });
-    fs.rename(p.join(outPath, `${repo}-${version}`), p.join(outPath, repo));
+      outPath
+    );
+    fs.rename(
+      p.join(outPath, `${repo}-${latestRelease.name.replace(' ', '-')}`),
+      p.join(outPath, repo)
+    );
     buildEmbeddedProtocol(p.join(outPath, repo, 'embedded_sass.proto'));
   } else {
     fetchRepo(repo, BUILD_PATH, options.version);
@@ -116,17 +121,16 @@ export async function getDartSassEmbedded(
 ): Promise<void> {
   const repo = 'dart-sass-embedded';
   if (options.release) {
-    await downloadRelease({
+    const latestRelease = await getLatestReleaseInfo(repo, options.version);
+    await downloadRelease(
       repo,
-      version: options.version,
-      assetUrl: releaseInfo =>
-        `https://github.com/sass/${repo}/releases/download/` +
-        `${releaseInfo.tag_name}/` +
-        `${releaseInfo.name.replace(' ', '-')}-` +
+      `https://github.com/sass/${repo}/releases/download/` +
+        `${latestRelease.tag_name}/` +
+        `${latestRelease.name.replace(' ', '-')}-` +
         `${OS}-${ARCH}` +
         ARCHIVE_EXTENSION,
-      outPath,
-    });
+      outPath
+    );
     fs.rename(p.join(outPath, 'sass_embedded'), p.join(outPath, repo));
   } else {
     fetchRepo(repo, BUILD_PATH, options.version);
@@ -136,66 +140,58 @@ export async function getDartSassEmbedded(
   }
 }
 
-// Downloads a release asset and returns the version that was downloaded.
-async function downloadRelease(options: {
-  // The Sass repo whose release we should download.
-  repo: string;
-  // The directory to download the release into.
-  outPath: string;
-  // Semver constraint for the release. This will always download the latest
-  // available version of the release, but will error if the latest version is
-  // not compatible with this version.
-  version?: string;
-  // Given the ReleaseInfo of the latest release, this callback should return
-  // the URL at which to download the asset.
-  assetUrl: (release: ReleaseInfo) => string;
-  // Whether to download the tag archive instead of a release asset.
-  tags?: boolean;
-}): Promise<string> {
-  const fetchOptions: RequestInit = {
-    redirect: 'follow',
-  };
-
-  console.log(`Getting version info for ${options.repo}.`);
-  let latestRelease: ReleaseInfo;
+// Gets the ReleaseInfo of the latest release for `repo`. If `version` is given,
+// throws an error if the latest version is not semver-compatible with
+// `version`. If `tag` is true, gets the latest tag instead of release.
+async function getLatestReleaseInfo(
+  repo: string,
+  version?: string,
+  tag?: boolean
+): Promise<ReleaseInfo> {
+  console.log(`Getting version info for ${repo}.`);
   try {
     const response = await fetch(
       'https://api.github.com/repos/sass/' +
-        `${options.repo}/${options.tags ? 'tags' : 'releases'}`,
-      fetchOptions
+        `${repo}/${tag ? 'tags' : 'releases'}`,
+      {
+        redirect: 'follow',
+      }
     );
     if (!response.ok) throw Error(response.statusText);
 
-    latestRelease = JSON.parse(await response.text())[0];
-    if (options.version) {
-      if (!satisfies(latestRelease.name, options.version)) {
-        throw Error(
-          `Latest release is not compatible with ${options.version}.`
-        );
-      }
+    const latestRelease = JSON.parse(await response.text())[0];
+    if (version && !satisfies(latestRelease.name, version)) {
+      throw Error(`Latest release is not compatible with ${version}.`);
     }
+    return latestRelease;
   } catch (error) {
-    throw Error(
-      `Failed to get version info for ${options.repo}: ${error.message}.`
-    );
+    throw Error(`Failed to get version info for ${repo}: ${error.message}.`);
   }
+}
 
-  console.log(`Downloading ${options.repo} release asset.`);
+// Downloads the release for `repo` located at `assetUrl`, then unzips it into
+// `outPath`.
+async function downloadRelease(
+  repo: string,
+  assetUrl: string,
+  outPath: string
+): Promise<void> {
+  console.log(`Downloading ${repo} release asset.`);
   let releaseAsset;
   try {
-    const response = await fetch(options.assetUrl(latestRelease), fetchOptions);
+    const response = await fetch(assetUrl, {
+      redirect: 'follow',
+    });
     if (!response.ok) throw Error(response.statusText);
     releaseAsset = await response.buffer();
   } catch (error) {
-    throw Error(
-      `Failed to download ${options.repo} release asset: ${error.message}.`
-    );
+    throw Error(`Failed to download ${repo} release asset: ${error.message}.`);
   }
 
-  console.log(`Unzipping ${options.repo} release asset to ${options.outPath}.`);
+  console.log(`Unzipping ${repo} release asset to ${outPath}.`);
   try {
-    await cleanDir(p.join(options.outPath, options.repo));
-    const zippedAssetPath = `${options.outPath}/${options.repo}${ARCHIVE_EXTENSION}`;
+    await cleanDir(p.join(outPath, repo));
+    const zippedAssetPath = `${outPath}/${repo}${ARCHIVE_EXTENSION}`;
     await fs.writeFile(zippedAssetPath, releaseAsset);
     if (OS === 'windows') {
       await extractZip(zippedAssetPath, {
@@ -204,18 +200,14 @@ async function downloadRelease(options: {
     } else {
       extractTar({
         file: zippedAssetPath,
-        cwd: options.outPath,
+        cwd: outPath,
         sync: true,
       });
     }
     await fs.unlink(zippedAssetPath);
   } catch (error) {
-    throw Error(
-      `Failed to unzip ${options.repo} release asset: ${error.message}.`
-    );
+    throw Error(`Failed to unzip ${repo} release asset: ${error.message}.`);
   }
-
-  return latestRelease.name.replace(' ', '-');
 }
 
 // Clones `repo` into `outPath`, then checks out the given Git `ref`.
@@ -241,22 +233,6 @@ function fetchRepo(repo: string, outPath: string, ref?: string) {
     silent: true,
     cwd: p.join(outPath, repo),
   });
-}
-
-// Links the built files at `builtPath` into `outPath`/`repo`.
-async function linkBuiltFiles(
-  repo: string,
-  builtPath: string,
-  outPath: string
-) {
-  console.log(`Linking built ${repo} into ${outPath}.`);
-  await cleanDir(p.join(outPath, repo));
-  if (OS === 'windows') {
-    shell.cp('-R', builtPath, p.join(outPath, repo));
-  } else {
-    // Symlinking doesn't play nice with Jasmine's test globbing on Windows.
-    fs.symlink(p.resolve(builtPath), p.join(outPath, repo));
-  }
 }
 
 // Builds the embedded proto at `protoPath` into a pbjs with TS declaration
@@ -298,6 +274,22 @@ function buildDartSassEmbedded(repoPath: string) {
     cwd: repoPath,
     silent: true,
   });
+}
+
+// Links the built files at `builtPath` into `outPath`/`repo`.
+async function linkBuiltFiles(
+  repo: string,
+  builtPath: string,
+  outPath: string
+) {
+  console.log(`Linking built ${repo} into ${outPath}.`);
+  await cleanDir(p.join(outPath, repo));
+  if (OS === 'windows') {
+    shell.cp('-R', builtPath, p.join(outPath, repo));
+  } else {
+    // Symlinking doesn't play nice with Jasmine's test globbing on Windows.
+    fs.symlink(p.resolve(builtPath), p.join(outPath, repo));
+  }
 }
 
 // Ensures that `dir` does not exist, but its parent directory does.

@@ -12,6 +12,44 @@ import * as shell from 'shelljs';
 
 shell.config.fatal = true;
 
+// The current platform's operating system. Throws if the operating system
+// is not supported by Dart Sass Embedded.
+let OS: 'linux' | 'macos' | 'windows';
+switch (process.platform) {
+  case 'linux':
+    OS = 'linux';
+    break;
+  case 'darwin':
+    OS = 'macos';
+    break;
+  case 'win32':
+    OS = 'windows';
+    break;
+  default:
+    throw Error(`Platform ${process.platform} is not supported.`);
+}
+
+// The current platform's architecture. Throws if the architecture is not
+// supported by Dart Sass Embedded.
+let ARCH: 'ia32' | 'x64';
+switch (process.arch) {
+  case 'ia32':
+    ARCH = 'ia32';
+    break;
+  case 'x86':
+    ARCH = 'ia32';
+    break;
+  case 'x64':
+    ARCH = 'x64';
+    break;
+  default:
+    throw Error(`Architecure ${process.arch} is not supported.`);
+}
+
+// The current platform's file extension for archives.
+const ARCHIVE_EXTENSION = OS === 'windows' ? '.zip' : '.tar.gz';
+
+// Directory that holds source files.
 const BUILD_PATH = 'build';
 
 // Release info provided by Github.
@@ -46,7 +84,7 @@ export async function getEmbeddedProtocol(
       assetUrl: releaseInfo =>
         `https://github.com/sass/${repo}/archive` +
         `/${releaseInfo.name.replace(' ', '-')}` +
-        getArchiveFileExtension(),
+        ARCHIVE_EXTENSION,
       tags: true,
     });
     fs.rename(p.join(outPath, `${repo}-${version}`), p.join(outPath, repo));
@@ -85,8 +123,8 @@ export async function getDartSassEmbedded(
         `https://github.com/sass/${repo}/releases/download` +
         `/${releaseInfo.tag_name}` +
         `/${releaseInfo.name.replace(' ', '-')}` +
-        `-${getOs()}-${getArch()}` +
-        getArchiveFileExtension(),
+        `-${OS}-${ARCH}` +
+        ARCHIVE_EXTENSION,
       outPath,
     });
     fs.rename(p.join(outPath, 'sass_embedded'), p.join(outPath, repo));
@@ -158,11 +196,9 @@ async function downloadRelease(options: {
   console.log(`Unzipping ${options.repo} release asset to ${options.outPath}.`);
   try {
     await cleanEmbeddedDir(options.outPath, options.repo);
-    const zippedAssetPath = `${options.outPath}/${
-      options.repo
-    }${getArchiveFileExtension()}`;
+    const zippedAssetPath = `${options.outPath}/${options.repo}${ARCHIVE_EXTENSION}`;
     await fs.writeFile(zippedAssetPath, releaseAsset);
-    if (getOs() === 'windows') {
+    if (OS === 'windows') {
       await extractZip(zippedAssetPath, {
         dir: p.join(process.cwd()),
       });
@@ -216,7 +252,7 @@ async function linkBuiltFiles(
 ) {
   console.log(`Linking built ${repo} into ${outPath}.`);
   await cleanEmbeddedDir(outPath, repo);
-  if (getOs() === 'windows') {
+  if (OS === 'windows') {
     shell.cp('-R', builtPath, p.join(outPath, repo));
   } else {
     // Symlinking doesn't play nice with Jasmine's test globbing on Windows.
@@ -230,11 +266,11 @@ function buildEmbeddedProtocol(protoPath: string) {
   console.log(`Building pbjs and TS declaration file from ${protoPath}.`);
   try {
     const protocPath =
-      getOs() === 'windows'
+      OS === 'windows'
         ? '%CD%/node_modules/protoc/protoc/bin/protoc.exe'
         : 'node_modules/protoc/protoc/bin/protoc';
     const pluginPath =
-      getOs() === 'windows'
+      OS === 'windows'
         ? '%CD%/node_modules/.bin/protoc-gen-ts.cmd'
         : 'node_modules/.bin/protoc-gen-ts';
     shell.exec(
@@ -276,38 +312,4 @@ async function cleanEmbeddedDir(
   } catch (_) {
     // If the path doesn't exist yet, that's fine.
   }
-}
-
-// Gets the current platform's operating system. Throws if the operating system
-// is not supported by Dart Sass Embedded.
-function getOs(): 'linux' | 'macos' | 'windows' {
-  switch (process.platform) {
-    case 'linux':
-      return 'linux';
-    case 'darwin':
-      return 'macos';
-    case 'win32':
-      return 'windows';
-    default:
-      throw Error(`Platform ${process.platform} is not supported.`);
-  }
-}
-
-// Gets the current platform's architecture. Throws if the architecture is not
-// supported by Dart Sass Embedded.
-function getArch(): 'ia32' | 'x64' {
-  switch (process.arch) {
-    case 'ia32':
-      return 'ia32';
-    case 'x86':
-      return 'ia32';
-    case 'x64':
-      return 'x64';
-    default:
-      throw Error(`Architecure ${process.arch} is not supported.`);
-  }
-}
-
-function getArchiveFileExtension(): '.zip' | '.tar.gz' {
-  return getOs() === 'windows' ? '.zip' : '.tar.gz';
 }

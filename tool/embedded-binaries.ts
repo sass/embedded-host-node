@@ -14,37 +14,33 @@ shell.config.fatal = true;
 
 // The current platform's operating system. Throws if the operating system
 // is not supported by Dart Sass Embedded.
-let OS: 'linux' | 'macos' | 'windows';
-switch (process.platform) {
-  case 'linux':
-    OS = 'linux';
-    break;
-  case 'darwin':
-    OS = 'macos';
-    break;
-  case 'win32':
-    OS = 'windows';
-    break;
-  default:
-    throw Error(`Platform ${process.platform} is not supported.`);
-}
+const OS: 'linux' | 'macos' | 'windows' = (() => {
+  switch (process.platform) {
+    case 'linux':
+      return 'linux';
+    case 'darwin':
+      return 'macos';
+    case 'win32':
+      return 'windows';
+    default:
+      throw Error(`Platform ${process.platform} is not supported.`);
+  }
+})();
 
 // The current platform's architecture. Throws if the architecture is not
 // supported by Dart Sass Embedded.
-let ARCH: 'ia32' | 'x64';
-switch (process.arch) {
-  case 'ia32':
-    ARCH = 'ia32';
-    break;
-  case 'x86':
-    ARCH = 'ia32';
-    break;
-  case 'x64':
-    ARCH = 'x64';
-    break;
-  default:
-    throw Error(`Architecure ${process.arch} is not supported.`);
-}
+const ARCH: 'ia32' | 'x64' = (() => {
+  switch (process.arch) {
+    case 'ia32':
+      return 'ia32';
+    case 'x86':
+      return 'ia32';
+    case 'x64':
+      return 'x64';
+    default:
+      throw Error(`Architecure ${process.arch} is not supported.`);
+  }
+})();
 
 // The current platform's file extension for archives.
 const ARCHIVE_EXTENSION = OS === 'windows' ? '.zip' : '.tar.gz';
@@ -77,11 +73,10 @@ export async function getEmbeddedProtocol(
 ): Promise<void> {
   const repo = 'embedded-protocol';
   if (options.release) {
-    const latestRelease = await getLatestReleaseInfo(
-      repo,
-      options.version,
-      true
-    );
+    const latestRelease = await getLatestReleaseInfo(repo, {
+      version: options.version,
+      tag: true,
+    });
     await downloadRelease(
       repo,
       `https://github.com/sass/${repo}/archive/` +
@@ -121,7 +116,9 @@ export async function getDartSassEmbedded(
 ): Promise<void> {
   const repo = 'dart-sass-embedded';
   if (options.release) {
-    const latestRelease = await getLatestReleaseInfo(repo, options.version);
+    const latestRelease = await getLatestReleaseInfo(repo, {
+      version: options.version,
+    });
     await downloadRelease(
       repo,
       `https://github.com/sass/${repo}/releases/download/` +
@@ -145,14 +142,16 @@ export async function getDartSassEmbedded(
 // `version`. If `tag` is true, gets the latest tag instead of release.
 async function getLatestReleaseInfo(
   repo: string,
-  version?: string,
-  tag?: boolean
+  options: {
+    version?: string;
+    tag?: boolean;
+  }
 ): Promise<ReleaseInfo> {
   console.log(`Getting version info for ${repo}.`);
   try {
     const response = await fetch(
       'https://api.github.com/repos/sass/' +
-        `${repo}/${tag ? 'tags' : 'releases'}`,
+        `${repo}/${options.tag ? 'tags' : 'releases'}`,
       {
         redirect: 'follow',
       }
@@ -160,8 +159,10 @@ async function getLatestReleaseInfo(
     if (!response.ok) throw Error(response.statusText);
 
     const latestRelease = JSON.parse(await response.text())[0];
-    if (version && !satisfies(latestRelease.name, version)) {
-      throw Error(`Latest release is not compatible with ${version}.`);
+    if (options.version && !satisfies(latestRelease.name, options.version)) {
+      throw Error(
+        `Latest release ${latestRelease.name} is not compatible with ${options.version}.`
+      );
     }
     return latestRelease;
   } catch (error) {

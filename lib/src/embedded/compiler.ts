@@ -15,7 +15,7 @@ export class EmbeddedCompiler {
   private readonly process = spawn(
     resolve(
       __dirname,
-      `../vendor/sass_embedded/dart-sass-embedded${
+      `../vendor/dart-sass-embedded/dart-sass-embedded${
         process.platform === 'win32' ? '.bat' : ''
       }`
     ),

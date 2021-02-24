@@ -4,7 +4,10 @@
 
 import {Subject} from 'rxjs';
 
-import {InboundMessage, OutboundMessage} from '../vendor/embedded_sass_pb';
+import {
+  InboundMessage,
+  OutboundMessage,
+} from '../vendor/embedded-protocol/embedded_sass_pb';
 import {InboundTypedMessage, OutboundTypedMessage} from './message-transformer';
 import {Dispatcher} from './dispatcher';
 import {PromiseOr} from '../utils';

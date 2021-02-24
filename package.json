@@ -26,6 +26,7 @@
     "google-protobuf": "^3.11.4",
     "immutable": "^4.0.0-rc.12",
     "rxjs": "^6.5.5",
+    "semver": "^5.7.1",
     "tar": "^6.0.5"
   },
   "devDependencies": {
@@ -34,6 +35,7 @@
     "@types/jasmine": "^3.5.11",
     "@types/node": "^12.18.2",
     "@types/node-fetch": "^2.5.7",
+    "@types/semver": "^7.3.4",
     "@types/shelljs": "^0.8.8",
     "@types/tar": "^4.0.3",
     "@types/yargs": "^15.0.12",

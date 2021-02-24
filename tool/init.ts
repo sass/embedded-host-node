@@ -13,7 +13,7 @@ const argv = yargs(process.argv.slice(2)).option('release', {
 
 async function main() {
   const outPath = 'lib/src/vendor';
-  await getEmbeddedProtocol(outPath);
+  await getEmbeddedProtocol(outPath, {release: argv.release});
   await getDartSassEmbedded(outPath, {release: argv.release});
 }
 

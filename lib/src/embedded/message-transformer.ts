@@ -6,7 +6,10 @@ import {Observable, Subject} from 'rxjs';
 import {map} from 'rxjs/operators';
 
 import {compilerError, hostError} from '../utils';
-import {InboundMessage, OutboundMessage} from '../vendor/embedded_sass_pb';
+import {
+  InboundMessage,
+  OutboundMessage,
+} from '../vendor/embedded-protocol/embedded_sass_pb';
 
 export type InboundRequestType = InboundMessage.MessageCase.COMPILEREQUEST;
 

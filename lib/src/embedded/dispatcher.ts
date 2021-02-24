@@ -5,7 +5,10 @@
 import {Observable, Subject} from 'rxjs';
 import {filter, map, mergeMap} from 'rxjs/operators';
 
-import {InboundMessage, OutboundMessage} from '../vendor/embedded_sass_pb';
+import {
+  InboundMessage,
+  OutboundMessage,
+} from '../vendor/embedded-protocol/embedded_sass_pb';
 import {
   InboundRequest,
   InboundRequestType,

@@ -58,6 +58,8 @@
     },
     "extends": "./node_modules/gts/",
     "ignorePatterns": [
+      "**/*.js",
+      "build/**/*",
       "dist/**/*",
       "lib/src/vendor/**/*"
     ]

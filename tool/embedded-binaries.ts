@@ -148,6 +148,7 @@ async function getLatestReleaseInfo(
   }
 ): Promise<ReleaseInfo> {
   console.log(`Getting version info for ${repo}.`);
+  let latestRelease: ReleaseInfo;
   try {
     const response = await fetch(
       'https://api.github.com/repos/sass/' +
@@ -157,17 +158,27 @@ async function getLatestReleaseInfo(
       }
     );
     if (!response.ok) throw Error(response.statusText);
-
-    const latestRelease = JSON.parse(await response.text())[0];
-    if (options.version && !satisfies(latestRelease.name, options.version)) {
-      throw Error(
-        `Latest release ${latestRelease.name} is not compatible with ${options.version}.`
-      );
-    }
-    return latestRelease;
+    latestRelease = JSON.parse(await response.text())[0];
   } catch (error) {
     throw Error(`Failed to get version info for ${repo}: ${error.message}.`);
   }
+
+  const latestVersion = options.tag
+    ? latestRelease.name
+    : latestRelease.tag_name;
+
+  if (options.version) {
+    try {
+      satisfies(latestVersion, options.version);
+    } catch {
+      throw Error(
+        `Latest release ${latestVersion} is not compatible with ${options.version}.`
+      );
+    }
+  }
+
+  console.log(`Latest release for ${repo} is ${latestVersion}.`);
+  return latestRelease;
 }
 
 // Downloads the release for `repo` located at `assetUrl`, then unzips it into

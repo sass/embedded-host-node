@@ -46,8 +46,8 @@ jobs:
       with:
         version: "${{env.protoc_version}}"
         repo-token: "${{github.token}}"
-    - uses: cedx/setup-dart@v2
-      with: {release-channel: stable}
+    - uses: dart-lang/setup-dart@v1
+      with: {sdk: stable}
     - run: dart --version
 
     - run: npm install

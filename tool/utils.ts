@@ -116,6 +116,7 @@ export async function getDartSassEmbedded(options: {
   release?: boolean;
 }): Promise<void> {
   const repo = 'dart-sass-embedded';
+
   if (options.release) {
     const latestRelease = await getLatestReleaseInfo({
       repo,
@@ -164,23 +165,19 @@ async function getLatestReleaseInfo(options: {
   tag?: boolean;
 }): Promise<ReleaseInfo> {
   console.log(`Getting version info for ${options.repo}.`);
-  let latestRelease: ReleaseInfo;
-  try {
-    const response = await fetch(
-      'https://api.github.com/repos/sass/' +
-        `${options.repo}/${options.tag ? 'tags' : 'releases'}`,
-      {
-        redirect: 'follow',
-      }
-    );
-    if (!response.ok) throw Error(response.statusText);
-    latestRelease = JSON.parse(await response.text())[0];
-  } catch (error) {
+  const response = await fetch(
+    'https://api.github.com/repos/sass/' +
+      `${options.repo}/${options.tag ? 'tags' : 'releases'}`,
+    {
+      redirect: 'follow',
+    }
+  );
+  if (!response.ok) {
     throw Error(
-      `Failed to get version info for ${options.repo}: ${error.message}.`
+      `Failed to get version info for ${options.repo}: ${response.statusText}`
     );
   }
-
+  const latestRelease = JSON.parse(await response.text())[0];
   const latestVersion = options.tag
     ? latestRelease.name
     : latestRelease.tag_name;
@@ -207,45 +204,40 @@ async function downloadRelease(options: {
   outPath: string;
 }): Promise<void> {
   console.log(`Downloading ${options.repo} release asset.`);
-  let releaseAsset;
-  try {
-    const response = await fetch(options.assetUrl, {
-      redirect: 'follow',
-    });
-    if (!response.ok) throw Error(response.statusText);
-    releaseAsset = await response.buffer();
-  } catch (error) {
+  const response = await fetch(options.assetUrl, {
+    redirect: 'follow',
+  });
+  if (!response.ok) {
     throw Error(
-      `Failed to download ${options.repo} release asset: ${error.message}.`
+      `Failed to download ${options.repo} release asset: ${response.statusText}`
     );
   }
+  const releaseAsset = await response.buffer();
 
   console.log(`Unzipping ${options.repo} release asset to ${options.outPath}.`);
-  try {
-    await cleanDir(p.join(options.outPath, options.repo));
-    const zippedAssetPath = `${options.outPath}/${options.repo}${ARCHIVE_EXTENSION}`;
-    await fs.writeFile(zippedAssetPath, releaseAsset);
-    if (OS === 'windows') {
-      await extractZip(zippedAssetPath, {
-        dir: process.cwd(),
-      });
-    } else {
-      extractTar({
-        file: zippedAssetPath,
-        cwd: options.outPath,
-        sync: true,
-      });
-    }
-    await fs.unlink(zippedAssetPath);
-  } catch (error) {
-    throw Error(
-      `Failed to unzip ${options.repo} release asset: ${error.message}.`
-    );
+  await cleanDir(p.join(options.outPath, options.repo));
+  const zippedAssetPath = `${options.outPath}/${options.repo}${ARCHIVE_EXTENSION}`;
+  await fs.writeFile(zippedAssetPath, releaseAsset);
+  if (OS === 'windows') {
+    await extractZip(zippedAssetPath, {
+      dir: process.cwd(),
+    });
+  } else {
+    extractTar({
+      file: zippedAssetPath,
+      cwd: options.outPath,
+      sync: true,
+    });
   }
+  await fs.unlink(zippedAssetPath);
 }
 
 // Clones `repo` into `outPath`, then checks out the given Git `ref`.
-function fetchRepo(options: {repo: string; outPath: string; ref?: string}) {
+function fetchRepo(options: {
+  repo: string;
+  outPath: string;
+  ref?: string;
+}): void {
   if (!existsSync(p.join(options.outPath, options.repo))) {
     console.log(`Cloning ${options.repo} into ${options.outPath}.`);
     shell.exec(
@@ -270,33 +262,29 @@ function fetchRepo(options: {repo: string; outPath: string; ref?: string}) {
 }
 
 // Builds the embedded proto at `repoPath` into a pbjs with TS declaration file.
-function buildEmbeddedProtocol(repoPath: string) {
+function buildEmbeddedProtocol(repoPath: string): void {
   const proto = p.join(repoPath, 'embedded_sass.proto');
   console.log(`Building pbjs and TS declaration file from ${proto}.`);
-  try {
-    const protocPath =
-      OS === 'windows'
-        ? '%CD%/node_modules/protoc/protoc/bin/protoc.exe'
-        : 'node_modules/protoc/protoc/bin/protoc';
-    const pluginPath =
-      OS === 'windows'
-        ? '%CD%/node_modules/.bin/protoc-gen-ts.cmd'
-        : 'node_modules/.bin/protoc-gen-ts';
-    shell.exec(
-      `${protocPath} \
+  const protocPath =
+    OS === 'windows'
+      ? '%CD%/node_modules/protoc/protoc/bin/protoc.exe'
+      : 'node_modules/protoc/protoc/bin/protoc';
+  const pluginPath =
+    OS === 'windows'
+      ? '%CD%/node_modules/.bin/protoc-gen-ts.cmd'
+      : 'node_modules/.bin/protoc-gen-ts';
+  shell.exec(
+    `${protocPath} \
       --plugin="protoc-gen-ts=${pluginPath}" \
       --js_out="import_style=commonjs,binary:." \
       --ts_out="." \
       ${proto}`,
-      {silent: true}
-    );
-  } catch (error) {
-    throw Error(`Failed to write proto to pbjs: ${error.message}.`);
-  }
+    {silent: true}
+  );
 }
 
 // Builds the Embedded Dart Sass executable from the source at `repoPath`.
-function buildDartSassEmbedded(repoPath: string) {
+function buildDartSassEmbedded(repoPath: string): void {
   console.log('Downloading dart-sass-embedded dependencies.');
   shell.exec('dart pub upgrade', {
     cwd: repoPath,
@@ -311,7 +299,10 @@ function buildDartSassEmbedded(repoPath: string) {
 }
 
 // Links the built files at `builtPath` into `outPath`.
-async function linkBuiltFiles(builtPath: string, outPath: string) {
+async function linkBuiltFiles(
+  builtPath: string,
+  outPath: string
+): Promise<void> {
   console.log(`Linking built files into ${outPath}.`);
   await cleanDir(outPath);
   if (OS === 'windows') {

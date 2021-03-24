@@ -26,15 +26,20 @@ const argv = yargs(process.argv.slice(2))
   }).argv;
 
 (async () => {
-  const outPath = 'lib/src/vendor';
-  await getEmbeddedProtocol({
-    outPath,
-    version: argv['protocol-version'],
-    path: argv['protocol-path'],
-  });
-  await getDartSassEmbedded({
-    outPath,
-    version: argv['compiler-version'],
-    path: argv['compiler-path'],
-  });
+  try {
+    const outPath = 'lib/src/vendor';
+    await getEmbeddedProtocol({
+      outPath,
+      version: argv['protocol-version'],
+      path: argv['protocol-path'],
+    });
+    await getDartSassEmbedded({
+      outPath,
+      version: argv['compiler-version'],
+      path: argv['compiler-path'],
+    });
+  } catch (error) {
+    console.error(error);
+    process.exitCode = 1;
+  }
 })();

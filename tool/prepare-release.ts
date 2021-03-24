@@ -10,15 +10,20 @@ import {getEmbeddedProtocol} from './utils';
 shell.config.fatal = true;
 
 (async () => {
-  await getEmbeddedProtocol({outPath: 'lib/src/vendor', release: true});
+  try {
+    await getEmbeddedProtocol({outPath: 'lib/src/vendor', release: true});
 
-  console.log('Transpiling TS into dist.');
-  shell.exec('tsc');
+    console.log('Transpiling TS into dist.');
+    shell.exec('tsc');
 
-  // .gitignore needs to exist in dist for `npm publish` to correctly exclude
-  // files from the published tarball.
-  console.log('Copying .gitignore to dist.');
-  await fs.copyFile('.gitignore', 'dist/.gitignore');
+    // .gitignore needs to exist in dist for `npm publish` to correctly exclude
+    // files from the published tarball.
+    console.log('Copying .gitignore to dist.');
+    await fs.copyFile('.gitignore', 'dist/.gitignore');
 
-  console.log('Ready for publishing to npm.');
+    console.log('Ready for publishing to npm.');
+  } catch (error) {
+    console.error(error);
+    process.exitCode = 1;
+  }
 })();

@@ -8,7 +8,8 @@
   "main": "dist/lib/index.js",
   "types": "dist/lib/index.d.ts",
   "files": [
-    "dist/**/*"
+    "dist/**/*",
+    "download-compiler-for-end-user.js"
   ],
   "engines": {
     "node": ">=12.18.2"
@@ -19,6 +20,7 @@
     "clean": "gts clean",
     "compile": "tsc",
     "fix": "gts fix",
+    "postinstall": "node ./download-compiler-for-end-user.js",
     "prepublishOnly": "npm run clean && ts-node ./tool/prepare-release.ts",
     "test": "ts-node ./node_modules/jasmine/bin/jasmine"
   },

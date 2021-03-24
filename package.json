@@ -14,10 +14,11 @@
     "node": ">=12.18.2"
   },
   "scripts": {
+    "build": "ts-node ./tool/prepare-dev-environment.ts",
     "check": "gts check",
+    "clean": "gts clean",
     "compile": "tsc",
     "fix": "gts fix",
-    "init": "ts-node ./tool/init.ts",
     "test": "ts-node ./node_modules/jasmine/bin/jasmine"
   },
   "dependencies": {
@@ -25,8 +26,10 @@
     "extract-zip": "^2.0.1",
     "google-protobuf": "^3.11.4",
     "immutable": "^4.0.0-rc.12",
+    "node-fetch": "^2.6.0",
     "rxjs": "^6.5.5",
     "semver": "^5.7.1",
+    "shelljs": "^0.8.4",
     "tar": "^6.0.5"
   },
   "devDependencies": {
@@ -42,26 +45,11 @@
     "gts": "^2.0.2",
     "jasmine": "^3.5.0",
     "jasmine-spec-reporter": "^5.0.2",
-    "node-fetch": "^2.6.0",
     "protoc": "^1.0.4",
-    "shelljs": "^0.8.4",
     "source-map": "^0.6.1",
     "ts-node": "^8.10.2",
     "ts-protoc-gen": "^0.12.0",
     "typescript": "~3.8.0",
     "yargs": "^16.2.0"
-  },
-  "prettier": "gts/.prettierrc.json",
-  "eslintConfig": {
-    "env": {
-      "jasmine": true
-    },
-    "extends": "./node_modules/gts/",
-    "ignorePatterns": [
-      "**/*.js",
-      "build/**/*",
-      "dist/**/*",
-      "lib/src/vendor/**/*"
-    ]
   }
 }

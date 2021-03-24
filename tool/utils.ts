@@ -58,42 +58,53 @@ interface ReleaseInfo {
 /**
  * Gets the latest version of the Embedded Protocol. Throws if an error occurs.
  *
- * @param release - Whether to download a release version of the Embedded
- *   Protocol or build one from source.
- * @param version - If `release` is `true`, the version of the Embedded Protocol
- *   to download. If it's `false`, the Git ref to check out. Defaults to
- *   the latest available version or `master`, respectively.
+ * @param version - The Git ref to check out and build. Defaults to `master`.
+ * @param path - Build from this path instead of pulling from Github.
+ * @param release - Download the latest release instead of building from source.
  */
-export async function getEmbeddedProtocol(
-  outPath: string,
-  options: {
-    release?: boolean;
-    version?: string;
-  }
-): Promise<void> {
+export async function getEmbeddedProtocol(options: {
+  outPath: string;
+  version?: string;
+  path?: string;
+  release?: boolean;
+}): Promise<void> {
   const repo = 'embedded-protocol';
   if (options.release) {
-    const latestRelease = await getLatestReleaseInfo(repo, {
-      version: options.version,
-      tag: true,
-    });
-    await downloadRelease(
+    const latestRelease = await getLatestReleaseInfo({
       repo,
-      `https://github.com/sass/${repo}/archive/` +
+      tag: true,
+      // TODO(awjin): versionConstraint
+    });
+    await downloadRelease({
+      repo,
+      assetUrl:
+        `https://github.com/sass/${repo}/archive/` +
         `${latestRelease.name.replace(' ', '-')}` +
         ARCHIVE_EXTENSION,
-      outPath
-    );
+      outPath: options.outPath,
+    });
     fs.rename(
-      p.join(outPath, `${repo}-${latestRelease.name.replace(' ', '-')}`),
-      p.join(outPath, repo)
+      p.join(
+        options.outPath,
+        `${repo}-${latestRelease.name.replace(' ', '-')}`
+      ),
+      p.join(options.outPath, repo)
     );
-    buildEmbeddedProtocol(p.join(outPath, repo, 'embedded_sass.proto'));
+    buildEmbeddedProtocol(p.join(options.outPath, repo));
+  } else if (options.path) {
+    buildEmbeddedProtocol(p.join(options.path));
+    await linkBuiltFiles(options.path, p.join(options.outPath, repo));
   } else {
-    fetchRepo(repo, BUILD_PATH, options.version);
-    // TODO(awjin): Allow building and linking from custom path for local dev.
-    buildEmbeddedProtocol(p.join(BUILD_PATH, repo, 'embedded_sass.proto'));
-    await linkBuiltFiles(repo, p.join(BUILD_PATH, repo), outPath);
+    fetchRepo({
+      repo,
+      outPath: BUILD_PATH,
+      ref: options.version,
+    });
+    buildEmbeddedProtocol(p.join(BUILD_PATH, repo));
+    await linkBuiltFiles(
+      p.join(BUILD_PATH, repo),
+      p.join(options.outPath, repo)
+    );
   }
 }
 
@@ -101,58 +112,70 @@ export async function getEmbeddedProtocol(
  * Gets the latest version of the Dart Sass wrapper for the Embedded Compiler.
  * Throws if an error occurs.
  *
- * @param release - Whether to download a release version of the Embedded
- *   Compiler or build one from source.
- * @param version - If `release` is `true`, the version of the Embedded Compiler
- *   to download. If it's `false`, the Git ref to check out. Defaults to
- *   the latest available version or `master`, respectively.
+ * @param version - The Git ref to check out and build. Defaults to `master`.
+ * @param path - Build from this path instead of pulling from Github.
+ * @param release - Download the latest release instead of building from source.
  */
-export async function getDartSassEmbedded(
-  outPath: string,
-  options: {
-    release?: boolean;
-    version?: string;
-  }
-): Promise<void> {
+export async function getDartSassEmbedded(options: {
+  outPath: string;
+  version?: string;
+  path?: string;
+  release?: boolean;
+}): Promise<void> {
   const repo = 'dart-sass-embedded';
   if (options.release) {
-    const latestRelease = await getLatestReleaseInfo(repo, {
-      version: options.version,
-    });
-    await downloadRelease(
+    const latestRelease = await getLatestReleaseInfo({
       repo,
-      `https://github.com/sass/${repo}/releases/download/` +
+      // TODO(awjin): versionConstraint
+    });
+    await downloadRelease({
+      repo,
+      assetUrl:
+        `https://github.com/sass/${repo}/releases/download/` +
         `${latestRelease.tag_name}/` +
         `${latestRelease.name.replace(' ', '-')}-` +
         `${OS}-${ARCH}` +
         ARCHIVE_EXTENSION,
-      outPath
+      outPath: options.outPath,
+    });
+    fs.rename(
+      p.join(options.outPath, 'sass_embedded'),
+      p.join(options.outPath, repo)
     );
-    fs.rename(p.join(outPath, 'sass_embedded'), p.join(outPath, repo));
+  } else if (options.path) {
+    buildDartSassEmbedded(options.path);
+    await linkBuiltFiles(
+      p.join(options.path, 'build'),
+      p.join(options.outPath, repo)
+    );
   } else {
-    fetchRepo(repo, BUILD_PATH, options.version);
-    // TODO(awjin): Allow building and linking from custom path for local dev.
+    fetchRepo({
+      repo,
+      outPath: BUILD_PATH,
+      ref: options.version,
+    });
     buildDartSassEmbedded(p.join(BUILD_PATH, repo));
-    await linkBuiltFiles(repo, p.join(BUILD_PATH, repo, 'build'), outPath);
+    await linkBuiltFiles(
+      p.join(BUILD_PATH, repo, 'build'),
+      p.join(options.outPath, repo)
+    );
   }
 }
 
 // Gets the ReleaseInfo of the latest release for `repo`. If `version` is given,
 // throws an error if the latest version is not semver-compatible with
 // `version`. If `tag` is true, gets the latest tag instead of release.
-async function getLatestReleaseInfo(
-  repo: string,
-  options: {
-    version?: string;
-    tag?: boolean;
-  }
-): Promise<ReleaseInfo> {
-  console.log(`Getting version info for ${repo}.`);
+async function getLatestReleaseInfo(options: {
+  repo: string;
+  versionConstraint?: string;
+  tag?: boolean;
+}): Promise<ReleaseInfo> {
+  console.log(`Getting version info for ${options.repo}.`);
   let latestRelease: ReleaseInfo;
   try {
     const response = await fetch(
       'https://api.github.com/repos/sass/' +
-        `${repo}/${options.tag ? 'tags' : 'releases'}`,
+        `${options.repo}/${options.tag ? 'tags' : 'releases'}`,
       {
         redirect: 'follow',
       }
@@ -160,50 +183,54 @@ async function getLatestReleaseInfo(
     if (!response.ok) throw Error(response.statusText);
     latestRelease = JSON.parse(await response.text())[0];
   } catch (error) {
-    throw Error(`Failed to get version info for ${repo}: ${error.message}.`);
+    throw Error(
+      `Failed to get version info for ${options.repo}: ${error.message}.`
+    );
   }
 
   const latestVersion = options.tag
     ? latestRelease.name
     : latestRelease.tag_name;
 
-  if (options.version) {
+  if (options.versionConstraint) {
     try {
-      satisfies(latestVersion, options.version);
+      satisfies(latestVersion, options.versionConstraint);
     } catch {
       throw Error(
-        `Latest release ${latestVersion} is not compatible with ${options.version}.`
+        `Latest release ${latestVersion} is not compatible with ${options.versionConstraint}.`
       );
     }
   }
 
-  console.log(`Latest release for ${repo} is ${latestVersion}.`);
+  console.log(`Latest release for ${options.repo} is ${latestVersion}.`);
   return latestRelease;
 }
 
 // Downloads the release for `repo` located at `assetUrl`, then unzips it into
 // `outPath`.
-async function downloadRelease(
-  repo: string,
-  assetUrl: string,
-  outPath: string
-): Promise<void> {
-  console.log(`Downloading ${repo} release asset.`);
+async function downloadRelease(options: {
+  repo: string;
+  assetUrl: string;
+  outPath: string;
+}): Promise<void> {
+  console.log(`Downloading ${options.repo} release asset.`);
   let releaseAsset;
   try {
-    const response = await fetch(assetUrl, {
+    const response = await fetch(options.assetUrl, {
       redirect: 'follow',
     });
     if (!response.ok) throw Error(response.statusText);
     releaseAsset = await response.buffer();
   } catch (error) {
-    throw Error(`Failed to download ${repo} release asset: ${error.message}.`);
+    throw Error(
+      `Failed to download ${options.repo} release asset: ${error.message}.`
+    );
   }
 
-  console.log(`Unzipping ${repo} release asset to ${outPath}.`);
+  console.log(`Unzipping ${options.repo} release asset to ${options.outPath}.`);
   try {
-    await cleanDir(p.join(outPath, repo));
-    const zippedAssetPath = `${outPath}/${repo}${ARCHIVE_EXTENSION}`;
+    await cleanDir(p.join(options.outPath, options.repo));
+    const zippedAssetPath = `${options.outPath}/${options.repo}${ARCHIVE_EXTENSION}`;
     await fs.writeFile(zippedAssetPath, releaseAsset);
     if (OS === 'windows') {
       await extractZip(zippedAssetPath, {
@@ -212,45 +239,47 @@ async function downloadRelease(
     } else {
       extractTar({
         file: zippedAssetPath,
-        cwd: outPath,
+        cwd: options.outPath,
         sync: true,
       });
     }
     await fs.unlink(zippedAssetPath);
   } catch (error) {
-    throw Error(`Failed to unzip ${repo} release asset: ${error.message}.`);
+    throw Error(
+      `Failed to unzip ${options.repo} release asset: ${error.message}.`
+    );
   }
 }
 
 // Clones `repo` into `outPath`, then checks out the given Git `ref`.
-function fetchRepo(repo: string, outPath: string, ref?: string) {
-  if (!existsSync(p.join(outPath, repo))) {
-    console.log(`Cloning ${repo} into ${outPath}.`);
+function fetchRepo(options: {repo: string; outPath: string; ref?: string}) {
+  if (!existsSync(p.join(options.outPath, options.repo))) {
+    console.log(`Cloning ${options.repo} into ${options.outPath}.`);
     shell.exec(
       `git clone \
       --depth=1 \
-      git://github.com/sass/${repo} \
-      ${p.join(outPath, repo)}`,
+      git://github.com/sass/${options.repo} \
+      ${p.join(options.outPath, options.repo)}`,
       {silent: true}
     );
   }
 
-  const version = ref ? `commit ${ref}` : 'latest update';
-  console.log(`Fetching ${version} for ${repo}.`);
-  shell.exec(`git fetch --depth=1 origin ${ref ?? 'master'}`, {
+  const version = options.ref ? `commit ${options.ref}` : 'latest update';
+  console.log(`Fetching ${version} for ${options.repo}.`);
+  shell.exec(`git fetch --depth=1 origin ${options.ref ?? 'master'}`, {
     silent: true,
-    cwd: p.join(outPath, repo),
+    cwd: p.join(options.outPath, options.repo),
   });
   shell.exec('git reset --hard FETCH_HEAD', {
     silent: true,
-    cwd: p.join(outPath, repo),
+    cwd: p.join(options.outPath, options.repo),
   });
 }
 
-// Builds the embedded proto at `protoPath` into a pbjs with TS declaration
-// file.
-function buildEmbeddedProtocol(protoPath: string) {
-  console.log(`Building pbjs and TS declaration file from ${protoPath}.`);
+// Builds the embedded proto at `repoPath` into a pbjs with TS declaration file.
+function buildEmbeddedProtocol(repoPath: string) {
+  const proto = p.join(repoPath, 'embedded_sass.proto');
+  console.log(`Building pbjs and TS declaration file from ${proto}.`);
   try {
     const protocPath =
       OS === 'windows'
@@ -265,7 +294,7 @@ function buildEmbeddedProtocol(protoPath: string) {
       --plugin="protoc-gen-ts=${pluginPath}" \
       --js_out="import_style=commonjs,binary:." \
       --ts_out="." \
-      ${protoPath}`,
+      ${proto}`,
       {silent: true}
     );
   } catch (error) {
@@ -276,31 +305,27 @@ function buildEmbeddedProtocol(protoPath: string) {
 // Builds the Embedded Dart Sass executable from the source at `repoPath`.
 function buildDartSassEmbedded(repoPath: string) {
   console.log('Downloading dart-sass-embedded dependencies.');
-  shell.exec('pub upgrade', {
+  shell.exec('dart pub upgrade', {
     cwd: repoPath,
     silent: true,
   });
 
   console.log('Building dart-sass-embedded executable.');
-  shell.exec('pub run grinder protobuf pkg-standalone-dev', {
+  shell.exec('dart run grinder protobuf pkg-standalone-dev', {
     cwd: repoPath,
     silent: true,
   });
 }
 
-// Links the built files at `builtPath` into `outPath`/`repo`.
-async function linkBuiltFiles(
-  repo: string,
-  builtPath: string,
-  outPath: string
-) {
-  console.log(`Linking built ${repo} into ${outPath}.`);
-  await cleanDir(p.join(outPath, repo));
+// Links the built files at `builtPath` into `outPath`.
+async function linkBuiltFiles(builtPath: string, outPath: string) {
+  console.log(`Linking built files into ${outPath}.`);
+  await cleanDir(outPath);
   if (OS === 'windows') {
-    shell.cp('-R', builtPath, p.join(outPath, repo));
+    shell.cp('-R', builtPath, outPath);
   } else {
     // Symlinking doesn't play nice with Jasmine's test globbing on Windows.
-    fs.symlink(p.resolve(builtPath), p.join(outPath, repo));
+    fs.symlink(p.resolve(builtPath), outPath);
   }
 }
 

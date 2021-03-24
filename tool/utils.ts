@@ -91,8 +91,10 @@ export async function getEmbeddedProtocol(options: {
       p.join(options.outPath, repo)
     );
     buildEmbeddedProtocol(p.join(options.outPath, repo));
+  } else if (options.path) {
+    buildEmbeddedProtocol(p.join(options.path));
+    await linkBuiltFiles(options.path, p.join(options.outPath, repo));
   } else {
-    // TODO(awjin): Allow building and linking from custom path for local dev.
     fetchRepo({
       repo,
       outPath: BUILD_PATH,
@@ -140,8 +142,13 @@ export async function getDartSassEmbedded(options: {
       p.join(options.outPath, 'sass_embedded'),
       p.join(options.outPath, repo)
     );
+  } else if (options.path) {
+    buildDartSassEmbedded(options.path);
+    await linkBuiltFiles(
+      p.join(options.path, 'build'),
+      p.join(options.outPath, repo)
+    );
   } else {
-    // TODO(awjin): Allow building and linking from custom path for local dev.
     fetchRepo({
       repo,
       outPath: BUILD_PATH,

@@ -69,6 +69,7 @@ export async function getEmbeddedProtocol(options: {
   release?: boolean;
 }): Promise<void> {
   const repo = 'embedded-protocol';
+
   if (options.release) {
     const latestRelease = await getLatestReleaseInfo({
       repo,
@@ -81,31 +82,23 @@ export async function getEmbeddedProtocol(options: {
         `https://github.com/sass/${repo}/archive/` +
         `${latestRelease.name.replace(' ', '-')}` +
         ARCHIVE_EXTENSION,
-      outPath: options.outPath,
+      outPath: BUILD_PATH,
     });
     fs.rename(
-      p.join(
-        options.outPath,
-        `${repo}-${latestRelease.name.replace(' ', '-')}`
-      ),
-      p.join(options.outPath, repo)
+      p.join(BUILD_PATH, `${repo}-${latestRelease.name.replace(' ', '-')}`),
+      p.join(BUILD_PATH, repo)
     );
-    buildEmbeddedProtocol(p.join(options.outPath, repo));
-  } else if (options.path) {
-    buildEmbeddedProtocol(p.join(options.path));
-    await linkBuiltFiles(options.path, p.join(options.outPath, repo));
-  } else {
+  } else if (!options.path) {
     fetchRepo({
       repo,
       outPath: BUILD_PATH,
       ref: options.version,
     });
-    buildEmbeddedProtocol(p.join(BUILD_PATH, repo));
-    await linkBuiltFiles(
-      p.join(BUILD_PATH, repo),
-      p.join(options.outPath, repo)
-    );
   }
+
+  const repoPath = options.path ?? p.join(BUILD_PATH, repo);
+  buildEmbeddedProtocol(repoPath);
+  await linkBuiltFiles(repoPath, p.join(options.outPath, repo));
 }
 
 /**

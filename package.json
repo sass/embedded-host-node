@@ -19,6 +19,7 @@
     "clean": "gts clean",
     "compile": "tsc",
     "fix": "gts fix",
+    "prepublishOnly": "npm run clean && ts-node ./tool/prepare-release.ts",
     "test": "ts-node ./node_modules/jasmine/bin/jasmine"
   },
   "dependencies": {

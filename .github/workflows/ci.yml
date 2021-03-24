@@ -22,8 +22,10 @@ jobs:
       with:
         version: "${{env.protoc_version}}"
         repo-token: "${{github.token}}"
+    - uses: dart-lang/setup-dart@v1
+      with: {sdk: stable}
     - run: npm install
-    - run: npm run init -- --release
+    - run: npm run build
     - run: npm run check
 
   tests:
@@ -49,7 +51,6 @@ jobs:
     - uses: dart-lang/setup-dart@v1
       with: {sdk: stable}
     - run: dart --version
-
     - run: npm install
-    - run: npm run init
+    - run: npm run build
     - run: npm run test

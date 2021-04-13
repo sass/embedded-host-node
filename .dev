@@ -1,0 +1,14 @@
+# Problem
+
+The npm post-install hook provides no way to differentiate a developer who runs
+`npm install` to develop this package from an end-user who runs `npm install` to
+get the package from npm. Only end-users need to download the Embedded Compiler
+binary during post-install.
+
+# Solution
+
+This file only exists in this package's repo. It is excluded from the tarball
+published to npm. During post-install, we first verify that this file does not
+exist before downloading the compiler.
+
+See: `./download-compiler-for-end-user.js`

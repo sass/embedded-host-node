@@ -74,7 +74,6 @@ export async function getEmbeddedProtocol(options: {
     const latestRelease = await getLatestReleaseInfo({
       repo,
       tag: true,
-      // TODO(awjin): versionConstraint
     });
     await downloadRelease({
       repo,
@@ -105,7 +104,9 @@ export async function getEmbeddedProtocol(options: {
  * Gets the latest version of the Dart Sass wrapper for the Embedded Compiler.
  * Throws if an error occurs.
  *
- * @param version - The Git ref to check out and build. Defaults to `master`.
+ * @param version - If `release` is true, the version of the released binary to
+ *   download (defaults to the latest version). If it's false, the Git ref to
+ *   check out and build (defaults to master).
  * @param path - Build from this path instead of pulling from Github.
  * @param release - Download the latest release instead of building from source.
  */
@@ -118,16 +119,17 @@ export async function getDartSassEmbedded(options: {
   const repo = 'dart-sass-embedded';
 
   if (options.release) {
-    const latestRelease = await getLatestReleaseInfo({
-      repo,
-      // TODO(awjin): versionConstraint
-    });
+    const release = options.version
+      ? {tag_name: options.version, name: `sass_embedded ${options.version}`}
+      : await getLatestReleaseInfo({
+          repo,
+        });
     await downloadRelease({
       repo,
       assetUrl:
         `https://github.com/sass/${repo}/releases/download/` +
-        `${latestRelease.tag_name}/` +
-        `${latestRelease.name.replace(' ', '-')}-` +
+        `${release.tag_name}/` +
+        `${release.name.replace(' ', '-')}-` +
         `${OS}-${ARCH}` +
         ARCHIVE_EXTENSION,
       outPath: options.outPath,

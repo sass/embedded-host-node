@@ -14,6 +14,12 @@ shell.config.fatal = true;
   try {
     await sanityCheckBeforeRelease();
 
+    console.log('Writing auth to .npmrc.');
+    await fs.writeFile(
+      '.npmrc',
+      `//registry.npmjs.org/:_authToken=${process.env['NPM_TOKEN']}`
+    );
+
     await getEmbeddedProtocol({outPath: 'lib/src/vendor', release: true});
 
     console.log('Transpiling TS into dist.');

@@ -49,7 +49,7 @@ async function sanityCheckBeforeRelease() {
   }
 
   const versionHeader = new RegExp(`^## ${releaseVersion}$`, 'm');
-  const changelog = await fs.readFile('../CHANGELOG.md', 'utf8');
+  const changelog = await fs.readFile('CHANGELOG.md', 'utf8');
   if (!changelog.match(versionHeader)) {
     throw Error(`There's no CHANGELOG entry for ${releaseVersion}.`);
   }

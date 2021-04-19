@@ -1,3 +1,7 @@
+## 1.0.0-beta.1
+
+- Downlaod the compiler binary to the correct directory on Windows.
+
 ## 1.0.0-beta.0
 
 - Release Embedded Host beta with limited support for `render()`, which compiles

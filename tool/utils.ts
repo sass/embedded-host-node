@@ -222,7 +222,7 @@ async function downloadRelease(options: {
   await fs.writeFile(zippedAssetPath, releaseAsset);
   if (OS === 'windows') {
     await extractZip(zippedAssetPath, {
-      dir: process.cwd(),
+      dir: p.join(process.cwd(), options.outPath),
     });
   } else {
     extractTar({

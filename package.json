@@ -22,7 +22,7 @@
     "compile": "tsc",
     "fix": "gts fix",
     "postinstall": "node ./download-compiler-for-end-user.js",
-    "prepublishOnly": "npm run clean && ts-node ./tool/prepare-release.ts",
+    "prepublishOnly": "npm run clean && ts-node ./tool/validate-release.ts && ts-node ./tool/prepare-release.ts",
     "test": "ts-node ./node_modules/jasmine/bin/jasmine"
   },
   "dependencies": {

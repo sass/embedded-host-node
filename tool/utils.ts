@@ -58,7 +58,7 @@ interface ReleaseInfo {
 /**
  * Gets the latest version of the Embedded Protocol. Throws if an error occurs.
  *
- * @param version - The Git ref to check out and build. Defaults to `master`.
+ * @param version - The Git ref to check out and build. Defaults to `main`.
  * @param path - Build from this path instead of pulling from Github.
  * @param release - Download the latest release instead of building from source.
  */
@@ -106,7 +106,7 @@ export async function getEmbeddedProtocol(options: {
  *
  * @param version - If `release` is true, the version of the released binary to
  *   download (defaults to the latest version). If it's false, the Git ref to
- *   check out and build (defaults to master).
+ *   check out and build (defaults to main).
  * @param path - Build from this path instead of pulling from Github.
  * @param release - Download the latest release instead of building from source.
  */
@@ -253,7 +253,7 @@ function fetchRepo(options: {
 
   const version = options.ref ? `commit ${options.ref}` : 'latest update';
   console.log(`Fetching ${version} for ${options.repo}.`);
-  shell.exec(`git fetch --depth=1 origin ${options.ref ?? 'master'}`, {
+  shell.exec(`git fetch --depth=1 origin ${options.ref ?? 'main'}`, {
     silent: true,
     cwd: p.join(options.outPath, options.repo),
   });

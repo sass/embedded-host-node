@@ -11,15 +11,15 @@ import {
   OutboundMessage,
 } from '../vendor/embedded-protocol/embedded_sass_pb';
 
-export type InboundRequestType = InboundMessage.MessageCase.COMPILEREQUEST;
+export type InboundRequestType = InboundMessage.MessageCase.COMPILE_REQUEST;
 
 export type InboundRequest = InboundMessage.CompileRequest;
 
 export type InboundResponseType =
-  | InboundMessage.MessageCase.IMPORTRESPONSE
-  | InboundMessage.MessageCase.FILEIMPORTRESPONSE
-  | InboundMessage.MessageCase.CANONICALIZERESPONSE
-  | InboundMessage.MessageCase.FUNCTIONCALLRESPONSE;
+  | InboundMessage.MessageCase.IMPORT_RESPONSE
+  | InboundMessage.MessageCase.FILE_IMPORT_RESPONSE
+  | InboundMessage.MessageCase.CANONICALIZE_RESPONSE
+  | InboundMessage.MessageCase.FUNCTION_CALL_RESPONSE;
 
 export type InboundResponse =
   | InboundMessage.ImportResponse
@@ -28,10 +28,10 @@ export type InboundResponse =
   | InboundMessage.FunctionCallResponse;
 
 export type OutboundRequestType =
-  | OutboundMessage.MessageCase.IMPORTREQUEST
-  | OutboundMessage.MessageCase.FILEIMPORTREQUEST
-  | OutboundMessage.MessageCase.CANONICALIZEREQUEST
-  | OutboundMessage.MessageCase.FUNCTIONCALLREQUEST;
+  | OutboundMessage.MessageCase.IMPORT_REQUEST
+  | OutboundMessage.MessageCase.FILE_IMPORT_REQUEST
+  | OutboundMessage.MessageCase.CANONICALIZE_REQUEST
+  | OutboundMessage.MessageCase.FUNCTION_CALL_REQUEST;
 
 export type OutboundRequest =
   | OutboundMessage.ImportRequest
@@ -39,11 +39,11 @@ export type OutboundRequest =
   | OutboundMessage.CanonicalizeRequest
   | OutboundMessage.FunctionCallRequest;
 
-export type OutboundResponseType = OutboundMessage.MessageCase.COMPILERESPONSE;
+export type OutboundResponseType = OutboundMessage.MessageCase.COMPILE_RESPONSE;
 
 export type OutboundResponse = OutboundMessage.CompileResponse;
 
-export type OutboundEventType = OutboundMessage.MessageCase.LOGEVENT;
+export type OutboundEventType = OutboundMessage.MessageCase.LOG_EVENT;
 
 export type OutboundEvent = OutboundMessage.LogEvent;
 
@@ -115,39 +115,39 @@ function decode(buffer: Buffer): OutboundTypedMessage {
   let payload;
   const type = message.getMessageCase();
   switch (type) {
-    case OutboundMessage.MessageCase.LOGEVENT:
-      payload = message.getLogevent();
+    case OutboundMessage.MessageCase.LOG_EVENT:
+      payload = message.getLogEvent();
       break;
-    case OutboundMessage.MessageCase.COMPILERESPONSE:
+    case OutboundMessage.MessageCase.COMPILE_RESPONSE:
       if (
-        message.getCompileresponse()?.getResultCase() ===
+        message.getCompileResponse()?.getResultCase() ===
         OutboundMessage.CompileResponse.ResultCase.RESULT_NOT_SET
       ) {
         throw compilerError(
           'OutboundMessage.CompileResponse.result is not set'
         );
       }
-      payload = message.getCompileresponse();
+      payload = message.getCompileResponse();
       break;
-    case OutboundMessage.MessageCase.IMPORTREQUEST:
-      payload = message.getImportrequest();
+    case OutboundMessage.MessageCase.IMPORT_REQUEST:
+      payload = message.getImportRequest();
       break;
-    case OutboundMessage.MessageCase.FILEIMPORTREQUEST:
-      payload = message.getFileimportrequest();
+    case OutboundMessage.MessageCase.FILE_IMPORT_REQUEST:
+      payload = message.getFileImportRequest();
       break;
-    case OutboundMessage.MessageCase.CANONICALIZEREQUEST:
-      payload = message.getCanonicalizerequest();
+    case OutboundMessage.MessageCase.CANONICALIZE_REQUEST:
+      payload = message.getCanonicalizeRequest();
       break;
-    case OutboundMessage.MessageCase.FUNCTIONCALLREQUEST:
+    case OutboundMessage.MessageCase.FUNCTION_CALL_REQUEST:
       if (
-        message.getFunctioncallrequest()?.getIdentifierCase() ===
+        message.getFunctionCallRequest()?.getIdentifierCase() ===
         OutboundMessage.FunctionCallRequest.IdentifierCase.IDENTIFIER_NOT_SET
       ) {
         throw compilerError(
           'OutboundMessage.FunctionCallRequest.identifier is not set'
         );
       }
-      payload = message.getFunctioncallrequest();
+      payload = message.getFunctionCallRequest();
       break;
     case OutboundMessage.MessageCase.ERROR:
       throw hostError(`${message.getError()?.getMessage()}`);
@@ -168,28 +168,28 @@ function decode(buffer: Buffer): OutboundTypedMessage {
 function encode(message: InboundTypedMessage): Buffer {
   const inboundMessage = new InboundMessage();
   switch (message.type) {
-    case InboundMessage.MessageCase.COMPILEREQUEST:
-      inboundMessage.setCompilerequest(
+    case InboundMessage.MessageCase.COMPILE_REQUEST:
+      inboundMessage.setCompileRequest(
         message.payload as InboundMessage.CompileRequest
       );
       break;
-    case InboundMessage.MessageCase.IMPORTRESPONSE:
-      inboundMessage.setImportresponse(
+    case InboundMessage.MessageCase.IMPORT_RESPONSE:
+      inboundMessage.setImportResponse(
         message.payload as InboundMessage.ImportResponse
       );
       break;
-    case InboundMessage.MessageCase.FILEIMPORTRESPONSE:
-      inboundMessage.setFileimportresponse(
+    case InboundMessage.MessageCase.FILE_IMPORT_RESPONSE:
+      inboundMessage.setFileImportResponse(
         message.payload as InboundMessage.FileImportResponse
       );
       break;
-    case InboundMessage.MessageCase.CANONICALIZERESPONSE:
-      inboundMessage.setCanonicalizeresponse(
+    case InboundMessage.MessageCase.CANONICALIZE_RESPONSE:
+      inboundMessage.setCanonicalizeResponse(
         message.payload as InboundMessage.CanonicalizeResponse
       );
       break;
-    case InboundMessage.MessageCase.FUNCTIONCALLRESPONSE:
-      inboundMessage.setFunctioncallresponse(
+    case InboundMessage.MessageCase.FUNCTION_CALL_RESPONSE:
+      inboundMessage.setFunctionCallResponse(
         message.payload as InboundMessage.FunctionCallResponse
       );
       break;

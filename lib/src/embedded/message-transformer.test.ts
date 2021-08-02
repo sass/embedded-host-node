@@ -21,7 +21,7 @@ describe('message transformer', () => {
     const request = new InboundMessage.CompileRequest();
     request.setString(input);
     const message = new InboundMessage();
-    message.setCompilerequest(request);
+    message.setCompileRequest(request);
     return message;
   }
 
@@ -39,8 +39,8 @@ describe('message transformer', () => {
       const message = validInboundMessage('a {b: c}');
 
       messages.writeInboundMessage({
-        payload: message.getCompilerequest()!,
-        type: InboundMessage.MessageCase.COMPILEREQUEST,
+        payload: message.getCompileRequest()!,
+        type: InboundMessage.MessageCase.COMPILE_REQUEST,
       });
 
       expect(encodedProtobufs).toEqual([
@@ -71,7 +71,7 @@ describe('message transformer', () => {
             .payload as OutboundMessage.CompileResponse;
           expect(response.getSuccess()?.getCss()).toBe('a {b: c}');
           const type = decodedMessages[0].type;
-          expect(type).toEqual(OutboundMessage.MessageCase.COMPILERESPONSE);
+          expect(type).toEqual(OutboundMessage.MessageCase.COMPILE_RESPONSE);
           done();
         }
       );
@@ -110,7 +110,7 @@ describe('message transformer', () => {
 
         const response = new OutboundMessage.CompileResponse();
         const message = new OutboundMessage();
-        message.setCompileresponse(response);
+        message.setCompileResponse(response);
         protobufs$.next(Buffer.from(message.serializeBinary()));
       });
 
@@ -123,7 +123,7 @@ describe('message transformer', () => {
 
         const request = new OutboundMessage.FunctionCallRequest();
         const message = new OutboundMessage();
-        message.setFunctioncallrequest(request);
+        message.setFunctionCallRequest(request);
         protobufs$.next(Buffer.from(message.serializeBinary()));
       });
 

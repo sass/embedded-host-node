@@ -39,7 +39,7 @@ describe('embedded compiler smoke test', () => {
     const request = new InboundMessage.CompileRequest();
     request.setString(input);
     const message = new InboundMessage();
-    message.setCompilerequest(request);
+    message.setCompileRequest(request);
 
     const protobuf = Buffer.from(message.serializeBinary());
     const packet = Buffer.alloc(4 + protobuf.length);

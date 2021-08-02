@@ -80,7 +80,7 @@ describe('dispatcher', () => {
 
       outbound$.next({
         payload: log,
-        type: OutboundMessage.MessageCase.LOGEVENT,
+        type: OutboundMessage.MessageCase.LOG_EVENT,
       });
     });
   });
@@ -90,7 +90,7 @@ describe('dispatcher', () => {
       const expectedCss = 'a {b: c}';
 
       dispatcher = createDispatcher(outbound$, message => {
-        if (message.type !== InboundMessage.MessageCase.COMPILEREQUEST) return;
+        if (message.type !== InboundMessage.MessageCase.COMPILE_REQUEST) return;
         const success = new OutboundMessage.CompileResponse.CompileSuccess();
         success.setCss(expectedCss);
         const response = new OutboundMessage.CompileResponse();
@@ -98,7 +98,7 @@ describe('dispatcher', () => {
         response.setId(message.payload.getId());
         outbound$.next({
           payload: response,
-          type: OutboundMessage.MessageCase.COMPILERESPONSE,
+          type: OutboundMessage.MessageCase.COMPILE_RESPONSE,
         });
       });
 
@@ -128,7 +128,9 @@ describe('dispatcher', () => {
         const expectedResponse = new InboundMessage.ImportResponse();
         expectedResponse.setId(id);
         expect(message.payload).toEqual(expectedResponse);
-        expect(message.type).toEqual(InboundMessage.MessageCase.IMPORTRESPONSE);
+        expect(message.type).toEqual(
+          InboundMessage.MessageCase.IMPORT_RESPONSE
+        );
         done();
       });
 
@@ -136,7 +138,7 @@ describe('dispatcher', () => {
       request.setId(id);
       outbound$.next({
         payload: request,
-        type: OutboundMessage.MessageCase.IMPORTREQUEST,
+        type: OutboundMessage.MessageCase.IMPORT_REQUEST,
       });
     });
 
@@ -148,7 +150,7 @@ describe('dispatcher', () => {
         expectedResponse.setId(id);
         expect(message.payload).toEqual(expectedResponse);
         expect(message.type).toEqual(
-          InboundMessage.MessageCase.FILEIMPORTRESPONSE
+          InboundMessage.MessageCase.FILE_IMPORT_RESPONSE
         );
         done();
       });
@@ -157,7 +159,7 @@ describe('dispatcher', () => {
       request.setId(id);
       outbound$.next({
         payload: request,
-        type: OutboundMessage.MessageCase.FILEIMPORTREQUEST,
+        type: OutboundMessage.MessageCase.FILE_IMPORT_REQUEST,
       });
     });
 
@@ -169,7 +171,7 @@ describe('dispatcher', () => {
         expectedResponse.setId(id);
         expect(message.payload).toEqual(expectedResponse);
         expect(message.type).toEqual(
-          InboundMessage.MessageCase.CANONICALIZERESPONSE
+          InboundMessage.MessageCase.CANONICALIZE_RESPONSE
         );
         done();
       });
@@ -178,7 +180,7 @@ describe('dispatcher', () => {
       request.setId(id);
       outbound$.next({
         payload: request,
-        type: OutboundMessage.MessageCase.CANONICALIZEREQUEST,
+        type: OutboundMessage.MessageCase.CANONICALIZE_REQUEST,
       });
     });
 
@@ -190,7 +192,7 @@ describe('dispatcher', () => {
         expectedResponse.setId(id);
         expect(message.payload).toEqual(expectedResponse);
         expect(message.type).toEqual(
-          InboundMessage.MessageCase.FUNCTIONCALLRESPONSE
+          InboundMessage.MessageCase.FUNCTION_CALL_RESPONSE
         );
         done();
       });
@@ -199,7 +201,7 @@ describe('dispatcher', () => {
       request.setId(id);
       outbound$.next({
         payload: request,
-        type: OutboundMessage.MessageCase.FUNCTIONCALLREQUEST,
+        type: OutboundMessage.MessageCase.FUNCTION_CALL_REQUEST,
       });
     });
   });
@@ -211,7 +213,9 @@ describe('dispatcher', () => {
       createDispatcher(
         outbound$,
         message => {
-          if (message.type === InboundMessage.MessageCase.FILEIMPORTRESPONSE) {
+          if (
+            message.type === InboundMessage.MessageCase.FILE_IMPORT_RESPONSE
+          ) {
             expect(receivedRequests).toEqual([1, 2]);
             done();
           }
@@ -232,14 +236,14 @@ describe('dispatcher', () => {
       request1.setId(1);
       outbound$.next({
         payload: request1,
-        type: OutboundMessage.MessageCase.IMPORTREQUEST,
+        type: OutboundMessage.MessageCase.IMPORT_REQUEST,
       });
 
       const request2 = new OutboundMessage.FileImportRequest();
       request2.setId(2);
       outbound$.next({
         payload: request2,
-        type: OutboundMessage.MessageCase.FILEIMPORTREQUEST,
+        type: OutboundMessage.MessageCase.FILE_IMPORT_REQUEST,
       });
     });
   });
@@ -259,11 +263,11 @@ describe('dispatcher', () => {
       const request = new OutboundMessage.ImportRequest();
       outbound$.next({
         payload: request,
-        type: OutboundMessage.MessageCase.IMPORTREQUEST,
+        type: OutboundMessage.MessageCase.IMPORT_REQUEST,
       });
       outbound$.next({
         payload: request,
-        type: OutboundMessage.MessageCase.IMPORTREQUEST,
+        type: OutboundMessage.MessageCase.IMPORT_REQUEST,
       });
     });
 
@@ -278,7 +282,7 @@ describe('dispatcher', () => {
       response.setId(1);
       outbound$.next({
         payload: response,
-        type: OutboundMessage.MessageCase.COMPILERESPONSE,
+        type: OutboundMessage.MessageCase.COMPILE_RESPONSE,
       });
     });
 

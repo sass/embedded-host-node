@@ -71,7 +71,7 @@ export class Dispatcher {
    * silently.
    */
   readonly logEvents$ = this.messages$.pipe(
-    filter(message => message.type === OutboundMessage.MessageCase.LOGEVENT),
+    filter(message => message.type === OutboundMessage.MessageCase.LOG_EVENT),
     map(message => message.payload as OutboundMessage.LogEvent)
   );
 
@@ -122,8 +122,8 @@ export class Dispatcher {
   ): Promise<OutboundMessage.CompileResponse> {
     return this.handleInboundRequest(
       request,
-      InboundMessage.MessageCase.COMPILEREQUEST,
-      OutboundMessage.MessageCase.COMPILERESPONSE
+      InboundMessage.MessageCase.COMPILE_REQUEST,
+      OutboundMessage.MessageCase.COMPILE_RESPONSE
     );
   }
 
@@ -142,20 +142,20 @@ export class Dispatcher {
     message: OutboundTypedMessage
   ): Promise<void> {
     switch (message.type) {
-      case OutboundMessage.MessageCase.LOGEVENT:
+      case OutboundMessage.MessageCase.LOG_EVENT:
         break;
 
-      case OutboundMessage.MessageCase.COMPILERESPONSE:
+      case OutboundMessage.MessageCase.COMPILE_RESPONSE:
         this.pendingInboundRequests.resolve(
           (message.payload as OutboundResponse).getId(),
           message.type
         );
         break;
 
-      case OutboundMessage.MessageCase.IMPORTREQUEST: {
+      case OutboundMessage.MessageCase.IMPORT_REQUEST: {
         const request = message.payload as OutboundMessage.ImportRequest;
         const id = request.getId();
-        const type = InboundMessage.MessageCase.IMPORTRESPONSE;
+        const type = InboundMessage.MessageCase.IMPORT_RESPONSE;
         this.pendingOutboundRequests.add(id, type);
         const response = await this.outboundRequestHandlers.handleImportRequest(
           request
@@ -164,10 +164,10 @@ export class Dispatcher {
         break;
       }
 
-      case OutboundMessage.MessageCase.FILEIMPORTREQUEST: {
+      case OutboundMessage.MessageCase.FILE_IMPORT_REQUEST: {
         const request = message.payload as OutboundMessage.FileImportRequest;
         const id = request.getId();
-        const type = InboundMessage.MessageCase.FILEIMPORTRESPONSE;
+        const type = InboundMessage.MessageCase.FILE_IMPORT_RESPONSE;
         this.pendingOutboundRequests.add(id, type);
         const response =
           await this.outboundRequestHandlers.handleFileImportRequest(request);
@@ -175,10 +175,10 @@ export class Dispatcher {
         break;
       }
 
-      case OutboundMessage.MessageCase.CANONICALIZEREQUEST: {
+      case OutboundMessage.MessageCase.CANONICALIZE_REQUEST: {
         const request = message.payload as OutboundMessage.CanonicalizeRequest;
         const id = request.getId();
-        const type = InboundMessage.MessageCase.CANONICALIZERESPONSE;
+        const type = InboundMessage.MessageCase.CANONICALIZE_RESPONSE;
         this.pendingOutboundRequests.add(id, type);
         const response =
           await this.outboundRequestHandlers.handleCanonicalizeRequest(request);
@@ -186,10 +186,10 @@ export class Dispatcher {
         break;
       }
 
-      case OutboundMessage.MessageCase.FUNCTIONCALLREQUEST: {
+      case OutboundMessage.MessageCase.FUNCTION_CALL_REQUEST: {
         const request = message.payload as OutboundMessage.FunctionCallRequest;
         const id = request.getId();
-        const type = InboundMessage.MessageCase.FUNCTIONCALLRESPONSE;
+        const type = InboundMessage.MessageCase.FUNCTION_CALL_RESPONSE;
         this.pendingOutboundRequests.add(id, type);
         const response =
           await this.outboundRequestHandlers.handleFunctionCallRequest(request);
@@ -245,16 +245,16 @@ export class Dispatcher {
   ): void {
     payload.setId(id);
 
-    if (type === InboundMessage.MessageCase.COMPILEREQUEST) {
+    if (type === InboundMessage.MessageCase.COMPILE_REQUEST) {
       this.pendingInboundRequests.add(
         id,
-        OutboundMessage.MessageCase.COMPILERESPONSE
+        OutboundMessage.MessageCase.COMPILE_RESPONSE
       );
     } else if (
-      type === InboundMessage.MessageCase.IMPORTRESPONSE ||
-      type === InboundMessage.MessageCase.FILEIMPORTRESPONSE ||
-      type === InboundMessage.MessageCase.CANONICALIZERESPONSE ||
-      type === InboundMessage.MessageCase.FUNCTIONCALLRESPONSE
+      type === InboundMessage.MessageCase.IMPORT_RESPONSE ||
+      type === InboundMessage.MessageCase.FILE_IMPORT_RESPONSE ||
+      type === InboundMessage.MessageCase.CANONICALIZE_RESPONSE ||
+      type === InboundMessage.MessageCase.FUNCTION_CALL_RESPONSE
     ) {
       this.pendingOutboundRequests.resolve(id, type);
     } else {

@@ -16,7 +16,7 @@
     "node": ">=12.18.2"
   },
   "scripts": {
-    "build": "ts-node ./tool/prepare-dev-environment.ts",
+    "init": "ts-node ./tool/prepare-dev-environment.ts",
     "check": "gts check",
     "clean": "gts clean",
     "compile": "tsc",

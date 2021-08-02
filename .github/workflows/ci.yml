@@ -28,7 +28,7 @@ jobs:
       - uses: dart-lang/setup-dart@v1
         with: {sdk: stable}
       - run: npm install
-      - run: npm run build
+      - run: npm run init
       - run: npm run check
 
   tests:
@@ -55,7 +55,7 @@ jobs:
         with: {sdk: stable}
       - run: dart --version
       - run: npm install
-      - run: npm run build
+      - run: npm run init
       - run: npm run test
 
   deploy_npm:

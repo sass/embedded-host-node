@@ -169,9 +169,8 @@ export class Dispatcher {
         const id = request.getId();
         const type = InboundMessage.MessageCase.FILEIMPORTRESPONSE;
         this.pendingOutboundRequests.add(id, type);
-        const response = await this.outboundRequestHandlers.handleFileImportRequest(
-          request
-        );
+        const response =
+          await this.outboundRequestHandlers.handleFileImportRequest(request);
         this.sendInboundMessage(id, response, type);
         break;
       }
@@ -181,9 +180,8 @@ export class Dispatcher {
         const id = request.getId();
         const type = InboundMessage.MessageCase.CANONICALIZERESPONSE;
         this.pendingOutboundRequests.add(id, type);
-        const response = await this.outboundRequestHandlers.handleCanonicalizeRequest(
-          request
-        );
+        const response =
+          await this.outboundRequestHandlers.handleCanonicalizeRequest(request);
         this.sendInboundMessage(id, response, type);
         break;
       }
@@ -193,9 +191,8 @@ export class Dispatcher {
         const id = request.getId();
         const type = InboundMessage.MessageCase.FUNCTIONCALLRESPONSE;
         this.pendingOutboundRequests.add(id, type);
-        const response = await this.outboundRequestHandlers.handleFunctionCallRequest(
-          request
-        );
+        const response =
+          await this.outboundRequestHandlers.handleFunctionCallRequest(request);
         this.sendInboundMessage(id, response, type);
         break;
       }

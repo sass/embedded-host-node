@@ -4,9 +4,7 @@
     "lib/src/embedded/*.test.ts",
     "lib/src/exception/*.test.ts"
   ],
-  "helpers": [
-    "spec/helpers/**/*.ts"
-  ],
+  "helpers": ["spec/helpers/**/*.ts"],
   "stopSpecOnExpectationFailure": false,
   "random": true
 }

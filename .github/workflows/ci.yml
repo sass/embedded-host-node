@@ -2,7 +2,7 @@ name: CI
 
 env:
   PROTOC_VERSION: 3.x
-  DEFAULT_NODE_VERSION: 15.x  # If changing this, also change jobs.tests.strategy.matrix.node_version
+  DEFAULT_NODE_VERSION: 15.x # If changing this, also change jobs.tests.strategy.matrix.node_version
 
 on:
   push:
@@ -16,47 +16,47 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-node@v2
-      with:
-        node-version: ${{ env.DEFAULT_NODE_VERSION }}
-        check-latest: true
-    - uses: arduino/setup-protoc@v1
-      with:
-        version: ${{ env.PROTOC_VERSION }}
-        repo-token: "${{ github.token }}"
-    - uses: dart-lang/setup-dart@v1
-      with: {sdk: stable}
-    - run: npm install
-    - run: npm run build
-    - run: npm run check
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.DEFAULT_NODE_VERSION }}
+          check-latest: true
+      - uses: arduino/setup-protoc@v1
+        with:
+          version: ${{ env.PROTOC_VERSION }}
+          repo-token: '${{ github.token }}'
+      - uses: dart-lang/setup-dart@v1
+        with: {sdk: stable}
+      - run: npm install
+      - run: npm run build
+      - run: npm run check
 
   tests:
-    name: "Tests | Node ${{ matrix.node-version }} | ${{ matrix.os }}"
+    name: 'Tests | Node ${{ matrix.node-version }} | ${{ matrix.os }}'
     runs-on: ${{ matrix.os }}-latest
 
     strategy:
       matrix:
         os: [ubuntu, macos, windows]
-        node-version: [15.x, 14.x, 12.x]  # If changing this, also change env.DEFAULT_NODE_VERSION
+        node-version: [15.x, 14.x, 12.x] # If changing this, also change env.DEFAULT_NODE_VERSION
       fail-fast: false
 
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-node@v2
-      with:
-        node-version: ${{ matrix.node-version }}
-        check-latest: true
-    - uses: arduino/setup-protoc@v1
-      with:
-        version: ${{ env.PROTOC_VERSION }}
-        repo-token: "${{ github.token }}"
-    - uses: dart-lang/setup-dart@v1
-      with: {sdk: stable}
-    - run: dart --version
-    - run: npm install
-    - run: npm run build
-    - run: npm run test
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+          check-latest: true
+      - uses: arduino/setup-protoc@v1
+        with:
+          version: ${{ env.PROTOC_VERSION }}
+          repo-token: '${{ github.token }}'
+      - uses: dart-lang/setup-dart@v1
+        with: {sdk: stable}
+      - run: dart --version
+      - run: npm install
+      - run: npm run build
+      - run: npm run test
 
   deploy_npm:
     name: Deploy npm
@@ -73,4 +73,4 @@ jobs:
       - run: npm install
       - run: npm publish
         env:
-          NODE_AUTH_TOKEN: "${{ secrets.NPM_TOKEN }}"
+          NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}'

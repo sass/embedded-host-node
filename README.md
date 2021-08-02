@@ -6,8 +6,8 @@ Sass][] executable. It's much faster than running [Dart Sass compiled to
 JavaScript][] while still providing a full JS API, with the ability to define
 custom functions and importers.
 
-[Embedded Sass protocol]: https://github.com/sass/sass-embedded-protocol/blob/master/README.md#readme
-[Dart Sass]: https://sass-lang.com/dart-sass
-[Dart Sass compiled to JavaScript]: https://www.npmjs.com/package/sass
+[embedded sass protocol]: https://github.com/sass/sass-embedded-protocol/blob/master/README.md#readme
+[dart sass]: https://sass-lang.com/dart-sass
+[dart sass compiled to javascript]: https://www.npmjs.com/package/sass
 
 Disclaimer: this is not an official Google product.

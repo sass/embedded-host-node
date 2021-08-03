@@ -158,8 +158,10 @@ function newRenderResult(
     }
 
     sourceMap.sources = sourceMap.sources.map(source => {
-      if (source === 'stdin') return source;
-      return p.relative(sourceMapDir, fileURLToPath(source));
+      if (source.startsWith('file://')) {
+        return p.relative(sourceMapDir, fileURLToPath(source));
+      }
+      return source;
     });
 
     sourceMapBytes = Buffer.from(JSON.stringify(sourceMap));

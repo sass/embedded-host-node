@@ -21,7 +21,7 @@ describe('message transformer', () => {
     const request = new InboundMessage.CompileRequest();
     request.setString(input);
     const message = new InboundMessage();
-    message.setCompilerequest(request);
+    message.setCompileRequest(request);
     return message;
   }
 
@@ -39,8 +39,8 @@ describe('message transformer', () => {
       const message = validInboundMessage('a {b: c}');
 
       messages.writeInboundMessage({
-        payload: message.getCompilerequest()!,
-        type: InboundMessage.MessageCase.COMPILEREQUEST,
+        payload: message.getCompileRequest()!,
+        type: InboundMessage.MessageCase.COMPILE_REQUEST,
       });
 
       expect(encodedProtobufs).toEqual([
@@ -59,7 +59,7 @@ describe('message transformer', () => {
       decodedMessages = [];
     });
 
-    it('decodes buffer to OutboundMessage', async done => {
+    it('decodes buffer to OutboundMessage', done => {
       const message = validInboundMessage('a {b: c}');
 
       messages.outboundMessages$.subscribe(
@@ -71,7 +71,7 @@ describe('message transformer', () => {
             .payload as OutboundMessage.CompileResponse;
           expect(response.getSuccess()?.getCss()).toBe('a {b: c}');
           const type = decodedMessages[0].type;
-          expect(type).toEqual(OutboundMessage.MessageCase.COMPILERESPONSE);
+          expect(type).toEqual(OutboundMessage.MessageCase.COMPILE_RESPONSE);
           done();
         }
       );
@@ -81,7 +81,7 @@ describe('message transformer', () => {
     });
 
     describe('protocol error', () => {
-      it('fails on invalid buffer', async done => {
+      it('fails on invalid buffer', done => {
         expectObservableToError(
           messages.outboundMessages$,
           'Compiler caused error: Invalid buffer.',
@@ -91,7 +91,7 @@ describe('message transformer', () => {
         protobufs$.next(Buffer.from([-1]));
       });
 
-      it('fails on empty message', async done => {
+      it('fails on empty message', done => {
         expectObservableToError(
           messages.outboundMessages$,
           'Compiler caused error: OutboundMessage.message is not set.',
@@ -101,7 +101,7 @@ describe('message transformer', () => {
         protobufs$.next(Buffer.from(new OutboundMessage().serializeBinary()));
       });
 
-      it('fails on compile response with missing result', async done => {
+      it('fails on compile response with missing result', done => {
         expectObservableToError(
           messages.outboundMessages$,
           'Compiler caused error: OutboundMessage.CompileResponse.result is not set.',
@@ -110,11 +110,11 @@ describe('message transformer', () => {
 
         const response = new OutboundMessage.CompileResponse();
         const message = new OutboundMessage();
-        message.setCompileresponse(response);
+        message.setCompileResponse(response);
         protobufs$.next(Buffer.from(message.serializeBinary()));
       });
 
-      it('fails on function call request with missing identifier', async done => {
+      it('fails on function call request with missing identifier', done => {
         expectObservableToError(
           messages.outboundMessages$,
           'Compiler caused error: OutboundMessage.FunctionCallRequest.identifier is not set.',
@@ -123,11 +123,11 @@ describe('message transformer', () => {
 
         const request = new OutboundMessage.FunctionCallRequest();
         const message = new OutboundMessage();
-        message.setFunctioncallrequest(request);
+        message.setFunctionCallRequest(request);
         protobufs$.next(Buffer.from(message.serializeBinary()));
       });
 
-      it('fails if message contains a protocol error', async done => {
+      it('fails if message contains a protocol error', done => {
         const errorMessage = 'sad';
         expectObservableToError(
           messages.outboundMessages$,

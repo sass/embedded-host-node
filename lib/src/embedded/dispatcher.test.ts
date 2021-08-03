@@ -68,7 +68,7 @@ describe('dispatcher', () => {
       dispatcher = createDispatcher(outbound$);
     });
 
-    it('exposes log events', async done => {
+    it('exposes log events', done => {
       const message = 'This is a log!';
       const log = new OutboundMessage.LogEvent();
       log.setMessage(message);
@@ -80,17 +80,17 @@ describe('dispatcher', () => {
 
       outbound$.next({
         payload: log,
-        type: OutboundMessage.MessageCase.LOGEVENT,
+        type: OutboundMessage.MessageCase.LOG_EVENT,
       });
     });
   });
 
   describe('inbound requests', () => {
-    it('dispatches a compile request and returns the response', async done => {
+    it('dispatches a compile request and returns the response', done => {
       const expectedCss = 'a {b: c}';
 
       dispatcher = createDispatcher(outbound$, message => {
-        if (message.type !== InboundMessage.MessageCase.COMPILEREQUEST) return;
+        if (message.type !== InboundMessage.MessageCase.COMPILE_REQUEST) return;
         const success = new OutboundMessage.CompileResponse.CompileSuccess();
         success.setCss(expectedCss);
         const response = new OutboundMessage.CompileResponse();
@@ -98,7 +98,7 @@ describe('dispatcher', () => {
         response.setId(message.payload.getId());
         outbound$.next({
           payload: response,
-          type: OutboundMessage.MessageCase.COMPILERESPONSE,
+          type: OutboundMessage.MessageCase.COMPILE_RESPONSE,
         });
       });
 
@@ -121,14 +121,16 @@ describe('dispatcher', () => {
   });
 
   describe('outbound requests', () => {
-    it('triggers the import request callback', async done => {
+    it('triggers the import request callback', done => {
       const id = 1;
 
       createDispatcher(outbound$, message => {
         const expectedResponse = new InboundMessage.ImportResponse();
         expectedResponse.setId(id);
         expect(message.payload).toEqual(expectedResponse);
-        expect(message.type).toEqual(InboundMessage.MessageCase.IMPORTRESPONSE);
+        expect(message.type).toEqual(
+          InboundMessage.MessageCase.IMPORT_RESPONSE
+        );
         done();
       });
 
@@ -136,11 +138,11 @@ describe('dispatcher', () => {
       request.setId(id);
       outbound$.next({
         payload: request,
-        type: OutboundMessage.MessageCase.IMPORTREQUEST,
+        type: OutboundMessage.MessageCase.IMPORT_REQUEST,
       });
     });
 
-    it('triggers the file import request callback', async done => {
+    it('triggers the file import request callback', done => {
       const id = 1;
 
       createDispatcher(outbound$, message => {
@@ -148,7 +150,7 @@ describe('dispatcher', () => {
         expectedResponse.setId(id);
         expect(message.payload).toEqual(expectedResponse);
         expect(message.type).toEqual(
-          InboundMessage.MessageCase.FILEIMPORTRESPONSE
+          InboundMessage.MessageCase.FILE_IMPORT_RESPONSE
         );
         done();
       });
@@ -157,11 +159,11 @@ describe('dispatcher', () => {
       request.setId(id);
       outbound$.next({
         payload: request,
-        type: OutboundMessage.MessageCase.FILEIMPORTREQUEST,
+        type: OutboundMessage.MessageCase.FILE_IMPORT_REQUEST,
       });
     });
 
-    it('triggers the canonicalize request callback', async done => {
+    it('triggers the canonicalize request callback', done => {
       const id = 1;
 
       createDispatcher(outbound$, message => {
@@ -169,7 +171,7 @@ describe('dispatcher', () => {
         expectedResponse.setId(id);
         expect(message.payload).toEqual(expectedResponse);
         expect(message.type).toEqual(
-          InboundMessage.MessageCase.CANONICALIZERESPONSE
+          InboundMessage.MessageCase.CANONICALIZE_RESPONSE
         );
         done();
       });
@@ -178,11 +180,11 @@ describe('dispatcher', () => {
       request.setId(id);
       outbound$.next({
         payload: request,
-        type: OutboundMessage.MessageCase.CANONICALIZEREQUEST,
+        type: OutboundMessage.MessageCase.CANONICALIZE_REQUEST,
       });
     });
 
-    it('triggers the function call request callback', async done => {
+    it('triggers the function call request callback', done => {
       const id = 1;
 
       createDispatcher(outbound$, message => {
@@ -190,7 +192,7 @@ describe('dispatcher', () => {
         expectedResponse.setId(id);
         expect(message.payload).toEqual(expectedResponse);
         expect(message.type).toEqual(
-          InboundMessage.MessageCase.FUNCTIONCALLRESPONSE
+          InboundMessage.MessageCase.FUNCTION_CALL_RESPONSE
         );
         done();
       });
@@ -199,19 +201,21 @@ describe('dispatcher', () => {
       request.setId(id);
       outbound$.next({
         payload: request,
-        type: OutboundMessage.MessageCase.FUNCTIONCALLREQUEST,
+        type: OutboundMessage.MessageCase.FUNCTION_CALL_REQUEST,
       });
     });
   });
 
   describe('multiple request listeners', () => {
-    it('supports multiple request callbacks', async done => {
+    it('supports multiple request callbacks', done => {
       const receivedRequests: number[] = [];
 
       createDispatcher(
         outbound$,
         message => {
-          if (message.type === InboundMessage.MessageCase.FILEIMPORTRESPONSE) {
+          if (
+            message.type === InboundMessage.MessageCase.FILE_IMPORT_RESPONSE
+          ) {
             expect(receivedRequests).toEqual([1, 2]);
             done();
           }
@@ -232,14 +236,14 @@ describe('dispatcher', () => {
       request1.setId(1);
       outbound$.next({
         payload: request1,
-        type: OutboundMessage.MessageCase.IMPORTREQUEST,
+        type: OutboundMessage.MessageCase.IMPORT_REQUEST,
       });
 
       const request2 = new OutboundMessage.FileImportRequest();
       request2.setId(2);
       outbound$.next({
         payload: request2,
-        type: OutboundMessage.MessageCase.FILEIMPORTREQUEST,
+        type: OutboundMessage.MessageCase.FILE_IMPORT_REQUEST,
       });
     });
   });
@@ -249,7 +253,7 @@ describe('dispatcher', () => {
       dispatcher = createDispatcher(outbound$);
     });
 
-    it('throws if a request ID overlaps with that of an in-flight request', async done => {
+    it('throws if a request ID overlaps with that of an in-flight request', done => {
       expectObservableToError(
         dispatcher.error$,
         'Request ID 0 is already in use by an in-flight request.',
@@ -259,15 +263,15 @@ describe('dispatcher', () => {
       const request = new OutboundMessage.ImportRequest();
       outbound$.next({
         payload: request,
-        type: OutboundMessage.MessageCase.IMPORTREQUEST,
+        type: OutboundMessage.MessageCase.IMPORT_REQUEST,
       });
       outbound$.next({
         payload: request,
-        type: OutboundMessage.MessageCase.IMPORTREQUEST,
+        type: OutboundMessage.MessageCase.IMPORT_REQUEST,
       });
     });
 
-    it('throws if a response ID does not match any in-flight request IDs', async done => {
+    it('throws if a response ID does not match any in-flight request IDs', done => {
       expectObservableToError(
         dispatcher.error$,
         'Response ID 1 does not match any pending requests.',
@@ -278,7 +282,7 @@ describe('dispatcher', () => {
       response.setId(1);
       outbound$.next({
         payload: response,
-        type: OutboundMessage.MessageCase.COMPILERESPONSE,
+        type: OutboundMessage.MessageCase.COMPILE_RESPONSE,
       });
     });
 
@@ -291,7 +295,7 @@ describe('dispatcher', () => {
       ).toBeRejectedWith(error);
     });
 
-    it('cleans up log event subscriptions upon error', async done => {
+    it('cleans up log event subscriptions upon error', done => {
       dispatcher.logEvents$.subscribe(
         () => fail('expected silent completion'),
         () => fail('expected silent completion'),

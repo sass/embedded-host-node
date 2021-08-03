@@ -94,9 +94,7 @@ function newCompileStringRequest(options: {
 // Spins up a compiler, then sends it a compile request. Returns a promise that
 // resolves with the CompileResult. Throws if there were any protocol or
 // compilation errors. Shuts down the compiler after compilation.
-async function compileRequest(
-  request: InboundMessage.CompileRequest
-): Promise<{
+async function compileRequest(request: InboundMessage.CompileRequest): Promise<{
   css: string;
   sourceMap?: RawSourceMap;
 }> {

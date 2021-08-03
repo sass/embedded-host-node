@@ -11,7 +11,5 @@
     "lib/src/vendor/embedded-protocol/embedded_sass_pb.js",
     "tool/utils.ts"
   ],
-  "exclude": [
-    "**/*.test.ts"
-  ]
+  "exclude": ["**/*.test.ts"]
 }

@@ -1,6 +1,6 @@
 {
   "name": "sass-embedded",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "compiler-version": "1.0.0-beta.7",
   "description": "Node.js library that communicates with Embedded Dart Sass using the Embedded Sass protocol",
   "repository": "sass/embedded-host-node",
@@ -13,10 +13,10 @@
     "download-compiler-for-end-user.js"
   ],
   "engines": {
-    "node": ">=12.18.2"
+    "node": ">=14.0.0"
   },
   "scripts": {
-    "build": "ts-node ./tool/prepare-dev-environment.ts",
+    "init": "ts-node ./tool/prepare-dev-environment.ts",
     "check": "gts check",
     "clean": "gts clean",
     "compile": "tsc",

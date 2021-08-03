@@ -1,6 +1,10 @@
+## 1.0.0-beta.2
+
+- No user visible changes.
+
 ## 1.0.0-beta.1
 
-- Downlaod the compiler binary to the correct directory on Windows.
+- Download the compiler binary to the correct directory on Windows.
 
 ## 1.0.0-beta.0
 

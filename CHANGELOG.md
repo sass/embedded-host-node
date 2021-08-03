@@ -1,3 +1,7 @@
+## 1.0.0-beta.3
+
+- Properly handle `data:` URIs in sourceMap sources.
+
 ## 1.0.0-beta.2
 
 - No user visible changes.

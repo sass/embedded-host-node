@@ -59,7 +59,7 @@ describe('message transformer', () => {
       decodedMessages = [];
     });
 
-    it('decodes buffer to OutboundMessage', async done => {
+    it('decodes buffer to OutboundMessage', done => {
       const message = validInboundMessage('a {b: c}');
 
       messages.outboundMessages$.subscribe(
@@ -81,7 +81,7 @@ describe('message transformer', () => {
     });
 
     describe('protocol error', () => {
-      it('fails on invalid buffer', async done => {
+      it('fails on invalid buffer', done => {
         expectObservableToError(
           messages.outboundMessages$,
           'Compiler caused error: Invalid buffer.',
@@ -91,7 +91,7 @@ describe('message transformer', () => {
         protobufs$.next(Buffer.from([-1]));
       });
 
-      it('fails on empty message', async done => {
+      it('fails on empty message', done => {
         expectObservableToError(
           messages.outboundMessages$,
           'Compiler caused error: OutboundMessage.message is not set.',
@@ -101,7 +101,7 @@ describe('message transformer', () => {
         protobufs$.next(Buffer.from(new OutboundMessage().serializeBinary()));
       });
 
-      it('fails on compile response with missing result', async done => {
+      it('fails on compile response with missing result', done => {
         expectObservableToError(
           messages.outboundMessages$,
           'Compiler caused error: OutboundMessage.CompileResponse.result is not set.',
@@ -114,7 +114,7 @@ describe('message transformer', () => {
         protobufs$.next(Buffer.from(message.serializeBinary()));
       });
 
-      it('fails on function call request with missing identifier', async done => {
+      it('fails on function call request with missing identifier', done => {
         expectObservableToError(
           messages.outboundMessages$,
           'Compiler caused error: OutboundMessage.FunctionCallRequest.identifier is not set.',
@@ -127,7 +127,7 @@ describe('message transformer', () => {
         protobufs$.next(Buffer.from(message.serializeBinary()));
       });
 
-      it('fails if message contains a protocol error', async done => {
+      it('fails if message contains a protocol error', done => {
         const errorMessage = 'sad';
         expectObservableToError(
           messages.outboundMessages$,

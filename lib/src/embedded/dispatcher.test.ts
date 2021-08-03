@@ -68,7 +68,7 @@ describe('dispatcher', () => {
       dispatcher = createDispatcher(outbound$);
     });
 
-    it('exposes log events', async done => {
+    it('exposes log events', done => {
       const message = 'This is a log!';
       const log = new OutboundMessage.LogEvent();
       log.setMessage(message);
@@ -86,7 +86,7 @@ describe('dispatcher', () => {
   });
 
   describe('inbound requests', () => {
-    it('dispatches a compile request and returns the response', async done => {
+    it('dispatches a compile request and returns the response', done => {
       const expectedCss = 'a {b: c}';
 
       dispatcher = createDispatcher(outbound$, message => {
@@ -121,7 +121,7 @@ describe('dispatcher', () => {
   });
 
   describe('outbound requests', () => {
-    it('triggers the import request callback', async done => {
+    it('triggers the import request callback', done => {
       const id = 1;
 
       createDispatcher(outbound$, message => {
@@ -142,7 +142,7 @@ describe('dispatcher', () => {
       });
     });
 
-    it('triggers the file import request callback', async done => {
+    it('triggers the file import request callback', done => {
       const id = 1;
 
       createDispatcher(outbound$, message => {
@@ -163,7 +163,7 @@ describe('dispatcher', () => {
       });
     });
 
-    it('triggers the canonicalize request callback', async done => {
+    it('triggers the canonicalize request callback', done => {
       const id = 1;
 
       createDispatcher(outbound$, message => {
@@ -184,7 +184,7 @@ describe('dispatcher', () => {
       });
     });
 
-    it('triggers the function call request callback', async done => {
+    it('triggers the function call request callback', done => {
       const id = 1;
 
       createDispatcher(outbound$, message => {
@@ -207,7 +207,7 @@ describe('dispatcher', () => {
   });
 
   describe('multiple request listeners', () => {
-    it('supports multiple request callbacks', async done => {
+    it('supports multiple request callbacks', done => {
       const receivedRequests: number[] = [];
 
       createDispatcher(
@@ -253,7 +253,7 @@ describe('dispatcher', () => {
       dispatcher = createDispatcher(outbound$);
     });
 
-    it('throws if a request ID overlaps with that of an in-flight request', async done => {
+    it('throws if a request ID overlaps with that of an in-flight request', done => {
       expectObservableToError(
         dispatcher.error$,
         'Request ID 0 is already in use by an in-flight request.',
@@ -271,7 +271,7 @@ describe('dispatcher', () => {
       });
     });
 
-    it('throws if a response ID does not match any in-flight request IDs', async done => {
+    it('throws if a response ID does not match any in-flight request IDs', done => {
       expectObservableToError(
         dispatcher.error$,
         'Response ID 1 does not match any pending requests.',
@@ -295,7 +295,7 @@ describe('dispatcher', () => {
       ).toBeRejectedWith(error);
     });
 
-    it('cleans up log event subscriptions upon error', async done => {
+    it('cleans up log event subscriptions upon error', done => {
       dispatcher.logEvents$.subscribe(
         () => fail('expected silent completion'),
         () => fail('expected silent completion'),

@@ -73,14 +73,14 @@ describe('packet transformer', () => {
     });
 
     describe('empty message', () => {
-      it('decodes a single chunk', async done => {
+      it('decodes a single chunk', done => {
         expectDecoding([Buffer.from([])], done);
 
         rawBuffers$.next(Buffer.from([0]));
         rawBuffers$.complete();
       });
 
-      it('decodes a chunk that contains more data', async done => {
+      it('decodes a chunk that contains more data', done => {
         expectDecoding([Buffer.from([]), Buffer.from([100])], done);
 
         rawBuffers$.next(Buffer.from([0, 1, 100]));
@@ -89,14 +89,14 @@ describe('packet transformer', () => {
     });
 
     describe('longer message', () => {
-      it('decodes a single chunk', async done => {
+      it('decodes a single chunk', done => {
         expectDecoding([Buffer.from(Buffer.from([1, 2, 3, 4]))], done);
 
         rawBuffers$.next(Buffer.from([4, 1, 2, 3, 4]));
         rawBuffers$.complete();
       });
 
-      it('decodes multiple chunks', async done => {
+      it('decodes multiple chunks', done => {
         expectDecoding([Buffer.alloc(300, 1)], done);
 
         rawBuffers$.next(Buffer.from([172]));
@@ -105,7 +105,7 @@ describe('packet transformer', () => {
         rawBuffers$.complete();
       });
 
-      it('decodes one chunk per byte', async done => {
+      it('decodes one chunk per byte', done => {
         expectDecoding([Buffer.alloc(300, 1)], done);
 
         for (const byte of [172, 2, ...Buffer.alloc(300, 1)]) {
@@ -114,14 +114,14 @@ describe('packet transformer', () => {
         rawBuffers$.complete();
       });
 
-      it('decodes a chunk that contains more data', async done => {
+      it('decodes a chunk that contains more data', done => {
         expectDecoding([Buffer.from([1, 2, 3, 4]), Buffer.from([0])], done);
 
         rawBuffers$.next(Buffer.from([4, 1, 2, 3, 4, 1, 0]));
         rawBuffers$.complete();
       });
 
-      it('decodes a full chunk of length greater than 256', async done => {
+      it('decodes a full chunk of length greater than 256', done => {
         expectDecoding([Buffer.from(new Array(300).fill(1))], done);
 
         rawBuffers$.next(Buffer.from([172, 2, ...new Array(300).fill(1)]));
@@ -130,7 +130,7 @@ describe('packet transformer', () => {
     });
 
     describe('multiple messages', () => {
-      it('decodes a single chunk', async done => {
+      it('decodes a single chunk', done => {
         expectDecoding(
           [Buffer.from([1, 2, 3, 4]), Buffer.from([101, 102])],
           done
@@ -140,7 +140,7 @@ describe('packet transformer', () => {
         rawBuffers$.complete();
       });
 
-      it('decodes multiple chunks', async done => {
+      it('decodes multiple chunks', done => {
         expectDecoding([Buffer.from([1, 2, 3, 4]), Buffer.alloc(300, 1)], done);
 
         rawBuffers$.next(Buffer.from([4]));
@@ -149,7 +149,7 @@ describe('packet transformer', () => {
         rawBuffers$.complete();
       });
 
-      it('decodes one chunk per byte', async done => {
+      it('decodes one chunk per byte', done => {
         expectDecoding([Buffer.from([1, 2, 3, 4]), Buffer.alloc(300, 1)], done);
 
         for (const byte of [4, 1, 2, 3, 4, 172, 2, ...Buffer.alloc(300, 1)]) {

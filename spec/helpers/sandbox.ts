@@ -37,7 +37,9 @@ export async function run(
     );
   }
 
-  return Promise.resolve(test()).finally(async () => {
+  try {
+    await test();
+  } finally {
     if (options?.sassPathDirs) {
       process.env.SASS_PATH = undefined;
     }
@@ -47,5 +49,5 @@ export async function run(
     } catch {
       // noop
     }
-  });
+  }
 }

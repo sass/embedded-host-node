@@ -19,8 +19,8 @@ describe('render', () => {
   function expectRenderResult(
     renderOptions: RenderOptions,
     runExpectations: (result: RenderResult) => void
-  ) {
-    return new Promise<void>((resolve, reject) => {
+  ): Promise<void> {
+    return new Promise((resolve, reject) => {
       render(renderOptions, (error, result) => {
         if (error || result === undefined) {
           reject('Expected successful render');
@@ -35,8 +35,8 @@ describe('render', () => {
   function expectRenderError(
     renderOptions: RenderOptions,
     runExpectations: (error: RenderError) => void
-  ) {
-    return new Promise<void>((resolve, reject) => {
+  ): Promise<void> {
+    return new Promise((resolve, reject) => {
       render(renderOptions, error => {
         if (error === undefined) {
           reject('Expected render error');
@@ -49,21 +49,21 @@ describe('render', () => {
   }
 
   describe('input', () => {
-    it('renders a file from an absolute path', () => {
-      return sandbox.run(async () => {
+    it('renders a file from an absolute path', async () => {
+      await sandbox.run(async () => {
         await fs.writeFile(sassPath, 'a {b: c}');
 
-        return expectRenderResult({file: p.resolve(sassPath)}, result => {
+        await expectRenderResult({file: p.resolve(sassPath)}, result => {
           expectEqualIgnoringWhitespace(result.css.toString(), 'a {b: c;}');
         });
       });
     });
 
-    it('renders a file from a relative path', () => {
-      return sandbox.run(async () => {
+    it('renders a file from a relative path', async () => {
+      await sandbox.run(async () => {
         await fs.writeFile(sassPath, 'a {b: c}');
 
-        return expectRenderResult({file: sassPath}, result => {
+        await expectRenderResult({file: sassPath}, result => {
           expectEqualIgnoringWhitespace(result.css.toString(), 'a {b: c;}');
         });
       });
@@ -86,11 +86,11 @@ describe('render', () => {
     });
 
     describe('both data and file', () => {
-      it('uses the data parameter as the source', () => {
-        return sandbox.run(async () => {
+      it('uses the data parameter as the source', async () => {
+        await sandbox.run(async () => {
           await fs.writeFile(sassPath, 'a {b: c}');
 
-          return expectRenderResult(
+          await expectRenderResult(
             {data: 'x {y: z}', file: sassPath},
             result => {
               expectEqualIgnoringWhitespace(result.css.toString(), 'x {y: z;}');
@@ -109,12 +109,12 @@ describe('render', () => {
         );
       });
 
-      it('imports relative to the file path', () => {
-        return sandbox.run(async () => {
+      it('imports relative to the file path', async () => {
+        await sandbox.run(async () => {
           await fs.mkdir('subdir');
           await fs.writeFile(p.join('subdir', 'importee.scss'), 'a {b: c}');
 
-          return expectRenderResult(
+          await expectRenderResult(
             {
               data: '@import "importee"',
               file: p.join('subdir', sassPath),
@@ -143,8 +143,8 @@ describe('render', () => {
   });
 
   describe('imports', () => {
-    it('supports relative imports for a file', () => {
-      return sandbox.run(async () => {
+    it('supports relative imports for a file', async () => {
+      await sandbox.run(async () => {
         const importerPath = 'importer.scss';
         await fs.writeFile(
           importerPath,
@@ -152,14 +152,14 @@ describe('render', () => {
         );
         await fs.writeFile(sassPath, 'a {b: c}');
 
-        return expectRenderResult({file: importerPath}, result => {
+        await expectRenderResult({file: importerPath}, result => {
           expectEqualIgnoringWhitespace(result.css.toString(), 'a {b: c;}');
         });
       });
     });
 
-    it('supports relative imports for a file from a relative path', () => {
-      return sandbox.run(async () => {
+    it('supports relative imports for a file from a relative path', async () => {
+      await sandbox.run(async () => {
         await fs.mkdir('subdir');
         const importerPath = p.join('subdir', 'importer.scss');
         await fs.writeFile(
@@ -168,17 +168,17 @@ describe('render', () => {
         );
         await fs.writeFile(sassPath, 'a {b: c}');
 
-        return expectRenderResult({file: importerPath}, result => {
+        await expectRenderResult({file: importerPath}, result => {
           expectEqualIgnoringWhitespace(result.css.toString(), 'a {b: c;}');
         });
       });
     });
 
-    it('supports absolute path imports', () => {
-      return sandbox.run(async () => {
+    it('supports absolute path imports', async () => {
+      await sandbox.run(async () => {
         await fs.writeFile(sassPath, 'a {b: c}');
 
-        return expectRenderResult(
+        await expectRenderResult(
           {data: `@import "${pathToFileURL(p.resolve(sassPath))}"`},
           result => {
             expectEqualIgnoringWhitespace(result.css.toString(), 'a {b: c;}');
@@ -187,12 +187,12 @@ describe('render', () => {
       });
     });
 
-    it('supports import only files', () => {
-      return sandbox.run(async () => {
+    it('supports import only files', async () => {
+      await sandbox.run(async () => {
         await fs.writeFile('foo.scss', 'a {b: regular}');
         await fs.writeFile('foo.import.scss', 'a {b: import-only}');
 
-        return expectRenderResult({data: '@import "foo"'}, result => {
+        await expectRenderResult({data: '@import "foo"'}, result => {
           expectEqualIgnoringWhitespace(
             result.css.toString(),
             'a {b: import-only;}'
@@ -201,12 +201,12 @@ describe('render', () => {
       });
     });
 
-    it('supports mixed @use and @import', () => {
-      return sandbox.run(async () => {
+    it('supports mixed @use and @import', async () => {
+      await sandbox.run(async () => {
         await fs.writeFile('foo.scss', 'a {b: regular}');
         await fs.writeFile('foo.import.scss', 'a {b: import-only}');
 
-        return expectRenderResult(
+        await expectRenderResult(
           {
             data: '@use "foo"; @import "foo";',
           },
@@ -220,15 +220,15 @@ describe('render', () => {
       });
     });
 
-    it('supports SASS_PATH', () => {
-      return sandbox.run(
+    it('supports SASS_PATH', async () => {
+      await sandbox.run(
         async () => {
           await fs.mkdir('dir1');
           await fs.mkdir('dir2');
           await fs.writeFile('dir1/test1.scss', 'a {b: c}');
           await fs.writeFile('dir2/test2.scss', 'x {y: z}');
 
-          return expectRenderResult(
+          await expectRenderResult(
             {data: "@import 'test1'; @import 'test2';"},
             result => {
               expectEqualIgnoringWhitespace(
@@ -244,21 +244,21 @@ describe('render', () => {
   });
 
   describe('output', () => {
-    it('has expanded output style by default', () => {
-      return sandbox.run(async () => {
+    it('has expanded output style by default', async () => {
+      await sandbox.run(async () => {
         await fs.writeFile(sassPath, 'a {b: c}');
 
-        return expectRenderResult({file: sassPath}, result => {
+        await expectRenderResult({file: sassPath}, result => {
           expect(result.css.toString()).toBe('a {\n  b: c;\n}');
         });
       });
     });
 
-    it('includes the filename', () => {
-      return sandbox.run(async () => {
+    it('includes the filename', async () => {
+      await sandbox.run(async () => {
         await fs.writeFile(sassPath, 'a {b: c}');
 
-        return expectRenderResult({file: sassPath}, result => {
+        await expectRenderResult({file: sassPath}, result => {
           expect(result.stats.entry).toBe(sassPath);
         });
       });
@@ -309,7 +309,7 @@ describe('render', () => {
           },
         });
 
-        return new Promise<void>(resolve => {
+        await new Promise<void>(resolve => {
           render(
             {
               data,
@@ -345,11 +345,11 @@ describe('render', () => {
     });
 
     describe('sources list', () => {
-      it('contains a relative path to an input file', () => {
-        return sandbox.run(async () => {
+      it('contains a relative path to an input file', async () => {
+        await sandbox.run(async () => {
           await fs.writeFile(sassPath, 'a {b: c}');
 
-          return expectRenderResult(
+          await expectRenderResult(
             {
               file: sassPath,
               sourceMap: true,
@@ -362,11 +362,11 @@ describe('render', () => {
         });
       });
 
-      it('makes the path relative to outFile', () => {
-        return sandbox.run(async () => {
+      it('makes the path relative to outFile', async () => {
+        await sandbox.run(async () => {
           await fs.writeFile(sassPath, 'a {b: c}');
 
-          return expectRenderResult(
+          await expectRenderResult(
             {
               file: sassPath,
               sourceMap: true,
@@ -381,12 +381,12 @@ describe('render', () => {
         });
       });
 
-      it("contains an imported file's path", () => {
-        return sandbox.run(async () => {
+      it("contains an imported file's path", async () => {
+        await sandbox.run(async () => {
           await fs.writeFile(sassPath, '@import "other";\na {b: c}');
           await fs.writeFile('other.scss', 'x {y: z}');
 
-          return expectRenderResult(
+          await expectRenderResult(
             {
               file: sassPath,
               sourceMap: true,
@@ -444,11 +444,11 @@ describe('render', () => {
         });
       });
 
-      it('derives the target URL from the input file', () => {
-        return sandbox.run(async () => {
+      it('derives the target URL from the input file', async () => {
+        await sandbox.run(async () => {
           await fs.writeFile(sassPath, 'a {b: c}');
 
-          return expectRenderResult(
+          await expectRenderResult(
             {
               file: sassPath,
               sourceMap: 'out.css.map',
@@ -462,11 +462,11 @@ describe('render', () => {
         });
       });
 
-      it('derives the target URL from the input file without an extension', () => {
-        return sandbox.run(async () => {
+      it('derives the target URL from the input file without an extension', async () => {
+        await sandbox.run(async () => {
           await fs.writeFile(sassPathWithoutExtension, 'a {b: c}');
 
-          return expectRenderResult(
+          await expectRenderResult(
             {
               file: sassPathWithoutExtension,
               sourceMap: 'out.css.map',
@@ -572,11 +572,11 @@ describe('render', () => {
         );
       });
 
-      it('makes the sources list relative to the map location', () => {
-        return sandbox.run(async () => {
+      it('makes the sources list relative to the map location', async () => {
+        await sandbox.run(async () => {
           await fs.writeFile(sassPath, 'a {b: c}');
 
-          return expectRenderResult(
+          await expectRenderResult(
             {
               file: sassPath,
               sourceMap: 'map',
@@ -630,12 +630,12 @@ describe('render', () => {
         );
       });
 
-      it("doesn't modify the source URLs", () => {
-        return sandbox.run(async () => {
+      it("doesn't modify the source URLs", async () => {
+        await sandbox.run(async () => {
           const root = 'root';
           await fs.writeFile(sassPath, 'a {b: c}');
 
-          return expectRenderResult(
+          await expectRenderResult(
             {
               file: sassPath,
               sourceMap: true,
@@ -666,11 +666,11 @@ describe('render', () => {
     describe('parse error', () => {
       const data = 'a {b: }';
 
-      it('has the correct error for a file', () => {
-        return sandbox.run(async () => {
+      it('has the correct error for a file', async () => {
+        await sandbox.run(async () => {
           await fs.writeFile(sassPath, data);
 
-          return expectRenderError({file: sassPath}, error => {
+          await expectRenderError({file: sassPath}, error => {
             expectMessageAndToString(
               error,
               `Expected expression.
@@ -711,11 +711,11 @@ describe('render', () => {
     describe('runtime error', () => {
       const data = 'a {b: 1 % a}';
 
-      it('has the correct error for a file', () => {
-        return sandbox.run(async () => {
+      it('has the correct error for a file', async () => {
+        await sandbox.run(async () => {
           await fs.writeFile(sassPath, data);
 
-          return expectRenderError({file: sassPath}, error => {
+          await expectRenderError({file: sassPath}, error => {
             expectMessageAndToString(
               error,
               `Undefined operation "1 % a".

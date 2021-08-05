@@ -5,11 +5,11 @@
 import {RawSourceMap} from 'source-map';
 import {URL} from 'url';
 
-import {EmbeddedCompiler} from './embedded/compiler';
-import {Dispatcher} from './embedded/dispatcher';
-import {MessageTransformer} from './embedded/message-transformer';
-import {PacketTransformer} from './embedded/packet-transformer';
-import {deprotifyException} from './utils';
+import {EmbeddedCompiler} from './embedded-compiler/compiler';
+import {PacketTransformer} from './embedded-compiler/packet-transformer';
+import {MessageTransformer} from './embedded-protocol/message-transformer';
+import {Dispatcher} from './embedded-protocol/dispatcher';
+import {deprotifyException} from './embedded-protocol/utils';
 import {InboundMessage} from './vendor/embedded-protocol/embedded_sass_pb';
 
 /**

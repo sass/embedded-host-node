@@ -2,6 +2,10 @@
 
 - Properly handle `data:` URIs in sourceMap sources.
 
+- Function and Values API
+  - Add `Value` abstract class.
+  - Add `sassNull` singleton.
+
 ## 1.0.0-beta.2
 
 - No user visible changes.

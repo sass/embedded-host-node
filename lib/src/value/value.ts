@@ -3,6 +3,7 @@
 // https://opensource.org/licenses/MIT.
 
 import {List, OrderedMap, ValueObject} from 'immutable';
+
 import {valueError} from '../utils';
 
 /**
@@ -32,11 +33,9 @@ export abstract class Value implements ValueObject {
     return this;
   }
 
-  private _asList?: List<Value>;
-
   /** `this` as a list. */
   get asList(): List<Value> {
-    return this._asList ?? (this._asList = List([this]));
+    return List([this]);
   }
 
   /** The separator for `this` as a list. */
@@ -62,8 +61,11 @@ export abstract class Value implements ValueObject {
    * - a valid index into `asList`.
    *
    * Otherwise, this throws an error.
+   *
+   * If `this` came from a function argument, `name` is the argument name
+   * (without the `$`) and is used for error reporting.
    */
-  sassIndexToListIndex(sassIndex: Value): number {
+  sassIndexToListIndex(sassIndex: Value, name?: string): number {
     // TODO(awjin)
     throw Error('Not implemented yet');
   }

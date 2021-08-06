@@ -3,6 +3,7 @@
 // https://opensource.org/licenses/MIT.
 
 import {Observable} from 'rxjs';
+import {Value} from '../../lib/src/value/value';
 
 /**
  * Subscribes to `observable` and asserts that it errors with the expected
@@ -47,4 +48,12 @@ export function expectEqualIgnoringWhitespace(
     return str.replace(/\s+/g, '');
   }
   expect(strip(string1)).toBe(strip(string2));
+}
+
+/**
+ * Asserts that `val1` and `val2` are equal and have the same hashcode.
+ */
+export function expectEqualWithHashCode(val1: Value, val2: Value): void {
+  expect(val1.equals(val2)).toBe(true);
+  expect(val1.hashCode()).toBe(val2.hashCode());
 }

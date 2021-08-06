@@ -2,24 +2,32 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
+import {expectEqualWithHashCode} from '../../../spec/helpers/utils';
 import {sassNull} from './null';
+import {Value} from './value';
 
 describe('Sass null', () => {
+  const value: Value = sassNull;
+
   it('is falsey', () => {
-    expect(sassNull.isTruthy).toBe(false);
+    expect(value.isTruthy).toBe(false);
+  });
+
+  it('returns null in realNull check', () => {
+    expect(value.realNull).toBe(null);
   });
 
   it('is equal to itself', () => {
-    expect(sassNull.equals(sassNull)).toBe(true);
+    expectEqualWithHashCode(value, sassNull);
   });
 
   it("isn't any type", () => {
-    expect(sassNull.assertBoolean).toThrow();
-    expect(sassNull.assertColor).toThrow();
-    expect(sassNull.assertFunction).toThrow();
-    expect(sassNull.assertMap).toThrow();
-    expect(sassNull.tryMap()).toBe(null);
-    expect(sassNull.assertNumber).toThrow();
-    expect(sassNull.assertString).toThrow();
+    expect(value.assertBoolean).toThrow();
+    expect(value.assertColor).toThrow();
+    expect(value.assertFunction).toThrow();
+    expect(value.assertMap).toThrow();
+    expect(value.tryMap()).toBe(null);
+    expect(value.assertNumber).toThrow();
+    expect(value.assertString).toThrow();
   });
 });

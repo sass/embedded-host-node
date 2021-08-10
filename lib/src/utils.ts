@@ -18,3 +18,8 @@ export function compilerError(message: string): Error {
 export function hostError(message: string): Error {
   return Error(`Compiler reported error: ${message}.`);
 }
+
+/** Constructs an error caused by an invalid value type. */
+export function valueError(message: string, name?: string): Error {
+  return Error(name ? `$${name}: ${message}.` : `${message}.`);
+}

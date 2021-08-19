@@ -4,6 +4,7 @@
 
 import {List, OrderedMap, ValueObject} from 'immutable';
 
+import {SassBoolean} from './boolean';
 import {valueError} from '../utils';
 
 /**
@@ -76,9 +77,8 @@ export abstract class Value implements ValueObject {
    * If `this` came from a function argument, `name` is the argument name
    * (without the `$`) and is used for error reporting.
    */
-  assertBoolean(name?: string): Value {
+  assertBoolean(name?: string): SassBoolean {
     throw valueError(`${this} is not a boolean`, name);
-    // TODO(awjin): Narrow the return type to SassBoolean.
   }
 
   /**

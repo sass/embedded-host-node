@@ -1,3 +1,8 @@
+## 1.0.0-beta.4
+
+- Function and Values API
+  - Add `sassTrue` and `sassFalse` singletons.
+
 ## 1.0.0-beta.3
 
 - Properly handle `data:` URIs in sourceMap sources.

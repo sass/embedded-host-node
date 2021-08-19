@@ -6,10 +6,15 @@ import {hash} from 'immutable';
 
 import {Value} from './value';
 
+const hashCode = hash(null);
+
 // SassScript null. Cannot be constructed; exists only as the exported
 // singleton.
 class SassNull extends Value {
-  private readonly _hashCode = hash(null);
+  constructor() {
+    super();
+    Object.freeze(this);
+  }
 
   get isTruthy(): boolean {
     return false;
@@ -24,10 +29,9 @@ class SassNull extends Value {
   }
 
   hashCode(): number {
-    return this._hashCode;
+    return hashCode;
   }
 }
 
 /** The singleton instance of SassScript null. */
 export const sassNull = new SassNull();
-Object.freeze(sassNull);

@@ -17,7 +17,7 @@ export interface SassBoolean extends Value {
 }
 
 const trueHash = hash(true);
-const falseHash = hash(true);
+const falseHash = hash(false);
 
 class SassBooleanInternal extends Value implements SassBoolean {
   constructor(private readonly _value: boolean) {

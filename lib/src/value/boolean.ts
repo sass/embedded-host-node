@@ -44,6 +44,10 @@ class SassBooleanInternal extends Value implements SassBoolean {
   hashCode(): number {
     return this._value ? trueHash : falseHash;
   }
+
+  toString(): string {
+    return this._value ? 'sassTrue' : 'sassFalse';
+  }
 }
 
 /** The singleton instance of SassScript true. */

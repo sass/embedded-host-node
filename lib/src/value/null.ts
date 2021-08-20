@@ -31,6 +31,10 @@ class SassNull extends Value {
   hashCode(): number {
     return hashCode;
   }
+
+  toString(): string {
+    return 'sassNull';
+  }
 }
 
 /** The singleton instance of SassScript null. */

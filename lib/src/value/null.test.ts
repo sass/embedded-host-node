@@ -2,9 +2,9 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-import {expectEqualWithHashCode} from '../../../spec/helpers/utils';
-import {sassNull} from './null';
 import {Value} from './value';
+import {sassNull} from './null';
+import {expectEqualWithHashCode} from '../../../spec/helpers/utils';
 
 describe('Sass null', () => {
   const value: Value = sassNull;

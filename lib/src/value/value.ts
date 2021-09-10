@@ -5,6 +5,7 @@
 import {List, OrderedMap, ValueObject} from 'immutable';
 
 import {SassBoolean} from './boolean';
+import {SassNumber} from './number';
 import {valueError} from '../utils';
 
 /**
@@ -129,9 +130,8 @@ export abstract class Value implements ValueObject {
    * If `this` came from a function argument, `name` is the argument name
    * (without the `$`) and is used for error reporting.
    */
-  assertNumber(name?: string): Value {
+  assertNumber(name?: string): SassNumber {
     throw valueError(`${this} is not a number`, name);
-    // TODO(awjin): Narrow the return type to SassNumber.
   }
 
   /**

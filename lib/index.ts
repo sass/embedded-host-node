@@ -4,6 +4,8 @@
 
 export {Value} from './src/value/value';
 export {SassBoolean, sassFalse, sassTrue} from './src/value/boolean';
+export {SassList} from './src/value/list';
+export {SassMap} from './src/value/map';
 export {SassNumber} from './src/value/number';
 export {sassNull} from './src/value/null';
 

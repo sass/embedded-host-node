@@ -150,4 +150,7 @@ export abstract class Value implements ValueObject {
 
   /** This is the same for values that are `==` in SassScript. */
   abstract hashCode(): number;
+
+  /** A meaningful descriptor for this value. */
+  abstract toString(): string;
 }

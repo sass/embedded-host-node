@@ -58,6 +58,61 @@ jobs:
       - run: npm run init
       - run: npm run test
 
+  # The versions should be kept up-to-date with the latest LTS Node releases.
+  # They next need to be rotated October 2021. See
+  # https://github.com/nodejs/Release.
+  sass_spec:
+    name: 'JS API Tests | Node ${{ matrix.node_version }} | ${{ matrix.os }}'
+    runs-on: ${{ matrix.os }}-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        node_version: [16]
+        include:
+          # Include LTS versions on Ubuntu
+          - os: ubuntu-latest
+            node_version: 14
+          - os: ubuntu-latest
+            node_version: 12
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dart-lang/setup-dart@v1
+        with: {sdk: "${{ matrix.dart_channel }}"}
+      - run: dart pub get
+      - uses: actions/setup-node@v2
+        with: {node-version: "${{ matrix.node_version }}"}
+
+      - name: Check out sass-spec
+        run: tool/github-action/check-out-sass-spec.sh
+        env:
+          PR_BRANCH: "${{ github.base_ref }}"
+          CURRENT_REF: "${{ github.ref }}"
+          PR_BODY: "${{ github.event.pull_request.body }}"
+
+      - name: Compile
+        run: |
+          npm run init
+          npm run compile
+          ln -s {`pwd`/,dist/}lib/src/vendor/dart-sass-embedded
+          # Prefer the Sass specification to the natively-generated .d.ts files.
+          # This ensures that features the embedded host doesn't yet support
+          # don't cause compile-time failures.
+          find dist -name '*.d.ts' -exec rm {} \;
+
+      - name: Link into sass-spec
+        run: npm install sass@file:..
+        working-directory: sass-spec
+
+      - name: Check out Sass specification
+        run: git clone https://github.com/sass/sass.git language --depth 1
+
+      - name: Run tests
+        run: npm run js-api-spec -- --sassSassRepo ../language
+        working-directory: sass-spec
+
   deploy_npm:
     name: Deploy npm
     runs-on: ubuntu-latest

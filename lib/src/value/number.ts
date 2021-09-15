@@ -159,15 +159,16 @@ for (const [type, units] of Object.entries(unitsByType)) {
 
 /** A SassScript number. */
 export class SassNumber extends Value {
+  private valueInternal: number;
   private numeratorUnitsInternal: List<string>;
   private denominatorUnitsInternal: List<string>;
 
   /** Creates a number, optionally with a single numerator unit. */
-  constructor(private readonly valueInternal: number, unit?: string) {
+  constructor(value: number, unit?: string) {
     super();
+    this.valueInternal = value;
     this.numeratorUnitsInternal = unit === undefined ? List([]) : List([unit]);
     this.denominatorUnitsInternal = List([]);
-    Object.freeze(this);
   }
 
   /**
@@ -217,7 +218,8 @@ export class SassNumber extends Value {
   }
 
   /**
-   * If `value` is an integer according to `isInt`, returns it as an integer.
+   * If `value` is an integer according to `isInt`, returns `value` rounded to
+   * that integer.
    *
    * Otherwise, returns null.
    */
@@ -316,15 +318,10 @@ export class SassNumber extends Value {
     );
   }
 
-  /**
-   * Returns whether `this` can be coerced to `unit`.
-   *
-   * Always returns `true` if `this` is unitless.
-   */
+  /** Whether `this` is compatible with `unit`. */
   compatibleWithUnit(unit: string): boolean {
     if (!this.denominatorUnits.isEmpty()) return false;
     if (this.numeratorUnits.size > 1) return false;
-    if (this.numeratorUnits.isEmpty()) return true;
     const numerator = this.numeratorUnits.get(0)!;
     return typesByUnit[numerator]
       ? typesByUnit[numerator] === typesByUnit[unit]
@@ -369,7 +366,7 @@ export class SassNumber extends Value {
     newDenominators: string[] | List<string>,
     name?: string
   ): number {
-    return convertOrCoerce(this, {
+    return this.convertOrCoerce({
       coerceUnitless: false,
       newNumeratorUnits: asImmutableList(newNumerators),
       newDenominatorUnits: asImmutableList(newDenominators),
@@ -416,7 +413,7 @@ export class SassNumber extends Value {
     name?: string,
     otherName?: string
   ): number {
-    return convertOrCoerce(this, {
+    return this.convertOrCoerce({
       coerceUnitless: false,
       other,
       name,
@@ -470,7 +467,7 @@ export class SassNumber extends Value {
     newDenominators: string[] | List<string>,
     name?: string
   ): number {
-    return convertOrCoerce(this, {
+    return this.convertOrCoerce({
       coerceUnitless: true,
       newNumeratorUnits: asImmutableList(newNumerators),
       newDenominatorUnits: asImmutableList(newDenominators),
@@ -523,7 +520,7 @@ export class SassNumber extends Value {
     name?: string,
     otherName?: string
   ): number {
-    return convertOrCoerce(this, {
+    return this.convertOrCoerce({
       coerceUnitless: true,
       other,
       name,
@@ -555,123 +552,128 @@ export class SassNumber extends Value {
   }
 
   toString(): string {
-    return 'SassNumber';
+    return `${this.value}${unitString(
+      this.numeratorUnits,
+      this.denominatorUnits
+    )}`;
   }
-}
 
-// Returns the value of converting `number` to new units.
-//
-// The units may be specified as lists of units (`newNumeratorUnits` and
-// `newDenominatorUnits`), or by providng a SassNumber `other` that contains the
-// desired units.
-//
-// Throws an error if `number` is not compatible with the new units. Coercing a
-// unitful number to unitless (or vice-versa) throws an error unless
-// specifically enabled with `coerceUnitless`.
-function convertOrCoerce(
-  number: SassNumber,
-  params: {
-    name?: string;
-    coerceUnitless: boolean;
-  } & (
-    | {
-        newNumeratorUnits: List<string>;
-        newDenominatorUnits: List<string>;
+  // Returns the value of converting `number` to new units.
+  //
+  // The units may be specified as lists of units (`newNumeratorUnits` and
+  // `newDenominatorUnits`), or by providng a SassNumber `other` that contains the
+  // desired units.
+  //
+  // Throws an error if `number` is not compatible with the new units. Coercing a
+  // unitful number to unitless (or vice-versa) throws an error unless
+  // specifically enabled with `coerceUnitless`.
+  private convertOrCoerce(
+    params: {
+      name?: string;
+      coerceUnitless: boolean;
+    } & (
+      | {
+          newNumeratorUnits: List<string>;
+          newDenominatorUnits: List<string>;
+        }
+      | {
+          other: SassNumber;
+          otherName?: string;
+        }
+    )
+  ): number {
+    const newNumerators =
+      'other' in params
+        ? params.other.numeratorUnits
+        : params.newNumeratorUnits;
+    const newDenominators =
+      'other' in params
+        ? params.other.denominatorUnits
+        : params.newDenominatorUnits;
+
+    const compatibilityError = (): Error => {
+      if ('other' in params) {
+        let message = `${this} and`;
+        if (params.otherName) {
+          message += ` $${params.otherName}:`;
+        }
+        message += ` ${params.other} have incompatible units`;
+        if (!this.hasUnits || !otherHasUnits) {
+          message += " (one has units and the other doesn't)";
+        }
+        return valueError(message, params.name);
       }
-    | {
-        other: SassNumber;
-        otherName?: string;
+
+      if (!otherHasUnits) {
+        return valueError(`Expected ${this} to have no units.`, params.name);
       }
-  )
-): number {
-  const newNumerators =
-    'other' in params ? params.other.numeratorUnits : params.newNumeratorUnits;
-  const newDenominators =
-    'other' in params
-      ? params.other.denominatorUnits
-      : params.newDenominatorUnits;
 
-  const otherHasUnits = !newNumerators.isEmpty() || !newDenominators.isEmpty();
-  if (
-    (number.hasUnits && !otherHasUnits) ||
-    (!number.hasUnits && otherHasUnits)
-  ) {
-    if (params.coerceUnitless) return number.value;
-    throw compatibilityError();
-  }
-
-  if (
-    number.numeratorUnits.equals(newNumerators) &&
-    number.denominatorUnits.equals(newDenominators)
-  ) {
-    return number.value;
-  }
-
-  let value = number.value;
-  let oldNumerators = number.numeratorUnits;
-  for (const newNumerator of newNumerators) {
-    const idx = oldNumerators.findIndex(oldNumerator => {
-      const factor = conversionFactor(oldNumerator, newNumerator);
-      if (factor === null) return false;
-      value *= factor;
-      return true;
-    });
-    if (idx < 0) throw compatibilityError();
-    oldNumerators = oldNumerators.delete(idx);
-  }
-  let oldDenominators = number.denominatorUnits;
-  for (const newDenominator of newDenominators) {
-    const idx = oldDenominators.findIndex(oldDenominator => {
-      const factor = conversionFactor(oldDenominator, newDenominator);
-      if (factor === null) return false;
-      value /= factor;
-      return true;
-    });
-    if (idx < 0) throw compatibilityError();
-    oldDenominators = oldDenominators.delete(idx);
-  }
-  if (!oldNumerators.isEmpty() || !oldDenominators.isEmpty()) {
-    throw compatibilityError();
-  }
-  return value;
-
-  function compatibilityError(): Error {
-    if ('other' in params) {
-      let message = `${number} and`;
-      if (params.otherName) {
-        message += ` $${params.otherName}:`;
+      // For single numerators, throw a detailed error with info about which unit
+      // types would have been acceptable.
+      if (newNumerators.size === 1 && newDenominators.isEmpty) {
+        const type = typesByUnit[newNumerators.get(0)!];
+        if (type) {
+          return valueError(
+            `Expected ${this} to have a single ${type} unit (${unitsByType[
+              type
+            ].join(', ')}).`,
+            params.name
+          );
+        }
       }
-      message += ` ${params.other} have incompatible units`;
-      if (!number.hasUnits || !otherHasUnits) {
-        message += " (one has units and the other doesn't)";
-      }
-      return valueError(message, params.name);
+
+      return valueError(
+        `Expected $this to have ${
+          newNumerators.size + newDenominators.size > 1 ? 'units' : 'unit'
+        } ${unitString(newNumerators, newDenominators)}.`,
+        params.name
+      );
+    };
+
+    const otherHasUnits =
+      !newNumerators.isEmpty() || !newDenominators.isEmpty();
+    if (
+      (this.hasUnits && !otherHasUnits) ||
+      (!this.hasUnits && otherHasUnits)
+    ) {
+      if (params.coerceUnitless) return this.value;
+      throw compatibilityError();
     }
 
-    if (!otherHasUnits) {
-      return valueError(`Expected ${number} to have no units.`, params.name);
+    if (
+      this.numeratorUnits.equals(newNumerators) &&
+      this.denominatorUnits.equals(newDenominators)
+    ) {
+      return this.value;
     }
 
-    // For single numerators, throw a detailed error with info about which unit
-    // types would have been acceptable.
-    if (newNumerators.size === 1 && newDenominators.isEmpty) {
-      const type = typesByUnit[newNumerators.get(0)!];
-      if (type) {
-        return valueError(
-          `Expected ${number} to have a single ${type} unit (${unitsByType[
-            type
-          ].join(', ')}).`,
-          params.name
-        );
-      }
+    let value = this.value;
+    let oldNumerators = this.numeratorUnits;
+    for (const newNumerator of newNumerators) {
+      const idx = oldNumerators.findIndex(oldNumerator => {
+        const factor = conversionFactor(oldNumerator, newNumerator);
+        if (factor === null) return false;
+        value *= factor;
+        return true;
+      });
+      if (idx < 0) throw compatibilityError();
+      oldNumerators = oldNumerators.delete(idx);
     }
-
-    return valueError(
-      `Expected $this to have ${
-        newNumerators.size + newDenominators.size > 1 ? 'units' : 'unit'
-      } ${unitString(newNumerators, newDenominators)}.`,
-      params.name
-    );
+    let oldDenominators = this.denominatorUnits;
+    for (const newDenominator of newDenominators) {
+      const idx = oldDenominators.findIndex(oldDenominator => {
+        const factor = conversionFactor(oldDenominator, newDenominator);
+        if (factor === null) return false;
+        value /= factor;
+        return true;
+      });
+      if (idx < 0) throw compatibilityError();
+      oldDenominators = oldDenominators.delete(idx);
+    }
+    if (!oldNumerators.isEmpty() || !oldDenominators.isEmpty()) {
+      throw compatibilityError();
+    }
+    return value;
   }
 }
 

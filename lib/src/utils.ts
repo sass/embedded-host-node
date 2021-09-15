@@ -13,7 +13,7 @@ export function isNullOrUndefined<T>(object: T): boolean {
 
 /** Returns `collection` as an immutable List. */
 export function asImmutableList<T>(collection: T[] | List<T>): List<T> {
-  return collection instanceof Array ? List(collection) : collection;
+  return List.isList(collection) ? collection : List(collection);
 }
 
 /** Constructs a compiler-caused Error. */

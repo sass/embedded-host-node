@@ -2,6 +2,8 @@
 
 - Function and Values API
   - Add `sassTrue` and `sassFalse` singletons.
+  - Add `SassNumber` class.
+  - Add `SassString` class.
 
 ## 1.0.0-beta.3
 

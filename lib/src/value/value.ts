@@ -6,6 +6,7 @@ import {List, OrderedMap, ValueObject} from 'immutable';
 
 import {SassBoolean} from './boolean';
 import {SassNumber} from './number';
+import {SassString} from './string';
 import {valueError} from '../utils';
 
 /**
@@ -140,9 +141,8 @@ export abstract class Value implements ValueObject {
    * If `this` came from a function argument, `name` is the argument name
    * (without the `$`) and is used for error reporting.
    */
-  assertString(name?: string): Value {
+  assertString(name?: string): SassString {
     throw valueError(`${this} is not a string`, name);
-    // TODO(awjin): Narrow the return type to SassString.
   }
 
   /** Whether `this == other` in SassScript. */

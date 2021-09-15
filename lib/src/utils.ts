@@ -2,11 +2,18 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
+import {List} from 'immutable';
+
 export type PromiseOr<T> = T | Promise<T>;
 
 /** Checks for null or undefined. */
 export function isNullOrUndefined<T>(object: T): boolean {
   return object === null || object === undefined;
+}
+
+/** Returns `collection` as an immutable List. */
+export function asImmutableList<T>(collection: T[] | List<T>): List<T> {
+  return List.isList(collection) ? collection : List(collection);
 }
 
 /** Constructs a compiler-caused Error. */

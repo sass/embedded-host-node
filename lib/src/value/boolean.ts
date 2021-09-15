@@ -1,4 +1,4 @@
-// Copyright 2020 Google Inc. Use of this source code is governed by an
+// Copyright 2021 Google Inc. Use of this source code is governed by an
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
@@ -13,20 +13,20 @@ import {Value} from './value';
  * singletons.
  */
 export interface SassBoolean extends Value {
-  value: boolean;
+  readonly value: boolean;
 }
 
 const trueHash = hash(true);
 const falseHash = hash(false);
 
 class SassBooleanInternal extends Value implements SassBoolean {
-  constructor(private readonly _value: boolean) {
+  constructor(private readonly valueInternal: boolean) {
     super();
     Object.freeze(this);
   }
 
   get value(): boolean {
-    return this._value;
+    return this.valueInternal;
   }
 
   get isTruthy(): boolean {
@@ -38,15 +38,15 @@ class SassBooleanInternal extends Value implements SassBoolean {
   }
 
   equals(other: Value): boolean {
-    return other instanceof SassBooleanInternal && this._value === other._value;
+    return other instanceof SassBooleanInternal && this.value === other.value;
   }
 
   hashCode(): number {
-    return this._value ? trueHash : falseHash;
+    return this.value ? trueHash : falseHash;
   }
 
   toString(): string {
-    return this._value ? 'sassTrue' : 'sassFalse';
+    return this.value ? 'sassTrue' : 'sassFalse';
   }
 }
 

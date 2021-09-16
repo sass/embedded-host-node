@@ -68,13 +68,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu, windows, macos]
         node_version: [16]
         include:
           # Include LTS versions on Ubuntu
-          - os: ubuntu-latest
+          - os: ubuntu
             node_version: 14
-          - os: ubuntu-latest
+          - os: ubuntu
             node_version: 12
 
     steps:

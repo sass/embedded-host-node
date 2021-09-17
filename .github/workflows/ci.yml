@@ -1,5 +1,8 @@
 name: CI
 
+defaults:
+  run: {shell: bash}
+
 env:
   PROTOC_VERSION: 3.x
   DEFAULT_NODE_VERSION: 15.x # If changing this, also change jobs.tests.strategy.matrix.node_version

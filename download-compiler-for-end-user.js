@@ -7,15 +7,10 @@ const fs = require('fs');
 if (fs.existsSync('.dev')) return;
 
 const getDartSassEmbedded = require('./dist/tool/utils.js').getDartSassEmbedded;
-const pkg = require('./package.json');
 
 (async () => {
   try {
-    await getDartSassEmbedded({
-      outPath: './dist/lib/src/vendor',
-      release: true,
-      version: pkg['compiler-version'],
-    });
+    await getDartSassEmbedded('./dist/lib/src/vendor');
   } catch (error) {
     console.error(error);
     process.exitCode = 1;

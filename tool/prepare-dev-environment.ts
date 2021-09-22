@@ -12,32 +12,62 @@ const argv = yargs(process.argv.slice(2))
     description:
       'Build the Embedded Dart Sass binary from the source at this path.',
   })
-  .option('compiler-version', {
+  .option('compiler-ref', {
     type: 'string',
     description: 'Build the Embedded Dart Sass binary from this Git ref.',
+  })
+  .option('compiler-version', {
+    type: 'string',
+    description: 'Download this version of the Embedded Dart Sass binary.',
   })
   .option('protocol-path', {
     type: 'string',
     description: 'Build the Embedded Protocol from the source at this path.',
   })
-  .option('protocol-version', {
+  .option('protocol-ref', {
     type: 'string',
     description: 'Build the Embedded Protocol from this Git ref.',
+  })
+  .option('protocol-version', {
+    type: 'string',
+    description: 'Build the Embedded Protocol from this release version.',
   }).argv;
 
 (async () => {
   try {
     const outPath = 'lib/src/vendor';
-    await getEmbeddedProtocol({
-      outPath,
-      version: argv['protocol-version'],
-      path: argv['protocol-path'],
-    });
-    await getDartSassEmbedded({
-      outPath,
-      version: argv['compiler-version'],
-      path: argv['compiler-path'],
-    });
+
+    if (argv['protocol-version']) {
+      await getEmbeddedProtocol(outPath, {
+        version: argv['protocol-version'],
+      });
+    } else if (argv['protocol-ref']) {
+      await getEmbeddedProtocol(outPath, {
+        ref: argv['protocol-ref'],
+      });
+    } else if (argv['protocol-path']) {
+      await getEmbeddedProtocol(outPath, {
+        path: argv['protocol-path'],
+      });
+    } else {
+      await getEmbeddedProtocol(outPath);
+    }
+
+    if (argv['compiler-version']) {
+      await getDartSassEmbedded(outPath, {
+        version: argv['compiler-version'],
+      });
+    } else if (argv['compiler-ref']) {
+      await getDartSassEmbedded(outPath, {
+        ref: argv['compiler-ref'],
+      });
+    } else if (argv['compiler-path']) {
+      await getDartSassEmbedded(outPath, {
+        path: argv['compiler-path'],
+      });
+    } else {
+      await getDartSassEmbedded(outPath);
+    }
   } catch (error) {
     console.error(error);
     process.exitCode = 1;

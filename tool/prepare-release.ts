@@ -14,7 +14,7 @@ shell.config.fatal = true;
   try {
     await sanityCheckBeforeRelease();
 
-    await getEmbeddedProtocol({outPath: 'lib/src/vendor', release: true});
+    await getEmbeddedProtocol('lib/src/vendor');
 
     console.log('Transpiling TS into dist.');
     shell.exec('tsc');

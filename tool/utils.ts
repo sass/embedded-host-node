@@ -6,9 +6,10 @@ import extractZip = require('extract-zip');
 import {promises as fs, existsSync} from 'fs';
 import fetch from 'node-fetch';
 import * as p from 'path';
-import {satisfies} from 'semver';
 import * as shell from 'shelljs';
 import {extract as extractTar} from 'tar';
+
+import * as pkg from '../package.json';
 
 shell.config.fatal = true;
 
@@ -48,154 +49,104 @@ const ARCHIVE_EXTENSION = OS === 'windows' ? '.zip' : '.tar.gz';
 // Directory that holds source files.
 const BUILD_PATH = 'build';
 
-// Release info provided by Github.
-// See: https://docs.github.com/en/rest/reference/repos#releases
-interface ReleaseInfo {
-  tag_name: string;
-  name: string;
-}
-
 /**
- * Gets the latest version of the Embedded Protocol. Throws if an error occurs.
+ * Gets the Embedded Protocol.
  *
- * @param version - The Git ref to check out and build. Defaults to `main`.
- * @param path - Build from this path instead of pulling from Github.
- * @param release - Download the latest release instead of building from source.
+ * Can download the release `version`, check out and build the source from a Git
+ * `ref`, or build from the source at `path`.
+ *
+ * By default, downloads the release version specified in package.json. Throws
+ * if an error occurs.
  */
-export async function getEmbeddedProtocol(options: {
-  outPath: string;
-  version?: string;
-  path?: string;
-  release?: boolean;
-}): Promise<void> {
+export async function getEmbeddedProtocol(
+  outPath: string,
+  options?:
+    | {
+        version: string;
+      }
+    | {
+        ref: string;
+      }
+    | {
+        path: string;
+      }
+): Promise<void> {
   const repo = 'embedded-protocol';
 
-  if (options.release) {
-    const latestRelease = await getLatestReleaseInfo({
-      repo,
-      tag: true,
-    });
+  if (!options || 'version' in options) {
+    const version = options?.version ?? pkg['protocol-version'];
     await downloadRelease({
       repo,
-      assetUrl:
-        `https://github.com/sass/${repo}/archive/` +
-        `${latestRelease.name.replace(' ', '-')}` +
-        ARCHIVE_EXTENSION,
+      assetUrl: `https://github.com/sass/${repo}/archive/${version}${ARCHIVE_EXTENSION}`,
       outPath: BUILD_PATH,
     });
     fs.rename(
-      p.join(BUILD_PATH, `${repo}-${latestRelease.name.replace(' ', '-')}`),
+      p.join(BUILD_PATH, `${repo}-${version}`),
       p.join(BUILD_PATH, repo)
     );
-  } else if (!options.path) {
+  } else if ('ref' in options) {
     fetchRepo({
       repo,
       outPath: BUILD_PATH,
-      ref: options.version,
+      ref: options.ref,
     });
   }
 
-  const repoPath = options.path ?? p.join(BUILD_PATH, repo);
-  buildEmbeddedProtocol(repoPath);
-  await linkBuiltFiles(repoPath, p.join(options.outPath, repo));
+  const source =
+    options && 'path' in options ? options.path : p.join(BUILD_PATH, repo);
+  buildEmbeddedProtocol(source);
+  await linkBuiltFiles(source, p.join(outPath, repo));
 }
 
 /**
- * Gets the latest version of the Dart Sass wrapper for the Embedded Compiler.
- * Throws if an error occurs.
+ * Gets the Dart Sass wrapper for the Embedded Compiler.
  *
- * @param version - If `release` is true, the version of the released binary to
- *   download (defaults to the latest version). If it's false, the Git ref to
- *   check out and build (defaults to main).
- * @param path - Build from this path instead of pulling from Github.
- * @param release - Download the latest release instead of building from source.
+ * Can download the release `version`, check out and build the source from a Git
+ * `ref`, or build from the source at `path`.
+ *
+ * By default, downloads the release version specified in package.json. Throws
+ * if an error occurs.
  */
-export async function getDartSassEmbedded(options: {
-  outPath: string;
-  version?: string;
-  path?: string;
-  release?: boolean;
-}): Promise<void> {
+export async function getDartSassEmbedded(
+  outPath: string,
+  options?:
+    | {
+        version: string;
+      }
+    | {
+        ref: string;
+      }
+    | {
+        path: string;
+      }
+): Promise<void> {
   const repo = 'dart-sass-embedded';
 
-  if (options.release) {
-    const release = options.version
-      ? {tag_name: options.version, name: `sass_embedded ${options.version}`}
-      : await getLatestReleaseInfo({
-          repo,
-        });
+  if (!options || 'version' in options) {
+    const version = options?.version ?? pkg['compiler-version'];
     await downloadRelease({
       repo,
       assetUrl:
         `https://github.com/sass/${repo}/releases/download/` +
-        `${release.tag_name}/` +
-        `${release.name.replace(' ', '-')}-` +
-        `${OS}-${ARCH}` +
-        ARCHIVE_EXTENSION,
-      outPath: options.outPath,
+        `${version}/sass_embedded-${version}-` +
+        `${OS}-${ARCH}${ARCHIVE_EXTENSION}`,
+      outPath,
     });
-    fs.rename(
-      p.join(options.outPath, 'sass_embedded'),
-      p.join(options.outPath, repo)
-    );
-  } else if (options.path) {
-    buildDartSassEmbedded(options.path);
-    await linkBuiltFiles(
-      p.join(options.path, 'build'),
-      p.join(options.outPath, repo)
-    );
-  } else {
+    fs.rename(p.join(outPath, 'sass_embedded'), p.join(outPath, repo));
+    return;
+  }
+
+  if ('ref' in options) {
     fetchRepo({
       repo,
       outPath: BUILD_PATH,
-      ref: options.version,
+      ref: options.ref,
     });
-    buildDartSassEmbedded(p.join(BUILD_PATH, repo));
-    await linkBuiltFiles(
-      p.join(BUILD_PATH, repo, 'build'),
-      p.join(options.outPath, repo)
-    );
-  }
-}
-
-// Gets the ReleaseInfo of the latest release for `repo`. If `version` is given,
-// throws an error if the latest version is not semver-compatible with
-// `version`. If `tag` is true, gets the latest tag instead of release.
-async function getLatestReleaseInfo(options: {
-  repo: string;
-  versionConstraint?: string;
-  tag?: boolean;
-}): Promise<ReleaseInfo> {
-  console.log(`Getting version info for ${options.repo}.`);
-  const response = await fetch(
-    'https://api.github.com/repos/sass/' +
-      `${options.repo}/${options.tag ? 'tags' : 'releases'}`,
-    {
-      redirect: 'follow',
-    }
-  );
-  if (!response.ok) {
-    throw Error(
-      `Failed to get version info for ${options.repo}: ${response.statusText}`
-    );
-  }
-  const latestRelease = JSON.parse(await response.text())[0];
-  const latestVersion = options.tag
-    ? latestRelease.name
-    : latestRelease.tag_name;
-
-  if (options.versionConstraint) {
-    try {
-      satisfies(latestVersion, options.versionConstraint);
-    } catch {
-      throw Error(
-        `Latest release ${latestVersion} is not compatible with ${options.versionConstraint}.`
-      );
-    }
   }
 
-  console.log(`Latest release for ${options.repo} is ${latestVersion}.`);
-  return latestRelease;
+  const source = 'path' in options ? options.path : p.join(BUILD_PATH, repo);
+  buildDartSassEmbedded(source);
+  await linkBuiltFiles(p.join(source, 'build'), p.join(outPath, repo));
 }
 
 // Downloads the release for `repo` located at `assetUrl`, then unzips it into
@@ -238,7 +189,7 @@ async function downloadRelease(options: {
 function fetchRepo(options: {
   repo: string;
   outPath: string;
-  ref?: string;
+  ref: string;
 }): void {
   if (!existsSync(p.join(options.outPath, options.repo))) {
     console.log(`Cloning ${options.repo} into ${options.outPath}.`);
@@ -251,16 +202,16 @@ function fetchRepo(options: {
     );
   }
 
-  const version = options.ref ? `commit ${options.ref}` : 'latest update';
+  const version =
+    options.ref === 'main' ? 'latest update' : `commit ${options.ref}`;
   console.log(`Fetching ${version} for ${options.repo}.`);
-  shell.exec(`git fetch --depth=1 origin ${options.ref ?? 'main'}`, {
-    silent: true,
-    cwd: p.join(options.outPath, options.repo),
-  });
-  shell.exec('git reset --hard FETCH_HEAD', {
-    silent: true,
-    cwd: p.join(options.outPath, options.repo),
-  });
+  shell.exec(
+    `git fetch --depth=1 origin ${options.ref} && git reset --hard FETCH_HEAD`,
+    {
+      silent: true,
+      cwd: p.join(options.outPath, options.repo),
+    }
+  );
 }
 
 // Builds the embedded proto at `repoPath` into a pbjs with TS declaration file.

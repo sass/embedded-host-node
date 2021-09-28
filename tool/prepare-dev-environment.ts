@@ -31,7 +31,11 @@ const argv = yargs(process.argv.slice(2))
   .option('protocol-version', {
     type: 'string',
     description: 'Build the Embedded Protocol from this release version.',
-  }).argv;
+  })
+  .conflicts({'compiler-path': ['compiler-ref', 'compiler-version']})
+  .conflicts('compiler-ref', 'compiler-version')
+  .conflicts({'protocol-path': ['protocol-ref', 'protocol-version']})
+  .conflicts('protocol-ref', 'protocol-version').argv;
 
 (async () => {
   try {

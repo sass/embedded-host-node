@@ -49,13 +49,6 @@ const ARCHIVE_EXTENSION = OS === 'windows' ? '.zip' : '.tar.gz';
 // Directory that holds source files.
 const BUILD_PATH = 'build';
 
-// Release info provided by Github.
-// See: https://docs.github.com/en/rest/reference/repos#releases
-interface ReleaseInfo {
-  tag_name: string;
-  name: string;
-}
-
 /**
  * Gets the Embedded Protocol.
  *
@@ -72,7 +65,7 @@ export async function getEmbeddedProtocol(
         version: string;
       }
     | {
-        ref: string | 'main';
+        ref: string;
       }
     | {
         path: string;
@@ -91,9 +84,7 @@ export async function getEmbeddedProtocol(
       p.join(BUILD_PATH, `${repo}-${version}`),
       p.join(BUILD_PATH, repo)
     );
-  }
-
-  if (options && 'ref' in options) {
+  } else if ('ref' in options) {
     fetchRepo({
       repo,
       outPath: BUILD_PATH,
@@ -101,11 +92,10 @@ export async function getEmbeddedProtocol(
     });
   }
 
-  const repoPath =
+  const source =
     options && 'path' in options ? options.path : p.join(BUILD_PATH, repo);
-
-  buildEmbeddedProtocol(repoPath);
-  await linkBuiltFiles(repoPath, p.join(outPath, repo));
+  buildEmbeddedProtocol(source);
+  await linkBuiltFiles(source, p.join(outPath, repo));
 }
 
 /**
@@ -124,7 +114,7 @@ export async function getDartSassEmbedded(
         version: string;
       }
     | {
-        ref: string | 'main';
+        ref: string;
       }
     | {
         path: string;
@@ -154,10 +144,9 @@ export async function getDartSassEmbedded(
     });
   }
 
-  const repoPath = 'path' in options ? options.path : p.join(BUILD_PATH, repo);
-
-  buildDartSassEmbedded(repoPath);
-  await linkBuiltFiles(p.join(repoPath, 'build'), p.join(outPath, repo));
+  const source = 'path' in options ? options.path : p.join(BUILD_PATH, repo);
+  buildDartSassEmbedded(source);
+  await linkBuiltFiles(p.join(source, 'build'), p.join(outPath, repo));
 }
 
 // Downloads the release for `repo` located at `assetUrl`, then unzips it into

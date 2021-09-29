@@ -4,6 +4,8 @@
 
 import {hash} from 'immutable';
 
+import {valueError} from '../utils';
+
 /** The precision of Sass numbers. */
 export const precision = 10;
 
@@ -92,4 +94,23 @@ export function fuzzyInRange(
   if (fuzzyEquals(num, max)) return max;
   if (num > min && num < max) return num;
   return null;
+}
+
+/**
+ * Returns `num` if it's within `min` and `max`. Otherwise, throws an error.
+ *
+ * If `num` `fuzzyEquals` `min` or `max`, it gets clamped to that value.
+ *
+ * If `name` is provided, it is used as the parameter name for error reporting.
+ */
+export function fuzzyAssertInRange(
+  num: number,
+  min: number,
+  max: number,
+  name?: string
+): number {
+  if (fuzzyEquals(num, min)) return min;
+  if (fuzzyEquals(num, max)) return max;
+  if (num > min && num < max) return num;
+  throw valueError(`${num} must be between ${min} and ${max}`, name);
 }

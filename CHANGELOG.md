@@ -4,6 +4,7 @@
 
 - Function and Values API
   - Add `sassTrue` and `sassFalse` singletons.
+  - Add `SassColor` class.
   - Add `SassNumber` class.
   - Add `SassString` class.
 

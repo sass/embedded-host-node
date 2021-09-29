@@ -1,5 +1,7 @@
 ## 1.0.0-beta.4
 
+- Allow installing on arm64.
+
 - Function and Values API
   - Add `sassTrue` and `sassFalse` singletons.
   - Add `SassNumber` class.

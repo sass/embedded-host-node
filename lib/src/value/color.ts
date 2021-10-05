@@ -20,13 +20,6 @@ interface HslColor {
   alpha: number;
 }
 
-interface HwbColor {
-  hue: number;
-  whiteness: number;
-  blackness: number;
-  alpha: number;
-}
-
 /** A SassScript color. */
 export class SassColor extends Value {
   private redInternal?: number;
@@ -188,7 +181,7 @@ export class SassColor extends Value {
     // Because HWB is (currently) used much less frequently than HSL or RGB, we
     // don't cache its values because we expect the memory overhead of doing so
     // to outweigh the cost of recalculating it on access.
-    return (Math.min(Math.min(this.red, this.green), this.blue) / 255) * 100;
+    return (Math.min(this.red, this.green, this.blue) / 255) * 100;
   }
 
   /** `this`'s blackness value. */
@@ -196,9 +189,7 @@ export class SassColor extends Value {
     // Because HWB is (currently) used much less frequently than HSL or RGB, we
     // don't cache its values because we expect the memory overhead of doing so
     // to outweigh the cost of recalculating it on access.
-    return (
-      100 - (Math.max(Math.max(this.red, this.green), this.blue) / 255) * 100
-    );
+    return 100 - (Math.max(this.red, this.green, this.blue) / 255) * 100;
   }
 
   /** `this`'s alpha channel. */
@@ -296,28 +287,6 @@ export class SassColor extends Value {
     return string;
   }
 
-  // Computes `this`'s red`, `green`, and `blue` channels based on `hue`,
-  // `saturation`, and `value`.
-  //
-  // Algorithm from the CSS3 spec: https://www.w3.org/TR/css3-color/#hsl-color.
-  private hslToRgb(): void {
-    const scaledHue = this.hue / 360;
-    const scaledSaturation = this.saturation / 100;
-    const scaledLightness = this.lightness / 100;
-
-    const m2 =
-      scaledLightness <= 0.5
-        ? scaledLightness * (scaledSaturation + 1)
-        : scaledLightness +
-          scaledSaturation -
-          scaledLightness * scaledSaturation;
-    const m1 = scaledLightness * 2 - m2;
-
-    this.redInternal = fuzzyRound(hueToRgb(m1, m2, scaledHue + 1 / 3));
-    this.greenInternal = fuzzyRound(hueToRgb(m1, m2, scaledHue));
-    this.blueInternal = fuzzyRound(hueToRgb(m1, m2, scaledHue - 1 / 3));
-  }
-
   // Computes `this`'s `hue`, `saturation`, and `lightness` values based on
   // `red`, `green`, and `blue`.
   //
@@ -327,8 +296,8 @@ export class SassColor extends Value {
     const scaledGreen = this.green / 255;
     const scaledBlue = this.blue / 255;
 
-    const max = Math.max(Math.max(scaledRed, scaledGreen), scaledBlue);
-    const min = Math.min(Math.min(scaledRed, scaledGreen), scaledBlue);
+    const max = Math.max(scaledRed, scaledGreen, scaledBlue);
+    const min = Math.min(scaledRed, scaledGreen, scaledBlue);
     const delta = max - min;
 
     if (max === min) {
@@ -351,6 +320,28 @@ export class SassColor extends Value {
       this.saturationInternal = (100 * delta) / (2 - max - min);
     }
   }
+
+  // Computes `this`'s red`, `green`, and `blue` channels based on `hue`,
+  // `saturation`, and `value`.
+  //
+  // Algorithm from the CSS3 spec: https://www.w3.org/TR/css3-color/#hsl-color.
+  private hslToRgb(): void {
+    const scaledHue = this.hue / 360;
+    const scaledSaturation = this.saturation / 100;
+    const scaledLightness = this.lightness / 100;
+
+    const m2 =
+      scaledLightness <= 0.5
+        ? scaledLightness * (scaledSaturation + 1)
+        : scaledLightness +
+          scaledSaturation -
+          scaledLightness * scaledSaturation;
+    const m1 = scaledLightness * 2 - m2;
+
+    this.redInternal = fuzzyRound(hueToRgb(m1, m2, scaledHue + 1 / 3) * 255);
+    this.greenInternal = fuzzyRound(hueToRgb(m1, m2, scaledHue) * 255);
+    this.blueInternal = fuzzyRound(hueToRgb(m1, m2, scaledHue - 1 / 3) * 255);
+  }
 }
 
 // An algorithm from the CSS3 spec: http://www.w3.org/TR/css3-color/#hsl-color.
@@ -358,16 +349,13 @@ function hueToRgb(m1: number, m2: number, hue: number): number {
   if (hue < 0) hue += 1;
   if (hue > 1) hue -= 1;
 
-  let result;
   if (hue < 1 / 6) {
-    result = m1 + (m2 - m1) * hue * 6;
+    return m1 + (m2 - m1) * hue * 6;
   } else if (hue < 1 / 2) {
-    result = m2;
+    return m2;
   } else if (hue < 2 / 3) {
-    result = m1 + (m2 - m1) * (2 / 3 - hue) * 6;
+    return m1 + (m2 - m1) * (2 / 3 - hue) * 6;
   } else {
-    result = m1;
+    return m1;
   }
-
-  return result * 255;
 }

@@ -7,6 +7,8 @@ import * as pkg from '../package.json';
 export {Value} from './src/value/value';
 export {SassBoolean, sassFalse, sassTrue} from './src/value/boolean';
 export {SassColor} from './src/value/color';
+export {ListSeparator, SassList} from './src/value/list';
+export {SassMap} from './src/value/map';
 export {sassNull} from './src/value/null';
 export {SassNumber} from './src/value/number';
 export {SassString} from './src/value/string';

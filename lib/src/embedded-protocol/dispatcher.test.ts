@@ -114,9 +114,9 @@ describe('dispatcher', () => {
       dispatcher = createDispatcher(outbound$, () => {});
       outbound$.complete();
 
-      await expectAsync(
+      await expect(
         dispatcher.sendCompileRequest(new InboundMessage.CompileRequest())
-      ).toBeRejectedWithError('Tried writing to closed dispatcher');
+      ).rejects.toEqual(new Error('Tried writing to closed dispatcher'));
     });
   });
 
@@ -290,9 +290,9 @@ describe('dispatcher', () => {
       const error = 'fail';
       dispatcher = createDispatcher(outbound$, () => outbound$.error(error));
 
-      await expectAsync(
+      await expect(
         dispatcher.sendCompileRequest(new InboundMessage.CompileRequest())
-      ).toBeRejectedWith(error);
+      ).rejects.toBe(error);
     });
 
     it('cleans up log event subscriptions upon error', done => {

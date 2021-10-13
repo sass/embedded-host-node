@@ -129,7 +129,7 @@ export class Dispatcher {
 
   // Rejects with `error` all promises awaiting an outbound response, and
   // silently closes all subscriptions awaiting outbound events.
-  private throwAndClose(error: Error): void {
+  private throwAndClose(error: unknown): void {
     this.messages$.complete();
     this.errorInternal$.error(error);
   }

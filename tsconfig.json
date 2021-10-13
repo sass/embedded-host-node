@@ -4,7 +4,8 @@
     "allowJs": true,
     "outDir": "dist",
     "resolveJsonModule": true,
-    "rootDir": "."
+    "rootDir": ".",
+    "useUnknownInCatchVariables": false
   },
   "include": [
     "lib/**/*.ts",

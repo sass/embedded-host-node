@@ -141,6 +141,19 @@ describe('render', () => {
         });
       });
     });
+
+    it('renders indented syntax if indentedSyntax is enabled', done => {
+      render(
+        {
+          data: 'a\n\tb: c',
+          indentedSyntax: true,
+        },
+        (_, result) => {
+          expectEqualIgnoringWhitespace(result!.css.toString(), 'a {b: c;}');
+          done();
+        }
+      );
+    });
   });
 
   describe('imports', () => {

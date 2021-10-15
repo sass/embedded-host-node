@@ -25,6 +25,7 @@ interface FileOptions extends SharedOptions {
 interface StringOptions extends SharedOptions {
   data: string;
   file?: string;
+  indentedSyntax?: boolean;
 }
 
 interface SharedOptions {
@@ -38,7 +39,6 @@ interface SharedOptions {
   // TODO(awjin): https://github.com/sass/embedded-host-node/issues/13
   // importer
   // includePaths
-  // indentedSyntax
   // functions
   // outputStyle
 }
@@ -108,6 +108,7 @@ export function render(
         source: stringRequest.data,
         sourceMap: getSourceMap,
         url: stringRequest.file ? pathToFileURL(stringRequest.file) : 'stdin',
+        indentedSyntax: stringRequest.indentedSyntax,
       })
     : compile({path: fileRequest.file, sourceMap: getSourceMap});
 

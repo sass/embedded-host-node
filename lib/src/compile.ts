@@ -10,7 +10,10 @@ import {PacketTransformer} from './embedded-compiler/packet-transformer';
 import {MessageTransformer} from './embedded-protocol/message-transformer';
 import {Dispatcher} from './embedded-protocol/dispatcher';
 import {deprotifyException} from './embedded-protocol/utils';
-import {InboundMessage} from './vendor/embedded-protocol/embedded_sass_pb';
+import {
+  InboundMessage,
+  Syntax,
+} from './vendor/embedded-protocol/embedded_sass_pb';
 
 /**
  * Compiles a path and returns the resulting css. Throws a SassException if the
@@ -42,6 +45,7 @@ export async function compileString(options: {
   source: string;
   sourceMap?: (sourceMap: RawSourceMap) => void;
   url?: URL | string;
+  indentedSyntax?: boolean;
 }): Promise<string> {
   // TODO(awjin): Create logger, importer, function registries.
 
@@ -49,6 +53,7 @@ export async function compileString(options: {
     source: options.source,
     sourceMap: !!options.sourceMap,
     url: options.url instanceof URL ? options.url.toString() : options.url,
+    indentedSyntax: !!options.indentedSyntax,
   });
 
   const response = await compileRequest(request);
@@ -77,11 +82,13 @@ function newCompileStringRequest(options: {
   source: string;
   sourceMap: boolean;
   url?: string;
+  indentedSyntax: boolean;
 }): InboundMessage.CompileRequest {
   // TODO(awjin): Populate request with importer/function IDs.
 
   const input = new InboundMessage.CompileRequest.StringInput();
   input.setSource(options.source);
+  if (options.indentedSyntax) input.setSyntax(Syntax['INDENTED']);
   if (options.url) input.setUrl(options.url.toString());
 
   const request = new InboundMessage.CompileRequest();

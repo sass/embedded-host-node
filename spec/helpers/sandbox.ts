@@ -2,12 +2,11 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-import {promises as fs} from 'fs';
-import {resolve} from 'path';
+import * as fs from 'fs';
+import * as p from 'path';
+import * as del from 'del';
 
 import {PromiseOr} from '../../lib/src/utils';
-
-const sandboxDir = 'sandbox';
 
 /**
  * Runs `test` within a sandbox directory.
@@ -22,32 +21,21 @@ export async function run(
     sassPathDirs?: string[];
   }
 ): Promise<void> {
-  try {
-    await fs.rmdir(sandboxDir, {recursive: true});
-  } catch {
-    // noop
-  } finally {
-    await fs.mkdir(sandboxDir);
-    process.chdir(resolve(sandboxDir));
-  }
-
+  const currDir = process.cwd();
+  const testDir = p.join('spec', 'sandbox', `${Math.random()}`.slice(2));
+  fs.mkdirSync(testDir, {recursive: true});
+  process.chdir(testDir);
   if (options?.sassPathDirs) {
     process.env.SASS_PATH = options.sassPathDirs.join(
       process.platform === 'win32' ? ';' : ':'
     );
   }
-
   try {
     await test();
   } finally {
-    if (options?.sassPathDirs) {
-      process.env.SASS_PATH = undefined;
-    }
-    process.chdir(resolve('..'));
-    try {
-      await fs.rmdir(sandboxDir, {recursive: true});
-    } catch {
-      // noop
-    }
+    if (options?.sassPathDirs) process.env.SASS_PATH = undefined;
+    process.chdir(currDir);
+    // TODO(awjin): Change this to rmSync once we drop support for Node 12.
+    del.sync('spec/sandbox/**', {force: true});
   }
 }

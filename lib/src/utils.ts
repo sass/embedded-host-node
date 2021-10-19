@@ -3,6 +3,8 @@
 // https://opensource.org/licenses/MIT.
 
 import {List} from 'immutable';
+import * as p from 'path';
+import * as url from 'url';
 
 export type PromiseOr<T> = T | Promise<T>;
 
@@ -29,4 +31,18 @@ export function hostError(message: string): Error {
 /** Constructs an error caused by an invalid value type. */
 export function valueError(message: string, name?: string): Error {
   return Error(name ? `$${name}: ${message}.` : `${message}.`);
+}
+
+/** Converts a (possibly relative) path on the local filesystem to a URL. */
+export function pathToUrlString(path: string): string {
+  if (p.isAbsolute(path)) return url.pathToFileURL(path).toString();
+
+  const components = p.sep === '\\' ? path.split(/[/\\]/) : path.split('/');
+  return components.map(encodeURIComponent).join('/');
+}
+
+/** Returns `path` without an extension, if it had one. */
+export function withoutExtension(path: string): string {
+  const extension = p.extname(path);
+  return path.substring(0, path.length - extension.length);
 }

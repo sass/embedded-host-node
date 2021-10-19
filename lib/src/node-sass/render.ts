@@ -8,7 +8,7 @@ import {fileURLToPath, pathToFileURL} from 'url';
 
 import {compile, compileString} from '../compile';
 import {SassException} from '../exception/exception';
-import {isNullOrUndefined} from '../utils';
+import {isNullOrUndefined, pathToUrlString, withoutExtension} from '../utils';
 
 /**
  * Options that are passed to render().
@@ -146,20 +146,18 @@ function newRenderResult(
     const sourceMapDir = p.dirname(sourceMapPath);
 
     if (options.outFile) {
-      sourceMap.file = p.relative(sourceMapDir, options.outFile);
+      sourceMap.file = pathToUrlString(
+        p.relative(sourceMapDir, options.outFile)
+      );
     } else if (options.file) {
-      const extension = p.extname(options.file);
-      sourceMap.file = `${options.file.substring(
-        0,
-        options.file.length - extension.length
-      )}.css`;
+      sourceMap.file = pathToUrlString(withoutExtension(options.file) + '.css');
     } else {
       sourceMap.file = 'stdin.css';
     }
 
     sourceMap.sources = sourceMap.sources.map(source => {
       if (source.startsWith('file://')) {
-        return p.relative(sourceMapDir, fileURLToPath(source));
+        return pathToUrlString(p.relative(sourceMapDir, fileURLToPath(source)));
       }
       return source;
     });
@@ -173,9 +171,11 @@ function newRenderResult(
           'base64'
         )}`;
       } else if (options.outFile) {
-        url = p.relative(p.dirname(options.outFile), sourceMapPath);
+        url = pathToUrlString(
+          p.relative(p.dirname(options.outFile), sourceMapPath)
+        );
       } else {
-        url = sourceMapPath;
+        url = pathToUrlString(sourceMapPath);
       }
       css += `\n\n/*# sourceMappingURL=${url} */`;
     }

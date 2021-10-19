@@ -363,9 +363,7 @@ describe('render', () => {
               outFile: 'dir/out.css',
             },
             result => {
-              expect(getSourceMap(result).sources).toEqual([
-                p.join('..', 'test.scss'),
-              ]);
+              expect(getSourceMap(result).sources).toEqual(['../test.scss']);
             }
           );
         });

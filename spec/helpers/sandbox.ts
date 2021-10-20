@@ -9,32 +9,31 @@ import * as del from 'del';
 import {PromiseOr} from '../../lib/src/utils';
 
 /**
- * Runs `test` within a sandbox directory.
+ * Runs `test` within a sandbox directory. This directory is made available via
+ * the `dir` function, which acts like `p.join()` but includes the sandbox
+ * directory at the beginning.
  *
  * Handles all buildup and teardown. Returns a promise that resolves when `test`
  * finishes running.
  */
 export async function run(
-  test: () => PromiseOr<void>,
+  test: (dir: (...paths: string[]) => string) => PromiseOr<void>,
   options?: {
     // Directories to put in the SASS_PATH env variable before running test.
     sassPathDirs?: string[];
   }
 ): Promise<void> {
-  const currDir = process.cwd();
   const testDir = p.join('spec', 'sandbox', `${Math.random()}`.slice(2));
   fs.mkdirSync(testDir, {recursive: true});
-  process.chdir(testDir);
   if (options?.sassPathDirs) {
     process.env.SASS_PATH = options.sassPathDirs.join(
       process.platform === 'win32' ? ';' : ':'
     );
   }
   try {
-    await test();
+    await test((...paths) => p.join(testDir, ...paths));
   } finally {
     if (options?.sassPathDirs) process.env.SASS_PATH = undefined;
-    process.chdir(currDir);
     // TODO(awjin): Change this to rmSync once we drop support for Node 12.
     del.sync('spec/sandbox/**', {force: true});
   }

@@ -150,7 +150,9 @@ function newRenderResult(
         p.relative(sourceMapDir, options.outFile)
       );
     } else if (options.file) {
-      sourceMap.file = pathToUrlString(withoutExtension(options.file) + '.css');
+      sourceMap.file = pathToUrlString(
+        p.relative(sourceMapDir, withoutExtension(options.file) + '.css')
+      );
     } else {
       sourceMap.file = 'stdin.css';
     }

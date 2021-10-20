@@ -1,9 +1,15 @@
+## 1.0.0-beta.5
+
+- Function and Values API
+  - Add `SassColor` class.
+
 ## 1.0.0-beta.4
 
 - Allow installing on arm64.
 
 - Function and Values API
   - Add `sassTrue` and `sassFalse` singletons.
+  - Add `SassColor` class.
   - Add `SassNumber` class.
   - Add `SassString` class.
 

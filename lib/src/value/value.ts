@@ -5,6 +5,7 @@
 import {List, OrderedMap, ValueObject} from 'immutable';
 
 import {SassBoolean} from './boolean';
+import {SassColor} from './color';
 import {SassNumber} from './number';
 import {SassString} from './string';
 import {valueError} from '../utils';
@@ -89,9 +90,8 @@ export abstract class Value implements ValueObject {
    * If `this` came from a function argument, `name` is the argument name
    * (without the `$`) and is used for error reporting.
    */
-  assertColor(name?: string): Value {
+  assertColor(name?: string): SassColor {
     throw valueError(`${this} is not a color`, name);
-    // TODO(awjin): Narrow the return type to SassColor.
   }
 
   /**

@@ -2,6 +2,7 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
+import * as fs from 'fs';
 import {spawn} from 'child_process';
 import {resolve} from 'path';
 import {Observable} from 'rxjs';
@@ -12,17 +13,25 @@ import {takeUntil} from 'rxjs/operators';
  * stdio as Observables.
  */
 export class EmbeddedCompiler {
-  private readonly process = spawn(
-    resolve(
-      __dirname,
-      `../vendor/dart-sass-embedded/dart-sass-embedded${
-        process.platform === 'win32' ? '.bat' : ''
-      }`
-    ),
-    {
-      windowsHide: true,
+  private readonly process = (() => {
+    for (const path of ['../vendor', '../../../../lib/src/vendor']) {
+      const executable = resolve(
+        __dirname,
+        path,
+        `dart-sass-embedded/dart-sass-embedded${
+          process.platform === 'win32' ? '.bat' : ''
+        }`
+      );
+
+      if (fs.existsSync(executable)) {
+        return spawn(executable, {windowsHide: true});
+      }
     }
-  );
+
+    throw new Error(
+      "Embedded Dart Sass couldn't find the embedded compiler executable."
+    );
+  })();
 
   /** The child process's exit event. */
   readonly exit$ = new Observable<number | null>(observer => {

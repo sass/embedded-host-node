@@ -93,11 +93,12 @@ jobs:
       - run: npm install
 
       - name: Check out sass-spec
-        run: tool/github-action/check-out-sass-spec.sh
-        env:
-          PR_BRANCH: "${{ github.base_ref }}"
-          CURRENT_REF: "${{ github.ref }}"
-          PR_BODY: "${{ github.event.pull_request.body }}"
+        uses: sass/clone-linked-repo@v1
+        with: {repo: sass/sass-spec}
+
+      - name: Install sass-spec dependencies
+        run: npm install
+        working-directory: sass-spec
 
       - name: Compile
         run: |
@@ -109,15 +110,12 @@ jobs:
           # don't cause compile-time failures.
           find dist -name '*.d.ts' -exec rm {} \;
 
-      - name: Link into sass-spec
-        run: npm install sass@file:..
-        working-directory: sass-spec
-
       - name: Check out Sass specification
-        run: git clone https://github.com/sass/sass.git language --depth 1
+        uses: sass/clone-linked-repo@v1
+        with: {repo: sass/sass, path: language}
 
       - name: Run tests
-        run: npm run js-api-spec -- --sassSassRepo ../language
+        run: npm run js-api-spec -- --sassPackage .. --sassSassRepo ../language
         working-directory: sass-spec
 
   deploy_npm:

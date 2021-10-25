@@ -2,7 +2,7 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-import {RawSourceMap} from 'source-map';
+import {RawSourceMap} from 'source-map-js';
 import {URL} from 'url';
 
 import {EmbeddedCompiler} from './embedded-compiler/compiler';

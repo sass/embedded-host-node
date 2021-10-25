@@ -35,7 +35,8 @@ const argv = yargs(process.argv.slice(2))
   .conflicts({'compiler-path': ['compiler-ref', 'compiler-version']})
   .conflicts('compiler-ref', 'compiler-version')
   .conflicts({'protocol-path': ['protocol-ref', 'protocol-version']})
-  .conflicts('protocol-ref', 'protocol-version').argv;
+  .conflicts('protocol-ref', 'protocol-version')
+  .parseSync();
 
 (async () => {
   try {

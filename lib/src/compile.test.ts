@@ -8,7 +8,7 @@ import {fileURLToPath} from 'url';
 
 import {compile, compileString} from './compile';
 import {expectEqualPaths} from '../../spec/helpers/utils';
-import {RawSourceMap, SourceMapConsumer} from 'source-map';
+import {RawSourceMap, SourceMapConsumer} from 'source-map-js';
 
 describe('compile', () => {
   describe('success', () => {

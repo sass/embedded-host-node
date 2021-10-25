@@ -34,8 +34,8 @@ export class EmbeddedCompiler {
   })();
 
   /** The child process's exit event. */
-  readonly exit$ = new Observable<number | null>(observer => {
-    this.process.on('exit', code => observer.next(code));
+  readonly exit$ = new Promise<number | null>(resolve => {
+    this.process.on('exit', code => resolve(code));
   });
 
   /** The buffers emitted by the child process's stdout. */

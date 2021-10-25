@@ -66,7 +66,7 @@ describe('embedded compiler smoke test', () => {
   it('listens to exit event', async () => {
     const compiler = new EmbeddedCompiler();
     compiler.close();
-    const output = await compiler.exit$.pipe(take(1)).toPromise();
+    const output = await compiler.exit$;
 
     expect(output).not.toBeNull();
   });

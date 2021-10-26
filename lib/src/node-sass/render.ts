@@ -3,7 +3,7 @@
 // https://opensource.org/licenses/MIT.
 
 import * as p from 'path';
-import {RawSourceMap} from 'source-map';
+import {RawSourceMap} from 'source-map-js';
 import {fileURLToPath, pathToFileURL} from 'url';
 
 import {compile, compileString} from '../compile';

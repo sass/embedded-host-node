@@ -4,7 +4,7 @@
 
 import {promises as fs} from 'fs';
 import * as p from 'path';
-import {RawSourceMap} from 'source-map';
+import {RawSourceMap} from 'source-map-js';
 import {pathToFileURL} from 'url';
 
 import * as sandbox from '../../../spec/helpers/sandbox';

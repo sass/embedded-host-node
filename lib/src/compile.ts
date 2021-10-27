@@ -153,5 +153,6 @@ async function compileRequest(request: InboundMessage.CompileRequest): Promise<{
     }
   } finally {
     embeddedCompiler.close();
+    await embeddedCompiler.exit$;
   }
 }

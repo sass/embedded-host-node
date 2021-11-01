@@ -34,6 +34,11 @@ export class SassList extends Value {
   ) {
     super();
     this.contentsInternal = asImmutableList(contents);
+    if (this.contentsInternal.size > 1 && options?.separator === null) {
+      throw Error(
+        'Non-null separator required for SassList with more than one element.'
+      );
+    }
     this.separatorInternal =
       options?.separator === undefined ? ',' : options.separator;
     this.hasBracketsInternal = options?.brackets ?? false;

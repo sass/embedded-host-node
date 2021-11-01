@@ -93,9 +93,9 @@ export class SassList extends Value {
 
   equals(other: Value): boolean {
     if (
-      other instanceof SassMap &&
+      (other instanceof SassList || other instanceof SassMap) &&
       this.contentsInternal.isEmpty() &&
-      other.contents.isEmpty()
+      other.asList.isEmpty()
     ) {
       return true;
     }

@@ -5,7 +5,7 @@
 import {List, OrderedMap} from 'immutable';
 
 import {Value} from './value';
-import {SassList} from './list';
+import {ListSeparator, SassList} from './list';
 
 /** A SassScript map */
 export class SassMap extends Value {
@@ -23,7 +23,7 @@ export class SassMap extends Value {
   }
 
   /** The separator for `this`'s contents as a list. */
-  get separator() {
+  get separator(): ListSeparator {
     return this.contentsInternal.isEmpty() ? null : ',';
   }
 
@@ -84,7 +84,11 @@ export class SassMap extends Value {
   hashCode(): number {
     return this.contents.isEmpty()
       ? SassList.empty().hashCode()
-      : this.contents.reduce(
+      : // SassMaps with the same key-value pairs are considered equal
+        // regardless of key-value order, so this hash must be order
+        // independent. Since OrderedMap.hashCode() encodes the key-value order,
+        // we use a manual XOR accumulator instead.
+        this.contents.reduce(
           (accumulator, value, key) =>
             accumulator ^ value.hashCode() ^ key.hashCode(),
           0

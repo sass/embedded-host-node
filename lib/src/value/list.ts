@@ -8,7 +8,12 @@ import {Value} from './value';
 import {SassMap} from './map';
 import {asImmutableList, valueError} from '../utils';
 
+/** The types of separator that a SassList can have. */
 export type ListSeparator = ',' | '/' | ' ' | null;
+
+// All empty SassList and SassMaps should have the same hashcode, so this caches
+// the value.
+const emptyListHashCode = hash([]);
 
 /** A SassScript list. */
 export class SassList extends Value {
@@ -92,19 +97,13 @@ export class SassList extends Value {
 
     if (
       !(other instanceof SassList) ||
-      this.contentsInternal.size !== other.asList.size ||
       this.hasBrackets !== other.hasBrackets ||
       this.separator !== other.separator
     ) {
       return false;
     }
 
-    for (let i = 0; i < this.contentsInternal.size; i++) {
-      const thisValue = this.contentsInternal.get(i)!;
-      const otherValue = other.asList.get(i)!;
-      if (!thisValue.equals(otherValue)) return false;
-    }
-    return true;
+    return this.contentsInternal.equals(other.asList);
   }
 
   hashCode(): number {
@@ -127,5 +126,3 @@ export class SassList extends Value {
     return string;
   }
 }
-
-const emptyListHashCode = hash([]);

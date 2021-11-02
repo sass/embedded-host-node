@@ -57,8 +57,7 @@ export interface RenderResult {
     end: number;
     duration: number;
     entry: string;
-    // TODO(awjin): https://github.com/sass/embedded-protocol/issues/46
-    // includedFiles?: string[];
+    includedFiles: string[];
   };
 }
 
@@ -112,7 +111,11 @@ export function render(
     : compile({path: fileRequest.file, sourceMap: getSourceMap});
 
   compileSass.then(
-    css => callback(undefined, newRenderResult(options, start, css, sourceMap)),
+    ({css, loadedUrls}) =>
+      callback(
+        undefined,
+        newRenderResult(options, start, css, loadedUrls, sourceMap)
+      ),
     error => callback(newRenderError(error))
   );
 }
@@ -131,6 +134,7 @@ function newRenderResult(
   options: RenderOptions,
   start: number,
   css: string,
+  loadedUrls: string[],
   sourceMap?: RawSourceMap
 ): RenderResult {
   const end = Date.now();
@@ -183,6 +187,8 @@ function newRenderResult(
     }
   }
 
+  const includedFiles = loadedUrls.map(url => url.replace('file://', ''));
+
   return {
     css: Buffer.from(css),
     map: sourceMapBytes,
@@ -191,6 +197,7 @@ function newRenderResult(
       start,
       end,
       duration: end - start,
+      includedFiles,
     },
   };
 }

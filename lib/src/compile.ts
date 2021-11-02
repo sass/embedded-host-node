@@ -12,6 +12,11 @@ import {Dispatcher} from './embedded-protocol/dispatcher';
 import {deprotifyException} from './embedded-protocol/utils';
 import {InboundMessage} from './vendor/embedded-protocol/embedded_sass_pb';
 
+type CompileResult = {
+  css: string;
+  loadedUrls: string[];
+};
+
 /**
  * Compiles a path and returns the resulting css. Throws a SassException if the
  * compilation failed.
@@ -19,7 +24,7 @@ import {InboundMessage} from './vendor/embedded-protocol/embedded_sass_pb';
 export async function compile(options: {
   path: string;
   sourceMap?: (sourceMap: RawSourceMap) => void;
-}): Promise<string> {
+}): Promise<CompileResult> {
   // TODO(awjin): Create logger, importer, function registries.
 
   const request = newCompileRequest({
@@ -31,7 +36,7 @@ export async function compile(options: {
   if (options.sourceMap) {
     options.sourceMap(response.sourceMap!);
   }
-  return response.css;
+  return {css: response.css, loadedUrls: response.loadedUrls};
 }
 
 /**
@@ -42,7 +47,7 @@ export async function compileString(options: {
   source: string;
   sourceMap?: (sourceMap: RawSourceMap) => void;
   url?: URL | string;
-}): Promise<string> {
+}): Promise<CompileResult> {
   // TODO(awjin): Create logger, importer, function registries.
 
   const request = newCompileStringRequest({
@@ -55,7 +60,7 @@ export async function compileString(options: {
   if (options.sourceMap) {
     options.sourceMap(response.sourceMap!);
   }
-  return response.css;
+  return {css: response.css, loadedUrls: response.loadedUrls};
 }
 
 // Creates a request for compiling a file.
@@ -97,6 +102,7 @@ function newCompileStringRequest(options: {
 async function compileRequest(request: InboundMessage.CompileRequest): Promise<{
   css: string;
   sourceMap?: RawSourceMap;
+  loadedUrls: string[];
 }> {
   const embeddedCompiler = new EmbeddedCompiler();
 
@@ -145,6 +151,7 @@ async function compileRequest(request: InboundMessage.CompileRequest): Promise<{
       return {
         css: success.getCss(),
         sourceMap: sourceMap ? JSON.parse(sourceMap) : undefined,
+        loadedUrls: success.getLoadedUrlsList(),
       };
     } else if (response.getFailure()) {
       throw deprotifyException(response.getFailure()!);

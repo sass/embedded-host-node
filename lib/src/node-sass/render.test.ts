@@ -273,6 +273,20 @@ describe('render', () => {
       });
     });
 
+    it('includes all file paths imported', async () => {
+      await sandbox.run(async dir => {
+        await fs.writeFile(dir('test.scss'), '@import "other";\na {b: c}');
+        await fs.writeFile(dir('other.scss'), 'x {y: z}');
+
+        await expectRenderResult({file: dir('test.scss')}, result => {
+          expect(result.stats.includedFiles).toEqual([
+            p.resolve(dir('test.scss')),
+            p.resolve(dir('other.scss')),
+          ]);
+        });
+      });
+    });
+
     it('includes timing information', done => {
       render({data: 'a {b: c}'}, (_, result) => {
         const start = result!.stats.start;

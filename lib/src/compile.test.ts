@@ -14,9 +14,9 @@ describe('compile', () => {
   describe('success', () => {
     describe('input', () => {
       it('compiles an SCSS string by default', async () => {
-        expect(await compileString({source: 'a {b: c}'})).toBe(
-          'a {\n  b: c;\n}'
-        );
+        expect(await compileString({source: 'a {b: c}'})).toMatchObject({
+          css: 'a {\n  b: c;\n}',
+        });
       });
 
       // TODO(awjin): compiles an SCSS string explicitly
@@ -27,7 +27,7 @@ describe('compile', () => {
         const path = resolve('test.scss');
         await fs.writeFile(path, 'a {b: c}');
 
-        expect(await compile({path})).toBe('a {\n  b: c;\n}');
+        expect(await compile({path})).toMatchObject({css: 'a {\n  b: c;\n}'});
         await fs.unlink(path);
       });
 
@@ -35,16 +35,16 @@ describe('compile', () => {
         const path = 'test.scss';
         await fs.writeFile(path, 'a {b: c}');
 
-        expect(await compile({path})).toBe('a {\n  b: c;\n}');
+        expect(await compile({path})).toMatchObject({css: 'a {\n  b: c;\n}'});
         await fs.unlink(path);
       });
     });
 
     describe('output', () => {
       it('outputs in expanded mode by default', async () => {
-        expect(await compileString({source: 'a {b: c}'})).toBe(
-          'a {\n  b: c;\n}'
-        );
+        expect(await compileString({source: 'a {b: c}'})).toMatchObject({
+          css: 'a {\n  b: c;\n}',
+        });
       });
 
       // TODO(awjin): outputs in expanded mode explicitly

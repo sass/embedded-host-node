@@ -108,7 +108,7 @@ export function render(
         source: stringRequest.data,
         sourceMap: getSourceMap,
         url: stringRequest.file ? pathToFileURL(stringRequest.file) : 'stdin',
-        indentedSyntax: stringRequest.indentedSyntax,
+        syntax: stringRequest.indentedSyntax ? 'indented' : 'scss',
       })
     : compile({path: fileRequest.file, sourceMap: getSourceMap});
 

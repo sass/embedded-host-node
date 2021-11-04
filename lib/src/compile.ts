@@ -12,8 +12,10 @@ import {Dispatcher} from './embedded-protocol/dispatcher';
 import {deprotifyException} from './embedded-protocol/utils';
 import {
   InboundMessage,
-  Syntax,
+  Syntax as SyntaxMap,
 } from './vendor/embedded-protocol/embedded_sass_pb';
+
+export type Syntax = 'scss' | 'indented' | 'css';
 
 /**
  * Compiles a path and returns the resulting css. Throws a SassException if the
@@ -45,7 +47,7 @@ export async function compileString(options: {
   source: string;
   sourceMap?: (sourceMap: RawSourceMap) => void;
   url?: URL | string;
-  indentedSyntax?: boolean;
+  syntax?: Syntax;
 }): Promise<string> {
   // TODO(awjin): Create logger, importer, function registries.
 
@@ -53,7 +55,7 @@ export async function compileString(options: {
     source: options.source,
     sourceMap: !!options.sourceMap,
     url: options.url instanceof URL ? options.url.toString() : options.url,
-    indentedSyntax: !!options.indentedSyntax,
+    syntax: options.syntax ?? 'scss',
   });
 
   const response = await compileRequest(request);
@@ -77,18 +79,24 @@ function newCompileRequest(options: {
   return request;
 }
 
+const mapSyntaxes = {
+  indented: 'INDENTED',
+  scss: 'SCSS',
+  css: 'CSS',
+} as const;
+
 // Creates a request for compiling a string.
 function newCompileStringRequest(options: {
   source: string;
   sourceMap: boolean;
   url?: string;
-  indentedSyntax: boolean;
+  syntax: Syntax;
 }): InboundMessage.CompileRequest {
   // TODO(awjin): Populate request with importer/function IDs.
 
   const input = new InboundMessage.CompileRequest.StringInput();
   input.setSource(options.source);
-  if (options.indentedSyntax) input.setSyntax(Syntax['INDENTED']);
+  input.setSyntax(SyntaxMap[mapSyntaxes[options.syntax]]);
   if (options.url) input.setUrl(options.url.toString());
 
   const request = new InboundMessage.CompileRequest();

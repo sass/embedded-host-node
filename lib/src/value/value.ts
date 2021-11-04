@@ -4,8 +4,10 @@
 
 import {List, OrderedMap, ValueObject} from 'immutable';
 
+import {ListSeparator} from './list';
 import {SassBoolean} from './boolean';
 import {SassColor} from './color';
+import {SassMap} from './map';
 import {SassNumber} from './number';
 import {SassString} from './string';
 import {valueError} from '../utils';
@@ -24,7 +26,8 @@ import {valueError} from '../utils';
  * All values, except `false` and `null`, count as `true`.
  *
  * All values can be used as lists. Maps count as lists of pairs, while all
- * other values count as single-value lists.
+ * other values count as single-value lists. Empty maps are equal to empty
+ * lists.
  */
 export abstract class Value implements ValueObject {
   /** Whether `this` counts as `true`. */
@@ -43,14 +46,19 @@ export abstract class Value implements ValueObject {
   }
 
   /** The separator for `this` as a list. */
-  get separator(): null {
+  get separator(): ListSeparator {
     return null;
-    // TODO(awjin): Implement the proper return type ListSeparator.
   }
 
   /** Whether `this`, as a list, has brackets. */
   get hasBrackets(): boolean {
     return false;
+  }
+
+  // Subclasses can override this to change the behavior of
+  // `sassIndexToListIndex`.
+  protected get lengthAsList(): number {
+    return 1;
   }
 
   /**
@@ -70,8 +78,17 @@ export abstract class Value implements ValueObject {
    * (without the `$`) and is used for error reporting.
    */
   sassIndexToListIndex(sassIndex: Value, name?: string): number {
-    // TODO(awjin)
-    throw Error('Not implemented yet');
+    const index = sassIndex.assertNumber().assertInt();
+    if (index === 0) {
+      throw Error('List index may not be 0.');
+    }
+    if (Math.abs(index) > this.lengthAsList) {
+      throw valueError(
+        `Invalid index ${sassIndex} for a list with ${this.lengthAsList} elements.`,
+        name
+      );
+    }
+    return index < 0 ? this.lengthAsList + index : index - 1;
   }
 
   /**
@@ -112,9 +129,8 @@ export abstract class Value implements ValueObject {
    * If `this` came from a function argument, `name` is the argument name
    * (without the `$`) and is used for error reporting.
    */
-  assertMap(name?: string): Value {
+  assertMap(name?: string): SassMap {
     throw valueError(`${this} is not a map`, name);
-    // TODO(awjin): Narrow the return type to SassMap.
   }
 
   /**

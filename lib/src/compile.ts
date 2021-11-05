@@ -10,10 +10,7 @@ import {PacketTransformer} from './embedded-compiler/packet-transformer';
 import {MessageTransformer} from './embedded-protocol/message-transformer';
 import {Dispatcher} from './embedded-protocol/dispatcher';
 import {deprotifyException} from './embedded-protocol/utils';
-import {
-  InboundMessage,
-  Syntax as SyntaxMap,
-} from './vendor/embedded-protocol/embedded_sass_pb';
+import * as proto from './vendor/embedded-protocol/embedded_sass_pb';
 
 export type Syntax = 'scss' | 'indented' | 'css';
 
@@ -69,21 +66,15 @@ export async function compileString(options: {
 function newCompileRequest(options: {
   path: string;
   sourceMap: boolean;
-}): InboundMessage.CompileRequest {
+}): proto.InboundMessage.CompileRequest {
   // TODO(awjin): Populate request with importer/function IDs.
 
-  const request = new InboundMessage.CompileRequest();
+  const request = new proto.InboundMessage.CompileRequest();
   request.setPath(options.path);
   request.setSourceMap(options.sourceMap);
 
   return request;
 }
-
-const mapSyntaxes = {
-  indented: 'INDENTED',
-  scss: 'SCSS',
-  css: 'CSS',
-} as const;
 
 // Creates a request for compiling a string.
 function newCompileStringRequest(options: {
@@ -91,15 +82,20 @@ function newCompileStringRequest(options: {
   sourceMap: boolean;
   url?: string;
   syntax: Syntax;
-}): InboundMessage.CompileRequest {
+}): proto.InboundMessage.CompileRequest {
   // TODO(awjin): Populate request with importer/function IDs.
 
-  const input = new InboundMessage.CompileRequest.StringInput();
+  const input = new proto.InboundMessage.CompileRequest.StringInput();
   input.setSource(options.source);
-  input.setSyntax(SyntaxMap[mapSyntaxes[options.syntax]]);
+
+  if (options.syntax === 'scss') input.setSyntax(proto.Syntax['SCSS']);
+  else if (options.syntax === 'indented')
+    input.setSyntax(proto.Syntax['INDENTED']);
+  else if (options.syntax === 'css') input.setSyntax(proto.Syntax['CSS']);
+
   if (options.url) input.setUrl(options.url.toString());
 
-  const request = new InboundMessage.CompileRequest();
+  const request = new proto.InboundMessage.CompileRequest();
   request.setString(input);
   request.setSourceMap(options.sourceMap);
 
@@ -109,7 +105,9 @@ function newCompileStringRequest(options: {
 // Spins up a compiler, then sends it a compile request. Returns a promise that
 // resolves with the CompileResult. Throws if there were any protocol or
 // compilation errors. Shuts down the compiler after compilation.
-async function compileRequest(request: InboundMessage.CompileRequest): Promise<{
+async function compileRequest(
+  request: proto.InboundMessage.CompileRequest
+): Promise<{
   css: string;
   sourceMap?: RawSourceMap;
 }> {

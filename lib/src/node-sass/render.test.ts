@@ -142,7 +142,7 @@ describe('render', () => {
       });
     });
 
-    it('renders indented syntax if indentedSyntax is enabled', done => {
+    it('renders a string with indented syntax', done => {
       render(
         {
           data: 'a\n\tb: c',

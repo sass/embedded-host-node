@@ -88,10 +88,13 @@ function newCompileStringRequest(options: {
   const input = new proto.InboundMessage.CompileRequest.StringInput();
   input.setSource(options.source);
 
-  if (options.syntax === 'scss') input.setSyntax(proto.Syntax['SCSS']);
-  else if (options.syntax === 'indented')
+  if (options.syntax === 'scss') {
+    input.setSyntax(proto.Syntax['SCSS']);
+  } else if (options.syntax === 'indented') {
     input.setSyntax(proto.Syntax['INDENTED']);
-  else if (options.syntax === 'css') input.setSyntax(proto.Syntax['CSS']);
+  } else if (options.syntax === 'css') {
+    input.setSyntax(proto.Syntax['CSS']);
+  }
 
   if (options.url) input.setUrl(options.url.toString());
 

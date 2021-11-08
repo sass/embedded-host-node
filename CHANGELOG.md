@@ -2,6 +2,8 @@
 
 - Function and Values API
   - Add `SassColor` class.
+  - Add `SassList` and `SassMap` classes.
+
 - Add `indentedSyntax` option to `render()`
 
 ## 1.0.0-beta.4

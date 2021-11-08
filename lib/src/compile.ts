@@ -10,7 +10,9 @@ import {PacketTransformer} from './embedded-compiler/packet-transformer';
 import {MessageTransformer} from './embedded-protocol/message-transformer';
 import {Dispatcher} from './embedded-protocol/dispatcher';
 import {deprotifyException} from './embedded-protocol/utils';
-import {InboundMessage} from './vendor/embedded-protocol/embedded_sass_pb';
+import * as proto from './vendor/embedded-protocol/embedded_sass_pb';
+
+export type Syntax = 'scss' | 'indented' | 'css';
 
 /**
  * Compiles a path and returns the resulting css. Throws a SassException if the
@@ -42,6 +44,7 @@ export async function compileString(options: {
   source: string;
   sourceMap?: (sourceMap: RawSourceMap) => void;
   url?: URL | string;
+  syntax?: Syntax;
 }): Promise<string> {
   // TODO(awjin): Create logger, importer, function registries.
 
@@ -49,6 +52,7 @@ export async function compileString(options: {
     source: options.source,
     sourceMap: !!options.sourceMap,
     url: options.url instanceof URL ? options.url.toString() : options.url,
+    syntax: options.syntax ?? 'scss',
   });
 
   const response = await compileRequest(request);
@@ -62,10 +66,10 @@ export async function compileString(options: {
 function newCompileRequest(options: {
   path: string;
   sourceMap: boolean;
-}): InboundMessage.CompileRequest {
+}): proto.InboundMessage.CompileRequest {
   // TODO(awjin): Populate request with importer/function IDs.
 
-  const request = new InboundMessage.CompileRequest();
+  const request = new proto.InboundMessage.CompileRequest();
   request.setPath(options.path);
   request.setSourceMap(options.sourceMap);
 
@@ -77,14 +81,24 @@ function newCompileStringRequest(options: {
   source: string;
   sourceMap: boolean;
   url?: string;
-}): InboundMessage.CompileRequest {
+  syntax: Syntax;
+}): proto.InboundMessage.CompileRequest {
   // TODO(awjin): Populate request with importer/function IDs.
 
-  const input = new InboundMessage.CompileRequest.StringInput();
+  const input = new proto.InboundMessage.CompileRequest.StringInput();
   input.setSource(options.source);
+
+  if (options.syntax === 'scss') {
+    input.setSyntax(proto.Syntax['SCSS']);
+  } else if (options.syntax === 'indented') {
+    input.setSyntax(proto.Syntax['INDENTED']);
+  } else if (options.syntax === 'css') {
+    input.setSyntax(proto.Syntax['CSS']);
+  }
+
   if (options.url) input.setUrl(options.url.toString());
 
-  const request = new InboundMessage.CompileRequest();
+  const request = new proto.InboundMessage.CompileRequest();
   request.setString(input);
   request.setSourceMap(options.sourceMap);
 
@@ -94,7 +108,9 @@ function newCompileStringRequest(options: {
 // Spins up a compiler, then sends it a compile request. Returns a promise that
 // resolves with the CompileResult. Throws if there were any protocol or
 // compilation errors. Shuts down the compiler after compilation.
-async function compileRequest(request: InboundMessage.CompileRequest): Promise<{
+async function compileRequest(
+  request: proto.InboundMessage.CompileRequest
+): Promise<{
   css: string;
   sourceMap?: RawSourceMap;
 }> {

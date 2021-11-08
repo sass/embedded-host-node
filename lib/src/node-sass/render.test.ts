@@ -141,6 +141,29 @@ describe('render', () => {
         });
       });
     });
+
+    it('renders a string with indented syntax', done => {
+      render(
+        {
+          data: 'a\n\tb: c',
+          indentedSyntax: true,
+        },
+        (_, result) => {
+          expectEqualIgnoringWhitespace(result!.css.toString(), 'a {b: c;}');
+          done();
+        }
+      );
+    });
+
+    it('renders a file with indented syntax', async () => {
+      await sandbox.run(async dir => {
+        await fs.writeFile(dir('test.sass'), 'a\n\tb: c');
+
+        await expectRenderResult({file: dir('test.sass')}, result => {
+          expectEqualIgnoringWhitespace(result.css.toString(), 'a {b: c;}');
+        });
+      });
+    });
   });
 
   describe('imports', () => {

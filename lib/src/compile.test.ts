@@ -19,9 +19,32 @@ describe('compile', () => {
         );
       });
 
-      // TODO(awjin): compiles an SCSS string explicitly
-      // TODO(awjin): compiles an indented syntax string
-      // TODO(awjin): compiles a plain CSS string
+      it('compiles an indented string', async () => {
+        expect(
+          await compileString({
+            source: 'a\n\tb: c',
+            syntax: 'indented',
+          })
+        ).toBe('a {\n  b: c;\n}');
+      });
+
+      it('compiles a scss string explicitly', async () => {
+        expect(
+          await compileString({
+            source: 'a {b {c: d}}',
+            syntax: 'scss',
+          })
+        ).toBe('a b {\n  c: d;\n}');
+      });
+
+      it('compiles a css string', async () => {
+        expect(
+          await compileString({
+            source: 'a {b: c}',
+            syntax: 'css',
+          })
+        ).toBe('a {\n  b: c;\n}');
+      });
 
       it('compiles an absolute path', async () => {
         const path = resolve('test.scss');
@@ -96,6 +119,54 @@ describe('compile', () => {
             context: 'a {',
           });
           expect(error.trace).toBe('- 1:4  root stylesheet\n');
+        }
+      });
+
+      it('fails if syntax is indented while compiling scss', async () => {
+        try {
+          await compileString({source: 'a\n\tb: c', syntax: 'scss'});
+        } catch (error) {
+          expect(error.message).toBe('expected "{".');
+          expect(error.span).toEqual({
+            text: '',
+            start: {
+              offset: 7,
+              line: 1,
+              column: 5,
+            },
+            end: {
+              offset: 7,
+              line: 1,
+              column: 5,
+            },
+            url: undefined,
+            context: '\tb: c',
+          });
+          expect(error.trace).toBe('- 2:6  root stylesheet\n');
+        }
+      });
+
+      it('fails if string contains nested scss while compiling css', async () => {
+        try {
+          await compileString({source: 'a { b {', syntax: 'css'});
+        } catch (error) {
+          expect(error.message).toBe('expected ":".');
+          expect(error.span).toEqual({
+            text: '',
+            start: {
+              offset: 6,
+              line: 0,
+              column: 6,
+            },
+            end: {
+              offset: 6,
+              line: 0,
+              column: 6,
+            },
+            url: undefined,
+            context: 'a { b {',
+          });
+          expect(error.trace).toBe('- 1:7  root stylesheet\n');
         }
       });
 

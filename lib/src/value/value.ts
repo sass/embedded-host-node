@@ -2,7 +2,7 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-import {List, OrderedMap, ValueObject} from 'immutable';
+import {List, ValueObject} from 'immutable';
 
 import {ListSeparator} from './list';
 import {SassBoolean} from './boolean';
@@ -91,6 +91,11 @@ export abstract class Value implements ValueObject {
     return index < 0 ? this.lengthAsList + index : index - 1;
   }
 
+  /** Returns `this.asList.get(index)`. */
+  get(index: number): Value | undefined {
+    return index < 1 && index >= -1 ? this : undefined;
+  }
+
   /**
    * Casts `this` to `SassBoolean`; throws if `this` isn't a boolean.
    *
@@ -137,7 +142,7 @@ export abstract class Value implements ValueObject {
    * Returns `this` as a `SassMap` if it counts as one (including empty lists),
    * or `null` if it does not.
    */
-  tryMap(): OrderedMap<Value, Value> | null {
+  tryMap(): SassMap | null {
     return null;
   }
 

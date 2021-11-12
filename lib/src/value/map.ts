@@ -12,14 +12,9 @@ export class SassMap extends Value {
   private readonly contentsInternal: OrderedMap<Value, Value>;
 
   /** Returns a map that contains `contents`. */
-  constructor(contents: OrderedMap<Value, Value>) {
+  constructor(contents?: OrderedMap<Value, Value>) {
     super();
-    this.contentsInternal = contents;
-  }
-
-  /** Returns an empty map. */
-  static empty(): SassMap {
-    return new SassMap(OrderedMap<Value, Value>());
+    this.contentsInternal = contents ?? OrderedMap();
   }
 
   /** The separator for `this`'s contents as a list. */
@@ -39,7 +34,7 @@ export class SassMap extends Value {
   get asList(): List<Value> {
     const list = [];
     for (const entry of this.contents.entries()) {
-      list.push(new SassList(entry));
+      list.push(new SassList(entry, {separator: ' '}));
     }
     return List(list);
   }
@@ -48,12 +43,23 @@ export class SassMap extends Value {
     return this.contentsInternal.size;
   }
 
+  get(indexOrKey: number | Value): Value | undefined {
+    if (indexOrKey instanceof Value) {
+      return this.contentsInternal.get(indexOrKey);
+    } else {
+      const entry = this.contentsInternal
+        .entrySeq()
+        .get(Math.floor(indexOrKey));
+      return entry ? new SassList(entry, {separator: ' '}) : undefined;
+    }
+  }
+
   assertMap(): SassMap {
     return this;
   }
 
-  tryMap(): OrderedMap<Value, Value> {
-    return this.contents;
+  tryMap(): SassMap {
+    return this;
   }
 
   equals(other: Value): boolean {
@@ -83,7 +89,7 @@ export class SassMap extends Value {
 
   hashCode(): number {
     return this.contents.isEmpty()
-      ? SassList.empty().hashCode()
+      ? new SassList().hashCode()
       : // SassMaps with the same key-value pairs are considered equal
         // regardless of key-value order, so this hash must be order
         // independent. Since OrderedMap.hashCode() encodes the key-value order,

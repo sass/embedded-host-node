@@ -41,9 +41,24 @@ export class SassColor extends Value {
     super();
 
     if ('red' in color) {
-      this.redInternal = fuzzyAssertInRange(color.red, 0, 255, 'red');
-      this.greenInternal = fuzzyAssertInRange(color.green, 0, 255, 'green');
-      this.blueInternal = fuzzyAssertInRange(color.blue, 0, 255, 'blue');
+      this.redInternal = fuzzyAssertInRange(
+        Math.round(color.red),
+        0,
+        255,
+        'red'
+      );
+      this.greenInternal = fuzzyAssertInRange(
+        Math.round(color.green),
+        0,
+        255,
+        'green'
+      );
+      this.blueInternal = fuzzyAssertInRange(
+        Math.round(color.blue),
+        0,
+        255,
+        'blue'
+      );
     } else if ('saturation' in color) {
       this.hueInternal = color.hue % 360;
       this.saturationInternal = fuzzyAssertInRange(

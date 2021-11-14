@@ -21,18 +21,21 @@ export type Syntax = 'scss' | 'indented' | 'css';
 export async function compile(options: {
   path: string;
   sourceMap?: (sourceMap: RawSourceMap) => void;
+  includePaths?: string[];
 }): Promise<string> {
   // TODO(awjin): Create logger, importer, function registries.
 
   const request = newCompileRequest({
     path: options.path,
     sourceMap: !!options.sourceMap,
+    includePaths: options.includePaths ?? [],
   });
 
   const response = await compileRequest(request);
   if (options.sourceMap) {
     options.sourceMap(response.sourceMap!);
   }
+
   return response.css;
 }
 
@@ -45,6 +48,7 @@ export async function compileString(options: {
   sourceMap?: (sourceMap: RawSourceMap) => void;
   url?: URL | string;
   syntax?: Syntax;
+  includePaths?: string[];
 }): Promise<string> {
   // TODO(awjin): Create logger, importer, function registries.
 
@@ -53,6 +57,7 @@ export async function compileString(options: {
     sourceMap: !!options.sourceMap,
     url: options.url instanceof URL ? options.url.toString() : options.url,
     syntax: options.syntax ?? 'scss',
+    includePaths: options.includePaths ?? [],
   });
 
   const response = await compileRequest(request);
@@ -66,12 +71,19 @@ export async function compileString(options: {
 function newCompileRequest(options: {
   path: string;
   sourceMap: boolean;
+  includePaths: string[];
 }): proto.InboundMessage.CompileRequest {
   // TODO(awjin): Populate request with importer/function IDs.
 
   const request = new proto.InboundMessage.CompileRequest();
   request.setPath(options.path);
   request.setSourceMap(options.sourceMap);
+
+  for (const path of options.includePaths) {
+    const importer = new proto.InboundMessage.CompileRequest.Importer();
+    importer.setPath(path);
+    request.addImporters(importer);
+  }
 
   return request;
 }
@@ -82,6 +94,7 @@ function newCompileStringRequest(options: {
   sourceMap: boolean;
   url?: string;
   syntax: Syntax;
+  includePaths: string[];
 }): proto.InboundMessage.CompileRequest {
   // TODO(awjin): Populate request with importer/function IDs.
 
@@ -101,6 +114,12 @@ function newCompileStringRequest(options: {
   const request = new proto.InboundMessage.CompileRequest();
   request.setString(input);
   request.setSourceMap(options.sourceMap);
+
+  for (const path of options.includePaths) {
+    const importer = new proto.InboundMessage.CompileRequest.Importer();
+    importer.setPath(path);
+    request.addImporters(importer);
+  }
 
   return request;
 }

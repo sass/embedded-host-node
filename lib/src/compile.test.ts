@@ -74,19 +74,22 @@ describe('compile', () => {
         await fs.writeFile(file2Path, 'd {e: f}');
 
         const entryFile = resolve('./entryFolder/entry.scss');
-        await fs.writeFile(entryFile, `
-@import 'file1.scss';
-@import 'file2.scss';
-`);
+        await fs.writeFile(
+          entryFile,
+          `@import 'file1.scss';
+@import 'file2.scss';`
+        );
 
-        expect(await compile({
-          path: entryFile.toString(),
-          includePaths: [resolve('folder1'), resolve('folder2')],
-        })).toBe('a {\n  b: c;\n}\n\nd {\n  e: f;\n}');
+        expect(
+          await compile({
+            path: entryFile.toString(),
+            includePaths: [resolve('folder1'), resolve('folder2')],
+          })
+        ).toBe('a {\n  b: c;\n}\n\nd {\n  e: f;\n}');
 
-        await fs.rmdir(resolve('folder1'), { recursive: true });
-        await fs.rmdir(resolve('folder2'), { recursive: true });
-        await fs.rmdir(resolve('entryFolder'), { recursive: true });
+        await fs.rmdir(resolve('folder1'), {recursive: true});
+        await fs.rmdir(resolve('folder2'), {recursive: true});
+        await fs.rmdir(resolve('entryFolder'), {recursive: true});
       });
     });
 

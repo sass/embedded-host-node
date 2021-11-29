@@ -13,6 +13,8 @@ export class SassString extends Value {
   private readonly hasQuotesInternal: boolean;
 
   /** Creates a string with `text`, optionally with quotes. */
+  constructor(text: string, options?: ConstructorOptions);
+  constructor(options?: ConstructorOptions);
   constructor(
     textOrOptions?: string | {quotes?: boolean},
     options?: {quotes?: boolean}

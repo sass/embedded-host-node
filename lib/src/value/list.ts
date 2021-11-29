@@ -38,7 +38,7 @@ export class SassList extends Value {
       brackets?: boolean;
     }
   );
-  constructor(options?: {separator?: ListSeparator; brackets?: boolean});
+  constructor(options?: ConstructorOptions);
   constructor(
     contentsOrOptions?: Value[] | List<Value> | ConstructorOptions,
     options?: ConstructorOptions

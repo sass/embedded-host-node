@@ -2,7 +2,7 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-import {hash, List, OrderedMap} from 'immutable';
+import {hash, isList, List} from 'immutable';
 
 import {Value} from './value';
 import {SassMap} from './map';
@@ -14,6 +14,12 @@ export type ListSeparator = ',' | '/' | ' ' | null;
 // All empty SassList and SassMaps should have the same hashcode, so this caches
 // the value.
 const emptyListHashCode = hash([]);
+
+/** The options that are passed to the constructor. */
+interface ConstructorOptions {
+  separator?: ListSeparator;
+  brackets?: boolean;
+}
 
 /** A SassScript list. */
 export class SassList extends Value {
@@ -28,12 +34,24 @@ export class SassList extends Value {
   constructor(
     contents: Value[] | List<Value>,
     options?: {
-      /** @default ',' */ separator?: ListSeparator;
-      /** @default false */ brackets?: boolean;
+      separator?: ListSeparator;
+      brackets?: boolean;
     }
+  );
+  constructor(options?: ConstructorOptions);
+  constructor(
+    contentsOrOptions?: Value[] | List<Value> | ConstructorOptions,
+    options?: ConstructorOptions
   ) {
     super();
-    this.contentsInternal = asImmutableList(contents);
+
+    if (isList(contentsOrOptions) || Array.isArray(contentsOrOptions)) {
+      this.contentsInternal = asImmutableList(contentsOrOptions);
+    } else {
+      this.contentsInternal = List();
+      options = contentsOrOptions;
+    }
+
     if (this.contentsInternal.size > 1 && options?.separator === null) {
       throw Error(
         'Non-null separator required for SassList with more than one element.'
@@ -42,17 +60,6 @@ export class SassList extends Value {
     this.separatorInternal =
       options?.separator === undefined ? ',' : options.separator;
     this.hasBracketsInternal = options?.brackets ?? false;
-  }
-
-  /** Returns an empty list with the given `separator` and `brackets`. */
-  static empty(options?: {
-    /** @default null */ separator?: ListSeparator;
-    /** @default false */ brackets?: boolean;
-  }) {
-    return new SassList([], {
-      separator: options?.separator ?? null,
-      brackets: options?.brackets,
-    });
   }
 
   get asList(): List<Value> {
@@ -73,12 +80,16 @@ export class SassList extends Value {
     return this.contentsInternal.size;
   }
 
+  get(index: number): Value | undefined {
+    return this.contentsInternal.get(index);
+  }
+
   assertList(): SassList {
     return this;
   }
 
   assertMap(name?: string): SassMap {
-    if (this.contentsInternal.isEmpty()) return SassMap.empty();
+    if (this.contentsInternal.isEmpty()) return new SassMap();
     throw valueError(`${this} is not a map`, name);
   }
 
@@ -87,8 +98,8 @@ export class SassList extends Value {
    *
    * Otherwise, returns null.
    */
-  tryMap(): OrderedMap<Value, Value> | null {
-    return this.contentsInternal.isEmpty() ? OrderedMap<Value, Value>() : null;
+  tryMap(): SassMap | null {
+    return this.contentsInternal.isEmpty() ? new SassMap() : null;
   }
 
   equals(other: Value): boolean {

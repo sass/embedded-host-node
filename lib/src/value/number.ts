@@ -163,29 +163,27 @@ export class SassNumber extends Value {
   private numeratorUnitsInternal: List<string>;
   private denominatorUnitsInternal: List<string>;
 
-  /** Creates a number, optionally with a single numerator unit. */
-  constructor(value: number, unit?: string) {
-    super();
-    this.valueInternal = value;
-    this.numeratorUnitsInternal = unit === undefined ? List([]) : List([unit]);
-    this.denominatorUnitsInternal = List([]);
-  }
-
-  /**
-   * Creates a number with `numeratorUnits` and `denominatorUnits`.
-   *
-   * Upon construction, any compatible numerator and denominator units are
-   * simplified away according to the conversion factor between them.
-   */
-  static withUnits(
+  constructor(
     value: number,
-    options?: {
-      numeratorUnits?: string[] | List<string>;
-      denominatorUnits?: string[] | List<string>;
+    unitOrOptions?:
+      | string
+      | {
+          numeratorUnits?: string[] | List<string>;
+          denominatorUnits?: string[] | List<string>;
+        }
+  ) {
+    super();
+
+    if (typeof unitOrOptions === 'string') {
+      this.valueInternal = value;
+      this.numeratorUnitsInternal =
+        unitOrOptions === undefined ? List([]) : List([unitOrOptions]);
+      this.denominatorUnitsInternal = List([]);
+      return;
     }
-  ): SassNumber {
-    let numerators = asImmutableList(options?.numeratorUnits ?? []);
-    const unsimplifiedDenominators = options?.denominatorUnits ?? [];
+
+    let numerators = asImmutableList(unitOrOptions?.numeratorUnits ?? []);
+    const unsimplifiedDenominators = unitOrOptions?.denominatorUnits ?? [];
 
     const denominators = [];
     for (const denominator of unsimplifiedDenominators) {
@@ -201,10 +199,9 @@ export class SassNumber extends Value {
       if (!simplifiedAway) denominators.push(denominator);
     }
 
-    const number = new SassNumber(value);
-    number.numeratorUnitsInternal = numerators;
-    number.denominatorUnitsInternal = List(denominators);
-    return number;
+    this.valueInternal = value;
+    this.numeratorUnitsInternal = numerators;
+    this.denominatorUnitsInternal = List(denominators);
   }
 
   /** `this`'s value. */
@@ -344,7 +341,7 @@ export class SassNumber extends Value {
     newDenominators: string[] | List<string>,
     name?: string
   ): SassNumber {
-    return SassNumber.withUnits(
+    return new SassNumber(
       this.convertValue(newNumerators, newDenominators, name),
       {numeratorUnits: newNumerators, denominatorUnits: newDenominators}
     );
@@ -389,13 +386,10 @@ export class SassNumber extends Value {
     name?: string,
     otherName?: string
   ): SassNumber {
-    return SassNumber.withUnits(
-      this.convertValueToMatch(other, name, otherName),
-      {
-        numeratorUnits: other.numeratorUnits,
-        denominatorUnits: other.denominatorUnits,
-      }
-    );
+    return new SassNumber(this.convertValueToMatch(other, name, otherName), {
+      numeratorUnits: other.numeratorUnits,
+      denominatorUnits: other.denominatorUnits,
+    });
   }
 
   /**
@@ -441,7 +435,7 @@ export class SassNumber extends Value {
     newDenominators: string[] | List<string>,
     name?: string
   ): SassNumber {
-    return SassNumber.withUnits(
+    return new SassNumber(
       this.coerceValue(newNumerators, newDenominators, name),
       {numeratorUnits: newNumerators, denominatorUnits: newDenominators}
     );
@@ -493,13 +487,10 @@ export class SassNumber extends Value {
     name?: string,
     otherName?: string
   ): SassNumber {
-    return SassNumber.withUnits(
-      this.coerceValueToMatch(other, name, otherName),
-      {
-        numeratorUnits: other.numeratorUnits,
-        denominatorUnits: other.denominatorUnits,
-      }
-    );
+    return new SassNumber(this.coerceValueToMatch(other, name, otherName), {
+      numeratorUnits: other.numeratorUnits,
+      denominatorUnits: other.denominatorUnits,
+    });
   }
 
   /**

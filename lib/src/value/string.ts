@@ -13,10 +13,21 @@ export class SassString extends Value {
   private readonly hasQuotesInternal: boolean;
 
   /** Creates a string with `text`, optionally with quotes. */
-  constructor(text: string, options?: {/** @default true */ quotes?: boolean}) {
+  constructor(text: string, options?: {quotes?: boolean});
+  constructor(options?: {quotes?: boolean});
+  constructor(
+    textOrOptions?: string | {quotes?: boolean},
+    options?: {quotes?: boolean}
+  ) {
     super();
-    this.textInternal = text;
-    this.hasQuotesInternal = options?.quotes ?? true;
+
+    if (typeof textOrOptions === 'string') {
+      this.textInternal = textOrOptions;
+      this.hasQuotesInternal = options?.quotes ?? true;
+    } else {
+      this.textInternal = '';
+      this.hasQuotesInternal = textOrOptions?.quotes ?? true;
+    }
   }
 
   /** Creates an empty string, optionally with quotes. */

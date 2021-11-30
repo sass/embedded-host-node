@@ -3,21 +3,33 @@
 // https://opensource.org/licenses/MIT.
 
 import {Value} from './value';
-import {fuzzyAssertInRange, fuzzyEquals, fuzzyRound} from './utils';
+import {
+  fuzzyAssertInRange,
+  fuzzyEquals,
+  fuzzyRound,
+  positiveMod,
+} from './utils';
 import {hash} from 'immutable';
 
 interface RgbColor {
   red: number;
   green: number;
   blue: number;
-  alpha: number;
+  alpha?: number;
 }
 
 interface HslColor {
   hue: number;
   saturation: number;
   lightness: number;
-  alpha: number;
+  alpha?: number;
+}
+
+interface HwbColor {
+  hue: number;
+  whiteness: number;
+  blackness: number;
+  alpha?: number;
 }
 
 /** A SassScript color. */
@@ -30,102 +42,84 @@ export class SassColor extends Value {
   private lightnessInternal?: number;
   private readonly alphaInternal: number;
 
-  private constructor(color: RgbColor | HslColor) {
+  constructor(color: RgbColor);
+  constructor(color: HslColor);
+  constructor(color: HwbColor);
+  constructor(color: RgbColor | HslColor | HwbColor) {
     super();
 
     if ('red' in color) {
-      this.redInternal = color.red;
-      this.greenInternal = color.green;
-      this.blueInternal = color.blue;
+      this.redInternal = fuzzyAssertInRange(
+        Math.round(color.red),
+        0,
+        255,
+        'red'
+      );
+      this.greenInternal = fuzzyAssertInRange(
+        Math.round(color.green),
+        0,
+        255,
+        'green'
+      );
+      this.blueInternal = fuzzyAssertInRange(
+        Math.round(color.blue),
+        0,
+        255,
+        'blue'
+      );
+    } else if ('saturation' in color) {
+      this.hueInternal = positiveMod(color.hue, 360);
+      this.saturationInternal = fuzzyAssertInRange(
+        color.saturation,
+        0,
+        100,
+        'saturation'
+      );
+      this.lightnessInternal = fuzzyAssertInRange(
+        color.lightness,
+        0,
+        100,
+        'lightness'
+      );
     } else {
-      this.hueInternal = color.hue;
-      this.saturationInternal = color.saturation;
-      this.lightnessInternal = color.lightness;
-    }
-    this.alphaInternal = color.alpha;
-  }
+      // From https://www.w3.org/TR/css-color-4/#hwb-to-rgb
+      const scaledHue = positiveMod(color.hue, 360) / 360;
+      let scaledWhiteness =
+        fuzzyAssertInRange(color.whiteness, 0, 100, 'whiteness') / 100;
+      let scaledBlackness =
+        fuzzyAssertInRange(color.blackness, 0, 100, 'blackness') / 100;
 
-  /**
-   * Creates an RGB color.
-   *
-   * Throws an error if `red`, `green`, and `blue` aren't between `0` and `255`,
-   * or if `alpha` isn't between `0` and `1`.
-   */
-  static rgb(
-    red: number,
-    green: number,
-    blue: number,
-    alpha?: number
-  ): SassColor {
-    return new SassColor({
-      red: fuzzyAssertInRange(red, 0, 255, 'red'),
-      green: fuzzyAssertInRange(green, 0, 255, 'green'),
-      blue: fuzzyAssertInRange(blue, 0, 255, 'blue'),
-      alpha: alpha === undefined ? 1 : fuzzyAssertInRange(alpha, 0, 1, 'alpha'),
-    });
-  }
+      const sum = scaledWhiteness + scaledBlackness;
+      if (sum > 1) {
+        scaledWhiteness /= sum;
+        scaledBlackness /= sum;
+      }
 
-  /**
-   * Creates an HSL color.
-   *
-   * Throws an error if `saturation` or `lightness` aren't between `0` and
-   * `100`, or if `alpha` isn't between `0` and `1`.
-   */
-  static hsl(
-    hue: number,
-    saturation: number,
-    lightness: number,
-    alpha?: number
-  ) {
-    return new SassColor({
-      hue: hue % 360,
-      saturation: fuzzyAssertInRange(saturation, 0, 100, 'saturation'),
-      lightness: fuzzyAssertInRange(lightness, 0, 100, 'lightness'),
-      alpha: alpha === undefined ? 1 : fuzzyAssertInRange(alpha, 0, 1, 'alpha'),
-    });
-  }
-
-  /**
-   * Creates an HWB color.
-   *
-   * Throws an error if `whiteness` or `blackness` aren't between `0` and `100`,
-   * or if `alpha` isn't between `0` and `1`.
-   */
-  static hwb(
-    hue: number,
-    whiteness: number,
-    blackness: number,
-    alpha?: number
-  ) {
-    // From https://www.w3.org/TR/css-color-4/#hwb-to-rgb
-    const scaledHue = (hue % 360) / 360;
-    let scaledWhiteness =
-      fuzzyAssertInRange(whiteness, 0, 100, 'whiteness') / 100;
-    let scaledBlackness =
-      fuzzyAssertInRange(blackness, 0, 100, 'blackness') / 100;
-
-    const sum = scaledWhiteness + scaledBlackness;
-    if (sum > 1) {
-      scaledWhiteness /= sum;
-      scaledBlackness /= sum;
+      // Because HWB is (currently) used much less frequently than HSL or RGB, we
+      // don't cache its values because we expect the memory overhead of doing so
+      // to outweigh the cost of recalculating it on access. Instead, we eagerly
+      // convert it to RGB and then convert back if necessary.
+      this.redInternal = hwbToRgb(
+        scaledHue + 1 / 3,
+        scaledWhiteness,
+        scaledBlackness
+      );
+      this.greenInternal = hwbToRgb(
+        scaledHue,
+        scaledWhiteness,
+        scaledBlackness
+      );
+      this.blueInternal = hwbToRgb(
+        scaledHue - 1 / 3,
+        scaledWhiteness,
+        scaledBlackness
+      );
     }
 
-    const factor = 1 - scaledWhiteness - scaledBlackness;
-    function toRgb(hue: number) {
-      const channel = hueToRgb(0, 1, hue) * factor + scaledWhiteness;
-      return fuzzyRound(channel * 255);
-    }
-
-    // Because HWB is (currently) used much less frequently than HSL or RGB, we
-    // don't cache its values because we expect the memory overhead of doing so
-    // to outweigh the cost of recalculating it on access. Instead, we eagerly
-    // convert it to RGB and then convert back if necessary.
-    return SassColor.rgb(
-      toRgb(scaledHue + 1 / 3),
-      toRgb(scaledHue),
-      toRgb(scaledHue - 1 / 3),
-      alpha
-    );
+    this.alphaInternal =
+      color.alpha === undefined
+        ? 1
+        : fuzzyAssertInRange(color.alpha, 0, 1, 'alpha');
   }
 
   /** `this`'s red channel. */
@@ -202,67 +196,55 @@ export class SassColor extends Value {
   }
 
   /**
-   * Returns a copy of `this` with its RGB channels changed to `red`, `green`,
-   * `blue`, and/or `alpha`.
+   * Returns a copy of `this` with its channels changed to match `color`.
    */
-  changeRgb(options: {
-    red?: number;
-    green?: number;
-    blue?: number;
-    alpha?: number;
-  }): SassColor {
-    return SassColor.rgb(
-      options.red ?? this.red,
-      options.green ?? this.green,
-      options.blue ?? this.blue,
-      options.alpha ?? this.alpha
-    );
-  }
-
-  /**
-   * Returns a copy of `this` with its HSL values changed to `hue`,
-   * `saturation`, `lightness`, and/or `alpha`.
-   */
-  changeHsl(options: {
-    hue?: number;
-    saturation?: number;
-    lightness?: number;
-    alpha?: number;
-  }): SassColor {
-    return SassColor.hsl(
-      options.hue ?? this.hue,
-      options.saturation ?? this.saturation,
-      options.lightness ?? this.lightness,
-      options.alpha ?? this.alpha
-    );
-  }
-
-  /**
-   * Returns a copy of `this` with its HWB values changed to `hue`, `whiteness`,
-   * `blackness`, and/or `alpha`.
-   */
-  changeHwb(options: {
-    hue?: number;
-    whiteness?: number;
-    blackness?: number;
-    alpha?: number;
-  }): SassColor {
-    return SassColor.hwb(
-      options.hue ?? this.hue,
-      options.whiteness ?? this.whiteness,
-      options.blackness ?? this.blackness,
-      options.alpha ?? this.alpha
-    );
-  }
-
-  /** Returns a copy of `this` with its alpha channel changed to `alpha`. */
-  changeAlpha(alpha: number): SassColor {
-    return new SassColor({
-      red: this.red,
-      green: this.green,
-      blue: this.blue,
-      alpha: fuzzyAssertInRange(alpha, 0, 1, 'alpha'),
-    });
+  change(color: Partial<RgbColor>): SassColor;
+  change(color: Partial<HslColor>): SassColor;
+  change(color: Partial<HwbColor>): SassColor;
+  change(
+    color: Partial<RgbColor> | Partial<HslColor> | Partial<HwbColor>
+  ): SassColor {
+    if ('whiteness' in color || 'blackness' in color) {
+      return new SassColor({
+        hue: color.hue ?? this.hue,
+        whiteness: color.whiteness ?? this.whiteness,
+        blackness: color.blackness ?? this.blackness,
+        alpha: color.alpha ?? this.alpha,
+      });
+    } else if (
+      'hue' in color ||
+      'saturation' in color ||
+      'lightness' in color
+    ) {
+      // Tell TypeScript this isn't a Partial<HwbColor>.
+      const hsl = color as Partial<HslColor>;
+      return new SassColor({
+        hue: hsl.hue ?? this.hue,
+        saturation: hsl.saturation ?? this.saturation,
+        lightness: hsl.lightness ?? this.lightness,
+        alpha: hsl.alpha ?? this.alpha,
+      });
+    } else if (
+      'red' in color ||
+      'green' in color ||
+      'blue' in color ||
+      this.redInternal
+    ) {
+      const rgb = color as Partial<RgbColor>;
+      return new SassColor({
+        red: rgb.red ?? this.red,
+        green: rgb.green ?? this.green,
+        blue: rgb.blue ?? this.blue,
+        alpha: rgb.alpha ?? this.alpha,
+      });
+    } else {
+      return new SassColor({
+        hue: this.hue,
+        saturation: this.saturation,
+        lightness: this.lightness,
+        alpha: color.alpha ?? this.alpha,
+      });
+    }
   }
 
   equals(other: Value): boolean {
@@ -303,11 +285,20 @@ export class SassColor extends Value {
     if (max === min) {
       this.hueInternal = 0;
     } else if (max === scaledRed) {
-      this.hueInternal = ((60 * (scaledGreen - scaledBlue)) / delta) % 360;
+      this.hueInternal = positiveMod(
+        (60 * (scaledGreen - scaledBlue)) / delta,
+        360
+      );
     } else if (max === scaledGreen) {
-      this.hueInternal = (120 + (60 * (scaledBlue - scaledRed)) / delta) % 360;
+      this.hueInternal = positiveMod(
+        120 + (60 * (scaledBlue - scaledRed)) / delta,
+        360
+      );
     } else if (max === scaledBlue) {
-      this.hueInternal = (240 + (60 * (scaledRed - scaledGreen)) / delta) % 360;
+      this.hueInternal = positiveMod(
+        240 + (60 * (scaledRed - scaledGreen)) / delta,
+        360
+      );
     }
 
     this.lightnessInternal = 50 * (max + min);
@@ -342,6 +333,17 @@ export class SassColor extends Value {
     this.greenInternal = fuzzyRound(hueToRgb(m1, m2, scaledHue) * 255);
     this.blueInternal = fuzzyRound(hueToRgb(m1, m2, scaledHue - 1 / 3) * 255);
   }
+}
+
+// A helper for converting HWB colors to RGB.
+function hwbToRgb(
+  hue: number,
+  scaledWhiteness: number,
+  scaledBlackness: number
+) {
+  const factor = 1 - scaledWhiteness - scaledBlackness;
+  const channel = hueToRgb(0, 1, hue) * factor + scaledWhiteness;
+  return fuzzyRound(channel * 255);
 }
 
 // An algorithm from the CSS3 spec: http://www.w3.org/TR/css3-color/#hsl-color.

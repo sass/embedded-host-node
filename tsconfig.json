@@ -5,7 +5,8 @@
     "outDir": "dist",
     "resolveJsonModule": true,
     "rootDir": ".",
-    "useUnknownInCatchVariables": false
+    "useUnknownInCatchVariables": false,
+    "lib": ["DOM"]
   },
   "include": [
     "lib/**/*.ts",

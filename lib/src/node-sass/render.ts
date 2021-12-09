@@ -38,7 +38,7 @@ interface SharedOptions {
   sourceMapRoot?: string;
   // TODO(awjin): https://github.com/sass/embedded-host-node/issues/13
   // importer
-  includePaths?: string[];
+  loadPaths?: string[];
   // functions
   // outputStyle
 }
@@ -109,12 +109,12 @@ export function render(
         sourceMap: getSourceMap,
         url: stringRequest.file ? pathToFileURL(stringRequest.file) : 'stdin',
         syntax: stringRequest.indentedSyntax ? 'indented' : 'scss',
-        includePaths: stringRequest.includePaths ?? [],
+        loadPaths: stringRequest.loadPaths ?? [],
       })
     : compile({
         path: fileRequest.file,
         sourceMap: getSourceMap,
-        includePaths: fileRequest.includePaths ?? [],
+        loadPaths: fileRequest.loadPaths ?? [],
       });
 
   compileSass.then(

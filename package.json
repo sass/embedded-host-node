@@ -8,7 +8,7 @@
   "author": "Google Inc.",
   "license": "MIT",
   "main": "dist/lib/index.js",
-  "types": "dist/lib/index.d.ts",
+  "types": "dist/types/index.d.ts",
   "files": [
     "dist/**/*",
     "download-compiler-for-end-user.js"

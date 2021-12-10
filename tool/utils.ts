@@ -100,7 +100,7 @@ export async function getEmbeddedProtocol(
   const source =
     options && 'path' in options ? options.path : p.join(BUILD_PATH, repo);
   buildEmbeddedProtocol(source);
-  await linkBuiltFiles(source, p.join(outPath, repo));
+  await link(source, p.join(outPath, repo));
 }
 
 /**
@@ -151,7 +151,34 @@ export async function getDartSassEmbedded(
 
   const source = 'path' in options ? options.path : p.join(BUILD_PATH, repo);
   buildDartSassEmbedded(source);
-  await linkBuiltFiles(p.join(source, 'build'), p.join(outPath, repo));
+  await link(p.join(source, 'build'), p.join(outPath, repo));
+}
+
+/**
+ * Checks out JS API type defintions from the Sass language repo.
+ *
+ * Can check out a Git `ref`, or link to the source at `path`. By default,
+ * checks out the latest revision from GitHub.
+ */
+export async function getJSApi(
+  outPath: string,
+  options?: {ref: string} | {path: string}
+): Promise<void> {
+  const repo = 'sass';
+
+  let source: string;
+  if (!options || 'ref' in options) {
+    fetchRepo({
+      repo,
+      outPath: BUILD_PATH,
+      ref: options?.ref ?? 'main',
+    });
+    source = p.join(BUILD_PATH, repo);
+  } else {
+    source = options.path;
+  }
+
+  await link(p.join(source, 'js-api-doc'), p.join(outPath, repo));
 }
 
 // Downloads the release for `repo` located at `assetUrl`, then unzips it into
@@ -256,18 +283,16 @@ function buildDartSassEmbedded(repoPath: string): void {
   });
 }
 
-// Links the built files at `builtPath` into `outPath`.
-async function linkBuiltFiles(
-  builtPath: string,
-  outPath: string
-): Promise<void> {
-  console.log(`Linking built files into ${outPath}.`);
-  await cleanDir(outPath);
+// Links or copies the contents of `source` into `destination`.
+async function link(source: string, destination: string): Promise<void> {
+  await cleanDir(destination);
   if (OS === 'windows') {
-    shell.cp('-R', builtPath, outPath);
+    console.log(`Copying ${source} into ${destination}.`);
+    shell.cp('-R', source, destination);
   } else {
+    console.log(`Linking ${source} into ${destination}.`);
     // Symlinking doesn't play nice with Jasmine's test globbing on Windows.
-    fs.symlink(p.resolve(builtPath), outPath);
+    fs.symlink(p.resolve(source), destination);
   }
 }
 

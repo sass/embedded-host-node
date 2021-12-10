@@ -154,7 +154,7 @@ export class SyncMessagePort extends EventEmitter {
     // If there's no new message, wait for the other port to flip the "new
     // message" indicator to 1. If it's been set to 1 since we stored 0, this
     // will terminate immediately.
-    Atomics.wait(this.buffer, 0, BufferState.AwaitingMessage, 2000); // TODO BEFORE COMMIT: delete timeout
+    Atomics.wait(this.buffer, 0, BufferState.AwaitingMessage, 6000); // TODO BEFORE COMMIT: delete timeout
     message = receiveMessageOnPort(this.port);
     if (message) return message.message;
 

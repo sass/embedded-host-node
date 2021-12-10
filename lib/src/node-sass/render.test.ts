@@ -220,8 +220,10 @@ describe('render', () => {
         const entryFile = dir('entryDir', 'entry.scss');
         await fs.writeFile(
           entryFile,
-          `@import 'file1.scss';
-  @import 'file2.scss';`
+          `
+            @import 'file1.scss';
+            @import 'file2.scss';
+          `
         );
 
         await expectRenderResult(

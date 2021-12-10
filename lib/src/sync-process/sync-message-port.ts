@@ -1,4 +1,4 @@
-// Copyright 2021 Google Inc. Use of this source code is governed by an
+// Copyright 2021 Google LLC. Use of this source code is governed by an
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
@@ -11,7 +11,7 @@ import {
   TransferListItem,
 } from 'worker_threads';
 
-// TODO(nweiz): Make this its own package.
+// TODO(nex3): Make this its own package.
 
 /**
  * An enum of possible states for the shared buffer that two `SyncMessagePort`s
@@ -60,9 +60,10 @@ export class SyncMessagePort extends EventEmitter {
   /**
    * An Int32 view of the shared buffer.
    *
-   * Each port sets this to 0 before checking for new messages in
-   * `receiveMessage()`, and each port sets it to 1 after sending a new message.
-   * It's set to 2 when the channel is closed.
+   * Each port sets this to `BufferState.AwaitingMessage` before checking for
+   * new messages in `receiveMessage()`, and each port sets it to
+   * `BufferState.MessageSent` after sending a new message. It's set to
+   * `BufferState.Closed` when the channel is closed.
    */
   private readonly buffer: Int32Array;
 
@@ -110,7 +111,7 @@ export class SyncMessagePort extends EventEmitter {
     }
   }
 
-  // TODO(nweiz):
+  // TODO(nex3):
   // * Add a non-blocking `receiveMessage()`
   // * Add a timeout option to `receiveMessage()`
   // * Add an option to `receiveMessage()` to return a special value if the

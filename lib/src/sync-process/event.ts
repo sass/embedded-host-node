@@ -1,4 +1,4 @@
-// Copyright 2021 Google Inc. Use of this source code is governed by an
+// Copyright 2021 Google LLC. Use of this source code is governed by an
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
@@ -62,9 +62,9 @@ export interface InternalStderrEvent {
 }
 
 /**
- * An error ocurred when starting or closing the child process. This is only
- * used internally; the host will throw the error rather than returning it to the
- * caller.
+ * An error occurred when starting or closing the child process. This is only
+ * used internally; the host will throw the error rather than returning it to
+ * the caller.
  */
 export interface ErrorEvent {
   type: 'error';

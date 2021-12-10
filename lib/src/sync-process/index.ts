@@ -1,4 +1,4 @@
-// Copyright 2021 Google Inc. Use of this source code is governed by an
+// Copyright 2021 Google LLC. Use of this source code is governed by an
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
@@ -12,7 +12,7 @@ import {Event, InternalEvent} from './event';
 
 export {Event, ExitEvent, StderrEvent, StdoutEvent} from './event';
 
-// TODO(nweiz): Factor this out into its own package.
+// TODO(nex3): Factor this out into its own package.
 
 /**
  * A child process that runs synchronously while also allowing the user to
@@ -102,10 +102,10 @@ export class SyncProcess {
     }
   }
 
-  // TODO(nweiz): Add a non-blocking `yieldIfReady()` function that returns
+  // TODO(nex3): Add a non-blocking `yieldIfReady()` function that returns
   // `null` if the worker hasn't queued up an event.
 
-  // TODO(nweiz): Add a `yieldAsync()` function that returns a `Promise<Event>`.
+  // TODO(nex3): Add a `yieldAsync()` function that returns a `Promise<Event>`.
 
   /**
    * Sends a signal (`SIGTERM` by default) to the child process.

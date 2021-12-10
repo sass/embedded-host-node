@@ -3,128 +3,61 @@
 // https://opensource.org/licenses/MIT.
 
 import * as p from 'path';
-import {RawSourceMap} from 'source-map-js';
 import {fileURLToPath, pathToFileURL} from 'url';
 
-import {compile, compileString} from '../compile';
+import {compileAsync, compileStringAsync} from '../compile';
 import {SassException} from '../exception/exception';
 import {isNullOrUndefined, pathToUrlString, withoutExtension} from '../utils';
+import {
+  CompileResult,
+  LegacyException,
+  LegacyOptions,
+  LegacyResult,
+  LegacyStringOptions,
+} from '../vendor/sass';
 
-/**
- * Options that are passed to render().
- *
- * This attempts to match the Node Sass render options as closely as possible
- * (see: https://github.com/sass/node-sass#options).
- */
-export type RenderOptions = (FileOptions | StringOptions) & SharedOptions;
-
-interface FileOptions extends SharedOptions {
-  file: string;
-}
-
-interface StringOptions extends SharedOptions {
-  data: string;
-  file?: string;
-  indentedSyntax?: boolean;
-}
-
-interface SharedOptions {
-  omitSourceMapUrl?: boolean;
-  outFile?: string | null;
-  sourceMap?: boolean | string;
-  // TODO(awjin): https://github.com/sass/embedded-protocol/issues/46
-  // sourceMapContents?: boolean;
-  sourceMapEmbed?: boolean;
-  sourceMapRoot?: string;
-  // TODO(awjin): https://github.com/sass/embedded-host-node/issues/13
-  // importer
-  includePaths?: string[];
-  // functions
-  // outputStyle
-}
-
-/**
- * The result returned by render().
- *
- * This attempts to match the Node Sass result object as closely as possible
- * (see: https://github.com/sass/node-sass#result-object).
- */
-export interface RenderResult {
-  css: Buffer;
-  map?: Buffer;
-  stats: {
-    start: number;
-    end: number;
-    duration: number;
-    entry: string;
-    // TODO(awjin): https://github.com/sass/embedded-protocol/issues/46
-    // includedFiles?: string[];
-  };
-}
-
-/**
- * An error thrown by render().
- *
- * This attempts to match the Node Sass error object as closely as possible
- * (see: https://github.com/sass/node-sass#error-object).
- */
-export interface RenderError extends Error {
-  status: number;
-  message: string;
-  formatted?: string;
-  line?: number;
-  column?: number;
-  file?: string;
-}
-
-/**
- * Converts Sass to CSS.
- *
- * This attempts to match the Node Sass `render()` API as closely as possible
- * (see: https://github.com/sass/node-sass#usage).
- */
 export function render(
-  options: RenderOptions,
-  callback: (error?: RenderError, result?: RenderResult) => void
+  options: LegacyOptions<'async'>,
+  callback: (error?: LegacyException, result?: LegacyResult) => void
 ): void {
-  const fileRequest = options as FileOptions;
-  const stringRequest = options as StringOptions;
-
-  if (!fileRequest.file && isNullOrUndefined(stringRequest.data)) {
+  if (!('file' in options && options.file) && !('data' in options)) {
     callback(
-      newRenderError(Error('Either options.data or options.file must be set.'))
+      newLegacyException(
+        new Error('Either options.data or options.file must be set.')
+      )
     );
     return;
   }
 
-  let sourceMap: RawSourceMap | undefined;
-  const getSourceMap = wasSourceMapRequested(options)
-    ? (map: RawSourceMap) => (sourceMap = map)
-    : undefined;
-
   const start = Date.now();
-  const compileSass = stringRequest.data
-    ? compileString({
-        source: stringRequest.data,
-        sourceMap: getSourceMap,
-        url: stringRequest.file ? pathToFileURL(stringRequest.file) : 'stdin',
-        syntax: stringRequest.indentedSyntax ? 'indented' : 'scss',
-        loadPaths: stringRequest.includePaths ?? [],
+  const compileSass = isStringOptions(options)
+    ? compileStringAsync(options.data, {
+        sourceMap: wasSourceMapRequested(options),
+        url: options.file ? pathToFileURL(options.file) : undefined,
+        syntax: options.indentedSyntax ? 'indented' : 'scss',
       })
-    : compile({
-        path: fileRequest.file,
-        sourceMap: getSourceMap,
-        loadPaths: fileRequest.includePaths ?? [],
+    : compileAsync(options.file, {
+        sourceMap: wasSourceMapRequested(options),
+        loadPaths: options.includePaths,
       });
 
   compileSass.then(
-    css => callback(undefined, newRenderResult(options, start, css, sourceMap)),
-    error => callback(newRenderError(error))
+    result => callback(undefined, newLegacyResult(options, start, result)),
+    error => callback(newLegacyException(error))
   );
 }
 
-// Determines whether a sourceMap was requested by the call to render().
-function wasSourceMapRequested(options: RenderOptions): boolean {
+// Returns whether `options` is a `LegacyStringOptions`.
+function isStringOptions<sync extends 'sync' | 'async'>(
+  options: LegacyOptions<sync>
+): options is LegacyStringOptions<sync> {
+  return 'data' in options;
+}
+
+// Determines whether a sourceMap was requested by the call to `render()`.
+function wasSourceMapRequested(
+  options: LegacyOptions<'sync' | 'async'>
+): boolean {
   return (
     typeof options.sourceMap === 'string' ||
     (options.sourceMap === true && !!options.outFile)
@@ -133,16 +66,17 @@ function wasSourceMapRequested(options: RenderOptions): boolean {
 
 // Transforms the compilation result into an object that mimics the Node Sass
 // API format.
-function newRenderResult(
-  options: RenderOptions,
+function newLegacyResult(
+  options: LegacyOptions<'sync' | 'async'>,
   start: number,
-  css: string,
-  sourceMap?: RawSourceMap
-): RenderResult {
+  result: CompileResult
+): LegacyResult {
   const end = Date.now();
-  let sourceMapBytes: Buffer | undefined;
 
-  if (sourceMap) {
+  let css = result.css;
+  let sourceMapBytes: Buffer | undefined;
+  if (result.sourceMap) {
+    const sourceMap = result.sourceMap;
     sourceMap.sourceRoot = options.sourceMapRoot ?? '';
 
     const sourceMapPath =
@@ -166,8 +100,11 @@ function newRenderResult(
     sourceMap.sources = sourceMap.sources.map(source => {
       if (source.startsWith('file://')) {
         return pathToUrlString(p.relative(sourceMapDir, fileURLToPath(source)));
+      } else if (source.startsWith('data:')) {
+        return 'stdin';
+      } else {
+        return source;
       }
-      return source;
     });
 
     sourceMapBytes = Buffer.from(JSON.stringify(sourceMap));
@@ -197,22 +134,26 @@ function newRenderResult(
       start,
       end,
       duration: end - start,
+      includedFiles: result.loadedUrls.map(url => url.toString()),
     },
   };
 }
 
 // Decorates an Error with additional fields so that it behaves like a Node Sass
 // error.
-function newRenderError(error: Error | SassException): RenderError {
+function newLegacyException(error: Error | SassException): LegacyException {
   if (!(error instanceof SassException)) {
     return Object.assign(error, {
+      formatted: error.toString(),
       status: 3,
     });
   }
 
-  let file = error.span?.url || undefined;
-  if (file && file !== 'stdin') {
+  let file = error.span?.url;
+  if (file) {
     file = fileURLToPath(file);
+  } else {
+    file = 'stdin';
   }
 
   return Object.assign(new Error(), {

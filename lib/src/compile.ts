@@ -2,8 +2,6 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-import {RawSourceMap} from 'source-map-js';
-import {URL} from 'url';
 import * as p from 'path';
 
 import {EmbeddedCompiler} from './embedded-compiler/compiler';
@@ -12,111 +10,76 @@ import {MessageTransformer} from './embedded-protocol/message-transformer';
 import {Dispatcher} from './embedded-protocol/dispatcher';
 import {deprotifyException} from './embedded-protocol/utils';
 import * as proto from './vendor/embedded-protocol/embedded_sass_pb';
+import {CompileResult, Options, StringOptions} from './vendor/sass';
 
-export type Syntax = 'scss' | 'indented' | 'css';
-
-/**
- * Compiles a path and returns the resulting css. Throws a SassException if the
- * compilation failed.
- */
-export async function compile(options: {
-  path: string;
-  sourceMap?: (sourceMap: RawSourceMap) => void;
-  loadPaths?: string[];
-}): Promise<string> {
+export function compileAsync(
+  path: string,
+  options?: Options<'async'>
+): Promise<CompileResult> {
   // TODO(awjin): Create logger, importer, function registries.
-
-  const request = newCompileRequest({
-    path: options.path,
-    sourceMap: !!options.sourceMap,
-    loadPaths: options.loadPaths ?? [],
-  });
-
-  const response = await compileRequest(request);
-  if (options.sourceMap) {
-    options.sourceMap(response.sourceMap!);
-  }
-
-  return response.css;
+  return compileRequest(newCompilePathRequest(path, options));
 }
 
-/**
- * Compiles a string and returns the resulting css. Throws a SassException if
- * the compilation failed.
- */
-export async function compileString(options: {
-  source: string;
-  sourceMap?: (sourceMap: RawSourceMap) => void;
-  url?: URL | string;
-  syntax?: Syntax;
-  loadPaths?: string[];
-}): Promise<string> {
+export function compileStringAsync(
+  source: string,
+  options?: StringOptions<'async'>
+): Promise<CompileResult> {
   // TODO(awjin): Create logger, importer, function registries.
-
-  const request = newCompileStringRequest({
-    source: options.source,
-    sourceMap: !!options.sourceMap,
-    url: options.url instanceof URL ? options.url.toString() : options.url,
-    syntax: options.syntax ?? 'scss',
-    loadPaths: options.loadPaths ?? [],
-  });
-
-  const response = await compileRequest(request);
-  if (options.sourceMap) {
-    options.sourceMap(response.sourceMap!);
-  }
-  return response.css;
+  return compileRequest(newCompileStringRequest(source, options));
 }
 
 // Creates a request for compiling a file.
-function newCompileRequest(options: {
-  path: string;
-  sourceMap: boolean;
-  loadPaths: string[];
-}): proto.InboundMessage.CompileRequest {
+function newCompilePathRequest(
+  path: string,
+  options?: Options<'async'>
+): proto.InboundMessage.CompileRequest {
   // TODO(awjin): Populate request with importer/function IDs.
 
-  const request = new proto.InboundMessage.CompileRequest();
-  request.setPath(options.path);
-  request.setSourceMap(options.sourceMap);
-
-  for (const path of options.loadPaths) {
-    const importer = new proto.InboundMessage.CompileRequest.Importer();
-    importer.setPath(p.resolve(path));
-    request.addImporters(importer);
-  }
-
+  const request = newCompileRequest(options);
+  request.setPath(path);
   return request;
 }
 
 // Creates a request for compiling a string.
-function newCompileStringRequest(options: {
-  source: string;
-  sourceMap: boolean;
-  url?: string;
-  syntax: Syntax;
-  loadPaths: string[];
-}): proto.InboundMessage.CompileRequest {
+function newCompileStringRequest(
+  source: string,
+  options?: StringOptions<'async'>
+): proto.InboundMessage.CompileRequest {
   // TODO(awjin): Populate request with importer/function IDs.
 
   const input = new proto.InboundMessage.CompileRequest.StringInput();
-  input.setSource(options.source);
+  input.setSource(source);
 
-  if (options.syntax === 'scss') {
-    input.setSyntax(proto.Syntax['SCSS']);
-  } else if (options.syntax === 'indented') {
-    input.setSyntax(proto.Syntax['INDENTED']);
-  } else if (options.syntax === 'css') {
-    input.setSyntax(proto.Syntax['CSS']);
+  switch (options?.syntax ?? 'scss') {
+    case 'scss':
+      input.setSyntax(proto.Syntax.SCSS);
+      break;
+
+    case 'indented':
+      input.setSyntax(proto.Syntax.INDENTED);
+      break;
+
+    case 'css':
+      input.setSyntax(proto.Syntax.CSS);
+      break;
   }
 
-  if (options.url) input.setUrl(options.url.toString());
+  if (options?.url) input.setUrl(options.url.toString());
 
-  const request = new proto.InboundMessage.CompileRequest();
+  const request = newCompileRequest(options);
   request.setString(input);
-  request.setSourceMap(options.sourceMap);
+  return request;
+}
 
-  for (const path of options.loadPaths) {
+// Creates a compilation request for the given `options` without adding any
+// input-specific options.
+function newCompileRequest(
+  options?: Options<'async'>
+): proto.InboundMessage.CompileRequest {
+  const request = new proto.InboundMessage.CompileRequest();
+  request.setSourceMap(!!options?.sourceMap);
+
+  for (const path of options?.loadPaths ?? []) {
     const importer = new proto.InboundMessage.CompileRequest.Importer();
     importer.setPath(p.resolve(path));
     request.addImporters(importer);
@@ -130,10 +93,7 @@ function newCompileStringRequest(options: {
 // compilation errors. Shuts down the compiler after compilation.
 async function compileRequest(
   request: proto.InboundMessage.CompileRequest
-): Promise<{
-  css: string;
-  sourceMap?: RawSourceMap;
-}> {
+): Promise<CompileResult> {
   const embeddedCompiler = new EmbeddedCompiler();
 
   try {
@@ -180,6 +140,7 @@ async function compileRequest(
       }
       return {
         css: success.getCss(),
+        loadedUrls: [], // TODO(nex3): Fill this out
         sourceMap: sourceMap ? JSON.parse(sourceMap) : undefined,
       };
     } else if (response.getFailure()) {

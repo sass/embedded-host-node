@@ -35,6 +35,6 @@ export async function run(
   } finally {
     if (options?.sassPathDirs) process.env.SASS_PATH = undefined;
     // TODO(awjin): Change this to rmSync once we drop support for Node 12.
-    del.sync('spec/sandbox/**', {force: true});
+    del.sync(testDir, {force: true});
   }
 }

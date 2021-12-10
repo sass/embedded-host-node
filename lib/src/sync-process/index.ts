@@ -67,11 +67,29 @@ export class SyncProcess {
         );
         callback();
       },
-      final: callback => {
-        this.port.postMessage({type: 'stdinClosed'});
-        callback();
-      },
     });
+
+    // Unfortunately, there's no built-in event or callback that will reliably
+    // *synchronously* notify us that the stdin stream has been closed. (The
+    // `final` callback works in Node v16 but not v14.) Instead, we wrap the
+    // methods themselves that are used to close the stream.
+    const oldEnd = this.stdin.end.bind(this.stdin) as (
+      a1?: unknown,
+      a2?: unknown,
+      a3?: unknown
+    ) => void;
+    this.stdin.end = ((a1?: unknown, a2?: unknown, a3?: unknown) => {
+      oldEnd(a1, a2, a3);
+      this.port.postMessage({type: 'stdinClosed'});
+    }) as typeof this.stdin.end;
+
+    const oldDestroy = this.stdin.destroy.bind(this.stdin) as (
+      a1?: unknown
+    ) => void;
+    this.stdin.destroy = ((a1?: unknown) => {
+      oldDestroy(a1);
+      this.port.postMessage({type: 'stdinClosed'});
+    }) as typeof this.stdin.destroy;
   }
 
   /**

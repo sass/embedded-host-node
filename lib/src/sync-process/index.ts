@@ -67,6 +67,10 @@ export class SyncProcess {
         );
         callback();
       },
+      final: callback => {
+        this.port.postMessage({type: 'stdinClosed'});
+        callback();
+      },
     });
   }
 

@@ -33,6 +33,19 @@ describe('SyncProcess', () => {
         }
       );
     });
+
+    it('closes stdin', () => {
+      withJSProcess(
+        `
+          process.stdin.on("data", () => {});
+          process.stdin.on("end", () => console.log("closed!"));
+        `,
+        node => {
+          node.stdin.end();
+          expectStdout(node.yield(), 'closed!\n');
+        }
+      );
+    });
   });
 
   describe('emits exit', () => {

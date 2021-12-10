@@ -30,6 +30,8 @@ const process = spawn(
 port.on('message', message => {
   if (message.type === 'stdin') {
     process.stdin.write(message.data as Buffer);
+  } else if (message.type === 'stdinClosed') {
+    process.stdin.end();
   } else {
     assert.equal(message.type, 'kill');
     process.kill(message.signal as number | NodeJS.Signals | undefined);

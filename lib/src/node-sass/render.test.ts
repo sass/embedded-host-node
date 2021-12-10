@@ -205,6 +205,42 @@ describe('render', () => {
       });
     });
 
+    it('supports imports relative to includePaths', async () => {
+      await sandbox.run(async dir => {
+        await fs.mkdir(dir('dir1'));
+        await fs.mkdir(dir('dir2'));
+        await fs.mkdir(dir('entryDir'));
+
+        const file1Path = dir('dir1', 'file1.scss');
+        await fs.writeFile(file1Path, 'a {b: c}');
+
+        const file2Path = dir('dir2', 'file2.scss');
+        await fs.writeFile(file2Path, 'd {e: f}');
+
+        const entryFile = dir('entryDir', 'entry.scss');
+        await fs.writeFile(
+          entryFile,
+          `
+            @import 'file1.scss';
+            @import 'file2.scss';
+          `
+        );
+
+        await expectRenderResult(
+          {
+            file: entryFile,
+            includePaths: [dir('dir1'), dir('dir2')],
+          },
+          result => {
+            expectEqualIgnoringWhitespace(
+              result.css.toString(),
+              'a { b: c; } d {e: f; }'
+            );
+          }
+        );
+      });
+    });
+
     it('supports import only files', async () => {
       await sandbox.run(async dir => {
         await fs.writeFile(dir('foo.scss'), 'a {b: regular}');

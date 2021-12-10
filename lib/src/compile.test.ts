@@ -61,6 +61,38 @@ describe('compile', () => {
         expect(await compile({path})).toBe('a {\n  b: c;\n}');
         await fs.unlink(path);
       });
+
+      it('compiles imports using loadPaths', async () => {
+        await fs.mkdir(resolve('dir1'));
+        await fs.mkdir(resolve('dir2'));
+        await fs.mkdir(resolve('entryDir'));
+
+        const file1Path = resolve('./dir1/file1.scss');
+        await fs.writeFile(file1Path, 'a {b: c}');
+
+        const file2Path = resolve('./dir2/file2.scss');
+        await fs.writeFile(file2Path, 'd {e: f}');
+
+        const entryFile = resolve('./entryDir/entry.scss');
+        await fs.writeFile(
+          entryFile,
+          `
+            @import 'file1.scss';
+            @import 'file2.scss';
+          `
+        );
+
+        expect(
+          await compile({
+            path: entryFile.toString(),
+            loadPaths: [resolve('dir1'), resolve('dir2')],
+          })
+        ).toBe('a {\n  b: c;\n}\n\nd {\n  e: f;\n}');
+
+        await fs.rmdir(resolve('dir1'), {recursive: true});
+        await fs.rmdir(resolve('dir2'), {recursive: true});
+        await fs.rmdir(resolve('entryDir'), {recursive: true});
+      });
     });
 
     describe('output', () => {

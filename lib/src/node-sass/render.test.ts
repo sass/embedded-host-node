@@ -205,7 +205,7 @@ describe('render', () => {
       });
     });
 
-    it('supports imports relative to loadPaths', async () => {
+    it('supports imports relative to includePaths', async () => {
       await sandbox.run(async dir => {
         await fs.mkdir(dir('dir1'));
         await fs.mkdir(dir('dir2'));
@@ -220,14 +220,16 @@ describe('render', () => {
         const entryFile = dir('entryDir', 'entry.scss');
         await fs.writeFile(
           entryFile,
-          `@import 'file1.scss';
-  @import 'file2.scss';`
+          `
+            @import 'file1.scss';
+            @import 'file2.scss';
+          `
         );
 
         await expectRenderResult(
           {
             file: entryFile,
-            loadPaths: [dir('dir1'), dir('dir2')],
+            includePaths: [dir('dir1'), dir('dir2')],
           },
           result => {
             expectEqualIgnoringWhitespace(

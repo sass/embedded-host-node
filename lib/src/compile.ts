@@ -4,7 +4,7 @@
 
 import {RawSourceMap} from 'source-map-js';
 import {URL} from 'url';
-import {resolve} from 'path';
+import * as p from 'path';
 
 import {EmbeddedCompiler} from './embedded-compiler/compiler';
 import {PacketTransformer} from './embedded-compiler/packet-transformer';
@@ -82,7 +82,7 @@ function newCompileRequest(options: {
 
   for (const path of options.loadPaths) {
     const importer = new proto.InboundMessage.CompileRequest.Importer();
-    importer.setPath(resolve(path));
+    importer.setPath(p.resolve(path));
     request.addImporters(importer);
   }
 
@@ -118,7 +118,7 @@ function newCompileStringRequest(options: {
 
   for (const path of options.loadPaths) {
     const importer = new proto.InboundMessage.CompileRequest.Importer();
-    importer.setPath(resolve(path));
+    importer.setPath(p.resolve(path));
     request.addImporters(importer);
   }
 

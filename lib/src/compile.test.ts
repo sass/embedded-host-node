@@ -76,8 +76,10 @@ describe('compile', () => {
         const entryFile = resolve('./entryDir/entry.scss');
         await fs.writeFile(
           entryFile,
-          `@import 'file1.scss';
-@import 'file2.scss';`
+          `
+            @import 'file1.scss';
+            @import 'file2.scss';
+          `
         );
 
         expect(

@@ -5,7 +5,7 @@
 import {
   InboundMessage,
   OutboundMessage,
-} from '../vendor/embedded-protocol/embedded_sass_pb';
+} from './vendor/embedded-protocol/embedded_sass_pb';
 import {RequestTracker} from './request-tracker';
 
 describe('request tracker', () => {

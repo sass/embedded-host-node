@@ -8,7 +8,7 @@ import {filter, map, mergeMap} from 'rxjs/operators';
 import {
   InboundMessage,
   OutboundMessage,
-} from '../vendor/embedded-protocol/embedded_sass_pb';
+} from './vendor/embedded-protocol/embedded_sass_pb';
 import {
   InboundRequest,
   InboundRequestType,
@@ -20,7 +20,7 @@ import {
   OutboundTypedMessage,
 } from './message-transformer';
 import {RequestTracker} from './request-tracker';
-import {PromiseOr, thenOr} from '../utils';
+import {PromiseOr, thenOr} from './utils';
 
 /**
  * Dispatches requests, responses, and events.

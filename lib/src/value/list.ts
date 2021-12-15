@@ -4,7 +4,7 @@
 
 import {hash, isList, List} from 'immutable';
 
-import {Value} from './value';
+import {Value} from './index';
 import {SassMap} from './map';
 import {asImmutableList, valueError} from '../utils';
 

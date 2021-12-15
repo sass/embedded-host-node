@@ -7,12 +7,12 @@ import * as p from 'path';
 import {RawSourceMap} from 'source-map-js';
 import {pathToFileURL} from 'url';
 
-import * as sandbox from '../../../spec/helpers/sandbox';
-import {LegacyException, LegacyOptions, LegacyResult} from '../vendor/sass';
-import {compileStringAsync} from '../compile';
-import {expectEqualIgnoringWhitespace} from '../../../spec/helpers/utils';
-import {pathToUrlString} from '../utils';
-import {render} from './render';
+import * as sandbox from '../../test/sandbox';
+import {LegacyException, LegacyOptions, LegacyResult} from './vendor/sass';
+import {compileStringAsync} from './compile';
+import {expectEqualIgnoringWhitespace} from '../../test/utils';
+import {pathToUrlString} from './utils';
+import {render} from './legacy';
 
 describe('render', () => {
   function expectLegacyResult(
@@ -740,7 +740,7 @@ describe('render', () => {
 1 │ a {b: }
   │       ^
   ╵
-  ${dir('test.scss')} 1:7  root stylesheet`
+  ${p.relative('.', dir('test.scss'))} 1:7  root stylesheet`
             );
             expect(error?.line).toBe(1);
             expect(error?.column).toBe(7);
@@ -785,7 +785,7 @@ describe('render', () => {
 1 │ a {b: 1 % a}
   │       ^^^^^
   ╵
-  ${dir('test.scss')} 1:7  root stylesheet`
+  ${p.relative('.', dir('test.scss'))} 1:7  root stylesheet`
             );
             expect(error?.line).toBe(1);
             expect(error?.column).toBe(7);

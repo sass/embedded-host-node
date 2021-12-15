@@ -4,7 +4,7 @@
 
 import * as pkg from '../package.json';
 
-export {Value} from './src/value/value';
+export {Value} from './src/value';
 export {SassBoolean, sassFalse, sassTrue} from './src/value/boolean';
 export {SassColor} from './src/value/color';
 export {ListSeparator, SassList} from './src/value/list';
@@ -19,6 +19,6 @@ export {
   compileAsync,
   compileStringAsync,
 } from './src/compile';
-export {render} from './src/node-sass/render';
+export {render} from './src/legacy';
 
 export const info = `sass-embedded\t${pkg.version}`;

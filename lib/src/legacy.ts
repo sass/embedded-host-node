@@ -3,18 +3,18 @@
 // https://opensource.org/licenses/MIT.
 
 import * as p from 'path';
-import {fileURLToPath, pathToFileURL} from 'url';
+import {URL, fileURLToPath, pathToFileURL} from 'url';
 
-import {compileAsync, compileStringAsync} from '../compile';
-import {SassException} from '../exception/exception';
-import {isNullOrUndefined, pathToUrlString, withoutExtension} from '../utils';
+import {compileAsync, compileStringAsync} from './compile';
+import {SassException} from './exception';
+import {isNullOrUndefined, pathToUrlString, withoutExtension} from './utils';
 import {
   CompileResult,
   LegacyException,
   LegacyOptions,
   LegacyResult,
   LegacyStringOptions,
-} from '../vendor/sass';
+} from './vendor/sass';
 
 export function render(
   options: LegacyOptions<'async'>,
@@ -149,12 +149,13 @@ function newLegacyException(error: Error | SassException): LegacyException {
     });
   }
 
-  let file = error.span?.url;
-  if (file) {
-    file = fileURLToPath(file);
-  } else {
-    file = 'stdin';
-  }
+  const file = error.span?.url
+    ? // We have to cast to Node's URL type here because the specified type is the
+      // standard URL type which is slightly less featureful. `fileURLToPath()`
+      // does work with standard URL objects in practice, but we know that we
+      // generate Node URLs here regardless.
+      fileURLToPath(error.span?.url as URL)
+    : 'stdin';
 
   return Object.assign(new Error(), {
     status: 1,

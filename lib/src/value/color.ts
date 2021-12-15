@@ -2,7 +2,7 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-import {Value} from './value';
+import {Value} from './index';
 import {
   fuzzyAssertInRange,
   fuzzyEquals,

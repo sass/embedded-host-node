@@ -4,7 +4,7 @@
 
 import {hash} from 'immutable';
 
-import {Value} from './value';
+import {Value} from './index';
 import {valueError} from '../utils';
 
 /** A SassScript string. */

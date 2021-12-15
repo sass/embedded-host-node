@@ -7,7 +7,7 @@ import * as p from 'path';
 
 /** The path to the embedded compiler executable. */
 export const compilerPath = (() => {
-  for (const path of ['../vendor', '../../../../lib/src/vendor']) {
+  for (const path of ['vendor', '../../../lib/src/vendor']) {
     const executable = p.resolve(
       __dirname,
       path,

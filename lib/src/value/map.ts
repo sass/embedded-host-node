@@ -4,7 +4,7 @@
 
 import {List, OrderedMap} from 'immutable';
 
-import {Value} from './value';
+import {Value} from './index';
 import {ListSeparator, SassList} from './list';
 
 /** A SassScript map */

@@ -4,7 +4,7 @@
 
 import {Subject} from 'rxjs';
 
-import {SyncProcess} from '../sync-process';
+import {SyncProcess} from './sync-process';
 import {compilerPath} from './compiler-path';
 
 /**

@@ -12,7 +12,7 @@ import {Dispatcher, DispatcherHandlers} from './dispatcher';
 import {MessageTransformer} from './message-transformer';
 import {PacketTransformer} from './packet-transformer';
 import {SyncEmbeddedCompiler} from './sync-compiler';
-import {deprotofyException} from './exception';
+import {Exception} from './exception';
 
 export function compile(
   path: string,
@@ -257,7 +257,7 @@ function handleCompileResponse(
     if (sourceMap) result.sourceMap = JSON.parse(sourceMap);
     return result;
   } else if (response.getFailure()) {
-    throw deprotofyException(response.getFailure()!);
+    throw new Exception(response.getFailure()!);
   } else {
     throw Error('Compiler sent empty CompileResponse.');
   }

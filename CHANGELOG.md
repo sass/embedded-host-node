@@ -1,3 +1,8 @@
+## 1.0.0-beta.7
+
+* Expose the `Exception` class and ensure that syntax errors match the official
+  JS API.
+
 ## 1.0.0-beta.6
 
 * Expose (as yet incomplete) `compile()`, `compileString()`, `compileAsync()`,

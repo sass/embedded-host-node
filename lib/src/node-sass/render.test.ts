@@ -8,15 +8,16 @@ import {RawSourceMap} from 'source-map-js';
 import {pathToFileURL} from 'url';
 
 import * as sandbox from '../../../spec/helpers/sandbox';
+import {LegacyException, LegacyOptions, LegacyResult} from '../vendor/sass';
+import {compileStringAsync} from '../compile';
 import {expectEqualIgnoringWhitespace} from '../../../spec/helpers/utils';
-import {compileString} from '../compile';
 import {pathToUrlString} from '../utils';
-import {render, RenderError, RenderOptions, RenderResult} from './render';
+import {render} from './render';
 
 describe('render', () => {
-  function expectRenderResult(
-    renderOptions: RenderOptions,
-    runExpectations: (result: RenderResult) => void
+  function expectLegacyResult(
+    renderOptions: LegacyOptions<'async'>,
+    runExpectations: (result: LegacyResult) => void
   ): Promise<void> {
     return new Promise((resolve, reject) => {
       render(renderOptions, (error, result) => {
@@ -30,9 +31,9 @@ describe('render', () => {
     });
   }
 
-  function expectRenderError(
-    renderOptions: RenderOptions,
-    runExpectations: (error: RenderError) => void
+  function expectLegacyException(
+    renderOptions: LegacyOptions<'async'>,
+    runExpectations: (error: LegacyException) => void
   ): Promise<void> {
     return new Promise((resolve, reject) => {
       render(renderOptions, error => {
@@ -51,7 +52,7 @@ describe('render', () => {
       await sandbox.run(async dir => {
         await fs.writeFile(dir('test.scss'), 'a {b: c}');
 
-        await expectRenderResult(
+        await expectLegacyResult(
           {file: p.resolve(dir('test.scss'))},
           result => {
             expectEqualIgnoringWhitespace(result.css.toString(), 'a {b: c;}');
@@ -64,7 +65,7 @@ describe('render', () => {
       await sandbox.run(async dir => {
         await fs.writeFile(dir('test.scss'), 'a {b: c}');
 
-        await expectRenderResult({file: dir('test.scss')}, result => {
+        await expectLegacyResult({file: dir('test.scss')}, result => {
           expectEqualIgnoringWhitespace(result.css.toString(), 'a {b: c;}');
         });
       });
@@ -77,12 +78,23 @@ describe('render', () => {
       });
     });
 
-    it('enforces that one of data and file must be set', done => {
-      render({file: ''}, error => {
-        expect(error!.message).toBe(
-          'Either options.data or options.file must be set.'
-        );
-        done();
+    describe('enforces that one of data and file must be set', () => {
+      it('when neither is set', done => {
+        render({} as LegacyOptions<'async'>, error => {
+          expect(error!.message).toBe(
+            'Either options.data or options.file must be set.'
+          );
+          done();
+        });
+      });
+
+      it('when file is empty', done => {
+        render({file: ''}, error => {
+          expect(error!.message).toBe(
+            'Either options.data or options.file must be set.'
+          );
+          done();
+        });
       });
     });
 
@@ -91,7 +103,7 @@ describe('render', () => {
         await sandbox.run(async dir => {
           await fs.writeFile(dir('test.scss'), 'a {b: c}');
 
-          await expectRenderResult(
+          await expectLegacyResult(
             {data: 'x {y: z}', file: dir('test.scss')},
             result => {
               expectEqualIgnoringWhitespace(result.css.toString(), 'x {y: z;}');
@@ -115,7 +127,7 @@ describe('render', () => {
           await fs.mkdir(dir('subdir'));
           await fs.writeFile(dir('subdir', 'importee.scss'), 'a {b: c}');
 
-          await expectRenderResult(
+          await expectLegacyResult(
             {
               data: '@import "importee"',
               file: dir('subdir', 'test.scss'),
@@ -159,7 +171,7 @@ describe('render', () => {
       await sandbox.run(async dir => {
         await fs.writeFile(dir('test.sass'), 'a\n\tb: c');
 
-        await expectRenderResult({file: dir('test.sass')}, result => {
+        await expectLegacyResult({file: dir('test.sass')}, result => {
           expectEqualIgnoringWhitespace(result.css.toString(), 'a {b: c;}');
         });
       });
@@ -173,7 +185,7 @@ describe('render', () => {
         await fs.writeFile(importerPath, '@import "test"');
         await fs.writeFile(dir('test.scss'), 'a {b: c}');
 
-        await expectRenderResult({file: importerPath}, result => {
+        await expectLegacyResult({file: importerPath}, result => {
           expectEqualIgnoringWhitespace(result.css.toString(), 'a {b: c;}');
         });
       });
@@ -186,7 +198,7 @@ describe('render', () => {
         await fs.writeFile(importerPath, '@import "../test"');
         await fs.writeFile(dir('test.scss'), 'a {b: c}');
 
-        await expectRenderResult({file: importerPath}, result => {
+        await expectLegacyResult({file: importerPath}, result => {
           expectEqualIgnoringWhitespace(result.css.toString(), 'a {b: c;}');
         });
       });
@@ -196,7 +208,7 @@ describe('render', () => {
       await sandbox.run(async dir => {
         await fs.writeFile(dir('test.scss'), 'a {b: c}');
 
-        await expectRenderResult(
+        await expectLegacyResult(
           {data: `@import "${pathToFileURL(p.resolve(dir('test.scss')))}"`},
           result => {
             expectEqualIgnoringWhitespace(result.css.toString(), 'a {b: c;}');
@@ -226,7 +238,7 @@ describe('render', () => {
           `
         );
 
-        await expectRenderResult(
+        await expectLegacyResult(
           {
             file: entryFile,
             includePaths: [dir('dir1'), dir('dir2')],
@@ -246,7 +258,7 @@ describe('render', () => {
         await fs.writeFile(dir('foo.scss'), 'a {b: regular}');
         await fs.writeFile(dir('foo.import.scss'), 'a {b: import-only}');
 
-        await expectRenderResult(
+        await expectLegacyResult(
           {data: `@import "${pathToUrlString(dir('foo'))}"`},
           result => {
             expectEqualIgnoringWhitespace(
@@ -263,7 +275,7 @@ describe('render', () => {
         await fs.writeFile(dir('foo.scss'), 'a {b: regular}');
         await fs.writeFile(dir('foo.import.scss'), 'a {b: import-only}');
 
-        await expectRenderResult(
+        await expectLegacyResult(
           {
             data: `
               @use "${pathToUrlString(dir('foo'))}";
@@ -289,7 +301,7 @@ describe('render', () => {
           await fs.writeFile(dir('dir1/test1.scss'), 'a {b: c}');
           await fs.writeFile(dir('dir2/test2.scss'), 'x {y: z}');
 
-          await expectRenderResult(
+          await expectLegacyResult(
             {data: "@import 'test1'; @import 'test2';"},
             result => {
               expectEqualIgnoringWhitespace(
@@ -309,7 +321,7 @@ describe('render', () => {
       await sandbox.run(async dir => {
         await fs.writeFile(dir('test.scss'), 'a {b: c}');
 
-        await expectRenderResult({file: dir('test.scss')}, result => {
+        await expectLegacyResult({file: dir('test.scss')}, result => {
           expect(result.css.toString()).toBe('a {\n  b: c;\n}');
         });
       });
@@ -319,7 +331,7 @@ describe('render', () => {
       await sandbox.run(async dir => {
         await fs.writeFile(dir('test.scss'), 'a {b: c}');
 
-        await expectRenderResult({file: dir('test.scss')}, result => {
+        await expectLegacyResult({file: dir('test.scss')}, result => {
           expect(result.stats.entry).toBe(dir('test.scss'));
         });
       });
@@ -344,11 +356,12 @@ describe('render', () => {
   });
 
   describe('source maps', () => {
-    // Gets the source map from within a RenderResult.
-    function getSourceMap(result?: RenderResult): RawSourceMap {
+    // Gets the source map from within a LegacyResult.
+    function getSourceMap(result?: LegacyResult): RawSourceMap {
       if (result === undefined) throw Error('Expected render result.');
-      if (result.map === undefined)
+      if (result.map === undefined) {
         throw Error('Expected render result to contain a sourceMap.');
+      }
       return JSON.parse(result.map.toString());
     }
 
@@ -361,12 +374,8 @@ describe('render', () => {
       beforeAll(async () => {
         const data = 'a {b: c}';
 
-        await compileString({
-          source: data,
-          sourceMap: map => {
-            expectedMap = map;
-          },
-        });
+        expectedMap = (await compileStringAsync(data, {sourceMap: true}))
+          .sourceMap!;
 
         await new Promise<void>(resolve => {
           render(
@@ -408,7 +417,7 @@ describe('render', () => {
         await sandbox.run(async dir => {
           await fs.writeFile(dir('test.scss'), 'a {b: c}');
 
-          await expectRenderResult(
+          await expectLegacyResult(
             {
               file: dir('test.scss'),
               sourceMap: true,
@@ -425,7 +434,7 @@ describe('render', () => {
         await sandbox.run(async dir => {
           await fs.writeFile(dir('test.scss'), 'a {b: c}');
 
-          await expectRenderResult(
+          await expectLegacyResult(
             {
               file: dir('test.scss'),
               sourceMap: true,
@@ -443,7 +452,7 @@ describe('render', () => {
           await fs.writeFile(dir('test.scss'), '@import "other";\na {b: c}');
           await fs.writeFile(dir('other.scss'), 'x {y: z}');
 
-          await expectRenderResult(
+          await expectLegacyResult(
             {
               file: dir('test.scss'),
               sourceMap: true,
@@ -505,7 +514,7 @@ describe('render', () => {
         await sandbox.run(async dir => {
           await fs.writeFile(dir('test.scss'), 'a {b: c}');
 
-          await expectRenderResult(
+          await expectLegacyResult(
             {
               file: dir('test.scss'),
               sourceMap: dir('out.css.map'),
@@ -521,7 +530,7 @@ describe('render', () => {
         await sandbox.run(async dir => {
           await fs.writeFile(dir('test'), 'a {b: c}');
 
-          await expectRenderResult(
+          await expectLegacyResult(
             {
               file: dir('test'),
               sourceMap: dir('out.css.map'),
@@ -629,7 +638,7 @@ describe('render', () => {
         await sandbox.run(async dir => {
           await fs.writeFile(dir('test.scss'), 'a {b: c}');
 
-          await expectRenderResult(
+          await expectLegacyResult(
             {
               file: dir('test.scss'),
               sourceMap: dir('map'),
@@ -688,7 +697,7 @@ describe('render', () => {
           const root = 'root';
           await fs.writeFile(dir('test.scss'), 'a {b: c}');
 
-          await expectRenderResult(
+          await expectLegacyResult(
             {
               file: dir('test.scss'),
               sourceMap: true,
@@ -708,7 +717,7 @@ describe('render', () => {
 
   describe('errors', () => {
     function expectMessageAndToString(
-      error: RenderError | undefined,
+      error: LegacyException | undefined,
       message: string
     ) {
       if (error === undefined) throw Error('Expected render error.');
@@ -723,7 +732,7 @@ describe('render', () => {
         await sandbox.run(async dir => {
           await fs.writeFile(dir('test.scss'), data);
 
-          await expectRenderError({file: dir('test.scss')}, error => {
+          await expectLegacyException({file: dir('test.scss')}, error => {
             expectMessageAndToString(
               error,
               `Expected expression.
@@ -750,7 +759,7 @@ describe('render', () => {
 1 │ a {b: }
   │       ^
   ╵
-  stdin 1:7  root stylesheet`
+  - 1:7  root stylesheet`
           );
           expect(error?.line).toBe(1);
           expect(error?.column).toBe(7);
@@ -768,7 +777,7 @@ describe('render', () => {
         await sandbox.run(async dir => {
           await fs.writeFile(dir('test.scss'), data);
 
-          await expectRenderError({file: dir('test.scss')}, error => {
+          await expectLegacyException({file: dir('test.scss')}, error => {
             expectMessageAndToString(
               error,
               `Undefined operation "1 % a".
@@ -795,7 +804,7 @@ describe('render', () => {
 1 │ a {b: 1 % a}
   │       ^^^^^
   ╵
-  stdin 1:7  root stylesheet`
+  - 1:7  root stylesheet`
           );
           expect(error?.line).toBe(1);
           expect(error?.column).toBe(7);

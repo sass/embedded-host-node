@@ -9,7 +9,9 @@ import * as url from 'url';
 export type PromiseOr<T> = T | Promise<T>;
 
 /** Checks for null or undefined. */
-export function isNullOrUndefined<T>(object: T): boolean {
+export function isNullOrUndefined<T>(
+  object: T | null | undefined
+): object is null | undefined {
   return object === null || object === undefined;
 }
 

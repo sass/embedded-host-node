@@ -4,7 +4,7 @@
 
 import yargs from 'yargs';
 
-import {getDartSassEmbedded, getEmbeddedProtocol} from './utils';
+import {getDartSassEmbedded, getEmbeddedProtocol, getJSApi} from './utils';
 
 const argv = yargs(process.argv.slice(2))
   .option('compiler-path', {
@@ -32,10 +32,19 @@ const argv = yargs(process.argv.slice(2))
     type: 'string',
     description: 'Build the Embedded Protocol from this release version.',
   })
+  .option('api-path', {
+    type: 'string',
+    description: 'Use the JS API definitions from the source at this path.',
+  })
+  .option('api-ref', {
+    type: 'string',
+    description: 'Build the JS API definitions from this Git ref.',
+  })
   .conflicts({'compiler-path': ['compiler-ref', 'compiler-version']})
   .conflicts('compiler-ref', 'compiler-version')
   .conflicts({'protocol-path': ['protocol-ref', 'protocol-version']})
   .conflicts('protocol-ref', 'protocol-version')
+  .conflicts('api-path', 'api-ref')
   .parseSync();
 
 (async () => {
@@ -72,6 +81,18 @@ const argv = yargs(process.argv.slice(2))
       });
     } else {
       await getDartSassEmbedded(outPath);
+    }
+
+    if (argv['api-ref']) {
+      await getJSApi(outPath, {
+        ref: argv['api-ref'],
+      });
+    } else if (argv['api-path']) {
+      await getJSApi(outPath, {
+        path: argv['api-path'],
+      });
+    } else {
+      await getJSApi(outPath);
     }
   } catch (error) {
     console.error(error);

@@ -3,21 +3,39 @@
 // https://opensource.org/licenses/MIT.
 
 import * as p from 'path';
+import {Observable} from 'rxjs';
 
-import {EmbeddedCompiler} from './embedded-compiler/compiler';
+import {AsyncEmbeddedCompiler} from './embedded-compiler/async-compiler';
+import {SyncEmbeddedCompiler} from './embedded-compiler/sync-compiler';
 import {PacketTransformer} from './embedded-compiler/packet-transformer';
 import {MessageTransformer} from './embedded-protocol/message-transformer';
-import {Dispatcher} from './embedded-protocol/dispatcher';
+import {Dispatcher, DispatcherHandlers} from './embedded-protocol/dispatcher';
 import {deprotifyException} from './embedded-protocol/utils';
 import * as proto from './vendor/embedded-protocol/embedded_sass_pb';
 import {CompileResult, Options, StringOptions} from './vendor/sass';
+
+export function compile(
+  path: string,
+  options?: Options<'sync'>
+): CompileResult {
+  // TODO(awjin): Create logger, importer, function registries.
+  return compileRequestSync(newCompilePathRequest(path, options));
+}
+
+export function compileString(
+  source: string,
+  options?: Options<'sync'>
+): CompileResult {
+  // TODO(awjin): Create logger, importer, function registries.
+  return compileRequestSync(newCompileStringRequest(source, options));
+}
 
 export function compileAsync(
   path: string,
   options?: Options<'async'>
 ): Promise<CompileResult> {
   // TODO(awjin): Create logger, importer, function registries.
-  return compileRequest(newCompilePathRequest(path, options));
+  return compileRequestAsync(newCompilePathRequest(path, options));
 }
 
 export function compileStringAsync(
@@ -25,13 +43,13 @@ export function compileStringAsync(
   options?: StringOptions<'async'>
 ): Promise<CompileResult> {
   // TODO(awjin): Create logger, importer, function registries.
-  return compileRequest(newCompileStringRequest(source, options));
+  return compileRequestAsync(newCompileStringRequest(source, options));
 }
 
 // Creates a request for compiling a file.
 function newCompilePathRequest(
   path: string,
-  options?: Options<'async'>
+  options?: Options<'sync' | 'async'>
 ): proto.InboundMessage.CompileRequest {
   // TODO(awjin): Populate request with importer/function IDs.
 
@@ -43,7 +61,7 @@ function newCompilePathRequest(
 // Creates a request for compiling a string.
 function newCompileStringRequest(
   source: string,
-  options?: StringOptions<'async'>
+  options?: StringOptions<'sync' | 'async'>
 ): proto.InboundMessage.CompileRequest {
   // TODO(awjin): Populate request with importer/function IDs.
 
@@ -74,7 +92,7 @@ function newCompileStringRequest(
 // Creates a compilation request for the given `options` without adding any
 // input-specific options.
 function newCompileRequest(
-  options?: Options<'async'>
+  options?: Options<'sync' | 'async'>
 ): proto.InboundMessage.CompileRequest {
   const request = new proto.InboundMessage.CompileRequest();
   request.setSourceMap(!!options?.sourceMap);
@@ -91,27 +109,19 @@ function newCompileRequest(
 // Spins up a compiler, then sends it a compile request. Returns a promise that
 // resolves with the CompileResult. Throws if there were any protocol or
 // compilation errors. Shuts down the compiler after compilation.
-async function compileRequest(
+async function compileRequestAsync(
   request: proto.InboundMessage.CompileRequest
 ): Promise<CompileResult> {
-  const embeddedCompiler = new EmbeddedCompiler();
+  const embeddedCompiler = new AsyncEmbeddedCompiler();
 
   try {
-    const packetTransformer = new PacketTransformer(
-      embeddedCompiler.stdout$,
-      buffer => embeddedCompiler.writeStdin(buffer)
-    );
-
-    const messageTransformer = new MessageTransformer(
-      packetTransformer.outboundProtobufs$,
-      packet => packetTransformer.writeInboundProtobuf(packet)
-    );
-
     // TODO(awjin): Pass import and function registries' handler functions to
     // dispatcher.
-    const dispatcher = new Dispatcher(
-      messageTransformer.outboundMessages$,
-      message => messageTransformer.writeInboundMessage(message),
+    const dispatcher = createDispatcher<'sync'>(
+      embeddedCompiler.stdout$,
+      buffer => {
+        embeddedCompiler.writeStdin(buffer);
+      },
       {
         handleImportRequest: () => {
           throw Error('Custom importers not yet implemented.');
@@ -130,26 +140,125 @@ async function compileRequest(
 
     // TODO(awjin): Subscribe logger to dispatcher's log events.
 
-    const response = await dispatcher.sendCompileRequest(request);
-
-    if (response.getSuccess()) {
-      const success = response.getSuccess()!;
-      const sourceMap = success.getSourceMap();
-      if (request.getSourceMap() && sourceMap === undefined) {
-        throw Error('Compiler did not provide sourceMap.');
-      }
-      return {
-        css: success.getCss(),
-        loadedUrls: [], // TODO(nex3): Fill this out
-        sourceMap: sourceMap ? JSON.parse(sourceMap) : undefined,
-      };
-    } else if (response.getFailure()) {
-      throw deprotifyException(response.getFailure()!);
-    } else {
-      throw Error('Compiler sent empty CompileResponse.');
-    }
+    return handleCompileResponse(
+      await new Promise<proto.OutboundMessage.CompileResponse>(
+        (resolve, reject) =>
+          dispatcher.sendCompileRequest(request, (err, response) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve(response!);
+            }
+          })
+      )
+    );
   } finally {
     embeddedCompiler.close();
     await embeddedCompiler.exit$;
+  }
+}
+
+// Spins up a compiler, then sends it a compile request. Returns a promise that
+// resolves with the CompileResult. Throws if there were any protocol or
+// compilation errors. Shuts down the compiler after compilation.
+function compileRequestSync(
+  request: proto.InboundMessage.CompileRequest
+): CompileResult {
+  const embeddedCompiler = new SyncEmbeddedCompiler();
+
+  try {
+    // TODO(awjin): Pass import and function registries' handler functions to
+    // dispatcher.
+    const dispatcher = createDispatcher<'sync'>(
+      embeddedCompiler.stdout$,
+      buffer => {
+        embeddedCompiler.writeStdin(buffer);
+      },
+      {
+        handleImportRequest: () => {
+          throw Error('Custom importers not yet implemented.');
+        },
+        handleFileImportRequest: () => {
+          throw Error('Custom file importers not yet implemented.');
+        },
+        handleCanonicalizeRequest: () => {
+          throw Error('Canonicalize not yet implemented.');
+        },
+        handleFunctionCallRequest: () => {
+          throw Error('Custom functions not yet implemented.');
+        },
+      }
+    );
+
+    // TODO(awjin): Subscribe logger to dispatcher's log events.
+
+    let error: unknown;
+    let response: proto.OutboundMessage.CompileResponse | undefined;
+    dispatcher.sendCompileRequest(request, (error_, response_) => {
+      if (error_) {
+        error = error_;
+      } else {
+        response = response_;
+      }
+    });
+
+    for (;;) {
+      if (!embeddedCompiler.yield()) {
+        throw new Error('Embedded compiler exited unexpectedly.');
+      }
+
+      if (error) throw error;
+      if (response) return handleCompileResponse(response);
+    }
+  } finally {
+    embeddedCompiler.close();
+    embeddedCompiler.yieldUntilExit();
+  }
+}
+
+/**
+ * Creates a dispatcher that dispatches messages from the given `stdout` stream.
+ */
+function createDispatcher<sync extends 'sync' | 'async'>(
+  stdout: Observable<Buffer>,
+  writeStdin: (buffer: Buffer) => void,
+  handlers: DispatcherHandlers<sync>
+): Dispatcher<sync> {
+  const packetTransformer = new PacketTransformer(stdout, writeStdin);
+
+  const messageTransformer = new MessageTransformer(
+    packetTransformer.outboundProtobufs$,
+    packet => packetTransformer.writeInboundProtobuf(packet)
+  );
+
+  return new Dispatcher<sync>(
+    messageTransformer.outboundMessages$,
+    message => messageTransformer.writeInboundMessage(message),
+    handlers
+  );
+}
+
+/**
+ * Converts a `CompileResponse` into a `CompileResult`.
+ *
+ * Throws a `SassException` if the compilation failed.
+ */
+function handleCompileResponse(
+  response: proto.OutboundMessage.CompileResponse
+): CompileResult {
+  if (response.getSuccess()) {
+    const success = response.getSuccess()!;
+    const result: CompileResult = {
+      css: success.getCss(),
+      loadedUrls: [], // TODO(nex3): Fill this out
+    };
+
+    const sourceMap = success.getSourceMap();
+    if (sourceMap) result.sourceMap = JSON.parse(sourceMap);
+    return result;
+  } else if (response.getFailure()) {
+    throw deprotifyException(response.getFailure()!);
+  } else {
+    throw Error('Compiler sent empty CompileResponse.');
   }
 }

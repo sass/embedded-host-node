@@ -13,7 +13,12 @@ export {sassNull} from './src/value/null';
 export {SassNumber} from './src/value/number';
 export {SassString} from './src/value/string';
 
-export {compileAsync, compileStringAsync} from './src/compile';
+export {
+  compile,
+  compileString,
+  compileAsync,
+  compileStringAsync,
+} from './src/compile';
 export {render} from './src/node-sass/render';
 
 export const info = `sass-embedded\t${pkg.version}`;

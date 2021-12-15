@@ -20,7 +20,7 @@ import {
   OutboundTypedMessage,
 } from './message-transformer';
 import {RequestTracker} from './request-tracker';
-import {PromiseOr} from '../utils';
+import {PromiseOr, thenOr} from '../utils';
 
 /**
  * Dispatches requests, responses, and events.
@@ -42,7 +42,7 @@ import {PromiseOr} from '../utils';
  * as an Observable that consumers may choose to subscribe to. Subscribers must
  * perform proper error handling.
  */
-export class Dispatcher {
+export class Dispatcher<sync extends 'sync' | 'async'> {
   // Tracks the IDs of all inbound requests. An outbound response with matching
   // ID and type will remove the ID.
   private readonly pendingInboundRequests = new RequestTracker();
@@ -80,26 +80,15 @@ export class Dispatcher {
     private readonly writeInboundMessage: (
       message: InboundTypedMessage
     ) => void,
-    private readonly outboundRequestHandlers: {
-      handleImportRequest: (
-        request: OutboundMessage.ImportRequest
-      ) => PromiseOr<InboundMessage.ImportResponse>;
-      handleFileImportRequest: (
-        request: OutboundMessage.FileImportRequest
-      ) => PromiseOr<InboundMessage.FileImportResponse>;
-      handleCanonicalizeRequest: (
-        request: OutboundMessage.CanonicalizeRequest
-      ) => PromiseOr<InboundMessage.CanonicalizeResponse>;
-      handleFunctionCallRequest: (
-        request: OutboundMessage.FunctionCallRequest
-      ) => PromiseOr<InboundMessage.FunctionCallResponse>;
-    }
+    private readonly outboundRequestHandlers: DispatcherHandlers<sync>
   ) {
     this.outboundMessages$
       .pipe(
-        mergeMap(async message => {
-          await this.handleOutboundMessage(message);
-          return message;
+        mergeMap(message => {
+          const result = this.handleOutboundMessage(message);
+          return result instanceof Promise
+            ? result.then(() => message)
+            : [message];
         })
       )
       .subscribe(
@@ -113,17 +102,25 @@ export class Dispatcher {
   }
 
   /**
-   * Sends a CompileRequest inbound. Returns a promise that will either resolve
-   * with the corresponding outbound CompileResponse, or error if any Protocol
-   * Errors were encountered.
+   * Sends a CompileRequest inbound. Passes the corresponding outbound
+   * CompileResponse or an error to `callback`.
+   *
+   * This uses an old-style callback argument so that it can work either
+   * synchronously or asynchronously. If the underlying stdout stream emits
+   * events synchronously, `callback` will be called synchronously.
    */
   sendCompileRequest(
-    request: InboundMessage.CompileRequest
-  ): Promise<OutboundMessage.CompileResponse> {
-    return this.handleInboundRequest(
+    request: InboundMessage.CompileRequest,
+    callback: (
+      err: unknown,
+      response: OutboundMessage.CompileResponse | undefined
+    ) => void
+  ): void {
+    this.handleInboundRequest(
       request,
       InboundMessage.MessageCase.COMPILE_REQUEST,
-      OutboundMessage.MessageCase.COMPILE_RESPONSE
+      OutboundMessage.MessageCase.COMPILE_RESPONSE,
+      callback
     );
   }
 
@@ -138,30 +135,32 @@ export class Dispatcher {
   // request or response, registers it with pendingOutboundRequests. If it
   // contains a request, runs the appropriate callback to generate an inbound
   // response, and then sends it inbound.
-  private async handleOutboundMessage(
+  private handleOutboundMessage(
     message: OutboundTypedMessage
-  ): Promise<void> {
+  ): PromiseOr<void, sync> {
     switch (message.type) {
       case OutboundMessage.MessageCase.LOG_EVENT:
-        break;
+        return undefined;
 
       case OutboundMessage.MessageCase.COMPILE_RESPONSE:
         this.pendingInboundRequests.resolve(
           (message.payload as OutboundResponse).getId(),
           message.type
         );
-        break;
+        return undefined;
 
       case OutboundMessage.MessageCase.IMPORT_REQUEST: {
         const request = message.payload as OutboundMessage.ImportRequest;
         const id = request.getId();
         const type = InboundMessage.MessageCase.IMPORT_RESPONSE;
         this.pendingOutboundRequests.add(id, type);
-        const response = await this.outboundRequestHandlers.handleImportRequest(
-          request
+
+        return thenOr(
+          this.outboundRequestHandlers.handleImportRequest(request),
+          response => {
+            this.sendInboundMessage(id, response, type);
+          }
         );
-        this.sendInboundMessage(id, response, type);
-        break;
       }
 
       case OutboundMessage.MessageCase.FILE_IMPORT_REQUEST: {
@@ -169,10 +168,12 @@ export class Dispatcher {
         const id = request.getId();
         const type = InboundMessage.MessageCase.FILE_IMPORT_RESPONSE;
         this.pendingOutboundRequests.add(id, type);
-        const response =
-          await this.outboundRequestHandlers.handleFileImportRequest(request);
-        this.sendInboundMessage(id, response, type);
-        break;
+        return thenOr(
+          this.outboundRequestHandlers.handleFileImportRequest(request),
+          response => {
+            this.sendInboundMessage(id, response, type);
+          }
+        );
       }
 
       case OutboundMessage.MessageCase.CANONICALIZE_REQUEST: {
@@ -180,10 +181,12 @@ export class Dispatcher {
         const id = request.getId();
         const type = InboundMessage.MessageCase.CANONICALIZE_RESPONSE;
         this.pendingOutboundRequests.add(id, type);
-        const response =
-          await this.outboundRequestHandlers.handleCanonicalizeRequest(request);
-        this.sendInboundMessage(id, response, type);
-        break;
+        return thenOr(
+          this.outboundRequestHandlers.handleCanonicalizeRequest(request),
+          response => {
+            this.sendInboundMessage(id, response, type);
+          }
+        );
       }
 
       case OutboundMessage.MessageCase.FUNCTION_CALL_REQUEST: {
@@ -191,10 +194,12 @@ export class Dispatcher {
         const id = request.getId();
         const type = InboundMessage.MessageCase.FUNCTION_CALL_RESPONSE;
         this.pendingOutboundRequests.add(id, type);
-        const response =
-          await this.outboundRequestHandlers.handleFunctionCallRequest(request);
-        this.sendInboundMessage(id, response, type);
-        break;
+        return thenOr(
+          this.outboundRequestHandlers.handleFunctionCallRequest(request),
+          response => {
+            this.sendInboundMessage(id, response, type);
+          }
+        );
       }
 
       default:
@@ -208,33 +213,33 @@ export class Dispatcher {
   private handleInboundRequest(
     request: InboundRequest,
     requestType: InboundRequestType,
-    responseType: OutboundResponseType
-  ): Promise<OutboundResponse> {
-    return new Promise((resolve, reject) => {
-      if (this.messages$.isStopped) {
-        reject(Error('Tried writing to closed dispatcher'));
-      }
+    responseType: OutboundResponseType,
+    callback: (err: unknown, response: OutboundResponse | undefined) => void
+  ): void {
+    if (this.messages$.isStopped) {
+      callback(new Error('Tried writing to closed dispatcher'), undefined);
+      return;
+    }
 
-      this.messages$
-        .pipe(
-          filter(message => message.type === responseType),
-          map(message => message.payload as OutboundResponse),
-          filter(response => response.getId() === request.getId())
-        )
-        .subscribe({next: resolve});
+    this.messages$
+      .pipe(
+        filter(message => message.type === responseType),
+        map(message => message.payload as OutboundResponse),
+        filter(response => response.getId() === request.getId())
+      )
+      .subscribe({next: response => callback(null, response)});
 
-      this.error$.subscribe({error: reject});
+    this.error$.subscribe({error: error => callback(error, undefined)});
 
-      try {
-        this.sendInboundMessage(
-          this.pendingInboundRequests.nextId,
-          request,
-          requestType
-        );
-      } catch (error) {
-        this.throwAndClose(error);
-      }
-    });
+    try {
+      this.sendInboundMessage(
+        this.pendingInboundRequests.nextId,
+        request,
+        requestType
+      );
+    } catch (error) {
+      this.throwAndClose(error);
+    }
   }
 
   // Sends a message inbound. Keeps track of all pending inbound requests.
@@ -266,4 +271,22 @@ export class Dispatcher {
       type,
     });
   }
+}
+
+/**
+ * An interface for the handler callbacks that are passed to `new Dispatcher()`.
+ */
+export interface DispatcherHandlers<sync extends 'sync' | 'async'> {
+  handleImportRequest: (
+    request: OutboundMessage.ImportRequest
+  ) => PromiseOr<InboundMessage.ImportResponse, sync>;
+  handleFileImportRequest: (
+    request: OutboundMessage.FileImportRequest
+  ) => PromiseOr<InboundMessage.FileImportResponse, sync>;
+  handleCanonicalizeRequest: (
+    request: OutboundMessage.CanonicalizeRequest
+  ) => PromiseOr<InboundMessage.CanonicalizeResponse, sync>;
+  handleFunctionCallRequest: (
+    request: OutboundMessage.FunctionCallRequest
+  ) => PromiseOr<InboundMessage.FunctionCallResponse, sync>;
 }

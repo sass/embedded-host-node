@@ -3,6 +3,12 @@
 * Expose the `Exception` class and ensure that syntax errors match the official
   JS API.
 
+* Add support for the `style`, `alertColor`, `alertAscii`, `quietDeps`, and
+  `verbose` options in `compile()`, `compileString()`, `compileAsync()`, and
+  `compileStringAsync()`.
+
+* Add support for `CompileResult.loadedUrls`.
+
 ## 1.0.0-beta.6
 
 * Expose (as yet incomplete) `compile()`, `compileString()`, `compileAsync()`,

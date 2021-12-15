@@ -35,6 +35,7 @@
     "rxjs": "^7.4.0",
     "semver": "^7.3.5",
     "shelljs": "^0.8.4",
+    "supports-color": "^8.1.1",
     "tar": "^6.0.5"
   },
   "devDependencies": {
@@ -45,6 +46,7 @@
     "@types/node-fetch": "^2.5.7",
     "@types/semver": "^7.3.4",
     "@types/shelljs": "^0.8.8",
+    "@types/supports-color": "^8.1.1",
     "@types/tar": "^6.1.0",
     "@types/yargs": "^17.0.4",
     "del": "^6.0.0",

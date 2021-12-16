@@ -1,3 +1,10 @@
+## 1.0.0-beta.6
+
+* Expose (as yet incomplete) `compile()`, `compileString()`, `compileAsync()`,
+  and `compileStringAsync()` functions.
+
+* Include the official TypeScript definition files.
+
 ## 1.0.0-beta.5
 
 - Function and Values API

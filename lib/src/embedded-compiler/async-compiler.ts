@@ -2,36 +2,19 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-import * as fs from 'fs';
 import {spawn} from 'child_process';
-import {resolve} from 'path';
 import {Observable} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
 
+import {compilerPath} from './compiler-path';
+
 /**
- * Invokes the Embedded Sass Compiler as a Node child process, exposing its
- * stdio as Observables.
+ * An asynchronous wrapper for the embedded Sass compiler that exposes its stdio
+ * streams as Observables.
  */
-export class EmbeddedCompiler {
-  private readonly process = (() => {
-    for (const path of ['../vendor', '../../../../lib/src/vendor']) {
-      const executable = resolve(
-        __dirname,
-        path,
-        `dart-sass-embedded/dart-sass-embedded${
-          process.platform === 'win32' ? '.bat' : ''
-        }`
-      );
-
-      if (fs.existsSync(executable)) {
-        return spawn(executable, {windowsHide: true});
-      }
-    }
-
-    throw new Error(
-      "Embedded Dart Sass couldn't find the embedded compiler executable."
-    );
-  })();
+export class AsyncEmbeddedCompiler {
+  /** The underlying process that's being wrapped. */
+  private readonly process = spawn(compilerPath, {windowsHide: true});
 
   /** The child process's exit event. */
   readonly exit$ = new Promise<number | null>(resolve => {

@@ -6,7 +6,19 @@ import {List} from 'immutable';
 import * as p from 'path';
 import * as url from 'url';
 
-export type PromiseOr<T> = T | Promise<T>;
+export type PromiseOr<
+  T,
+  sync extends 'sync' | 'async' = 'async'
+> = sync extends 'async' ? T | Promise<T> : T;
+
+export function thenOr<T, V, sync extends 'sync' | 'async'>(
+  promiseOrValue: PromiseOr<T, sync>,
+  callback: (value: T) => PromiseOr<V, sync>
+): PromiseOr<V, sync> {
+  return promiseOrValue instanceof Promise
+    ? (promiseOrValue.then(callback) as PromiseOr<V, sync>)
+    : callback(promiseOrValue as T);
+}
 
 /** Checks for null or undefined. */
 export function isNullOrUndefined<T>(

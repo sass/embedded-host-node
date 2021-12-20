@@ -5,8 +5,8 @@
 import * as p from 'path';
 import {URL, fileURLToPath, pathToFileURL} from 'url';
 
+import {Exception} from './exception';
 import {compileAsync, compileStringAsync} from './compile';
-import {SassException} from './exception';
 import {isNullOrUndefined, pathToUrlString, withoutExtension} from './utils';
 import {
   CompileResult,
@@ -141,8 +141,8 @@ function newLegacyResult(
 
 // Decorates an Error with additional fields so that it behaves like a Node Sass
 // error.
-function newLegacyException(error: Error | SassException): LegacyException {
-  if (!(error instanceof SassException)) {
+function newLegacyException(error: Error | Exception): LegacyException {
+  if (!(error instanceof Exception)) {
     return Object.assign(error, {
       formatted: error.toString(),
       status: 3,

@@ -13,6 +13,7 @@ export {sassNull} from './src/value/null';
 export {SassNumber} from './src/value/number';
 export {SassString} from './src/value/string';
 
+export {Exception} from './src/exception';
 export {
   compile,
   compileString,

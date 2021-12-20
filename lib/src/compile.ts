@@ -4,6 +4,7 @@
 
 import * as p from 'path';
 import {Observable} from 'rxjs';
+import * as supportsColor from 'supports-color';
 
 import * as proto from './vendor/embedded-protocol/embedded_sass_pb';
 import {AsyncEmbeddedCompiler} from './async-compiler';
@@ -12,7 +13,7 @@ import {Dispatcher, DispatcherHandlers} from './dispatcher';
 import {MessageTransformer} from './message-transformer';
 import {PacketTransformer} from './packet-transformer';
 import {SyncEmbeddedCompiler} from './sync-compiler';
-import {deprotofyException} from './exception';
+import {Exception} from './exception';
 
 export function compile(
   path: string,
@@ -80,6 +81,9 @@ function newCompileStringRequest(
     case 'css':
       input.setSyntax(proto.Syntax.CSS);
       break;
+
+    default:
+      throw new Error(`Unknown options.syntax: "${options?.syntax}"`);
   }
 
   if (options?.url) input.setUrl(options.url.toString());
@@ -96,6 +100,23 @@ function newCompileRequest(
 ): proto.InboundMessage.CompileRequest {
   const request = new proto.InboundMessage.CompileRequest();
   request.setSourceMap(!!options?.sourceMap);
+  request.setAlertColor(options?.alertColor ?? !!supportsColor.stdout);
+  request.setAlertAscii(!!options?.alertAscii);
+  request.setQuietDeps(!!options?.quietDeps);
+  request.setVerbose(!!options?.verbose);
+
+  switch (options?.style ?? 'expanded') {
+    case 'expanded':
+      request.setStyle(proto.OutputStyle.EXPANDED);
+      break;
+
+    case 'compressed':
+      request.setStyle(proto.OutputStyle.COMPRESSED);
+      break;
+
+    default:
+      throw new Error(`Unknown options.style: "${options?.style}"`);
+  }
 
   for (const path of options?.loadPaths ?? []) {
     const importer = new proto.InboundMessage.CompileRequest.Importer();
@@ -250,14 +271,14 @@ function handleCompileResponse(
     const success = response.getSuccess()!;
     const result: CompileResult = {
       css: success.getCss(),
-      loadedUrls: [], // TODO(nex3): Fill this out
+      loadedUrls: success.getLoadedUrlsList().map(url => new URL(url)),
     };
 
     const sourceMap = success.getSourceMap();
     if (sourceMap) result.sourceMap = JSON.parse(sourceMap);
     return result;
   } else if (response.getFailure()) {
-    throw deprotofyException(response.getFailure()!);
+    throw new Exception(response.getFailure()!);
   } else {
     throw Error('Compiler sent empty CompileResponse.');
   }

@@ -6,7 +6,7 @@ import * as fs from 'fs';
 import * as p from 'path';
 import * as del from 'del';
 
-import {PromiseOr} from '../../lib/src/utils';
+import {PromiseOr} from '../lib/src/utils';
 
 /**
  * Runs `test` within a sandbox directory. This directory is made available via
@@ -23,7 +23,11 @@ export async function run(
     sassPathDirs?: string[];
   }
 ): Promise<void> {
-  const testDir = p.join('spec', 'sandbox', `${Math.random()}`.slice(2));
+  const testDir = p.join(
+    p.dirname(__filename),
+    'sandbox',
+    `${Math.random()}`.slice(2)
+  );
   fs.mkdirSync(testDir, {recursive: true});
   if (options?.sassPathDirs) {
     process.env.SASS_PATH = options.sassPathDirs.join(

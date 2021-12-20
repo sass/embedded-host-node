@@ -3,7 +3,7 @@
 // https://opensource.org/licenses/MIT.
 
 import {Observable} from 'rxjs';
-import {Value} from '../../lib/src/value/value';
+import {Value} from '../lib/src/value';
 
 /**
  * Subscribes to `observable` and asserts that it errors with the expected

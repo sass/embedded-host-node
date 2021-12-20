@@ -26,7 +26,7 @@ describe('SassException', () => {
         line: 1,
         column: 1,
       },
-      url: 'https://url',
+      url: new URL('https://url'),
       context: 'context',
     };
     try {

@@ -5,14 +5,14 @@
 import * as p from 'path';
 import {Observable} from 'rxjs';
 
-import {AsyncEmbeddedCompiler} from './embedded-compiler/async-compiler';
-import {SyncEmbeddedCompiler} from './embedded-compiler/sync-compiler';
-import {PacketTransformer} from './embedded-compiler/packet-transformer';
-import {MessageTransformer} from './embedded-protocol/message-transformer';
-import {Dispatcher, DispatcherHandlers} from './embedded-protocol/dispatcher';
-import {deprotifyException} from './embedded-protocol/utils';
 import * as proto from './vendor/embedded-protocol/embedded_sass_pb';
+import {AsyncEmbeddedCompiler} from './async-compiler';
 import {CompileResult, Options, StringOptions} from './vendor/sass';
+import {Dispatcher, DispatcherHandlers} from './dispatcher';
+import {MessageTransformer} from './message-transformer';
+import {PacketTransformer} from './packet-transformer';
+import {SyncEmbeddedCompiler} from './sync-compiler';
+import {deprotofyException} from './exception';
 
 export function compile(
   path: string,
@@ -257,7 +257,7 @@ function handleCompileResponse(
     if (sourceMap) result.sourceMap = JSON.parse(sourceMap);
     return result;
   } else if (response.getFailure()) {
-    throw deprotifyException(response.getFailure()!);
+    throw deprotofyException(response.getFailure()!);
   } else {
     throw Error('Compiler sent empty CompileResponse.');
   }

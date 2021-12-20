@@ -5,7 +5,7 @@
 import {hash, List} from 'immutable';
 
 import {asImmutableList, valueError} from '../utils';
-import {Value} from './value';
+import {Value} from './index';
 import {
   fuzzyAsInt,
   fuzzyEquals,

@@ -5,11 +5,11 @@
 import {Observable, Subject} from 'rxjs';
 import {map} from 'rxjs/operators';
 
-import {compilerError, hostError} from '../utils';
+import {compilerError, hostError} from './utils';
 import {
   InboundMessage,
   OutboundMessage,
-} from '../vendor/embedded-protocol/embedded_sass_pb';
+} from './vendor/embedded-protocol/embedded_sass_pb';
 
 export type InboundRequestType = InboundMessage.MessageCase.COMPILE_REQUEST;
 

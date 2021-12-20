@@ -4,13 +4,13 @@
 
 import {Subject, Observable} from 'rxjs';
 
-import {expectObservableToError} from '../../../spec/helpers/utils';
+import {expectObservableToError} from '../../test/utils';
 import {MessageTransformer, OutboundTypedMessage} from './message-transformer';
 import {
   InboundMessage,
   OutboundMessage,
   ProtocolError,
-} from '../vendor/embedded-protocol/embedded_sass_pb';
+} from './vendor/embedded-protocol/embedded_sass_pb';
 
 describe('message transformer', () => {
   let messages: MessageTransformer;

@@ -38,7 +38,7 @@ class SassBooleanInternal extends Value implements SassBoolean {
   }
 
   equals(other: Value): boolean {
-    return other instanceof SassBooleanInternal && this.value === other.value;
+    return this === other;
   }
 
   hashCode(): number {

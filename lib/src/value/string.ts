@@ -61,7 +61,7 @@ export class SassString extends Value {
    * JS, `"n😊b".length` returns `4`, whereas in Sass `string.length("n😊b")`
    * returns `3`.
    */
-  sassLength(): number {
+  get sassLength(): number {
     let length = 0;
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     for (const codepoint of this.text) {
@@ -98,7 +98,7 @@ export class SassString extends Value {
       throw valueError('String index may not be 0', name);
     }
 
-    const sassLength = this.sassLength();
+    const sassLength = this.sassLength;
     if (Math.abs(sassIdx) > sassLength) {
       throw valueError(
         `Invalid index ${sassIdx} for a string with ${sassLength} characters`,

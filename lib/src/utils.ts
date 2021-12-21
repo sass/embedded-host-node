@@ -20,6 +20,20 @@ export function thenOr<T, V, sync extends 'sync' | 'async'>(
     : callback(promiseOrValue as T);
 }
 
+export function catchOr<T, sync extends 'sync' | 'async'>(
+  promiseOrValueCallback: () => PromiseOr<T, sync>,
+  callback: (error: unknown) => PromiseOr<T, sync>
+): PromiseOr<T, sync> {
+  try {
+    const result = promiseOrValueCallback();
+    return result instanceof Promise
+      ? (result.catch(callback) as PromiseOr<T, sync>)
+      : result;
+  } catch (error: unknown) {
+    return callback(error);
+  }
+}
+
 /** Checks for null or undefined. */
 export function isNullOrUndefined<T>(
   object: T | null | undefined
@@ -35,6 +49,14 @@ export function asImmutableList<T>(collection: T[] | List<T>): List<T> {
 /** Constructs a compiler-caused Error. */
 export function compilerError(message: string): Error {
   return Error(`Compiler caused error: ${message}.`);
+}
+
+/**
+ * Returns a `compilerError()` indicating that the given `field` should have
+ * been included but was not.
+ */
+export function mandatoryError(field: string): Error {
+  return compilerError(`Missing mandatory field ${field}`);
 }
 
 /** Constructs a host-caused Error. */
@@ -59,4 +81,23 @@ export function pathToUrlString(path: string): string {
 export function withoutExtension(path: string): string {
   const extension = p.extname(path);
   return path.substring(0, path.length - extension.length);
+}
+
+/**
+ * Dart-style utility. See
+ * http://go/dart-api/stable/2.8.4/dart-core/Map/putIfAbsent.html.
+ */
+export function putIfAbsent<K, V>(
+  map: Map<K, V>,
+  key: K,
+  provider: () => V
+): V {
+  const val = map.get(key);
+  if (val !== undefined) {
+    return val;
+  } else {
+    const newVal = provider();
+    map.set(key, newVal);
+    return newVal;
+  }
 }

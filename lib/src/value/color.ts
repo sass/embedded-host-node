@@ -191,6 +191,16 @@ export class SassColor extends Value {
     return this.alphaInternal;
   }
 
+  /**
+   * Whether `this` has already calculated the HSL components for the color.
+   *
+   * This is an internal property that's not an official part of Sass's JS API,
+   * and may be broken at any time.
+   */
+  get hasCalculatedHsl(): boolean {
+    return !!this.hueInternal;
+  }
+
   assertColor(): SassColor {
     return this;
   }

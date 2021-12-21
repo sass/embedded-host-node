@@ -7,20 +7,22 @@ import {Observable} from 'rxjs';
 import * as supportsColor from 'supports-color';
 
 import * as proto from './vendor/embedded-protocol/embedded_sass_pb';
+import * as utils from './utils';
 import {AsyncEmbeddedCompiler} from './async-compiler';
 import {CompileResult, Options, StringOptions} from './vendor/sass';
 import {Dispatcher, DispatcherHandlers} from './dispatcher';
+import {Exception} from './exception';
+import {FunctionRegistry} from './function-registry';
 import {MessageTransformer} from './message-transformer';
 import {PacketTransformer} from './packet-transformer';
 import {SyncEmbeddedCompiler} from './sync-compiler';
-import {Exception} from './exception';
 
 export function compile(
   path: string,
   options?: Options<'sync'>
 ): CompileResult {
   // TODO(awjin): Create logger, importer, function registries.
-  return compileRequestSync(newCompilePathRequest(path, options));
+  return compileRequestSync(newCompilePathRequest(path, options), options);
 }
 
 export function compileString(
@@ -28,7 +30,7 @@ export function compileString(
   options?: Options<'sync'>
 ): CompileResult {
   // TODO(awjin): Create logger, importer, function registries.
-  return compileRequestSync(newCompileStringRequest(source, options));
+  return compileRequestSync(newCompileStringRequest(source, options), options);
 }
 
 export function compileAsync(
@@ -36,7 +38,7 @@ export function compileAsync(
   options?: Options<'async'>
 ): Promise<CompileResult> {
   // TODO(awjin): Create logger, importer, function registries.
-  return compileRequestAsync(newCompilePathRequest(path, options));
+  return compileRequestAsync(newCompilePathRequest(path, options), options);
 }
 
 export function compileStringAsync(
@@ -44,7 +46,7 @@ export function compileStringAsync(
   options?: StringOptions<'async'>
 ): Promise<CompileResult> {
   // TODO(awjin): Create logger, importer, function registries.
-  return compileRequestAsync(newCompileStringRequest(source, options));
+  return compileRequestAsync(newCompileStringRequest(source, options), options);
 }
 
 // Creates a request for compiling a file.
@@ -99,6 +101,7 @@ function newCompileRequest(
   options?: Options<'sync' | 'async'>
 ): proto.InboundMessage.CompileRequest {
   const request = new proto.InboundMessage.CompileRequest();
+  request.setGlobalFunctionsList(Object.keys(options?.functions ?? {}));
   request.setSourceMap(!!options?.sourceMap);
   request.setAlertColor(options?.alertColor ?? !!supportsColor.stdout);
   request.setAlertAscii(!!options?.alertAscii);
@@ -131,14 +134,16 @@ function newCompileRequest(
 // resolves with the CompileResult. Throws if there were any protocol or
 // compilation errors. Shuts down the compiler after compilation.
 async function compileRequestAsync(
-  request: proto.InboundMessage.CompileRequest
+  request: proto.InboundMessage.CompileRequest,
+  options?: Options<'async'>
 ): Promise<CompileResult> {
+  const functionRegistry = new FunctionRegistry<'async'>(options?.functions);
   const embeddedCompiler = new AsyncEmbeddedCompiler();
 
   try {
     // TODO(awjin): Pass import and function registries' handler functions to
     // dispatcher.
-    const dispatcher = createDispatcher<'sync'>(
+    const dispatcher = createDispatcher<'async'>(
       embeddedCompiler.stdout$,
       buffer => {
         embeddedCompiler.writeStdin(buffer);
@@ -153,9 +158,7 @@ async function compileRequestAsync(
         handleCanonicalizeRequest: () => {
           throw Error('Canonicalize not yet implemented.');
         },
-        handleFunctionCallRequest: () => {
-          throw Error('Custom functions not yet implemented.');
-        },
+        handleFunctionCallRequest: request => functionRegistry.call(request),
       }
     );
 
@@ -183,8 +186,10 @@ async function compileRequestAsync(
 // resolves with the CompileResult. Throws if there were any protocol or
 // compilation errors. Shuts down the compiler after compilation.
 function compileRequestSync(
-  request: proto.InboundMessage.CompileRequest
+  request: proto.InboundMessage.CompileRequest,
+  options?: Options<'sync'>
 ): CompileResult {
+  const functionRegistry = new FunctionRegistry<'sync'>(options?.functions);
   const embeddedCompiler = new SyncEmbeddedCompiler();
 
   try {
@@ -205,9 +210,7 @@ function compileRequestSync(
         handleCanonicalizeRequest: () => {
           throw Error('Canonicalize not yet implemented.');
         },
-        handleFunctionCallRequest: () => {
-          throw Error('Custom functions not yet implemented.');
-        },
+        handleFunctionCallRequest: request => functionRegistry.call(request),
       }
     );
 
@@ -225,7 +228,7 @@ function compileRequestSync(
 
     for (;;) {
       if (!embeddedCompiler.yield()) {
-        throw new Error('Embedded compiler exited unexpectedly.');
+        throw utils.compilerError('Embedded compiler exited unexpectedly.');
       }
 
       if (error) throw error;
@@ -280,6 +283,6 @@ function handleCompileResponse(
   } else if (response.getFailure()) {
     throw new Exception(response.getFailure()!);
   } else {
-    throw Error('Compiler sent empty CompileResponse.');
+    throw utils.compilerError('Compiler sent empty CompileResponse.');
   }
 }

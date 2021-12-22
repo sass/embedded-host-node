@@ -1,3 +1,7 @@
+## 1.0.0-beta.8
+
+* Support the `SassFunction` value type.
+
 ## 1.0.0-beta.7
 
 * Expose the `Exception` class and ensure that syntax errors match the official

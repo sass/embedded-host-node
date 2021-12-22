@@ -11,6 +11,10 @@ export type PromiseOr<
   sync extends 'sync' | 'async' = 'async'
 > = sync extends 'async' ? T | Promise<T> : T;
 
+/**
+ * The equivalent of `Promise.then()`, except that if the first argument is a
+ * plain value it synchronously invokes `callback()` and returns its result.
+ */
 export function thenOr<T, V, sync extends 'sync' | 'async'>(
   promiseOrValue: PromiseOr<T, sync>,
   callback: (value: T) => PromiseOr<V, sync>
@@ -20,6 +24,10 @@ export function thenOr<T, V, sync extends 'sync' | 'async'>(
     : callback(promiseOrValue as T);
 }
 
+/**
+ * The equivalent of `Promise.catch()`, except that if the first argument throws
+ * synchronously it synchronously invokes `callback()` and returns its result.
+ */
 export function catchOr<T, sync extends 'sync' | 'async'>(
   promiseOrValueCallback: () => PromiseOr<T, sync>,
   callback: (error: unknown) => PromiseOr<T, sync>

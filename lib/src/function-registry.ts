@@ -15,9 +15,19 @@ import {PromiseOr, catchOr, thenOr} from './utils';
 import {Protofier} from './protofier';
 import {Value} from './value';
 
+/**
+ * The next ID to use for a function. The embedded protocol requires that
+ * function IDs be globally unique.
+ */
+let nextFunctionID = 0;
+
+/**
+ * Tracks functions that are defined on the host so that the compiler can
+ * execute them.
+ */
 export class FunctionRegistry<sync extends 'sync' | 'async'> {
   private readonly functionsByName = new Map<string, CustomFunction<sync>>();
-  private readonly functionsById = new Array<CustomFunction<sync>>();
+  private readonly functionsById = new Map<number, CustomFunction<sync>>();
   private readonly idsByFunction = new Map<CustomFunction<sync>, number>();
 
   constructor(functionsBySignature?: Record<string, CustomFunction<sync>>) {
@@ -34,8 +44,9 @@ export class FunctionRegistry<sync extends 'sync' | 'async'> {
   /** Registers `fn` as a function that can be called using the returned ID. */
   register(fn: CustomFunction<sync>): number {
     return utils.putIfAbsent(this.idsByFunction, fn, () => {
-      const id = this.functionsById.length;
-      this.functionsById.push(fn);
+      const id = nextFunctionID;
+      nextFunctionID += 1;
+      this.functionsById.set(id, fn);
       return id;
     });
   }
@@ -46,7 +57,7 @@ export class FunctionRegistry<sync extends 'sync' | 'async'> {
   call(
     request: OutboundMessage.FunctionCallRequest
   ): PromiseOr<InboundMessage.FunctionCallResponse, sync> {
-    const protofier = new Protofier();
+    const protofier = new Protofier(this);
     const fn = this.get(request);
 
     return catchOr(
@@ -99,7 +110,7 @@ export class FunctionRegistry<sync extends 'sync' | 'async'> {
           `named "${request.getName()}"`
       );
     } else {
-      const fn = this.functionsById[request.getFunctionId()];
+      const fn = this.functionsById.get(request.getFunctionId());
       if (fn) return fn;
 
       throw new Error(

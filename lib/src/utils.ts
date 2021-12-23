@@ -6,6 +6,9 @@ import {List} from 'immutable';
 import * as p from 'path';
 import * as url from 'url';
 
+import * as proto from './vendor/embedded-protocol/embedded_sass_pb';
+import {Syntax} from './vendor/sass';
+
 export type PromiseOr<
   T,
   sync extends 'sync' | 'async' = 'async'
@@ -89,6 +92,25 @@ export function pathToUrlString(path: string): string {
 export function withoutExtension(path: string): string {
   const extension = p.extname(path);
   return path.substring(0, path.length - extension.length);
+}
+
+/** Converts a JS syntax string into a protobuf syntax enum. */
+export function protofySyntax(
+  syntax: Syntax
+): proto.SyntaxMap[keyof proto.SyntaxMap] {
+  switch (syntax) {
+    case 'scss':
+      return proto.Syntax.SCSS;
+
+    case 'indented':
+      return proto.Syntax.INDENTED;
+
+    case 'css':
+      return proto.Syntax.CSS;
+
+    default:
+      throw new Error(`Unknown syntax: "${syntax}"`);
+  }
 }
 
 /**

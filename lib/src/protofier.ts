@@ -7,6 +7,7 @@ import {OrderedMap} from 'immutable';
 import * as proto from './vendor/embedded-protocol/embedded_sass_pb';
 import * as utils from './utils';
 import {FunctionRegistry} from './function-registry';
+import {SassArgumentList} from './value/argument-list';
 import {SassColor} from './value/color';
 import {SassFunction} from './value/function';
 import {SassList, ListSeparator} from './value/list';
@@ -24,6 +25,19 @@ import {sassTrue, sassFalse} from './value/boolean';
  * custom function call.
  */
 export class Protofier {
+  /** All the argument lists returned by `deprotofy()`. */
+  private readonly argumentLists: SassArgumentList[] = [];
+
+  /**
+   * Returns IDs of all argument lists passed to `deprotofy()` whose keywords
+   * have been accessed.
+   */
+  get accessedArgumentLists(): number[] {
+    return this.argumentLists
+      .filter(list => list.keywordsAccessed)
+      .map(list => list.id);
+  }
+
   constructor(
     /**
      * The registry of custom functions that can be invoked by the compiler.
@@ -67,6 +81,18 @@ export class Protofier {
         list.addContents(this.protofy(element));
       }
       result.setList(list);
+    } else if (value instanceof SassArgumentList) {
+      const list = new proto.Value.ArgumentList();
+      list.setId(value.id);
+      list.setSeparator(this.protofySeparator(value.separator));
+      for (const element of value.asList) {
+        list.addContents(this.protofy(element));
+      }
+      const keywords = list.getKeywordsMap();
+      for (const [key, mapValue] of value.keywordsInternal) {
+        keywords.set(key, this.protofy(mapValue));
+      }
+      result.setArgumentList(list);
     } else if (value instanceof SassMap) {
       const map = new proto.Value.Map();
       for (const [key, mapValue] of value.contents) {
@@ -179,6 +205,33 @@ export class Protofier {
           contents.map(element => this.deprotofy(element)),
           {separator, brackets: list.getHasBrackets()}
         );
+      }
+
+      case proto.Value.ValueCase.ARGUMENT_LIST: {
+        const list = value.getArgumentList()!;
+        const separator = this.deprotofySeparator(list.getSeparator());
+
+        const contents = list.getContentsList();
+        if (separator === null && contents.length > 1) {
+          throw utils.compilerError(
+            `Value.List ${list} can't have an undecided separator because it ` +
+              `has ${contents.length} elements`
+          );
+        }
+
+        const result = new SassArgumentList(
+          contents.map(element => this.deprotofy(element)),
+          OrderedMap(
+            [...list.getKeywordsMap().entries()].map(([key, value]) => [
+              key,
+              this.deprotofy(value),
+            ])
+          ),
+          separator,
+          list.getId()
+        );
+        this.argumentLists.push(result);
+        return result;
       }
 
       case proto.Value.ValueCase.MAP:

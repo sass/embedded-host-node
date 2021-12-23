@@ -5,6 +5,7 @@
 import * as pkg from '../package.json';
 
 export {ListSeparator, SassList} from './src/value/list';
+export {SassArgumentList} from './src/value/argument-list';
 export {SassBoolean, sassFalse, sassTrue} from './src/value/boolean';
 export {SassColor} from './src/value/color';
 export {SassFunction} from './src/value/function';

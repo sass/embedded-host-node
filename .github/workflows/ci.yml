@@ -30,8 +30,38 @@ jobs:
           repo-token: '${{ github.token }}'
       - uses: dart-lang/setup-dart@v1
         with: {sdk: stable}
+      - run: dart --version
+
+      - name: Read package.json
+        id: pkg
+        run: |
+          echo ::set-output "name=protocol-version::$(jq -r '.["protocol-version"]' package.json)"
+          echo ::set-output "name=compiler-version::$(jq -r '.["compiler-version"]' package.json)"
+
+      - name: Check out the embedded protocol
+        uses: sass/clone-linked-repo@v1
+        with:
+          repo: sass/embedded-protocol
+          default-ref: ${{ steps.pkg.outputs.protocol-version }}
+
+      - name: Check out the embedded compiler
+        uses: sass/clone-linked-repo@v1
+        with:
+          repo: sass/dart-sass-embedded
+          default-ref: ${{ steps.pkg.outputs.compiler-version }}
+
+      - name: Check out the JS API definition
+        uses: sass/clone-linked-repo@v1
+        with: {repo: sass/sass, path: language}
+
       - run: npm install
-      - run: npm run init
+      - name: npm run init
+        run: |
+          npm run init -- \
+            --protocol-path=embedded-protocol \
+            --compiler-path=dart-sass-embedded \
+            --api-path=language
+
       - run: npm run check
 
   tests:
@@ -57,8 +87,37 @@ jobs:
       - uses: dart-lang/setup-dart@v1
         with: {sdk: stable}
       - run: dart --version
+
+      - name: Read package.json
+        id: pkg
+        run: |
+          echo ::set-output "name=protocol-version::$(jq -r '.["protocol-version"]' package.json)"
+          echo ::set-output "name=compiler-version::$(jq -r '.["compiler-version"]' package.json)"
+
+      - name: Check out the embedded protocol
+        uses: sass/clone-linked-repo@v1
+        with:
+          repo: sass/embedded-protocol
+          default-ref: ${{ steps.pkg.outputs.protocol-version }}
+
+      - name: Check out the embedded compiler
+        uses: sass/clone-linked-repo@v1
+        with:
+          repo: sass/dart-sass-embedded
+          default-ref: ${{ steps.pkg.outputs.compiler-version }}
+
+      - name: Check out the JS API definition
+        uses: sass/clone-linked-repo@v1
+        with: {repo: sass/sass, path: language}
+
       - run: npm install
-      - run: npm run init
+      - name: npm run init
+        run: |
+          npm run init -- \
+            --protocol-path=embedded-protocol \
+            --compiler-path=dart-sass-embedded \
+            --api-path=language
+
       - run: npm run test
 
   # The versions should be kept up-to-date with the latest LTS Node releases.
@@ -90,7 +149,36 @@ jobs:
         with:
           version: ${{ env.PROTOC_VERSION }}
           repo-token: '${{ github.token }}'
+
+      - name: Read package.json
+        id: pkg
+        run: |
+          echo ::set-output "name=protocol-version::$(jq -r '.["protocol-version"]' package.json)"
+          echo ::set-output "name=compiler-version::$(jq -r '.["compiler-version"]' package.json)"
+
+      - name: Check out the embedded protocol
+        uses: sass/clone-linked-repo@v1
+        with:
+          repo: sass/embedded-protocol
+          default-ref: ${{ steps.pkg.outputs.protocol-version }}
+
+      - name: Check out the embedded compiler
+        uses: sass/clone-linked-repo@v1
+        with:
+          repo: sass/dart-sass-embedded
+          default-ref: ${{ steps.pkg.outputs.compiler-version }}
+
+      - name: Check out the JS API definition
+        uses: sass/clone-linked-repo@v1
+        with: {repo: sass/sass, path: language}
+
       - run: npm install
+      - name: npm run init
+        run: |
+          npm run init -- \
+            --protocol-path=embedded-protocol \
+            --compiler-path=dart-sass-embedded \
+            --api-path=language
 
       - name: Check out sass-spec
         uses: sass/clone-linked-repo@v1
@@ -102,17 +190,8 @@ jobs:
 
       - name: Compile
         run: |
-          npm run init
           npm run compile
           ln -s {`pwd`/,dist/}lib/src/vendor/dart-sass-embedded
-          # Prefer the Sass specification to the natively-generated .d.ts files.
-          # This ensures that features the embedded host doesn't yet support
-          # don't cause compile-time failures.
-          find dist -name '*.d.ts' -exec rm {} \;
-
-      - name: Check out Sass specification
-        uses: sass/clone-linked-repo@v1
-        with: {repo: sass/sass, path: language}
 
       - name: Run tests
         run: npm run js-api-spec -- --sassPackage .. --sassSassRepo ../language

@@ -78,8 +78,9 @@ export async function getEmbeddedProtocol(
 ): Promise<void> {
   const repo = 'embedded-protocol';
 
-  if (!options || 'version' in options) {
-    const version = options?.version ?? pkg['protocol-version'];
+  options ??= defaultVersionOption('protocol-version');
+  if ('version' in options) {
+    const version = options?.version;
     await downloadRelease({
       repo,
       assetUrl: `https://github.com/sass/${repo}/archive/${version}${ARCHIVE_EXTENSION}`,
@@ -127,8 +128,9 @@ export async function getDartSassEmbedded(
 ): Promise<void> {
   const repo = 'dart-sass-embedded';
 
-  if (!options || 'version' in options) {
-    const version = options?.version ?? pkg['compiler-version'];
+  options ??= defaultVersionOption('compiler-version');
+  if ('version' in options) {
+    const version = options?.version;
     await downloadRelease({
       repo,
       assetUrl:
@@ -281,6 +283,15 @@ function buildDartSassEmbedded(repoPath: string): void {
     cwd: repoPath,
     silent: true,
   });
+}
+
+// Given the name of a field in `package.json`, returns the default version
+// option described by that field.
+function defaultVersionOption(
+  pkgField: keyof typeof pkg
+): {version: string} | {ref: string} {
+  const version = pkg[pkgField] as string;
+  return version.endsWith('-dev') ? {ref: 'main'} : {version};
 }
 
 // Links or copies the contents of `source` into `destination`.

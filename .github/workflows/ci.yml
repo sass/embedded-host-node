@@ -210,6 +210,12 @@ jobs:
           check-latest: true
           registry-url: 'https://registry.npmjs.org'
       - run: npm install
+
+      - name: "Check we're not using a -dev version of the embedded protocol"
+        run: jq -r '.["protocol-version"]' package.json | grep -qv -- '-dev$'
+      - name: "Check we're not using a -dev version of the embedded compiler"
+        run: jq -r '.["compiler-version"]' package.json | grep -qv -- '-dev$'
+
       - run: npm publish
         env:
           NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}'

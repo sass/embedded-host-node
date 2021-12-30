@@ -6,7 +6,9 @@ import {OrderedMap} from 'immutable';
 
 import * as proto from './vendor/embedded-protocol/embedded_sass_pb';
 import * as utils from './utils';
+import {FunctionRegistry} from './function-registry';
 import {SassColor} from './value/color';
+import {SassFunction} from './value/function';
 import {SassList, ListSeparator} from './value/list';
 import {SassMap} from './value/map';
 import {SassNumber} from './value/number';
@@ -22,6 +24,15 @@ import {sassTrue, sassFalse} from './value/boolean';
  * custom function call.
  */
 export class Protofier {
+  constructor(
+    /**
+     * The registry of custom functions that can be invoked by the compiler.
+     * This is used to register first-class functions so that the compiler may
+     * invoke them.
+     */
+    private readonly functions: FunctionRegistry<'sync' | 'async'>
+  ) {}
+
   /** Converts `value` to its protocol buffer representation. */
   protofy(value: Value): proto.Value {
     const result = new proto.Value();
@@ -65,6 +76,17 @@ export class Protofier {
         map.addEntries(entry);
       }
       result.setMap(map);
+    } else if (value instanceof SassFunction) {
+      if (value.id !== undefined) {
+        const fn = new proto.Value.CompilerFunction();
+        fn.setId(value.id);
+        result.setCompilerFunction(fn);
+      } else {
+        const fn = new proto.Value.HostFunction();
+        fn.setId(this.functions.register(value.callback!));
+        fn.setSignature(value.signature!);
+        result.setHostFunction(fn);
+      }
     } else if (value === sassTrue) {
       result.setSingleton(proto.SingletonValue.TRUE);
     } else if (value === sassFalse) {
@@ -174,6 +196,14 @@ export class Protofier {
                 return [this.deprotofy(key), this.deprotofy(value)];
               })
           )
+        );
+
+      case proto.Value.ValueCase.COMPILER_FUNCTION:
+        return new SassFunction(value.getCompilerFunction()!.getId());
+
+      case proto.Value.ValueCase.HOST_FUNCTION:
+        throw utils.compilerError(
+          'The compiler may not send Value.host_function.'
         );
 
       case proto.Value.ValueCase.SINGLETON:

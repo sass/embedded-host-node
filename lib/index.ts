@@ -25,3 +25,7 @@ export {
 export {render} from './src/legacy';
 
 export const info = `sass-embedded\t${pkg.version}`;
+
+export const Logger = {
+  silent: {warn() {}, debug() {}},
+};

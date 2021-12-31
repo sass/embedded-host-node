@@ -2,7 +2,6 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-import * as p from 'path';
 import {Observable} from 'rxjs';
 import * as supportsColor from 'supports-color';
 
@@ -13,6 +12,7 @@ import {CompileResult, Options, StringOptions} from './vendor/sass';
 import {Dispatcher, DispatcherHandlers} from './dispatcher';
 import {Exception} from './exception';
 import {FunctionRegistry} from './function-registry';
+import {ImporterRegistry} from './importer-registry';
 import {MessageTransformer} from './message-transformer';
 import {PacketTransformer} from './packet-transformer';
 import {SyncEmbeddedCompiler} from './sync-compiler';
@@ -21,42 +21,57 @@ export function compile(
   path: string,
   options?: Options<'sync'>
 ): CompileResult {
-  // TODO(awjin): Create logger, importer, function registries.
-  return compileRequestSync(newCompilePathRequest(path, options), options);
+  const importers = new ImporterRegistry(options);
+  return compileRequestSync(
+    newCompilePathRequest(path, importers, options),
+    importers,
+    options
+  );
 }
 
 export function compileString(
   source: string,
   options?: Options<'sync'>
 ): CompileResult {
-  // TODO(awjin): Create logger, importer, function registries.
-  return compileRequestSync(newCompileStringRequest(source, options), options);
+  const importers = new ImporterRegistry(options);
+  return compileRequestSync(
+    newCompileStringRequest(source, importers, options),
+    importers,
+    options
+  );
 }
 
 export function compileAsync(
   path: string,
   options?: Options<'async'>
 ): Promise<CompileResult> {
-  // TODO(awjin): Create logger, importer, function registries.
-  return compileRequestAsync(newCompilePathRequest(path, options), options);
+  const importers = new ImporterRegistry(options);
+  return compileRequestAsync(
+    newCompilePathRequest(path, importers, options),
+    importers,
+    options
+  );
 }
 
 export function compileStringAsync(
   source: string,
   options?: StringOptions<'async'>
 ): Promise<CompileResult> {
-  // TODO(awjin): Create logger, importer, function registries.
-  return compileRequestAsync(newCompileStringRequest(source, options), options);
+  const importers = new ImporterRegistry(options);
+  return compileRequestAsync(
+    newCompileStringRequest(source, importers, options),
+    importers,
+    options
+  );
 }
 
 // Creates a request for compiling a file.
 function newCompilePathRequest(
   path: string,
+  importers: ImporterRegistry<'sync' | 'async'>,
   options?: Options<'sync' | 'async'>
 ): proto.InboundMessage.CompileRequest {
-  // TODO(awjin): Populate request with importer/function IDs.
-
-  const request = newCompileRequest(options);
+  const request = newCompileRequest(importers, options);
   request.setPath(path);
   return request;
 }
@@ -64,33 +79,20 @@ function newCompilePathRequest(
 // Creates a request for compiling a string.
 function newCompileStringRequest(
   source: string,
+  importers: ImporterRegistry<'sync' | 'async'>,
   options?: StringOptions<'sync' | 'async'>
 ): proto.InboundMessage.CompileRequest {
-  // TODO(awjin): Populate request with importer/function IDs.
-
   const input = new proto.InboundMessage.CompileRequest.StringInput();
   input.setSource(source);
-
-  switch (options?.syntax ?? 'scss') {
-    case 'scss':
-      input.setSyntax(proto.Syntax.SCSS);
-      break;
-
-    case 'indented':
-      input.setSyntax(proto.Syntax.INDENTED);
-      break;
-
-    case 'css':
-      input.setSyntax(proto.Syntax.CSS);
-      break;
-
-    default:
-      throw new Error(`Unknown options.syntax: "${options?.syntax}"`);
-  }
+  input.setSyntax(utils.protofySyntax(options?.syntax ?? 'scss'));
 
   if (options?.url) input.setUrl(options.url.toString());
 
-  const request = newCompileRequest(options);
+  if (options && 'importer' in options) {
+    input.setImporter(importers.register(options.importer));
+  }
+
+  const request = newCompileRequest(importers, options);
   request.setString(input);
   return request;
 }
@@ -98,9 +100,11 @@ function newCompileStringRequest(
 // Creates a compilation request for the given `options` without adding any
 // input-specific options.
 function newCompileRequest(
+  importers: ImporterRegistry<'sync' | 'async'>,
   options?: Options<'sync' | 'async'>
 ): proto.InboundMessage.CompileRequest {
   const request = new proto.InboundMessage.CompileRequest();
+  request.setImportersList(importers.importers);
   request.setGlobalFunctionsList(Object.keys(options?.functions ?? {}));
   request.setSourceMap(!!options?.sourceMap);
   request.setAlertColor(options?.alertColor ?? !!supportsColor.stdout);
@@ -121,12 +125,6 @@ function newCompileRequest(
       throw new Error(`Unknown options.style: "${options?.style}"`);
   }
 
-  for (const path of options?.loadPaths ?? []) {
-    const importer = new proto.InboundMessage.CompileRequest.Importer();
-    importer.setPath(p.resolve(path));
-    request.addImporters(importer);
-  }
-
   return request;
 }
 
@@ -135,30 +133,23 @@ function newCompileRequest(
 // compilation errors. Shuts down the compiler after compilation.
 async function compileRequestAsync(
   request: proto.InboundMessage.CompileRequest,
+  importers: ImporterRegistry<'async'>,
   options?: Options<'async'>
 ): Promise<CompileResult> {
-  const functionRegistry = new FunctionRegistry<'async'>(options?.functions);
+  const functions = new FunctionRegistry(options?.functions);
   const embeddedCompiler = new AsyncEmbeddedCompiler();
 
   try {
-    // TODO(awjin): Pass import and function registries' handler functions to
-    // dispatcher.
     const dispatcher = createDispatcher<'async'>(
       embeddedCompiler.stdout$,
       buffer => {
         embeddedCompiler.writeStdin(buffer);
       },
       {
-        handleImportRequest: () => {
-          throw Error('Custom importers not yet implemented.');
-        },
-        handleFileImportRequest: () => {
-          throw Error('Custom file importers not yet implemented.');
-        },
-        handleCanonicalizeRequest: () => {
-          throw Error('Canonicalize not yet implemented.');
-        },
-        handleFunctionCallRequest: request => functionRegistry.call(request),
+        handleImportRequest: request => importers.import(request),
+        handleFileImportRequest: request => importers.fileImport(request),
+        handleCanonicalizeRequest: request => importers.canonicalize(request),
+        handleFunctionCallRequest: request => functions.call(request),
       }
     );
 
@@ -187,30 +178,23 @@ async function compileRequestAsync(
 // compilation errors. Shuts down the compiler after compilation.
 function compileRequestSync(
   request: proto.InboundMessage.CompileRequest,
+  importers: ImporterRegistry<'sync'>,
   options?: Options<'sync'>
 ): CompileResult {
-  const functionRegistry = new FunctionRegistry<'sync'>(options?.functions);
+  const functions = new FunctionRegistry(options?.functions);
   const embeddedCompiler = new SyncEmbeddedCompiler();
 
   try {
-    // TODO(awjin): Pass import and function registries' handler functions to
-    // dispatcher.
     const dispatcher = createDispatcher<'sync'>(
       embeddedCompiler.stdout$,
       buffer => {
         embeddedCompiler.writeStdin(buffer);
       },
       {
-        handleImportRequest: () => {
-          throw Error('Custom importers not yet implemented.');
-        },
-        handleFileImportRequest: () => {
-          throw Error('Custom file importers not yet implemented.');
-        },
-        handleCanonicalizeRequest: () => {
-          throw Error('Canonicalize not yet implemented.');
-        },
-        handleFunctionCallRequest: request => functionRegistry.call(request),
+        handleImportRequest: request => importers.import(request),
+        handleFileImportRequest: request => importers.fileImport(request),
+        handleCanonicalizeRequest: request => importers.canonicalize(request),
+        handleFunctionCallRequest: request => functions.call(request),
       }
     );
 

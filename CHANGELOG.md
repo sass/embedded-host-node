@@ -1,5 +1,7 @@
 ## 1.0.0-beta.8
 
+* Support custom importers for the new JS API.
+
 * Support the `SassArgumentList` value type.
 
 * Support the `SassFunction` value type.

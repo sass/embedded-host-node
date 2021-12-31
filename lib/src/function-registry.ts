@@ -82,6 +82,9 @@ export class FunctionRegistry<sync extends 'sync' | 'async'> {
 
             const response = new InboundMessage.FunctionCallResponse();
             response.setSuccess(protofier.protofy(result));
+            response.setAccessedArgumentListsList(
+              protofier.accessedArgumentLists
+            );
             return response;
           }
         );

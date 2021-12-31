@@ -32,23 +32,13 @@ jobs:
         with: {sdk: stable}
       - run: dart --version
 
-      - name: Read package.json
-        id: pkg
-        run: |
-          echo ::set-output "name=protocol-version::$(jq -r '.["protocol-version"]' package.json)"
-          echo ::set-output "name=compiler-version::$(jq -r '.["compiler-version"]' package.json)"
-
       - name: Check out the embedded protocol
         uses: sass/clone-linked-repo@v1
-        with:
-          repo: sass/embedded-protocol
-          default-ref: ${{ steps.pkg.outputs.protocol-version }}
+        with: {repo: sass/embedded-protocol, default-ref: null}
 
       - name: Check out the embedded compiler
         uses: sass/clone-linked-repo@v1
-        with:
-          repo: sass/dart-sass-embedded
-          default-ref: ${{ steps.pkg.outputs.compiler-version }}
+        with: {repo: sass/embedded-protocol, default-ref: null}
 
       - name: Check out the JS API definition
         uses: sass/clone-linked-repo@v1
@@ -57,10 +47,9 @@ jobs:
       - run: npm install
       - name: npm run init
         run: |
-          npm run init -- \
-            --protocol-path=embedded-protocol \
-            --compiler-path=dart-sass-embedded \
-            --api-path=language
+          if [[ -d embedded-protocol ]]; then args=--protocol-path=embedded-protocol; fi
+          if [[ -d dart-sass-embedded ]]; then args=$args --compiler-path=dart-sass-embedded; fi
+          npm run init -- --api-path=language $args
 
       - run: npm run check
 
@@ -88,23 +77,13 @@ jobs:
         with: {sdk: stable}
       - run: dart --version
 
-      - name: Read package.json
-        id: pkg
-        run: |
-          echo ::set-output "name=protocol-version::$(jq -r '.["protocol-version"]' package.json)"
-          echo ::set-output "name=compiler-version::$(jq -r '.["compiler-version"]' package.json)"
-
       - name: Check out the embedded protocol
         uses: sass/clone-linked-repo@v1
-        with:
-          repo: sass/embedded-protocol
-          default-ref: ${{ steps.pkg.outputs.protocol-version }}
+        with: {repo: sass/embedded-protocol, default-ref: null}
 
       - name: Check out the embedded compiler
         uses: sass/clone-linked-repo@v1
-        with:
-          repo: sass/dart-sass-embedded
-          default-ref: ${{ steps.pkg.outputs.compiler-version }}
+        with: {repo: sass/embedded-protocol, default-ref: null}
 
       - name: Check out the JS API definition
         uses: sass/clone-linked-repo@v1
@@ -113,10 +92,9 @@ jobs:
       - run: npm install
       - name: npm run init
         run: |
-          npm run init -- \
-            --protocol-path=embedded-protocol \
-            --compiler-path=dart-sass-embedded \
-            --api-path=language
+          if [[ -d embedded-protocol ]]; then args=--protocol-path=embedded-protocol; fi
+          if [[ -d dart-sass-embedded ]]; then args=$args --compiler-path=dart-sass-embedded; fi
+          npm run init -- --api-path=language $args
 
       - run: npm run test
 
@@ -150,23 +128,13 @@ jobs:
           version: ${{ env.PROTOC_VERSION }}
           repo-token: '${{ github.token }}'
 
-      - name: Read package.json
-        id: pkg
-        run: |
-          echo ::set-output "name=protocol-version::$(jq -r '.["protocol-version"]' package.json)"
-          echo ::set-output "name=compiler-version::$(jq -r '.["compiler-version"]' package.json)"
-
       - name: Check out the embedded protocol
         uses: sass/clone-linked-repo@v1
-        with:
-          repo: sass/embedded-protocol
-          default-ref: ${{ steps.pkg.outputs.protocol-version }}
+        with: {repo: sass/embedded-protocol, default-ref: null}
 
       - name: Check out the embedded compiler
         uses: sass/clone-linked-repo@v1
-        with:
-          repo: sass/dart-sass-embedded
-          default-ref: ${{ steps.pkg.outputs.compiler-version }}
+        with: {repo: sass/embedded-protocol, default-ref: null}
 
       - name: Check out the JS API definition
         uses: sass/clone-linked-repo@v1
@@ -175,10 +143,9 @@ jobs:
       - run: npm install
       - name: npm run init
         run: |
-          npm run init -- \
-            --protocol-path=embedded-protocol \
-            --compiler-path=dart-sass-embedded \
-            --api-path=language
+          if [[ -d embedded-protocol ]]; then args=--protocol-path=embedded-protocol; fi
+          if [[ -d dart-sass-embedded ]]; then args=$args --compiler-path=dart-sass-embedded; fi
+          npm run init -- --api-path=language $args
 
       - name: Check out sass-spec
         uses: sass/clone-linked-repo@v1
@@ -201,6 +168,7 @@ jobs:
     name: Deploy npm
     runs-on: ubuntu-latest
     if: "startsWith(github.ref, 'refs/tags/') && github.repository == 'sass/embedded-host-node'"
+    needs: [static_analysis, tests, sass_spec]
 
     steps:
       - uses: actions/checkout@v2

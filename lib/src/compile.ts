@@ -8,7 +8,7 @@ import * as supportsColor from 'supports-color';
 import * as proto from './vendor/embedded-protocol/embedded_sass_pb';
 import * as utils from './utils';
 import {AsyncEmbeddedCompiler} from './async-compiler';
-import {CompileResult, Options, StringOptions} from './vendor/sass';
+import {CompileResult, Options, SourceSpan, StringOptions} from './vendor/sass';
 import {Dispatcher, DispatcherHandlers} from './dispatcher';
 import {Exception} from './exception';
 import {FunctionRegistry} from './function-registry';
@@ -16,6 +16,7 @@ import {ImporterRegistry} from './importer-registry';
 import {MessageTransformer} from './message-transformer';
 import {PacketTransformer} from './packet-transformer';
 import {SyncEmbeddedCompiler} from './sync-compiler';
+import {deprotofySourceSpan} from './deprotofy-span';
 
 export function compile(
   path: string,
@@ -153,7 +154,7 @@ async function compileRequestAsync(
       }
     );
 
-    // TODO(awjin): Subscribe logger to dispatcher's log events.
+    dispatcher.logEvents$.subscribe(event => handleLogEvent(options, event));
 
     return handleCompileResponse(
       await new Promise<proto.OutboundMessage.CompileResponse>(
@@ -198,7 +199,7 @@ function compileRequestSync(
       }
     );
 
-    // TODO(awjin): Subscribe logger to dispatcher's log events.
+    dispatcher.logEvents$.subscribe(event => handleLogEvent(options, event));
 
     let error: unknown;
     let response: proto.OutboundMessage.CompileResponse | undefined;
@@ -244,6 +245,40 @@ function createDispatcher<sync extends 'sync' | 'async'>(
     message => messageTransformer.writeInboundMessage(message),
     handlers
   );
+}
+
+/** Handles a log event according to `options`. */
+function handleLogEvent(
+  options: Options<'sync' | 'async'> | undefined,
+  event: proto.OutboundMessage.LogEvent
+): void {
+  if (event.getType() === proto.LogEventType.DEBUG) {
+    if (options?.logger?.debug) {
+      options.logger.debug(event.getMessage(), {
+        span: deprotofySourceSpan(event.getSpan()!),
+      });
+    } else {
+      console.error(event.getFormatted());
+    }
+  } else {
+    if (options?.logger?.warn) {
+      const params: {deprecation: boolean; span?: SourceSpan; stack?: string} =
+        {
+          deprecation:
+            event.getType() === proto.LogEventType.DEPRECATION_WARNING,
+        };
+
+      const spanProto = event.getSpan();
+      if (spanProto) params.span = deprotofySourceSpan(spanProto);
+
+      const stack = event.getStackTrace();
+      if (stack) params.stack = stack;
+
+      options.logger.warn(event.getMessage(), params);
+    } else {
+      console.error(event.getFormatted());
+    }
+  }
 }
 
 /**

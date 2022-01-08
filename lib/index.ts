@@ -22,7 +22,7 @@ export {
   compileAsync,
   compileStringAsync,
 } from './src/compile';
-export {render} from './src/legacy';
+export {render, renderSync} from './src/legacy';
 
 export const info = `sass-embedded\t${pkg.version}`;
 

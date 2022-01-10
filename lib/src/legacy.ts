@@ -2,49 +2,91 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
+import * as fs from 'fs';
 import * as p from 'path';
 import {URL, fileURLToPath, pathToFileURL} from 'url';
 
 import {Exception} from './exception';
-import {compileAsync, compileStringAsync} from './compile';
+import {
+  compile,
+  compileAsync,
+  compileString,
+  compileStringAsync,
+} from './compile';
 import {isNullOrUndefined, pathToUrlString, withoutExtension} from './utils';
 import {
   CompileResult,
   LegacyException,
   LegacyOptions,
   LegacyResult,
+  LegacySharedOptions,
   LegacyStringOptions,
+  Options,
+  StringOptions,
 } from './vendor/sass';
 
 export function render(
   options: LegacyOptions<'async'>,
   callback: (error?: LegacyException, result?: LegacyResult) => void
 ): void {
-  if (!('file' in options && options.file) && !('data' in options)) {
-    callback(
-      newLegacyException(
-        new Error('Either options.data or options.file must be set.')
-      )
+  try {
+    options = adjustOptions(options);
+
+    const start = Date.now();
+    const compileSass = isStringOptions(options)
+      ? compileStringAsync(options.data, convertStringOptions(options))
+      : compileAsync(options.file, convertOptions(options));
+
+    compileSass.then(
+      result => callback(undefined, newLegacyResult(options, start, result)),
+      error => callback(newLegacyException(error))
     );
-    return;
+  } catch (error) {
+    if (error instanceof Error) callback(newLegacyException(error));
+    throw error;
+  }
+}
+
+export function renderSync(options: LegacyOptions<'sync'>): LegacyResult {
+  const start = Date.now();
+  try {
+    options = adjustOptions(options);
+    const result = isStringOptions(options)
+      ? compileString(options.data, convertStringOptions(options))
+      : compile(options.file, convertOptions(options));
+    return newLegacyResult(options, start, result);
+  } catch (error: unknown) {
+    throw newLegacyException(error as Error);
+  }
+}
+
+// Does some initial adjustments of `options` to make it easier to convert pass
+// to the new API.
+function adjustOptions<sync extends 'sync' | 'async'>(
+  options: LegacyOptions<sync>
+): LegacyOptions<sync> {
+  if (!('file' in options && options.file) && !('data' in options)) {
+    throw new Error('Either options.data or options.file must be set.');
   }
 
-  const start = Date.now();
-  const compileSass = isStringOptions(options)
-    ? compileStringAsync(options.data, {
-        sourceMap: wasSourceMapRequested(options),
-        url: options.file ? pathToFileURL(options.file) : undefined,
-        syntax: options.indentedSyntax ? 'indented' : 'scss',
-      })
-    : compileAsync(options.file, {
-        sourceMap: wasSourceMapRequested(options),
-        loadPaths: options.includePaths,
-      });
-
-  compileSass.then(
-    result => callback(undefined, newLegacyResult(options, start, result)),
-    error => callback(newLegacyException(error))
-  );
+  // The `indentedSyntax` option takes precedence over the file extension in the
+  // legacy API, but the new API doesn't have a `syntax` option for a file path.
+  // Instead, we eagerly load the entrypoint into memory and treat it like a
+  // string source.
+  if (
+    !isStringOptions(options) &&
+    (options as unknown as LegacyStringOptions<sync>).indentedSyntax !==
+      undefined
+  ) {
+    return {
+      ...options,
+      data: fs.readFileSync(options.file, 'utf8'),
+      indentedSyntax: (options as unknown as LegacyStringOptions<sync>)
+        .indentedSyntax,
+    };
+  } else {
+    return options;
+  }
 }
 
 // Returns whether `options` is a `LegacyStringOptions`.
@@ -54,9 +96,42 @@ function isStringOptions<sync extends 'sync' | 'async'>(
   return 'data' in options;
 }
 
+// Converts `LegacySharedOptions` into new API `Options`.
+function convertOptions<sync extends 'sync' | 'async'>(
+  options: LegacySharedOptions<sync>
+): Options<sync> {
+  if (
+    'outputStyle' in options &&
+    options.outputStyle !== 'compressed' &&
+    options.outputStyle !== 'expanded'
+  ) {
+    throw new Error(`Unknown output style: "${options.outputStyle}"`);
+  }
+
+  return {
+    sourceMap: wasSourceMapRequested(options),
+    loadPaths: options.includePaths,
+    style: options.outputStyle as 'compressed' | 'expanded' | undefined,
+    quietDeps: options.quietDeps,
+    verbose: options.verbose,
+    logger: options.logger,
+  };
+}
+
+// Converts `LegacyStringOptions` into new API `StringOptions`.
+function convertStringOptions<sync extends 'sync' | 'async'>(
+  options: LegacyStringOptions<sync>
+): StringOptions<sync> {
+  return {
+    ...convertOptions(options),
+    url: options.file ? pathToFileURL(options.file) : undefined,
+    syntax: options.indentedSyntax ? 'indented' : 'scss',
+  };
+}
+
 // Determines whether a sourceMap was requested by the call to `render()`.
 function wasSourceMapRequested(
-  options: LegacyOptions<'sync' | 'async'>
+  options: LegacySharedOptions<'sync' | 'async'>
 ): boolean {
   return (
     typeof options.sourceMap === 'string' ||
@@ -90,9 +165,7 @@ function newLegacyResult(
         p.relative(sourceMapDir, options.outFile)
       );
     } else if (options.file) {
-      sourceMap.file = pathToUrlString(
-        p.relative(sourceMapDir, withoutExtension(options.file) + '.css')
-      );
+      sourceMap.file = pathToUrlString(withoutExtension(options.file) + '.css');
     } else {
       sourceMap.file = 'stdin.css';
     }
@@ -134,14 +207,16 @@ function newLegacyResult(
       start,
       end,
       duration: end - start,
-      includedFiles: result.loadedUrls.map(url => url.toString()),
+      includedFiles: result.loadedUrls.map(url =>
+        url.protocol === 'file:' ? fileURLToPath(url as URL) : url.toString()
+      ),
     },
   };
 }
 
 // Decorates an Error with additional fields so that it behaves like a Node Sass
 // error.
-function newLegacyException(error: Error | Exception): LegacyException {
+function newLegacyException(error: Error): LegacyException {
   if (!(error instanceof Exception)) {
     return Object.assign(error, {
       formatted: error.toString(),

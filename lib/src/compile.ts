@@ -32,7 +32,7 @@ export function compile(
 
 export function compileString(
   source: string,
-  options?: Options<'sync'>
+  options?: StringOptions<'sync'>
 ): CompileResult {
   const importers = new ImporterRegistry(options);
   return compileRequestSync(

@@ -3,10 +3,12 @@
 // https://opensource.org/licenses/MIT.
 
 import * as pkg from '../package.json';
+import {sassFalse, sassTrue} from './src/value/boolean';
+import {sassNull} from './src/value/null';
 
 export {ListSeparator, SassList} from './src/value/list';
 export {SassArgumentList} from './src/value/argument-list';
-export {SassBoolean, sassFalse, sassTrue} from './src/value/boolean';
+export {sassFalse, sassTrue} from './src/value/boolean';
 export {SassColor} from './src/value/color';
 export {SassFunction} from './src/value/function';
 export {SassMap} from './src/value/map';
@@ -15,6 +17,7 @@ export {SassString} from './src/value/string';
 export {Value} from './src/value';
 export {sassNull} from './src/value/null';
 
+export * as types from './src/legacy/value';
 export {Exception} from './src/exception';
 export {
   compile,
@@ -29,3 +32,9 @@ export const info = `sass-embedded\t${pkg.version}`;
 export const Logger = {
   silent: {warn() {}, debug() {}},
 };
+
+// Legacy JS API
+
+export const TRUE = sassTrue;
+export const FALSE = sassFalse;
+export const NULL = sassNull;

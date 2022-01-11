@@ -6,24 +6,32 @@ import * as fs from 'fs';
 import * as p from 'path';
 import {URL, fileURLToPath, pathToFileURL} from 'url';
 
-import {Exception} from './exception';
+import {Exception} from '../exception';
 import {
   compile,
   compileAsync,
   compileString,
   compileStringAsync,
-} from './compile';
-import {isNullOrUndefined, pathToUrlString, withoutExtension} from './utils';
+} from '../compile';
+import {
+  isNullOrUndefined,
+  pathToUrlString,
+  withoutExtension,
+  SyncBoolean,
+} from '../utils';
 import {
   CompileResult,
+  CustomFunction,
   LegacyException,
   LegacyOptions,
+  LegacyPluginThis,
   LegacyResult,
   LegacySharedOptions,
   LegacyStringOptions,
   Options,
   StringOptions,
-} from './vendor/sass';
+} from '../vendor/sass';
+import {wrapFunction} from './value/wrap';
 
 export function render(
   options: LegacyOptions<'async'>,
@@ -34,8 +42,8 @@ export function render(
 
     const start = Date.now();
     const compileSass = isStringOptions(options)
-      ? compileStringAsync(options.data, convertStringOptions(options))
-      : compileAsync(options.file, convertOptions(options));
+      ? compileStringAsync(options.data, convertStringOptions(options, false))
+      : compileAsync(options.file, convertOptions(options, false));
 
     compileSass.then(
       result => callback(undefined, newLegacyResult(options, start, result)),
@@ -52,8 +60,8 @@ export function renderSync(options: LegacyOptions<'sync'>): LegacyResult {
   try {
     options = adjustOptions(options);
     const result = isStringOptions(options)
-      ? compileString(options.data, convertStringOptions(options))
-      : compile(options.file, convertOptions(options));
+      ? compileString(options.data, convertStringOptions(options, true))
+      : compile(options.file, convertOptions(options, true));
     return newLegacyResult(options, start, result);
   } catch (error: unknown) {
     throw newLegacyException(error as Error);
@@ -98,7 +106,8 @@ function isStringOptions<sync extends 'sync' | 'async'>(
 
 // Converts `LegacySharedOptions` into new API `Options`.
 function convertOptions<sync extends 'sync' | 'async'>(
-  options: LegacySharedOptions<sync>
+  options: LegacySharedOptions<sync>,
+  sync: SyncBoolean<sync>
 ): Options<sync> {
   if (
     'outputStyle' in options &&
@@ -108,7 +117,14 @@ function convertOptions<sync extends 'sync' | 'async'>(
     throw new Error(`Unknown output style: "${options.outputStyle}"`);
   }
 
+  const functions: Record<string, CustomFunction<sync>> = {};
+  for (const [signature, callback] of Object.entries(options.functions ?? {})) {
+    // TODO(nweiz): Provide a real context parameter.
+    functions[signature] = wrapFunction({} as LegacyPluginThis, callback, sync);
+  }
+
   return {
+    functions,
     sourceMap: wasSourceMapRequested(options),
     loadPaths: options.includePaths,
     style: options.outputStyle as 'compressed' | 'expanded' | undefined,
@@ -120,10 +136,11 @@ function convertOptions<sync extends 'sync' | 'async'>(
 
 // Converts `LegacyStringOptions` into new API `StringOptions`.
 function convertStringOptions<sync extends 'sync' | 'async'>(
-  options: LegacyStringOptions<sync>
+  options: LegacyStringOptions<sync>,
+  sync: SyncBoolean<sync>
 ): StringOptions<sync> {
   return {
-    ...convertOptions(options),
+    ...convertOptions(options, sync),
     url: options.file ? pathToFileURL(options.file) : undefined,
     syntax: options.indentedSyntax ? 'indented' : 'scss',
   };

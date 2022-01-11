@@ -14,6 +14,12 @@ export type PromiseOr<
   sync extends 'sync' | 'async' = 'async'
 > = sync extends 'async' ? T | Promise<T> : T;
 
+// A boolean type that's `true` if `sync` requires synchronous APIs only and
+// `false` if it allows asynchronous APIs.
+export type SyncBoolean<sync extends 'sync' | 'async'> = sync extends 'async'
+  ? false
+  : true;
+
 /**
  * The equivalent of `Promise.then()`, except that if the first argument is a
  * plain value it synchronously invokes `callback()` and returns its result.

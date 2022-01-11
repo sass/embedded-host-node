@@ -1,3 +1,9 @@
+## 1.0.0-beta.9
+
+* Add basic support for the legacy `render()` and `renderSync()` functions.
+
+* Add support for the legacy `sass.types.Boolean` and `sass.types.Null` classes.
+
 ## 1.0.0-beta.8
 
 * Fully support the new JS API:

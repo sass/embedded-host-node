@@ -230,7 +230,7 @@ function fetchRepo(options: {
     shell.exec(
       `git clone \
       --depth=1 \
-      git://github.com/sass/${options.repo} \
+      https://github.com/sass/${options.repo} \
       ${p.join(options.outPath, options.repo)}`,
       {silent: true}
     );

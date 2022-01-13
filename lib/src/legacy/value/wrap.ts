@@ -4,9 +4,12 @@
 
 import * as util from 'util';
 
+import {LegacyValueBase} from './base';
+import {LegacyColor} from './color';
 import {PromiseOr, SyncBoolean} from '../../utils';
 import {Value} from '../../value';
 import {sassTrue, sassFalse} from '../../value/boolean';
+import {SassColor} from '../../value/color';
 import {sassNull} from '../../value/null';
 import {
   CustomFunction,
@@ -59,6 +62,7 @@ function unwrapValue(value: unknown): types.Value {
 // Like `unwrapValue`, but returns the `Value` type defined by this package.
 function unwrapHostValue(value: unknown): Value {
   if (value instanceof Error) throw value;
+  if (value instanceof LegacyValueBase) return value.inner;
   if (value === sassTrue) return sassTrue;
   if (value === sassFalse) return sassFalse;
   if (value === sassNull) return sassNull;
@@ -67,6 +71,7 @@ function unwrapHostValue(value: unknown): Value {
 
 // Converts a `types.Value` into a `LegacyValue`.
 function wrapValue(value: types.Value): LegacyValue {
+  if (value instanceof SassColor) return new LegacyColor(value);
   if (value === sassTrue || value === sassFalse || value === sassNull) {
     return value;
   }

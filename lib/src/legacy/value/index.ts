@@ -4,6 +4,8 @@
 
 import {SassBooleanInternal} from '../../value/boolean';
 import {SassNull} from '../../value/null';
+import {LegacyColor} from './color';
 
+export const Color = LegacyColor;
 export const Boolean = SassBooleanInternal;
 export const Null = SassNull;

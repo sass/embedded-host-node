@@ -2,10 +2,10 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
+import {LegacyValueBase} from './base';
+import {LegacyValue} from '../../vendor/sass';
 import {SassList} from '../../value/list';
 import {sassNull} from '../../value/null';
-import {LegacyValue} from '../../vendor/sass';
-import {LegacyValueBase} from './base';
 import {unwrapValue, wrapValue} from './wrap';
 
 export class LegacyList extends LegacyValueBase<SassList> {
@@ -20,12 +20,18 @@ export class LegacyList extends LegacyValueBase<SassList> {
 
     super(
       new SassList(new Array(lengthOrInner).fill(sassNull), {
-        separator: commaSeparator ? ',' : ' ',
+        separator: commaSeparator === false ? ' ' : ',',
       })
     );
   }
 
   getValue(index: number): LegacyValue | undefined {
+    const length = this.inner.asList.size;
+    if (index < 0 || index >= length) {
+      throw new Error(
+        `Invalid index ${index}, must be between 0 and ${length}`
+      );
+    }
     const value = this.inner.get(index);
     return value ? wrapValue(value) : undefined;
   }

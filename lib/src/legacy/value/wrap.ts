@@ -6,10 +6,14 @@ import * as util from 'util';
 
 import {LegacyValueBase} from './base';
 import {LegacyColor} from './color';
+import {LegacyList} from './list';
+import {LegacyMap} from './map';
 import {PromiseOr, SyncBoolean} from '../../utils';
 import {Value} from '../../value';
 import {sassTrue, sassFalse} from '../../value/boolean';
 import {SassColor} from '../../value/color';
+import {SassList} from '../../value/list';
+import {SassMap} from '../../value/map';
 import {sassNull} from '../../value/null';
 import {
   CustomFunction,
@@ -72,6 +76,8 @@ export function unwrapValue(value: unknown): Value {
 /** Converts a `Value` into a `LegacyValue`. */
 export function wrapValue(value: Value | types.Value): LegacyValue {
   if (value instanceof SassColor) return new LegacyColor(value);
+  if (value instanceof SassList) return new LegacyList(value);
+  if (value instanceof SassMap) return new LegacyMap(value);
   if (value === sassTrue || value === sassFalse || value === sassNull) {
     return value;
   }

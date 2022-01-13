@@ -17,3 +17,6 @@ export const Map = LegacyMap;
 export const Null = SassNull;
 export const Number = LegacyNumber;
 export const String = LegacyString;
+
+// For the `sass.types.Error` object, we just re-export the native Error class.
+export const Error = global.Error;

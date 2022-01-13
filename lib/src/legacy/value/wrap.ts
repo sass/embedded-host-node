@@ -12,13 +12,11 @@ import {LegacyNumber} from './number';
 import {LegacyString} from './string';
 import {PromiseOr, SyncBoolean} from '../../utils';
 import {Value} from '../../value';
-import {sassTrue, sassFalse} from '../../value/boolean';
 import {SassColor} from '../../value/color';
 import {SassList} from '../../value/list';
 import {SassMap} from '../../value/map';
 import {SassNumber} from '../../value/number';
 import {SassString} from '../../value/string';
-import {sassNull} from '../../value/null';
 import {
   CustomFunction,
   LegacyFunction,
@@ -44,20 +42,25 @@ export function wrapFunction<sync extends 'sync' | 'async'>(
   } else {
     return args =>
       new Promise((resolve, reject) => {
-        const done = (result: unknown) =>
-          result instanceof Error
-            ? reject(result)
-            : resolve(unwrapTypedValue(result));
+        const done = (result: unknown) => {
+          try {
+            if (result instanceof Error) {
+              reject(result);
+            } else {
+              resolve(unwrapTypedValue(result));
+            }
+          } catch (error: unknown) {
+            reject(error);
+          }
+        };
 
         // The cast here is necesary to work around microsoft/TypeScript#33815.
-        resolve(
-          unwrapTypedValue(
-            (callback as (...args: unknown[]) => unknown).apply(thisArg, [
-              ...args.map(wrapValue),
-              done,
-            ])
-          )
+        const syncResult = (callback as (...args: unknown[]) => unknown).apply(
+          thisArg,
+          [...args.map(wrapValue), done]
         );
+
+        if (syncResult !== undefined) resolve(unwrapTypedValue(syncResult));
       }) as PromiseOr<types.Value, sync>;
   }
 }
@@ -70,10 +73,8 @@ function unwrapTypedValue(value: unknown): types.Value {
 /** Converts a value returned by a `LegacyFunction` into a `Value`. */
 export function unwrapValue(value: unknown): Value {
   if (value instanceof Error) throw value;
+  if (value instanceof Value) return value;
   if (value instanceof LegacyValueBase) return value.inner;
-  if (value === sassTrue) return sassTrue;
-  if (value === sassFalse) return sassFalse;
-  if (value === sassNull) return sassNull;
   throw new Error(`Expected legacy Sass value, got ${util.inspect(value)}.`);
 }
 
@@ -84,8 +85,6 @@ export function wrapValue(value: Value | types.Value): LegacyValue {
   if (value instanceof SassMap) return new LegacyMap(value);
   if (value instanceof SassNumber) return new LegacyNumber(value);
   if (value instanceof SassString) return new LegacyString(value);
-  if (value === sassTrue || value === sassFalse || value === sassNull) {
-    return value;
-  }
+  if (value instanceof Value) return value;
   throw new Error(`Expected Sass value, got ${util.inspect(value)}.`);
 }

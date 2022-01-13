@@ -104,9 +104,9 @@ function isStringOptions<sync extends 'sync' | 'async'>(
   return 'data' in options;
 }
 
-// Converts `LegacySharedOptions` into new API `Options`.
+// Converts `LegacyOptions` into new API `Options`.
 function convertOptions<sync extends 'sync' | 'async'>(
-  options: LegacySharedOptions<sync>,
+  options: LegacyOptions<sync>,
   sync: SyncBoolean<sync>
 ): Options<sync> {
   if (
@@ -117,10 +117,15 @@ function convertOptions<sync extends 'sync' | 'async'>(
     throw new Error(`Unknown output style: "${options.outputStyle}"`);
   }
 
+  const self = pluginThis(options);
   const functions: Record<string, CustomFunction<sync>> = {};
-  for (const [signature, callback] of Object.entries(options.functions ?? {})) {
+  for (let [signature, callback] of Object.entries(options.functions ?? {})) {
+    // The legacy API allows signatures without parentheses but the modern API
+    // does not.
+    if (!signature.includes('(')) signature += '()';
+
     // TODO(nweiz): Provide a real context parameter.
-    functions[signature] = wrapFunction({} as LegacyPluginThis, callback, sync);
+    functions[signature] = wrapFunction(self, callback, sync);
   }
 
   return {
@@ -154,6 +159,35 @@ function wasSourceMapRequested(
     typeof options.sourceMap === 'string' ||
     (options.sourceMap === true && !!options.outFile)
   );
+}
+
+// Creates the `this` value that's used for callbacks.
+function pluginThis(
+  options: LegacyOptions<'sync' | 'async'>
+): LegacyPluginThis {
+  const pluginThis: LegacyPluginThis = {
+    options: {
+      context: undefined as unknown as LegacyPluginThis,
+      file: options.file,
+      data: options.data,
+      includePaths: [process.cwd(), ...(options.includePaths ?? [])].join(
+        p.delimiter
+      ),
+      precision: 10,
+      style: 1,
+      indentType: 0,
+      indentWidth: 2,
+      linefeed: '\n',
+      result: {
+        stats: {
+          start: Date.now(),
+          entry: options.file ?? 'data',
+        },
+      },
+    },
+  };
+  pluginThis.options.context = pluginThis;
+  return pluginThis;
 }
 
 // Transforms the compilation result into an object that mimics the Node Sass

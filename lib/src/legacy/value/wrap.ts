@@ -30,7 +30,7 @@ export function wrapFunction<sync extends 'sync' | 'async'>(
 ): CustomFunction<sync> {
   if (sync) {
     return args =>
-      unwrapValue(
+      unwrapTypedValue(
         (callback as LegacyFunction<'sync'>).apply(thisArg, args.map(wrapValue))
       );
   } else {
@@ -39,11 +39,11 @@ export function wrapFunction<sync extends 'sync' | 'async'>(
         const done = (result: unknown) =>
           result instanceof Error
             ? reject(result)
-            : resolve(unwrapValue(result));
+            : resolve(unwrapTypedValue(result));
 
         // The cast here is necesary to work around microsoft/TypeScript#33815.
         resolve(
-          unwrapValue(
+          unwrapTypedValue(
             (callback as (...args: unknown[]) => unknown).apply(thisArg, [
               ...args.map(wrapValue),
               done,
@@ -54,13 +54,13 @@ export function wrapFunction<sync extends 'sync' | 'async'>(
   }
 }
 
-// Converts a value returned by a `LegacyFunction` into a `types.Value`.
-function unwrapValue(value: unknown): types.Value {
-  return unwrapHostValue(value) as types.Value;
+// Like `unwrapValue()`, but returns a `types.Value` type.
+function unwrapTypedValue(value: unknown): types.Value {
+  return unwrapValue(value) as types.Value;
 }
 
-// Like `unwrapValue`, but returns the `Value` type defined by this package.
-function unwrapHostValue(value: unknown): Value {
+/** Converts a value returned by a `LegacyFunction` into a `Value`. */
+export function unwrapValue(value: unknown): Value {
   if (value instanceof Error) throw value;
   if (value instanceof LegacyValueBase) return value.inner;
   if (value === sassTrue) return sassTrue;
@@ -69,8 +69,8 @@ function unwrapHostValue(value: unknown): Value {
   throw new Error(`Expected legacy Sass value, got ${util.inspect(value)}.`);
 }
 
-// Converts a `types.Value` into a `LegacyValue`.
-function wrapValue(value: types.Value): LegacyValue {
+/** Converts a `Value` into a `LegacyValue`. */
+export function wrapValue(value: Value | types.Value): LegacyValue {
   if (value instanceof SassColor) return new LegacyColor(value);
   if (value === sassTrue || value === sassFalse || value === sassNull) {
     return value;

@@ -5,7 +5,9 @@
 import {SassBooleanInternal} from '../../value/boolean';
 import {SassNull} from '../../value/null';
 import {LegacyColor} from './color';
+import {LegacyList} from './list';
 
-export const Color = LegacyColor;
 export const Boolean = SassBooleanInternal;
+export const Color = LegacyColor;
+export const List = LegacyList;
 export const Null = SassNull;

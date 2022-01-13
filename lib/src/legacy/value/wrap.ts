@@ -8,12 +8,14 @@ import {LegacyValueBase} from './base';
 import {LegacyColor} from './color';
 import {LegacyList} from './list';
 import {LegacyMap} from './map';
+import {LegacyNumber} from './number';
 import {PromiseOr, SyncBoolean} from '../../utils';
 import {Value} from '../../value';
 import {sassTrue, sassFalse} from '../../value/boolean';
 import {SassColor} from '../../value/color';
 import {SassList} from '../../value/list';
 import {SassMap} from '../../value/map';
+import {SassNumber} from '../../value/number';
 import {sassNull} from '../../value/null';
 import {
   CustomFunction,
@@ -78,6 +80,7 @@ export function wrapValue(value: Value | types.Value): LegacyValue {
   if (value instanceof SassColor) return new LegacyColor(value);
   if (value instanceof SassList) return new LegacyList(value);
   if (value instanceof SassMap) return new LegacyMap(value);
+  if (value instanceof SassNumber) return new LegacyNumber(value);
   if (value === sassTrue || value === sassFalse || value === sassNull) {
     return value;
   }

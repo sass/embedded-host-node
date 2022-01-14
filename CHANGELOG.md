@@ -2,7 +2,8 @@
 
 * Add basic support for the legacy `render()` and `renderSync()` functions.
 
-* Add support for the legacy `sass.types.Boolean` and `sass.types.Null` classes.
+* Add support for the legacy `sass.types.Boolean`, `sass.types.Color`, and
+  `sass.types.Null` classes.
 
 ## 1.0.0-beta.8
 

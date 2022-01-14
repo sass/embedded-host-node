@@ -9,7 +9,5 @@ import {Value} from '../../value';
  * detect legacy values and extract their inner value objects.
  */
 export class LegacyValueBase<T extends Value> {
-  inner: T;
-
   constructor(readonly inner: T) {}
 }

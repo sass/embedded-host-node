@@ -11,7 +11,5 @@ import {Value} from '../../value';
 export class LegacyValueBase<T extends Value> {
   inner: T;
 
-  constructor(inner: T) {
-    this.inner = inner;
-  }
+  constructor(readonly inner: T) {}
 }

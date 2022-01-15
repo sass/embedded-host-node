@@ -94,6 +94,20 @@ export function pathToUrlString(path: string): string {
   return components.map(encodeURIComponent).join('/');
 }
 
+/**
+ * Like `url.fileURLToPath`, but returns the same result for Windows-style file
+ * URLs on all platforms.
+ */
+export function fileUrlToPathCrossPlatform(fileUrl: url.URL | string): string {
+  const path = url.fileURLToPath(fileUrl);
+
+  // Windows file: URLs begin with `file:///C:/` (or another drive letter),
+  // which `fileURLToPath` converts to `"/C:/"` on non-Windows systems. We want
+  // to ensure the behavior is consistent across OSes, so we normalize this back
+  // to a Windows-style path.
+  return /^\/[A-Za-z]:\//.test(path) ? path.substring(1) : path;
+}
+
 /** Returns `path` without an extension, if it had one. */
 export function withoutExtension(path: string): string {
   const extension = p.extname(path);

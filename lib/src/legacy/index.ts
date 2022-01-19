@@ -287,10 +287,13 @@ function newLegacyResult(
       includedFiles: result.loadedUrls
         .filter(url => url.protocol !== endOfLoadProtocol)
         .map(url => {
-          if (url.protocol === 'file:')
+          if (url.protocol === 'file:') {
             return fileUrlToPathCrossPlatform(url as URL);
-          if (url.protocol === legacyImporterProtocol) return url.pathname;
-          return url.toString();
+          } else if (url.protocol === legacyImporterProtocol) {
+            return decodeURI(url.pathname);
+          } else {
+            return url.toString();
+          }
         }),
     },
   };

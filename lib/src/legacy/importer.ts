@@ -126,12 +126,13 @@ export class LegacyImporterWrapper<sync extends 'sync' | 'async'>
 
           if ('file' in result) {
             return new URL(
-              legacyImporterProtocol + (result as {file: string}).file
+              legacyImporterProtocol +
+                encodeURI((result as {file: string}).file)
             );
           } else if (/^[A-Za-z+.-]+:/.test(url)) {
             return new URL(url);
           } else {
-            return new URL(legacyImporterProtocol + url);
+            return new URL(legacyImporterProtocol + encodeURI(url));
           }
         } else {
           if (p.isAbsolute(result.file)) {

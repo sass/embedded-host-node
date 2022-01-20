@@ -26,14 +26,6 @@ import {
 } from '../vendor/sass';
 
 /**
-
- * Special URL protocols we use to for the legacy importer. These are generally
- * not exposed to user code, but used internally to track
-
- */
-export const protocol = {};
-
-/**
  * A special URL protocol we use to signal when a stylesheet has finished
  * loading. This allows us to determine which stylesheet is "current" when
  * resolving a new load, which in turn allows us to pass in an accurate `prev`

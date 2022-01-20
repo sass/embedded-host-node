@@ -89,7 +89,7 @@ function newCompileStringRequest(
 
   if (options?.url) input.setUrl(options.url.toString());
 
-  if (options && 'importer' in options) {
+  if (options && 'importer' in options && options.importer) {
     input.setImporter(importers.register(options.importer));
   }
 

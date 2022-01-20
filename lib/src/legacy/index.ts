@@ -4,7 +4,7 @@
 
 import * as fs from 'fs';
 import * as p from 'path';
-import {URL, fileURLToPath, pathToFileURL} from 'url';
+import {URL, pathToFileURL} from 'url';
 
 import {Exception} from '../exception';
 import {
@@ -14,6 +14,7 @@ import {
   compileStringAsync,
 } from '../compile';
 import {
+  fileUrlToPathCrossPlatform,
   isNullOrUndefined,
   pathToUrlString,
   withoutExtension,
@@ -32,6 +33,11 @@ import {
   StringOptions,
 } from '../vendor/sass';
 import {wrapFunction} from './value/wrap';
+import {
+  endOfLoadProtocol,
+  legacyImporterProtocol,
+  LegacyImporterWrapper,
+} from './importer';
 
 export function render(
   options: LegacyOptions<'async'>,
@@ -77,19 +83,20 @@ function adjustOptions<sync extends 'sync' | 'async'>(
     throw new Error('Either options.data or options.file must be set.');
   }
 
-  // The `indentedSyntax` option takes precedence over the file extension in the
-  // legacy API, but the new API doesn't have a `syntax` option for a file path.
-  // Instead, we eagerly load the entrypoint into memory and treat it like a
-  // string source.
   if (
     !isStringOptions(options) &&
-    (options as unknown as LegacyStringOptions<sync>).indentedSyntax !==
-      undefined
+    // The `indentedSyntax` option takes precedence over the file extension in the
+    // legacy API, but the new API doesn't have a `syntax` option for a file path.
+    // Instead, we eagerly load the entrypoint into memory and treat it like a
+    // string source.
+    ((options as unknown as LegacyStringOptions<sync>).indentedSyntax !==
+      undefined ||
+      options.importer)
   ) {
     return {
       ...options,
       data: fs.readFileSync(options.file, 'utf8'),
-      indentedSyntax: (options as unknown as LegacyStringOptions<sync>)
+      indentedSyntax: !!(options as unknown as LegacyStringOptions<sync>)
         .indentedSyntax,
     };
   } else {
@@ -124,14 +131,28 @@ function convertOptions<sync extends 'sync' | 'async'>(
     // does not.
     if (!signature.includes('(')) signature += '()';
 
-    // TODO(nweiz): Provide a real context parameter.
     functions[signature] = wrapFunction(self, callback, sync);
   }
 
+  const importers = options.importer
+    ? [
+        new LegacyImporterWrapper(
+          self,
+          options.importer instanceof Array
+            ? options.importer
+            : [options.importer],
+          options.includePaths ?? [],
+          options.file ?? 'stdin',
+          sync
+        ),
+      ]
+    : undefined;
+
   return {
     functions,
+    importers,
     sourceMap: wasSourceMapRequested(options),
-    loadPaths: options.includePaths,
+    loadPaths: importers ? undefined : options.includePaths,
     style: options.outputStyle as 'compressed' | 'expanded' | undefined,
     quietDeps: options.quietDeps,
     verbose: options.verbose,
@@ -144,9 +165,12 @@ function convertStringOptions<sync extends 'sync' | 'async'>(
   options: LegacyStringOptions<sync>,
   sync: SyncBoolean<sync>
 ): StringOptions<sync> {
+  const modernOptions = convertOptions(options, sync);
+
   return {
-    ...convertOptions(options, sync),
+    ...modernOptions,
     url: options.file ? pathToFileURL(options.file) : undefined,
+    importer: modernOptions.importers ? modernOptions.importers[0] : undefined,
     syntax: options.indentedSyntax ? 'indented' : 'scss',
   };
 }
@@ -223,7 +247,9 @@ function newLegacyResult(
 
     sourceMap.sources = sourceMap.sources.map(source => {
       if (source.startsWith('file://')) {
-        return pathToUrlString(p.relative(sourceMapDir, fileURLToPath(source)));
+        return pathToUrlString(
+          p.relative(sourceMapDir, fileUrlToPathCrossPlatform(source))
+        );
       } else if (source.startsWith('data:')) {
         return 'stdin';
       } else {
@@ -258,9 +284,17 @@ function newLegacyResult(
       start,
       end,
       duration: end - start,
-      includedFiles: result.loadedUrls.map(url =>
-        url.protocol === 'file:' ? fileURLToPath(url as URL) : url.toString()
-      ),
+      includedFiles: result.loadedUrls
+        .filter(url => url.protocol !== endOfLoadProtocol)
+        .map(url => {
+          if (url.protocol === 'file:') {
+            return fileUrlToPathCrossPlatform(url as URL);
+          } else if (url.protocol === legacyImporterProtocol) {
+            return decodeURI(url.pathname);
+          } else {
+            return url.toString();
+          }
+        }),
     },
   };
 }
@@ -275,13 +309,18 @@ function newLegacyException(error: Error): LegacyException {
     });
   }
 
-  const file = error.span?.url
-    ? // We have to cast to Node's URL type here because the specified type is the
-      // standard URL type which is slightly less featureful. `fileURLToPath()`
-      // does work with standard URL objects in practice, but we know that we
-      // generate Node URLs here regardless.
-      fileURLToPath(error.span?.url as URL)
-    : 'stdin';
+  let file: string;
+  if (!error.span?.url) {
+    file = 'stdin';
+  } else if (error.span.url.protocol === 'file:') {
+    // We have to cast to Node's URL type here because the specified type is the
+    // standard URL type which is slightly less featureful. `fileURLToPath()`
+    // does work with standard URL objects in practice, but we know that we
+    // generate Node URLs here regardless.
+    file = fileUrlToPathCrossPlatform(error.span.url as URL);
+  } else {
+    file = error.span.url.toString();
+  }
 
   return Object.assign(new Error(), {
     status: 1,

@@ -28,15 +28,8 @@ jobs:
         with:
           version: ${{ env.PROTOC_VERSION }}
           repo-token: '${{ github.token }}'
-      - uses: dart-lang/setup-dart@v1
-        with: {sdk: stable}
-      - run: dart --version
 
       - name: Check out the embedded protocol
-        uses: sass/clone-linked-repo@v1
-        with: {repo: sass/embedded-protocol, default-ref: null}
-
-      - name: Check out the embedded compiler
         uses: sass/clone-linked-repo@v1
         with: {repo: sass/embedded-protocol, default-ref: null}
 
@@ -48,8 +41,7 @@ jobs:
       - name: npm run init
         run: |
           if [[ -d embedded-protocol ]]; then args=--protocol-path=embedded-protocol; fi
-          if [[ -d dart-sass-embedded ]]; then args=$args --compiler-path=dart-sass-embedded; fi
-          npm run init -- --api-path=language $args
+          npm run init -- --no-compiler --api-path=language $args
 
       - run: npm run check
 
@@ -83,7 +75,18 @@ jobs:
 
       - name: Check out the embedded compiler
         uses: sass/clone-linked-repo@v1
-        with: {repo: sass/embedded-protocol, default-ref: null}
+        with: {repo: sass/dart-sass-embedded, default-ref: null}
+
+      - name: Check out Dart Sass
+        uses: sass/clone-linked-repo@v1
+        with: {repo: sass/dart-sass, default-ref: null}
+
+      - name: Link the embedded compiler to Dart Sass
+        run: >
+          if [[ -d dart-sass ]]; then
+            echo "dependency_overrides: {sass: {path: ../dart-sass}}" \
+                >> dart-sass-embedded/pubspec.yaml
+          fi
 
       - name: Check out the JS API definition
         uses: sass/clone-linked-repo@v1
@@ -134,7 +137,18 @@ jobs:
 
       - name: Check out the embedded compiler
         uses: sass/clone-linked-repo@v1
-        with: {repo: sass/embedded-protocol, default-ref: null}
+        with: {repo: sass/dart-sass-embedded, default-ref: null}
+
+      - name: Check out Dart Sass
+        uses: sass/clone-linked-repo@v1
+        with: {repo: sass/dart-sass, default-ref: null}
+
+      - name: Link the embedded compiler to Dart Sass
+        run: >
+          if [[ -d dart-sass ]]; then
+            echo "dependency_overrides: {sass: {path: ../dart-sass}}" \
+                >> dart-sass-embedded/pubspec.yaml
+          fi
 
       - name: Check out the JS API definition
         uses: sass/clone-linked-repo@v1

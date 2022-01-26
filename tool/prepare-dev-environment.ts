@@ -20,6 +20,10 @@ const argv = yargs(process.argv.slice(2))
     type: 'string',
     description: 'Download this version of the Embedded Dart Sass binary.',
   })
+  .option('no-compiler', {
+    type: 'boolean',
+    description: "Don't install Embedded Dart Sass at all.",
+  })
   .option('protocol-path', {
     type: 'string',
     description: 'Build the Embedded Protocol from the source at this path.',
@@ -40,11 +44,14 @@ const argv = yargs(process.argv.slice(2))
     type: 'string',
     description: 'Build the JS API definitions from this Git ref.',
   })
-  .conflicts({'compiler-path': ['compiler-ref', 'compiler-version']})
-  .conflicts('compiler-ref', 'compiler-version')
-  .conflicts({'protocol-path': ['protocol-ref', 'protocol-version']})
-  .conflicts('protocol-ref', 'protocol-version')
-  .conflicts('api-path', 'api-ref')
+  .conflicts({
+    'compiler-path': ['compiler-ref', 'compiler-version', 'no-compiler'],
+    'compiler-ref': ['compiler-version', 'no-compiler'],
+    'compiler-version': 'no-compiler',
+    'protocol-path': ['protocol-ref', 'protocol-version'],
+    'protocol-ref': 'protocol-version',
+    'api-path': 'api-ref',
+  })
   .parseSync();
 
 (async () => {
@@ -67,20 +74,22 @@ const argv = yargs(process.argv.slice(2))
       await getEmbeddedProtocol(outPath);
     }
 
-    if (argv['compiler-version']) {
-      await getDartSassEmbedded(outPath, {
-        version: argv['compiler-version'],
-      });
-    } else if (argv['compiler-ref']) {
-      await getDartSassEmbedded(outPath, {
-        ref: argv['compiler-ref'],
-      });
-    } else if (argv['compiler-path']) {
-      await getDartSassEmbedded(outPath, {
-        path: argv['compiler-path'],
-      });
-    } else {
-      await getDartSassEmbedded(outPath);
+    if (!argv['no-compiler']) {
+      if (argv['compiler-version']) {
+        await getDartSassEmbedded(outPath, {
+          version: argv['compiler-version'],
+        });
+      } else if (argv['compiler-ref']) {
+        await getDartSassEmbedded(outPath, {
+          ref: argv['compiler-ref'],
+        });
+      } else if (argv['compiler-path']) {
+        await getDartSassEmbedded(outPath, {
+          path: argv['compiler-path'],
+        });
+      } else {
+        await getDartSassEmbedded(outPath);
+      }
     }
 
     if (argv['api-ref']) {

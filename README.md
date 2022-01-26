@@ -2,7 +2,7 @@
 
 This package is an alternative to the [`sass`] package. It supports the same JS
 API as `sass` and is maintained by the same team, but where the `sass` package
-is pure JavaScript `sass-embedded` is instead a JavaScript wrapper around a
+is pure JavaScript, `sass-embedded` is instead a JavaScript wrapper around a
 native Dart executable. This means `sass-embedded` will generally be much faster
 especially for large Sass compilations, but it can only be installed on the
 platforms that Dart supports: Windows, Mac OS, and Linux.
@@ -88,8 +88,8 @@ which are invoked by messages from the embedded compiler back to the host.
 Although this sort of two-way communication with an embedded process is
 inherently asynchronous in Node.js, this package supports the synchronous
 `compile()` API using a custom [synchronous message-passing library] that's
-implemented with [`Atomics.wait()`] primitive. We hope to release this library
-as a stand-alone package at some point in the future.
+implemented with the [`Atomics.wait()`] primitive. We hope to release this
+library as a stand-alone package at some point in the future.
 
 [synchronous message-passing library]: https://github.com/sass/embedded-host-node/blob/main/lib/src/sync-process/sync-message-port.ts
 [`Atomics.wait()`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Atomics/wait

@@ -108,6 +108,7 @@ function newCompileRequest(
   request.setImportersList(importers.importers);
   request.setGlobalFunctionsList(Object.keys(options?.functions ?? {}));
   request.setSourceMap(!!options?.sourceMap);
+  request.setSourceMapIncludeSources(!!options?.sourceMapIncludeSources);
   request.setAlertColor(options?.alertColor ?? !!supportsColor.stdout);
   request.setAlertAscii(!!options?.alertAscii);
   request.setQuietDeps(!!options?.quietDeps);

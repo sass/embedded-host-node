@@ -96,7 +96,7 @@ jobs:
       - name: npm run init
         run: |
           if [[ -d embedded-protocol ]]; then args=--protocol-path=embedded-protocol; fi
-          if [[ -d dart-sass-embedded ]]; then args=$args --compiler-path=dart-sass-embedded; fi
+          if [[ -d dart-sass-embedded ]]; then args="$args --compiler-path=dart-sass-embedded"; fi
           npm run init -- --api-path=language $args
 
       - run: npm run test
@@ -158,7 +158,7 @@ jobs:
       - name: npm run init
         run: |
           if [[ -d embedded-protocol ]]; then args=--protocol-path=embedded-protocol; fi
-          if [[ -d dart-sass-embedded ]]; then args=$args --compiler-path=dart-sass-embedded; fi
+          if [[ -d dart-sass-embedded ]]; then args="$args --compiler-path=dart-sass-embedded"; fi
           npm run init -- --api-path=language $args
 
       - name: Check out sass-spec

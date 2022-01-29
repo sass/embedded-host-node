@@ -20,9 +20,10 @@ const argv = yargs(process.argv.slice(2))
     type: 'string',
     description: 'Download this version of the Embedded Dart Sass binary.',
   })
-  .option('no-compiler', {
+  .option('compiler', {
     type: 'boolean',
-    description: "Don't install Embedded Dart Sass at all.",
+    default: true,
+    description: 'Whether to install Embedded Dart Sass at all.',
   })
   .option('protocol-path', {
     type: 'string',
@@ -45,9 +46,9 @@ const argv = yargs(process.argv.slice(2))
     description: 'Build the JS API definitions from this Git ref.',
   })
   .conflicts({
-    'compiler-path': ['compiler-ref', 'compiler-version', 'no-compiler'],
-    'compiler-ref': ['compiler-version', 'no-compiler'],
-    'compiler-version': 'no-compiler',
+    'compiler-path': ['compiler-ref', 'compiler-version', 'compiler'],
+    'compiler-ref': ['compiler-version', 'compiler'],
+    'compiler-version': 'compiler',
     'protocol-path': ['protocol-ref', 'protocol-version'],
     'protocol-ref': 'protocol-version',
     'api-path': 'api-ref',
@@ -74,7 +75,7 @@ const argv = yargs(process.argv.slice(2))
       await getEmbeddedProtocol(outPath);
     }
 
-    if (!argv['no-compiler']) {
+    if (argv['compiler']) {
       if (argv['compiler-version']) {
         await getDartSassEmbedded(outPath, {
           version: argv['compiler-version'],

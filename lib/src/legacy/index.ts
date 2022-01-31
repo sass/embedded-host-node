@@ -152,6 +152,7 @@ function convertOptions<sync extends 'sync' | 'async'>(
     functions,
     importers,
     sourceMap: wasSourceMapRequested(options),
+    sourceMapIncludeSources: options.sourceMapContents,
     loadPaths: importers ? undefined : options.includePaths,
     style: options.outputStyle as 'compressed' | 'expanded' | undefined,
     quietDeps: options.quietDeps,

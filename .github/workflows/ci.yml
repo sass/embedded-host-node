@@ -41,7 +41,7 @@ jobs:
       - name: npm run init
         run: |
           if [[ -d embedded-protocol ]]; then args=--protocol-path=embedded-protocol; fi
-          npm run init -- --no-compiler --api-path=language $args
+          npm run init -- --skip-compiler --api-path=language $args
 
       - run: npm run check
 

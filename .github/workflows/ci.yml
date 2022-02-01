@@ -82,7 +82,7 @@ jobs:
         with: {repo: sass/dart-sass, default-ref: null}
 
       - name: Link the embedded compiler to Dart Sass
-        run: >
+        run: |
           if [[ -d dart-sass ]]; then
             echo "dependency_overrides: {sass: {path: ../dart-sass}}" \
                 >> dart-sass-embedded/pubspec.yaml
@@ -144,7 +144,7 @@ jobs:
         with: {repo: sass/dart-sass, default-ref: null}
 
       - name: Link the embedded compiler to Dart Sass
-        run: >
+        run: |
           if [[ -d dart-sass ]]; then
             echo "dependency_overrides: {sass: {path: ../dart-sass}}" \
                 >> dart-sass-embedded/pubspec.yaml

@@ -246,17 +246,21 @@ function newLegacyResult(
       sourceMap.file = 'stdin.css';
     }
 
-    sourceMap.sources = sourceMap.sources.map(source => {
-      if (source.startsWith('file://')) {
-        return pathToUrlString(
-          p.relative(sourceMapDir, fileUrlToPathCrossPlatform(source))
-        );
-      } else if (source.startsWith('data:')) {
-        return 'stdin';
-      } else {
-        return source;
-      }
-    });
+    sourceMap.sources = sourceMap.sources
+      .filter(source => !source.startsWith(endOfLoadProtocol))
+      .map(source => {
+        if (source.startsWith('file://')) {
+          return pathToUrlString(
+            p.relative(sourceMapDir, fileUrlToPathCrossPlatform(source))
+          );
+        } else if (source.startsWith(legacyImporterProtocol)) {
+          return source.substring(legacyImporterProtocol.length);
+        } else if (source.startsWith('data:')) {
+          return 'stdin';
+        } else {
+          return source;
+        }
+      });
 
     sourceMapBytes = Buffer.from(JSON.stringify(sourceMap));
 

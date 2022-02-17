@@ -170,7 +170,11 @@ export class LegacyImporterWrapper<sync extends 'sync' | 'async'>
   load(canonicalUrl: URL): ImporterResult | null {
     if (canonicalUrl.protocol === endOfLoadProtocol) {
       this.prev.pop();
-      return {contents: '', syntax: 'scss'};
+      return {
+        contents: '',
+        syntax: 'scss',
+        sourceMapUrl: new URL(endOfLoadProtocol),
+      };
     }
 
     if (canonicalUrl.protocol === 'file:') {
@@ -195,7 +199,7 @@ export class LegacyImporterWrapper<sync extends 'sync' | 'async'>
         this.prev.pop();
       }
 
-      return {contents, syntax};
+      return {contents, syntax, sourceMapUrl: canonicalUrl};
     }
 
     const lastContents = this.lastContents;
@@ -204,6 +208,7 @@ export class LegacyImporterWrapper<sync extends 'sync' | 'async'>
     return {
       contents: lastContents + this.endOfLoadImport,
       syntax: 'scss',
+      sourceMapUrl: canonicalUrl,
     };
   }
 

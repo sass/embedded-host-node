@@ -134,19 +134,21 @@ function convertOptions<sync extends 'sync' | 'async'>(
     functions[signature] = wrapFunction(self, callback, sync);
   }
 
-  const importers = options.importer
-    ? [
-        new LegacyImporterWrapper(
-          self,
-          options.importer instanceof Array
-            ? options.importer
-            : [options.importer],
-          options.includePaths ?? [],
-          options.file ?? 'stdin',
-          sync
-        ),
-      ]
-    : undefined;
+  const importers =
+    options.importer &&
+    (!(options.importer instanceof Array) || options.importer.length > 0)
+      ? [
+          new LegacyImporterWrapper(
+            self,
+            options.importer instanceof Array
+              ? options.importer
+              : [options.importer],
+            options.includePaths ?? [],
+            options.file ?? 'stdin',
+            sync
+          ),
+        ]
+      : undefined;
 
   return {
     functions,

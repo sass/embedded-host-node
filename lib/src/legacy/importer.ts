@@ -71,8 +71,6 @@ export class LegacyImporterWrapper<sync extends 'sync' | 'async'>
   // the modern API, so we always return `null` in this case.
   private expectingRelativeLoad = true;
 
-  // TODO: Support prev from a load path
-
   constructor(
     private readonly self: LegacyPluginThis,
     private readonly callbacks: Array<LegacyImporter<sync>>,
@@ -220,6 +218,8 @@ export class LegacyImporterWrapper<sync extends 'sync' | 'async'>
     prev: string,
     {fromImport}: {fromImport: boolean}
   ): PromiseOr<LegacyImporterResult, sync> {
+    assert(this.callbacks.length > 0);
+
     const self: LegacyImporterThis = {...this.self, fromImport};
     self.options = {...self.options, context: self};
 

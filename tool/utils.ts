@@ -30,7 +30,7 @@ const OS: 'linux' | 'macos' | 'windows' = (() => {
 
 // The current platform's architecture. Throws if the architecture is not
 // supported by Dart Sass Embedded.
-const ARCH: 'ia32' | 'x64' = (() => {
+const ARCH: 'ia32' | 'x64' | 'arm64' = (() => {
   switch (process.arch) {
     case 'ia32':
       return 'ia32';
@@ -38,11 +38,8 @@ const ARCH: 'ia32' | 'x64' = (() => {
       return 'ia32';
     case 'x64':
       return 'x64';
-    // TODO: This is blocked until Github Actions supports compiling Dart Sass
-    // for arm64. Until then, download the x64 binary for arm64 users.
-    // https://github.com/sass/dart-sass/issues/1125
     case 'arm64':
-      return 'x64';
+      return 'arm64';
     default:
       throw Error(`Architecure ${process.arch} is not supported.`);
   }

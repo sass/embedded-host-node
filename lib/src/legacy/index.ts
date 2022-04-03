@@ -172,7 +172,9 @@ function convertStringOptions<sync extends 'sync' | 'async'>(
 
   return {
     ...modernOptions,
-    url: options.file ? pathToFileURL(options.file) : undefined,
+    url: options.file
+      ? pathToFileURL(options.file)
+      : new URL(legacyImporterProtocol),
     importer: modernOptions.importers ? modernOptions.importers[0] : undefined,
     syntax: options.indentedSyntax ? 'indented' : 'scss',
   };

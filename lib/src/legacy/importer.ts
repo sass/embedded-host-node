@@ -6,6 +6,7 @@ import {strict as assert} from 'assert';
 import {pathToFileURL, URL as NodeURL} from 'url';
 import * as fs from 'fs';
 import * as p from 'path';
+import * as util from 'util';
 
 import {resolvePath} from './resolve-path';
 import {
@@ -96,7 +97,10 @@ export class LegacyImporterWrapper<sync extends 'sync' | 'async'>
           fileUrlToPathCrossPlatform(url),
           options.fromImport
         );
-        if (resolved !== null) return pathToFileURL(resolved);
+        if (resolved !== null) {
+          this.prev.push({url: resolved, path: true});
+          return pathToFileURL(resolved);
+        }
       }
 
       this.expectingRelativeLoad = false;
@@ -110,6 +114,13 @@ export class LegacyImporterWrapper<sync extends 'sync' | 'async'>
       thenOr(this.invokeCallbacks(url, prev.url, options), result => {
         if (result instanceof Error) throw result;
         if (result === null) return null;
+
+        if (typeof result !== 'object') {
+          throw (
+            'Expected importer to return an object, got ' +
+            `${util.inspect(result)}.`
+          );
+        }
 
         if ('contents' in result || !('file' in result)) {
           this.lastContents = result.contents ?? '';

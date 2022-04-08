@@ -3,7 +3,7 @@
 // https://opensource.org/licenses/MIT.
 
 import extractZip = require('extract-zip');
-import {promises as fs, existsSync} from 'fs';
+import {promises as fs, existsSync, mkdirSync} from 'fs';
 import fetch from 'node-fetch';
 import * as p from 'path';
 import * as shell from 'shelljs';
@@ -98,7 +98,7 @@ export async function getEmbeddedProtocol(
   const source =
     options && 'path' in options ? options.path : p.join(BUILD_PATH, repo);
   buildEmbeddedProtocol(source);
-  await link(source, p.join(outPath, repo));
+  await link('build/embedded-protocol', p.join(outPath, repo));
 }
 
 /**
@@ -257,11 +257,13 @@ function buildEmbeddedProtocol(repoPath: string): void {
     OS === 'windows'
       ? '%CD%/node_modules/.bin/protoc-gen-ts.cmd'
       : 'node_modules/.bin/protoc-gen-ts';
+  mkdirSync('build/embedded-protocol', {recursive: true});
   shell.exec(
     `${protocPath} \
       --plugin="protoc-gen-ts=${pluginPath}" \
-      --js_out="import_style=commonjs,binary:." \
-      --ts_out="." \
+      --js_out="import_style=commonjs,binary:build/embedded-protocol" \
+      --ts_out="build/embedded-protocol" \
+      --proto_path="${repoPath}" \
       ${proto}`,
     {silent: true}
   );

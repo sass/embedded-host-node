@@ -78,9 +78,11 @@ export async function getEmbeddedProtocol(
   options ??= defaultVersionOption('protocol-version');
   if ('version' in options) {
     const version = options?.version;
+    const downloadMirror = process.env.SASS_EMBEDDED_DOWNLOAD_MIRROR || process.env.npm_config_sass_embedded_download_mirror || 'https://github.com';
+
     await downloadRelease({
       repo,
-      assetUrl: `https://github.com/sass/${repo}/archive/${version}${ARCHIVE_EXTENSION}`,
+      assetUrl: `${downloadMirror}/sass/${repo}/archive/${version}${ARCHIVE_EXTENSION}`,
       outPath: BUILD_PATH,
     });
     fs.rename(
@@ -128,10 +130,12 @@ export async function getDartSassEmbedded(
   options ??= defaultVersionOption('compiler-version');
   if ('version' in options) {
     const version = options?.version;
+    const downloadMirror = process.env.SASS_EMBEDDED_DOWNLOAD_MIRROR || process.env.npm_config_sass_embedded_download_mirror || 'https://github.com';
+
     await downloadRelease({
       repo,
       assetUrl:
-        `https://github.com/sass/${repo}/releases/download/` +
+        `${downloadMirror}/sass/${repo}/releases/download/` +
         `${version}/sass_embedded-${version}-` +
         `${OS}-${ARCH}${ARCHIVE_EXTENSION}`,
       outPath,

@@ -94,6 +94,30 @@ library as a stand-alone package at some point in the future.
 [synchronous message-passing library]: https://github.com/sass/embedded-host-node/blob/main/lib/src/sync-process/sync-message-port.ts
 [`Atomics.wait()`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Atomics/wait
 
+## Installation options
+
+sass-embedded supports options to change the installation method.
+
+Each option can be configured in the `sass-embedded` section of your `package.json`:
+
+```json
+{
+  "name": "your-package",
+  "version": "0.0.1",
+  "sass-embedded": {
+    "downloadMirror": "https://some.example.com/mirror"
+  }
+}
+```
+
+Also as an environment variable:
+
+```sh
+export SASS_EMBEDDED_DOWNLOAD_MIRROR="https://some.example.com/mirror"
+```
+
+**Note that you have to run `npm install sass-embedded` to re-install sass-embedded itself, if you change any of these options.**
+
 ---
 
 Disclaimer: this is not an official Google product.

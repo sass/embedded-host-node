@@ -133,6 +133,13 @@ export function protofySyntax(
   }
 }
 
+/** Returns whether `error` is a NodeJS-style exception with an error code. */
+export function isErrnoException(
+  error: unknown
+): error is NodeJS.ErrnoException {
+  return error instanceof Error && ('errno' in error || 'code' in error);
+}
+
 /**
  * Dart-style utility. See
  * http://go/dart-api/stable/2.8.4/dart-core/Map/putIfAbsent.html.

@@ -83,7 +83,7 @@ export async function getEmbeddedProtocol(
       assetUrl: `https://github.com/sass/${repo}/archive/${version}${ARCHIVE_EXTENSION}`,
       outPath: BUILD_PATH,
     });
-    fs.rename(
+    await fs.rename(
       p.join(BUILD_PATH, `${repo}-${version}`),
       p.join(BUILD_PATH, repo)
     );
@@ -136,7 +136,7 @@ export async function getDartSassEmbedded(
         `${OS}-${ARCH}${ARCHIVE_EXTENSION}`,
       outPath,
     });
-    fs.rename(p.join(outPath, 'sass_embedded'), p.join(outPath, repo));
+    await fs.rename(p.join(outPath, 'sass_embedded'), p.join(outPath, repo));
     return;
   }
 
@@ -302,7 +302,7 @@ async function link(source: string, destination: string): Promise<void> {
   } else {
     console.log(`Linking ${source} into ${destination}.`);
     // Symlinking doesn't play nice with Jasmine's test globbing on Windows.
-    fs.symlink(p.resolve(source), destination);
+    await fs.symlink(p.resolve(source), destination);
   }
 }
 

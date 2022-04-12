@@ -2,6 +2,7 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
+import * as p from 'path';
 import {Observable} from 'rxjs';
 import * as supportsColor from 'supports-color';
 
@@ -17,6 +18,7 @@ import {MessageTransformer} from './message-transformer';
 import {PacketTransformer} from './packet-transformer';
 import {SyncEmbeddedCompiler} from './sync-compiler';
 import {deprotofySourceSpan} from './deprotofy-span';
+import {legacyImporterProtocol} from './legacy/importer';
 
 export function compile(
   path: string,
@@ -87,10 +89,20 @@ function newCompileStringRequest(
   input.setSource(source);
   input.setSyntax(utils.protofySyntax(options?.syntax ?? 'scss'));
 
-  if (options?.url) input.setUrl(options.url.toString());
+  const url = options?.url?.toString();
+  if (url && url !== legacyImporterProtocol) {
+    input.setUrl(url);
+  }
 
   if (options && 'importer' in options && options.importer) {
     input.setImporter(importers.register(options.importer));
+  } else if (url === legacyImporterProtocol) {
+    const importer = new proto.InboundMessage.CompileRequest.Importer();
+    importer.setPath(p.resolve('.'));
+    input.setImporter(importer);
+  } else {
+    // When importer is not set on the host, the compiler will set a
+    // FileSystemImporter if `url` is set to a file: url or a NoOpImporter.
   }
 
   const request = newCompileRequest(importers, options);

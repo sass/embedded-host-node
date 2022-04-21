@@ -30,6 +30,7 @@
     "buffer-builder": "^0.2.0",
     "extract-zip": "^2.0.1",
     "google-protobuf": "^3.11.4",
+    "https-proxy-agent": "^5.0.1",
     "immutable": "^4.0.0",
     "node-fetch": "^2.6.0",
     "rxjs": "^7.4.0",

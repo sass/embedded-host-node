@@ -5,6 +5,7 @@
 import extractZip = require('extract-zip');
 import {promises as fs, existsSync, mkdirSync} from 'fs';
 import fetch from 'node-fetch';
+import {HttpsProxyAgent} from 'https-proxy-agent';
 import * as p from 'path';
 import * as shell from 'shelljs';
 import {extract as extractTar} from 'tar';
@@ -188,8 +189,11 @@ async function downloadRelease(options: {
   outPath: string;
 }): Promise<void> {
   console.log(`Downloading ${options.repo} release asset.`);
+  const proxy = process.env.HTTPS_PROXY || process.env.HTTP_PROXY || process.env.https_proxy || process.env.http_proxy;
+  const agent = proxy ? new HttpsProxyAgent(proxy) : undefined;
   const response = await fetch(options.assetUrl, {
     redirect: 'follow',
+    agent,
   });
   if (!response.ok) {
     throw Error(

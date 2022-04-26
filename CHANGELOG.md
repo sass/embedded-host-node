@@ -1,3 +1,74 @@
+## 1.51.0
+
+* **Potentially breaking change**: Change the order of maps returned by
+  `map.deep-merge()` to match those returned by `map.merge()`. All keys that
+  appeared in the first map will now be listed first in the same order they
+  appeared in that map, followed by any new keys added from the second map.
+
+* Improve the string output of some AST nodes in error messages.
+
+## 1.50.1
+
+### Embedded Sass
+
+* The JS embedded host and the embedded compiler will now properly avoid
+  resolving imports relative to the current working directory unless `'.'` is
+  passed as a load path.
+
+* Fix a bug in the JS embedded host's implementation of the legacy JS API where
+  imports that began with `/` could crash on Windows.
+
+## 1.50.0
+
+* `@extend` now treats [`:where()`] the same as `:is()`.
+
+[`:where()`]: https://developer.mozilla.org/en-US/docs/Web/CSS/:where
+
+### Command Line Interface
+
+* Closing the standard input stream will now cause the `--watch` command to stop
+  running.
+
+### Embedded Sass
+
+* Fix a bug where the JS embedded host crashed when invoking a legacy importer
+  after resolving a relative filesystem import.
+
+* Improve error messages when returning non-`Object` values from legacy
+  importers.
+
+## 1.49.11
+
+* Add support for 64-bit ARM releases on Linux.
+
+### Embedded Sass
+
+* The embedded compiler now correctly sets the `id` field for all
+  `OutboundMessage`s.
+
+## 1.49.10
+
+* Quiet deps mode now silences compiler warnings in mixins and functions that
+  are defined in dependencies even if they're invoked from application
+  stylesheets.
+
+* In expanded mode, Sass will now emit colors using `rgb()`, `rbga()`, `hsl()`,
+  and `hsla()` function notation if they were defined using the corresponding
+  notation. As per our browser support policy, this change was only done once
+  95% of browsers were confirmed to support this output format, and so is not
+  considered a breaking change.
+
+  Note that this output format is intended for human readability and not for
+  interoperability with other tools. As always, Sass targets the CSS
+  specification, and any tool that consumes Sass's output should parse all
+  colors that are supported by the CSS spec.
+
+* Fix a bug in which a color written using the four- or eight-digit hex format
+  could be emitted as a hex color rather than a format with higher browser
+  compatibility.
+
+* Calculations are no longer simplified within supports declarations
+
 ## 1.49.9
 
 ### Embedded Sass

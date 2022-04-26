@@ -90,8 +90,14 @@ export function valueError(message: string, name?: string): Error {
 export function pathToUrlString(path: string): string {
   if (p.isAbsolute(path)) return url.pathToFileURL(path).toString();
 
-  const components = p.sep === '\\' ? path.split(/[/\\]/) : path.split('/');
-  return components.map(encodeURIComponent).join('/');
+  // percent encode relative path like `pathToFileURL`
+  return encodeURI(path)
+    .replace(/[#?]/g, encodeURIComponent)
+    .replace(
+      process.platform === 'win32' ? /%(5B|5C|5D|5E|7C)/g : /%(5B|5D|5E|7C)/g,
+      decodeURIComponent
+    )
+    .replace(/\\/g, '/');
 }
 
 /**
@@ -131,6 +137,13 @@ export function protofySyntax(
     default:
       throw new Error(`Unknown syntax: "${syntax}"`);
   }
+}
+
+/** Returns whether `error` is a NodeJS-style exception with an error code. */
+export function isErrnoException(
+  error: unknown
+): error is NodeJS.ErrnoException {
+  return error instanceof Error && ('errno' in error || 'code' in error);
 }
 
 /**

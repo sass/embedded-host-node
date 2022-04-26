@@ -6,10 +6,12 @@ import {strict as assert} from 'assert';
 import {pathToFileURL, URL as NodeURL} from 'url';
 import * as fs from 'fs';
 import * as p from 'path';
+import * as util from 'util';
 
 import {resolvePath} from './resolve-path';
 import {
   fileUrlToPathCrossPlatform,
+  isErrnoException,
   thenOr,
   PromiseOr,
   SyncBoolean,
@@ -92,11 +94,33 @@ export class LegacyImporterWrapper<sync extends 'sync' | 'async'>
     // sure that all normal loads are preceded by exactly one relative load.
     if (this.expectingRelativeLoad) {
       if (url.startsWith('file:')) {
-        const resolved = resolvePath(
-          fileUrlToPathCrossPlatform(url),
-          options.fromImport
-        );
-        if (resolved !== null) return pathToFileURL(resolved);
+        let resolved: string | null = null;
+
+        try {
+          const path = fileUrlToPathCrossPlatform(url);
+          resolved = resolvePath(path, options.fromImport);
+        } catch (error: unknown) {
+          if (
+            error instanceof TypeError &&
+            isErrnoException(error) &&
+            (error.code === 'ERR_INVALID_URL' ||
+              error.code === 'ERR_INVALID_FILE_URL_PATH')
+          ) {
+            // It's possible for `url` to represent an invalid path for the
+            // current platform. For example, `@import "/foo/bar/baz"` will
+            // resolve to `file:///foo/bar/baz` which is an invalid URL on
+            // Windows. In that case, we treat it as though the file doesn't
+            // exist so that the user's custom importer can still handle the
+            // URL.
+          } else {
+            throw error;
+          }
+        }
+
+        if (resolved !== null) {
+          this.prev.push({url: resolved, path: true});
+          return pathToFileURL(resolved);
+        }
       }
 
       this.expectingRelativeLoad = false;
@@ -110,6 +134,13 @@ export class LegacyImporterWrapper<sync extends 'sync' | 'async'>
       thenOr(this.invokeCallbacks(url, prev.url, options), result => {
         if (result instanceof Error) throw result;
         if (result === null) return null;
+
+        if (typeof result !== 'object') {
+          throw (
+            'Expected importer to return an object, got ' +
+            `${util.inspect(result)}.`
+          );
+        }
 
         if ('contents' in result || !('file' in result)) {
           this.lastContents = result.contents ?? '';

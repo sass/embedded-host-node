@@ -16,7 +16,8 @@ shell.config.fatal = true;
 // The current platform's operating system. Throws if the operating system
 // is not supported by Dart Sass Embedded.
 const OS: 'linux' | 'macos' | 'windows' = (() => {
-  switch (process.platform) {
+  const platform = process.env.npm_config_platform || process.platform;
+  switch (platform) {
     case 'linux':
       return 'linux';
     case 'darwin':
@@ -24,14 +25,15 @@ const OS: 'linux' | 'macos' | 'windows' = (() => {
     case 'win32':
       return 'windows';
     default:
-      throw Error(`Platform ${process.platform} is not supported.`);
+      throw Error(`Platform ${platform} is not supported.`);
   }
 })();
 
 // The current platform's architecture. Throws if the architecture is not
 // supported by Dart Sass Embedded.
 const ARCH: 'ia32' | 'x64' | 'arm64' = (() => {
-  switch (process.arch) {
+  const arch = process.env.npm_config_arch || process.arch;
+  switch (arch) {
     case 'ia32':
       return 'ia32';
     case 'x86':
@@ -41,7 +43,7 @@ const ARCH: 'ia32' | 'x64' | 'arm64' = (() => {
     case 'arm64':
       return 'arm64';
     default:
-      throw Error(`Architecure ${process.arch} is not supported.`);
+      throw Error(`Architecure ${arch} is not supported.`);
   }
 })();
 

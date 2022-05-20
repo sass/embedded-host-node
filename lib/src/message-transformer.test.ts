@@ -62,10 +62,9 @@ describe('message transformer', () => {
     it('decodes buffer to OutboundMessage', done => {
       const message = validInboundMessage('a {b: c}');
 
-      messages.outboundMessages$.subscribe(
-        message => decodedMessages.push(message),
-        () => {},
-        () => {
+      messages.outboundMessages$.subscribe({
+        next: message => decodedMessages.push(message),
+        complete: () => {
           expect(decodedMessages.length).toBe(1);
           const response = decodedMessages[0]
             .payload as OutboundMessage.CompileResponse;
@@ -73,8 +72,8 @@ describe('message transformer', () => {
           const type = decodedMessages[0].type;
           expect(type).toEqual(OutboundMessage.MessageCase.COMPILE_RESPONSE);
           done();
-        }
-      );
+        },
+      });
 
       protobufs$.next(Buffer.from(message.serializeBinary()));
       protobufs$.complete();

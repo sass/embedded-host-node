@@ -22,7 +22,7 @@ shell.config.fatal = true;
     shell.exec('tsc');
 
     console.log('Copying JS API types to dist.');
-    await shell.cp('-R', 'lib/src/vendor/sass', 'dist/types');
+    shell.cp('-R', 'lib/src/vendor/sass', 'dist/types');
     await fs.unlink('dist/types/README.md');
 
     // .gitignore needs to exist in dist for `npm publish` to correctly exclude

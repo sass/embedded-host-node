@@ -601,7 +601,7 @@ export class SassNumber extends Value {
 
       // For single numerators, throw a detailed error with info about which unit
       // types would have been acceptable.
-      if (newNumerators.size === 1 && newDenominators.isEmpty) {
+      if (newNumerators.size === 1 && newDenominators.isEmpty()) {
         const type = typesByUnit[newNumerators.get(0)!];
         if (type) {
           return valueError(

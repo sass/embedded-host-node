@@ -126,8 +126,10 @@ export async function getDartSassEmbedded(
       }
 ): Promise<void> {
   const repo = 'dart-sass-embedded';
-
   options ??= defaultVersionOption('compiler-version');
+
+  await checkForMusl();
+
   if ('version' in options) {
     const version = options?.version;
     await downloadRelease({
@@ -153,6 +155,21 @@ export async function getDartSassEmbedded(
   const source = 'path' in options ? options.path : p.join(BUILD_PATH, repo);
   buildDartSassEmbedded(source);
   await link(p.join(source, 'build'), p.join(outPath, repo));
+}
+
+/**
+ * Throws an informative error if we're running in a Linux environment that uses
+ * musl.
+ */
+async function checkForMusl(): Promise<void> {
+  if (process.platform !== 'linux') return;
+
+  const executable = await fs.readFile(process.execPath);
+  if (!executable.includes('libc.musl-x86_64.so.1')) return;
+
+  throw Error(
+    "sass-embedded doesn't support Linux distributions that use musl-libc."
+  );
 }
 
 /**

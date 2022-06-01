@@ -165,7 +165,7 @@ async function checkForMusl(): Promise<void> {
   if (process.platform !== 'linux') return;
 
   const executable = await fs.readFile(process.execPath);
-  if (!executable.includes('libc.musl-x86_64.so.1')) return;
+  if (!executable.includes('libc.musl-')) return;
 
   throw Error(
     "sass-embedded doesn't support Linux distributions that use musl-libc."

@@ -601,7 +601,7 @@ export class SassNumber extends Value {
 
       // For single numerators, throw a detailed error with info about which unit
       // types would have been acceptable.
-      if (newNumerators.size === 1 && newDenominators.isEmpty) {
+      if (newNumerators.size === 1 && newDenominators.isEmpty()) {
         const type = typesByUnit[newNumerators.get(0)!];
         if (type) {
           return valueError(
@@ -613,10 +613,16 @@ export class SassNumber extends Value {
         }
       }
 
+      const unitSize = newNumerators.size + newDenominators.size;
       return valueError(
         `Expected $this to have ${
-          newNumerators.size + newDenominators.size > 1 ? 'units' : 'unit'
-        } ${unitString(newNumerators, newDenominators)}.`,
+          unitSize === 0
+            ? 'no units'
+            : `unit${unitSize > 1 ? 's' : ''} ${unitString(
+                newNumerators,
+                newDenominators
+              )}`
+        }.`,
         params.name
       );
     };
@@ -684,7 +690,7 @@ function unitString(
   denominators: List<string>
 ): string {
   if (numerators.isEmpty() && denominators.isEmpty()) {
-    return 'no units';
+    return '';
   }
 
   if (denominators.isEmpty()) {

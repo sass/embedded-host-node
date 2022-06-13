@@ -91,14 +91,14 @@ export class Dispatcher<sync extends 'sync' | 'async'> {
             : [message];
         })
       )
-      .subscribe(
-        message => this.messages$.next(message),
-        error => this.throwAndClose(error),
-        () => {
+      .subscribe({
+        next: message => this.messages$.next(message),
+        error: error => this.throwAndClose(error),
+        complete: () => {
           this.messages$.complete();
           this.errorInternal$.complete();
-        }
-      );
+        },
+      });
   }
 
   /**

@@ -18,7 +18,8 @@ shell.config.fatal = true;
 // The current platform's operating system. Throws if the operating system
 // is not supported by Dart Sass Embedded.
 const OS: 'linux' | 'macos' | 'windows' = (() => {
-  switch (process.platform) {
+  const platform = process.env.npm_config_platform || process.platform;
+  switch (platform) {
     case 'linux':
       return 'linux';
     case 'darwin':
@@ -26,14 +27,15 @@ const OS: 'linux' | 'macos' | 'windows' = (() => {
     case 'win32':
       return 'windows';
     default:
-      throw Error(`Platform ${process.platform} is not supported.`);
+      throw Error(`Platform ${platform} is not supported.`);
   }
 })();
 
 // The current platform's architecture. Throws if the architecture is not
 // supported by Dart Sass Embedded.
 const ARCH: 'ia32' | 'x64' | 'arm64' = (() => {
-  switch (process.arch) {
+  const arch = process.env.npm_config_arch || process.arch;
+  switch (arch) {
     case 'ia32':
       return 'ia32';
     case 'x86':
@@ -43,7 +45,7 @@ const ARCH: 'ia32' | 'x64' | 'arm64' = (() => {
     case 'arm64':
       return 'arm64';
     default:
-      throw Error(`Architecure ${process.arch} is not supported.`);
+      throw Error(`Architecure ${arch} is not supported.`);
   }
 })();
 
@@ -126,8 +128,10 @@ export async function getDartSassEmbedded(
       }
 ): Promise<void> {
   const repo = 'dart-sass-embedded';
-
   options ??= defaultVersionOption('compiler-version');
+
+  await checkForMusl();
+
   if ('version' in options) {
     const version = options?.version;
     await downloadRelease({
@@ -153,6 +157,21 @@ export async function getDartSassEmbedded(
   const source = 'path' in options ? options.path : p.join(BUILD_PATH, repo);
   buildDartSassEmbedded(source);
   await link(p.join(source, 'build'), p.join(outPath, repo));
+}
+
+/**
+ * Throws an informative error if we're running in a Linux environment that uses
+ * musl.
+ */
+async function checkForMusl(): Promise<void> {
+  if (process.platform !== 'linux') return;
+
+  const executable = await fs.readFile(process.execPath);
+  if (!executable.includes('libc.musl-')) return;
+
+  throw Error(
+    "sass-embedded doesn't support Linux distributions that use musl-libc."
+  );
 }
 
 /**

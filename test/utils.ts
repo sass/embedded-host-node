@@ -14,14 +14,14 @@ export function expectObservableToError<T>(
   errorMessage: string,
   done: () => void
 ): void {
-  observable.subscribe(
-    () => fail('expected error'),
-    error => {
+  observable.subscribe({
+    next: () => fail('expected error'),
+    error: error => {
       expect(error.message).toBe(errorMessage);
       done();
     },
-    () => fail('expected error')
-  );
+    complete: () => fail('expected error'),
+  });
 }
 
 /**

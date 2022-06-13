@@ -57,14 +57,14 @@ describe('packet transformer', () => {
 
     function expectDecoding(expected: Buffer[], done: () => void) {
       const actual: Buffer[] = [];
-      packets.outboundProtobufs$.subscribe(
-        protobuf => actual.push(protobuf),
-        () => fail('expected correct decoding'),
-        () => {
+      packets.outboundProtobufs$.subscribe({
+        next: protobuf => actual.push(protobuf),
+        error: () => fail('expected correct decoding'),
+        complete: () => {
           expect(actual).toEqual(expected);
           done();
-        }
-      );
+        },
+      });
     }
 
     beforeEach(() => {

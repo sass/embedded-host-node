@@ -1,3 +1,60 @@
+## 1.52.3
+
+* Fix crash when trailing loud comments (`/* ... */`) appear twice in a row
+  across two different imports which themselves imported the same file each.
+
+## 1.52.2
+
+* Preserve location of trailing loud comments (`/* ... */`) instead of pushing
+  the comment to the next line.
+
+## 1.52.1
+
+### Command Line Interface
+
+* Fix a bug where `--watch` mode would close immediately in TTY mode. This was
+  caused by our change to close `--watch` when stdin was closed *outside of* TTY
+  mode, which has been reverted for now while we work on a fix.
+
+## 1.52.0
+
+* Add support for arbitrary modifiers at the end of plain CSS imports, in
+  addition to the existing `supports()` and media queries. Sass now allows any
+  sequence of identifiers of functions after the URL of an import for forwards
+  compatibility with future additions to the CSS spec.
+
+* Fix an issue where source locations tracked through variable references could
+  potentially become incorrect.
+
+* Fix a bug where a loud comment in the source can break the source map when
+  embedding the sources, when using the command-line interface or the legacy JS
+  API.
+
+### JS API
+
+* `SassNumber.assertUnit()` and `SassNumber.assertNoUnits()` now correctly
+  return the number called on when it passes the assertion.
+
+## 1.51.0
+
+* **Potentially breaking change**: Change the order of maps returned by
+  `map.deep-merge()` to match those returned by `map.merge()`. All keys that
+  appeared in the first map will now be listed first in the same order they
+  appeared in that map, followed by any new keys added from the second map.
+
+* Improve the string output of some AST nodes in error messages.
+
+## 1.50.1
+
+### Embedded Sass
+
+* The JS embedded host and the embedded compiler will now properly avoid
+  resolving imports relative to the current working directory unless `'.'` is
+  passed as a load path.
+
+* Fix a bug in the JS embedded host's implementation of the legacy JS API where
+  imports that began with `/` could crash on Windows.
+
 ## 1.50.0
 
 * `@extend` now treats [`:where()`] the same as `:is()`.

@@ -2,7 +2,7 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-const fetch = require('make-fetch-happen').defaults();
+import {defaults as initMakeFetchHappen} from 'make-fetch-happen';
 import extractZip = require('extract-zip');
 import {promises as fs, existsSync, mkdirSync} from 'fs';
 import * as p from 'path';
@@ -10,6 +10,8 @@ import * as shell from 'shelljs';
 import {extract as extractTar} from 'tar';
 
 import * as pkg from '../package.json';
+
+const fetch = initMakeFetchHappen();
 
 shell.config.fatal = true;
 

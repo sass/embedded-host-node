@@ -1,8 +1,8 @@
 {
   "name": "sass-embedded",
-  "version": "1.52.3",
+  "version": "1.53.0",
   "protocol-version": "1.0.0",
-  "compiler-version": "1.52.3",
+  "compiler-version": "1.53.0",
   "description": "Node.js library that communicates with Embedded Dart Sass using the Embedded Sass protocol",
   "repository": "sass/embedded-host-node",
   "author": "Google Inc.",
@@ -59,7 +59,6 @@
     "ts-protoc-gen": "^0.15.0",
     "typescript": "^4.4.3",
     "yargs": "^17.2.1",
-
     "minipass": "3.2.1"
   }
 }

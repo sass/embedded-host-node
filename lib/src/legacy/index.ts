@@ -159,6 +159,7 @@ function convertOptions<sync extends 'sync' | 'async'>(
     style: options.outputStyle as 'compressed' | 'expanded' | undefined,
     quietDeps: options.quietDeps,
     verbose: options.verbose,
+    charset: options.charset,
     logger: options.logger,
   };
 }

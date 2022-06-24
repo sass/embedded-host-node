@@ -125,6 +125,7 @@ function newCompileRequest(
   request.setAlertAscii(!!options?.alertAscii);
   request.setQuietDeps(!!options?.quietDeps);
   request.setVerbose(!!options?.verbose);
+  request.setCharset(!!(options?.charset ?? true));
 
   switch (options?.style ?? 'expanded') {
     case 'expanded':

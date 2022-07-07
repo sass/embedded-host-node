@@ -153,7 +153,7 @@ export async function getDartSassEmbedded(
       outPath: BUILD_PATH,
       ref: options.ref,
     });
-    await maybeOverrideSassDependency(p.join(BUILD_PATH, repo));
+    await maybeOverrideSassDependency(repo);
   }
 
   const source = 'path' in options ? options.path : p.join(BUILD_PATH, repo);
@@ -165,20 +165,22 @@ export async function getDartSassEmbedded(
  * Overrides the dart-sass dependency to latest git commit on main when the
  * pubspec file declares it as a "-dev" dependency.
  */
-async function maybeOverrideSassDependency(path: string): Promise<void> {
-  const pubspecPath = p.join(path, 'pubspec.yaml');
+async function maybeOverrideSassDependency(repo: string): Promise<void> {
+  const pubspecPath = p.join(BUILD_PATH, repo, 'pubspec.yaml');
   const pubspecRaw = await fs.readFile(pubspecPath, {encoding: 'utf-8'});
   const pubspec = yaml.parse(pubspecRaw);
-  const sassDependency = pubspec?.dependencies?.sass;
+  const sassVersion = pubspec?.dependencies?.sass;
 
-  if (typeof sassDependency !== 'string') return;
-  if (!sassDependency.endsWith('-dev')) return;
+  if (typeof sassVersion !== 'string') return;
+  if (!sassVersion.endsWith('-dev')) return;
 
-  // On the off-chance we have another dependency_override, don't overwrite it.
-  if (!pubspec['dependency_overrides']) pubspec['dependency_overrides'] = {};
+  console.log(
+    `${repo} depends on sass: ${sassVersion}, overriding with latest commit.`
+  );
 
-  pubspec['dependency_overrides'].sass = {
-    git: 'https://github.com/sass/dart-sass.git',
+  pubspec['dependency_overrides'] = {
+    ...pubspec['dependency_overrides'],
+    sass: {git: 'https://github.com/sass/dart-sass.git'},
   };
   await fs.writeFile(pubspecPath, yaml.stringify(pubspec), {encoding: 'utf-8'});
 }

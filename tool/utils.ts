@@ -6,6 +6,7 @@ import {defaults as initMakeFetchHappen} from 'make-fetch-happen';
 import extractZip = require('extract-zip');
 import {promises as fs, existsSync, mkdirSync} from 'fs';
 import * as p from 'path';
+import * as yaml from 'yaml';
 import * as shell from 'shelljs';
 import {extract as extractTar} from 'tar';
 
@@ -45,7 +46,7 @@ const ARCH: 'ia32' | 'x64' | 'arm64' = (() => {
     case 'arm64':
       return 'arm64';
     default:
-      throw Error(`Architecure ${arch} is not supported.`);
+      throw Error(`Architecture ${arch} is not supported.`);
   }
 })();
 
@@ -152,11 +153,34 @@ export async function getDartSassEmbedded(
       outPath: BUILD_PATH,
       ref: options.ref,
     });
+    await maybeOverrideSassDependency(p.join(BUILD_PATH, repo));
   }
 
   const source = 'path' in options ? options.path : p.join(BUILD_PATH, repo);
   buildDartSassEmbedded(source);
   await link(p.join(source, 'build'), p.join(outPath, repo));
+}
+
+/**
+ * Overrides the dart-sass dependency to latest git commit on main when the
+ * pubspec file declares it as a "-dev" dependency.
+ */
+async function maybeOverrideSassDependency(path: string): Promise<void> {
+  const pubspecPath = p.join(path, 'pubspec.yaml');
+  const pubspecRaw = await fs.readFile(pubspecPath, {encoding: 'utf-8'});
+  const pubspec = yaml.parse(pubspecRaw);
+  const sassDependency = pubspec?.dependencies?.sass;
+
+  if (typeof sassDependency !== 'string') return;
+  if (!sassDependency.endsWith('-dev')) return;
+
+  // On the off-chance we have another dependency_override, don't overwrite it.
+  if (!pubspec['dependency_overrides']) pubspec['dependency_overrides'] = {};
+
+  pubspec['dependency_overrides'].sass = {
+    git: 'https://github.com/sass/dart-sass.git',
+  };
+  await fs.writeFile(pubspecPath, yaml.stringify(pubspec), {encoding: 'utf-8'});
 }
 
 /**
@@ -175,7 +199,7 @@ async function checkForMusl(): Promise<void> {
 }
 
 /**
- * Checks out JS API type defintions from the Sass language repo.
+ * Checks out JS API type definitions from the Sass language repo.
  *
  * Can check out a Git `ref`, or link to the source at `path`. By default,
  * checks out the latest revision from GitHub.

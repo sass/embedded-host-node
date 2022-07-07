@@ -133,11 +133,14 @@ export async function getDartSassEmbedded(
   await checkForMusl();
 
   if ('version' in options) {
+    let binaryHost = process.env['npm_config_sass_embedded_binary_host_mirror'] || `https://github.com/sass/${repo}/releases/download/`;
+    if (binaryHost[binaryHost.length - 1] !== '/') {
+      binaryHost += '/'
+    }
     const version = options?.version;
     await downloadRelease({
       repo,
-      assetUrl:
-        `https://github.com/sass/${repo}/releases/download/` +
+      assetUrl: binaryHost +
         `${version}/sass_embedded-${version}-` +
         `${OS}-${ARCH}${ARCHIVE_EXTENSION}`,
       outPath,

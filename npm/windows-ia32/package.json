@@ -1,0 +1,22 @@
+{
+  "name": "@sass-embedded/windows-ia32",
+  "version": "1.54.4",
+  "repository": "sass/embedded-host-node",
+  "license": "MIT",
+  "scripts": {
+    "download": "ts-node ../../tool/prepare-optional-release.ts",
+    "prepublishOnly": "npm run download --platform=win32 --arch=ia32"
+  },
+  "files": [
+    "dart-sass-embedded/**/*"
+  ],
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "os": [
+    "win32"
+  ],
+  "cpu": [
+    "ia32"
+  ]
+}

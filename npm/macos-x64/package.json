@@ -1,0 +1,22 @@
+{
+  "name": "@sass-embedded/macos-x64",
+  "version": "1.54.4",
+  "repository": "sass/embedded-host-node",
+  "license": "MIT",
+  "scripts": {
+    "download": "ts-node ../../tool/prepare-optional-release.ts",
+    "prepublishOnly": "npm run download --platform=darwin --arch=x64"
+  },
+  "files": [
+    "dart-sass-embedded/**/*"
+  ],
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "os": [
+    "darwin"
+  ],
+  "cpu": [
+    "x64"
+  ]
+}

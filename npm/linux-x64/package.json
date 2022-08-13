@@ -1,12 +1,10 @@
 {
   "name": "@sass-embedded/linux-x64",
   "version": "1.54.4",
+  "description": "The linux-x64 binary for sass-embedded",
   "repository": "sass/embedded-host-node",
+  "author": "Google Inc.",
   "license": "MIT",
-  "scripts": {
-    "download": "ts-node ../../tool/prepare-optional-release.ts",
-    "prepublishOnly": "npm run download --platform=linux --arch=x64"
-  },
   "files": [
     "dart-sass-embedded/**/*"
   ],

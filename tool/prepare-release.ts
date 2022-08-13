@@ -53,7 +53,7 @@ async function sanityCheckBeforeRelease() {
   for (const [dep, version] of Object.entries(pkg.optionalDependencies)) {
     if (version !== releaseVersion) {
       throw Error(
-        `optional dependency ${dep}'s version has not been updated to ${releaseVersion}.`
+        `optional dependency ${dep}'s version doesn't match ${releaseVersion}.`
       );
     }
   }

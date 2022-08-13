@@ -4,33 +4,22 @@
 
 import * as fs from 'fs';
 import * as p from 'path';
-
-const {platform, arch} = process;
-
-const PACKAGES: {[key: string]: string} = {
-  'linux arm64': '@sass-embedded/linux-arm64',
-  'linux ia32': '@sass-embedded/linux-ia32',
-  'linux x64': '@sass-embedded/linux-x64',
-  'darwin arm64': '@sass-embedded/macos-arm64',
-  'darwin x64': '@sass-embedded/macos-x64',
-  'win32 ia32': '@sass-embedded/windows-ia32',
-  'win32 x64': '@sass-embedded/windows-x64',
-};
+import {isErrnoException} from './utils';
 
 /** The path to the embedded compiler executable. */
 export const compilerPath = (() => {
   try {
-    const executable = require.resolve(
-      `${
-        PACKAGES[`${platform} ${arch}`]
+    return require.resolve(
+      `@sass-embedded/${process.platform}-${
+        process.arch
       }/dart-sass-embedded/dart-sass-embedded${
-        platform === 'win32' ? '.bat' : ''
+        process.platform === 'win32' ? '.bat' : ''
       }`
     );
-
-    if (fs.existsSync(executable)) return executable;
-  } catch (e) {
-    // ignore
+  } catch (e: unknown) {
+    if (!(isErrnoException(e) && e.code === 'MODULE_NOT_FOUND')) {
+      throw e;
+    }
   }
 
   // find for development
@@ -47,6 +36,6 @@ export const compilerPath = (() => {
   }
 
   throw new Error(
-    "Embedded Dart Sass couldn't find the embedded compiler executable."
+    `Embedded Dart Sass couldn't find the embedded compiler executable. Please make sure there is an optional dependency @sass-embedded/${process.platform}-${process.arch} is installed in node_modules.`
   );
 })();

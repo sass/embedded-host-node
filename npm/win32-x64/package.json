@@ -1,12 +1,10 @@
 {
-  "name": "@sass-embedded/windows-ia32",
+  "name": "@sass-embedded/win32-x64",
   "version": "1.54.4",
+  "description": "The win32-x64 binary for sass-embedded",
   "repository": "sass/embedded-host-node",
+  "author": "Google Inc.",
   "license": "MIT",
-  "scripts": {
-    "download": "ts-node ../../tool/prepare-optional-release.ts",
-    "prepublishOnly": "npm run download --platform=win32 --arch=ia32"
-  },
   "files": [
     "dart-sass-embedded/**/*"
   ],
@@ -17,6 +15,6 @@
     "win32"
   ],
   "cpu": [
-    "ia32"
+    "x64"
   ]
 }

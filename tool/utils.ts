@@ -18,8 +18,8 @@ shell.config.fatal = true;
 
 // The current platform's operating system. Throws if the operating system
 // is not supported by Dart Sass Embedded.
-const OS: 'linux' | 'macos' | 'windows' = (() => {
-  const platform = process.env.npm_config_platform || process.platform;
+const getOS = (platform?: string) => {
+  platform = platform || process.env.npm_config_platform || process.platform;
   switch (platform) {
     case 'linux':
       return 'linux';
@@ -30,12 +30,12 @@ const OS: 'linux' | 'macos' | 'windows' = (() => {
     default:
       throw Error(`Platform ${platform} is not supported.`);
   }
-})();
+};
 
 // The current platform's architecture. Throws if the architecture is not
 // supported by Dart Sass Embedded.
-const ARCH: 'ia32' | 'x64' | 'arm64' = (() => {
-  const arch = process.env.npm_config_arch || process.arch;
+const getArch = (arch?: string) => {
+  arch = arch || process.env.npm_config_arch || process.arch;
   switch (arch) {
     case 'ia32':
       return 'ia32';
@@ -48,13 +48,17 @@ const ARCH: 'ia32' | 'x64' | 'arm64' = (() => {
     default:
       throw Error(`Architecture ${arch} is not supported.`);
   }
-})();
+};
 
 // The current platform's file extension for archives.
-const ARCHIVE_EXTENSION = OS === 'windows' ? '.zip' : '.tar.gz';
+const getArchiveExtension = (platform?: string) =>
+  getOS(platform) === 'windows' ? '.zip' : '.tar.gz';
 
 // Directory that holds source files.
 const BUILD_PATH = 'build';
+
+// Package names under `npm` directory that contains optional dependencies.
+export type OptionalDependencyName = keyof typeof pkg.optionalDependencies;
 
 /**
  * Gets the Embedded Protocol.
@@ -85,7 +89,7 @@ export async function getEmbeddedProtocol(
     const version = options?.version;
     await downloadRelease({
       repo,
-      assetUrl: `https://github.com/sass/${repo}/archive/${version}${ARCHIVE_EXTENSION}`,
+      assetUrl: `https://github.com/sass/${repo}/archive/${version}${getArchiveExtension()}`,
       outPath: BUILD_PATH,
     });
     await fs.rename(
@@ -135,12 +139,17 @@ export async function getDartSassEmbedded(
 
   if ('version' in options) {
     const version = options?.version;
+    // Download platform-specific release for optinal dependencies if the
+    // outPath under the `npm` directory.
+    const [platform, arch] = outPath.startsWith('npm/')
+      ? outPath.split('npm/')[1].split('-')
+      : [];
     await downloadRelease({
       repo,
       assetUrl:
         `https://github.com/sass/${repo}/releases/download/` +
         `${version}/sass_embedded-${version}-` +
-        `${OS}-${ARCH}${ARCHIVE_EXTENSION}`,
+        `${getOS(platform)}-${getArch(arch)}${getArchiveExtension(platform)}`,
       outPath,
     });
     await fs.rename(p.join(outPath, 'sass_embedded'), p.join(outPath, repo));
@@ -247,9 +256,11 @@ async function downloadRelease(options: {
 
   console.log(`Unzipping ${options.repo} release asset to ${options.outPath}.`);
   await cleanDir(p.join(options.outPath, options.repo));
-  const zippedAssetPath = `${options.outPath}/${options.repo}${ARCHIVE_EXTENSION}`;
+  const zippedAssetPath = `${options.outPath}/${
+    options.repo
+  }${getArchiveExtension()}`;
   await fs.writeFile(zippedAssetPath, releaseAsset);
-  if (OS === 'windows') {
+  if (getOS() === 'windows') {
     await extractZip(zippedAssetPath, {
       dir: p.join(process.cwd(), options.outPath),
     });
@@ -297,11 +308,11 @@ function buildEmbeddedProtocol(repoPath: string): void {
   const proto = p.join(repoPath, 'embedded_sass.proto');
   console.log(`Building pbjs and TS declaration file from ${proto}.`);
   const protocPath =
-    OS === 'windows'
+    getOS() === 'windows'
       ? '%CD%/node_modules/protoc/protoc/bin/protoc.exe'
       : 'node_modules/protoc/protoc/bin/protoc';
   const pluginPath =
-    OS === 'windows'
+    getOS() === 'windows'
       ? '%CD%/node_modules/.bin/protoc-gen-ts.cmd'
       : 'node_modules/.bin/protoc-gen-ts';
   mkdirSync('build/embedded-protocol', {recursive: true});
@@ -343,7 +354,7 @@ function defaultVersionOption(
 // Links or copies the contents of `source` into `destination`.
 async function link(source: string, destination: string): Promise<void> {
   await cleanDir(destination);
-  if (OS === 'windows') {
+  if (getOS() === 'windows') {
     console.log(`Copying ${source} into ${destination}.`);
     shell.cp('-R', source, destination);
   } else {

@@ -202,13 +202,13 @@ jobs:
         env:
           NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}'
         run: |
-          cd npm/linux-arm64 && npm_config_platform=linux npm_config_arch=arm64 npx ts-node ../../tool/prepare-optional-release.ts && npm publish && cd ../..
-          cd npm/linux-ia32 && npm_config_platform=linux npm_config_arch=ia32 npx ts-node ../../tool/prepare-optional-release.ts && npm publish && cd ../..
-          cd npm/linux-x64 && npm_config_platform=linux npm_config_arch=x64 npx ts-node ../../tool/prepare-optional-release.ts && npm publish && cd ../..
-          cd npm/darwin-arm64 && npm_config_platform=darwin npm_config_arch=arm64 npx ts-node ../../tool/prepare-optional-release.ts && npm publish && cd ../..
-          cd npm/darwin-x64 && npm_config_platform=darwin npm_config_arch=x64 npx ts-node ../../tool/prepare-optional-release.ts && npm publish && cd ../..
-          cd npm/win32-ia32 && npm_config_platform=win32 npm_config_arch=ia32 npx ts-node ../../tool/prepare-optional-release.ts && npm publish && cd ../..
-          cd npm/win32-x64 && npm_config_platform=win32 npm_config_arch=x64 npx ts-node ../../tool/prepare-optional-release.ts && npm publish && cd ../..
+          npx ts-node ./tool/prepare-optional-release.ts --package=@sass-embedded/linux-arm64 && npm publish ./npm/linux-arm64
+          npx ts-node ./tool/prepare-optional-release.ts --package=@sass-embedded/linux-ia32 && npm publish ./npm/linux-ia32
+          npx ts-node ./tool/prepare-optional-release.ts --package=@sass-embedded/linux-x64 && npm publish ./npm/linux-x64
+          npx ts-node ./tool/prepare-optional-release.ts --package=@sass-embedded/darwin-arm64 && npm publish ./npm/darwin-arm64
+          npx ts-node ./tool/prepare-optional-release.ts --package=@sass-embedded/darwin-x64 && npm publish ./npm/darwin-x64
+          npx ts-node ./tool/prepare-optional-release.ts --package=@sass-embedded/win32-ia32 && npm publish ./npm/win32-ia32
+          npx ts-node ./tool/prepare-optional-release.ts --package=@sass-embedded/win32-x64 && npm publish ./npm/win32-x64
 
       - run: npm publish
         env:

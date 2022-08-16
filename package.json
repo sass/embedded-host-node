@@ -23,16 +23,17 @@
     "compile": "tsc",
     "fix": "gts fix",
     "prepublishOnly": "npm run clean && ts-node ./tool/prepare-release.ts",
-    "test": "jest"
+    "test": "jest",
+    "prepare-optional": "ts-node ./tool/prepare-optional-release.ts"
   },
   "optionalDependencies": {
     "@sass-embedded/linux-arm64": "1.54.4",
     "@sass-embedded/linux-ia32": "1.54.4",
     "@sass-embedded/linux-x64": "1.54.4",
-    "@sass-embedded/macos-arm64": "1.54.4",
-    "@sass-embedded/macos-x64": "1.54.4",
-    "@sass-embedded/windows-ia32": "1.54.4",
-    "@sass-embedded/windows-x64": "1.54.4"
+    "@sass-embedded/darwin-arm64": "1.54.4",
+    "@sass-embedded/darwin-x64": "1.54.4",
+    "@sass-embedded/win32-ia32": "1.54.4",
+    "@sass-embedded/win32-x64": "1.54.4"
   },
   "dependencies": {
     "buffer-builder": "^0.2.0",

@@ -1,22 +1,8 @@
-import yargs from 'yargs';
-import {getDartSassEmbedded, OptionalDependencyName} from './utils';
-
-import * as pkg from '../package.json';
-
-const argv = yargs(process.argv.slice(2))
-  .option('package', {
-    type: 'string',
-    description:
-      'Directory name under `npm` directory that contains optional dependencies.',
-    demandOption: true,
-    choices: Object.keys(pkg.optionalDependencies),
-  })
-  .parseSync();
+import {getDartSassEmbedded} from './utils';
 
 (async () => {
   try {
-    const packageName = argv.package as OptionalDependencyName;
-    const dirName = packageName.split('/')[1];
+    const dirName = `${process.env.npm_config_platform}-${process.env.npm_config_arch}`;
     await getDartSassEmbedded(`npm/${dirName}`);
   } catch (error) {
     console.error(error);

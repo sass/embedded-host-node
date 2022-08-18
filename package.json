@@ -23,8 +23,7 @@
     "compile": "tsc",
     "fix": "gts fix",
     "prepublishOnly": "npm run clean && ts-node ./tool/prepare-release.ts",
-    "test": "jest",
-    "prepare-optional": "ts-node ./tool/prepare-optional-release.ts"
+    "test": "jest"
   },
   "optionalDependencies": {
     "@sass-embedded/linux-arm64": "1.54.4",

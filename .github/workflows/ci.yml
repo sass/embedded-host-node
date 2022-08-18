@@ -202,13 +202,13 @@ jobs:
         env:
           NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}'
         run: |
-          npm run prepare-optional --platform=linux --arch=arm64 && npm publish ./npm/linux-arm64
-          npm run prepare-optional --platform=linux --arch=ia32 && npm publish ./npm/linux-ia32
-          npm run prepare-optional --platform=linux --arch=x64 && npm publish ./npm/linux-x64
-          npm run prepare-optional --platform=darwin --arch=arm64 && npm publish ./npm/darwin-arm64
-          npm run prepare-optional --platform=darwin --arch=x64 && npm publish ./npm/darwin-x64
-          npm run prepare-optional --platform=win32 --arch=ia32 && npm publish ./npm/win32-ia32
-          npm run prepare-optional --platform=win32 --arch=x64 && npm publish ./npm/win32-x64
+          npx ts-node ./tool/prepare-optional-release.ts --package=linux-arm64 && npm publish ./npm/linux-arm64
+          npx ts-node ./tool/prepare-optional-release.ts --package=linux-ia32 && npm publish ./npm/linux-ia32
+          npx ts-node ./tool/prepare-optional-release.ts --package=linux-x64 && npm publish ./npm/linux-x64
+          npx ts-node ./tool/prepare-optional-release.ts --package=darwin-arm64 && npm publish ./npm/darwin-arm64
+          npx ts-node ./tool/prepare-optional-release.ts --package=darwin-x64 && npm publish ./npm/darwin-x64
+          npx ts-node ./tool/prepare-optional-release.ts --package=win32-ia32 && npm publish ./npm/win32-ia32
+          npx ts-node ./tool/prepare-optional-release.ts --package=win32-x64 && npm publish ./npm/win32-x64
 
       - run: npm publish
         env:

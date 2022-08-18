@@ -6,17 +6,19 @@ import {promises as fs} from 'fs';
 import * as shell from 'shelljs';
 
 import * as pkg from '../package.json';
-import {getEmbeddedProtocol, getJSApi} from './utils';
+import {getEmbeddedProtocol, getJSApi, getOS} from './utils';
 
 shell.config.fatal = true;
 
 (async () => {
   try {
+    const os = getOS(process.env.npm_config_platform || process.platform);
+
     await sanityCheckBeforeRelease();
 
-    await getEmbeddedProtocol('lib/src/vendor');
+    await getEmbeddedProtocol('lib/src/vendor', os);
 
-    await getJSApi('lib/src/vendor');
+    await getJSApi('lib/src/vendor', os);
 
     console.log('Transpiling TS into dist.');
     shell.exec('tsc');

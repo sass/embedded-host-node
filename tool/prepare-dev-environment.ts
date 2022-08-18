@@ -4,7 +4,13 @@
 
 import yargs from 'yargs';
 
-import {getDartSassEmbedded, getEmbeddedProtocol, getJSApi} from './utils';
+import {
+  getArch,
+  getDartSassEmbedded,
+  getEmbeddedProtocol,
+  getJSApi,
+  getOS,
+} from './utils';
 
 const argv = yargs(process.argv.slice(2))
   .option('compiler-path', {
@@ -57,51 +63,53 @@ const argv = yargs(process.argv.slice(2))
 (async () => {
   try {
     const outPath = 'lib/src/vendor';
+    const os = getOS(process.env.npm_config_platform || process.platform);
+    const arch = getArch(process.env.npm_config_arch || process.arch);
 
     if (argv['protocol-version']) {
-      await getEmbeddedProtocol(outPath, {
+      await getEmbeddedProtocol(outPath, os, {
         version: argv['protocol-version'],
       });
     } else if (argv['protocol-ref']) {
-      await getEmbeddedProtocol(outPath, {
+      await getEmbeddedProtocol(outPath, os, {
         ref: argv['protocol-ref'],
       });
     } else if (argv['protocol-path']) {
-      await getEmbeddedProtocol(outPath, {
+      await getEmbeddedProtocol(outPath, os, {
         path: argv['protocol-path'],
       });
     } else {
-      await getEmbeddedProtocol(outPath);
+      await getEmbeddedProtocol(outPath, os);
     }
 
     if (!argv['skip-compiler']) {
       if (argv['compiler-version']) {
-        await getDartSassEmbedded(outPath, {
+        await getDartSassEmbedded(outPath, os, arch, {
           version: argv['compiler-version'],
         });
       } else if (argv['compiler-ref']) {
-        await getDartSassEmbedded(outPath, {
+        await getDartSassEmbedded(outPath, os, arch, {
           ref: argv['compiler-ref'],
         });
       } else if (argv['compiler-path']) {
-        await getDartSassEmbedded(outPath, {
+        await getDartSassEmbedded(outPath, os, arch, {
           path: argv['compiler-path'],
         });
       } else {
-        await getDartSassEmbedded(outPath);
+        await getDartSassEmbedded(outPath, os, arch);
       }
     }
 
     if (argv['api-ref']) {
-      await getJSApi(outPath, {
+      await getJSApi(outPath, os, {
         ref: argv['api-ref'],
       });
     } else if (argv['api-path']) {
-      await getJSApi(outPath, {
+      await getJSApi(outPath, os, {
         path: argv['api-path'],
       });
     } else {
-      await getJSApi(outPath);
+      await getJSApi(outPath, os);
     }
   } catch (error) {
     console.error(error);

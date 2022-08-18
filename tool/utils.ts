@@ -16,10 +16,15 @@ const fetch = initMakeFetchHappen();
 
 shell.config.fatal = true;
 
-// The current platform's operating system. Throws if the operating system
+// Directory that holds source files.
+const BUILD_PATH = 'build';
+
+export type OSKind = 'linux' | 'macos' | 'windows';
+export type ArchKind = 'ia32' | 'x64' | 'arm64';
+
+// Get the platform's operating system. Throws if the operating system
 // is not supported by Dart Sass Embedded.
-const OS: 'linux' | 'macos' | 'windows' = (() => {
-  const platform = process.env.npm_config_platform || process.platform;
+export function getOS(platform: string): OSKind {
   switch (platform) {
     case 'linux':
       return 'linux';
@@ -30,12 +35,11 @@ const OS: 'linux' | 'macos' | 'windows' = (() => {
     default:
       throw Error(`Platform ${platform} is not supported.`);
   }
-})();
+}
 
-// The current platform's architecture. Throws if the architecture is not
+// Get the platform's architecture. Throws if the architecture is not
 // supported by Dart Sass Embedded.
-const ARCH: 'ia32' | 'x64' | 'arm64' = (() => {
-  const arch = process.env.npm_config_arch || process.arch;
+export function getArch(arch: string): ArchKind {
   switch (arch) {
     case 'ia32':
       return 'ia32';
@@ -48,13 +52,12 @@ const ARCH: 'ia32' | 'x64' | 'arm64' = (() => {
     default:
       throw Error(`Architecture ${arch} is not supported.`);
   }
-})();
+}
 
-// The current platform's file extension for archives.
-const ARCHIVE_EXTENSION = OS === 'windows' ? '.zip' : '.tar.gz';
-
-// Directory that holds source files.
-const BUILD_PATH = 'build';
+// Get the platform's file extension for archives.
+function getArchiveExtension(os: OSKind): '.zip' | '.tar.gz' {
+  return os === 'windows' ? '.zip' : '.tar.gz';
+}
 
 /**
  * Gets the Embedded Protocol.
@@ -67,6 +70,7 @@ const BUILD_PATH = 'build';
  */
 export async function getEmbeddedProtocol(
   outPath: string,
+  os: OSKind,
   options?:
     | {
         version: string;
@@ -85,8 +89,11 @@ export async function getEmbeddedProtocol(
     const version = options?.version;
     await downloadRelease({
       repo,
-      assetUrl: `https://github.com/sass/${repo}/archive/${version}${ARCHIVE_EXTENSION}`,
+      assetUrl: `https://github.com/sass/${repo}/archive/${version}${getArchiveExtension(
+        os
+      )}`,
       outPath: BUILD_PATH,
+      os,
     });
     await fs.rename(
       p.join(BUILD_PATH, `${repo}-${version}`),
@@ -102,8 +109,8 @@ export async function getEmbeddedProtocol(
 
   const source =
     options && 'path' in options ? options.path : p.join(BUILD_PATH, repo);
-  buildEmbeddedProtocol(source);
-  await link('build/embedded-protocol', p.join(outPath, repo));
+  buildEmbeddedProtocol(source, os);
+  await link('build/embedded-protocol', p.join(outPath, repo), os);
 }
 
 /**
@@ -117,6 +124,8 @@ export async function getEmbeddedProtocol(
  */
 export async function getDartSassEmbedded(
   outPath: string,
+  os: OSKind,
+  arch: ArchKind,
   options?:
     | {
         version: string;
@@ -140,8 +149,9 @@ export async function getDartSassEmbedded(
       assetUrl:
         `https://github.com/sass/${repo}/releases/download/` +
         `${version}/sass_embedded-${version}-` +
-        `${OS}-${ARCH}${ARCHIVE_EXTENSION}`,
+        `${os}-${arch}${getArchiveExtension(os)}`,
       outPath,
+      os,
     });
     await fs.rename(p.join(outPath, 'sass_embedded'), p.join(outPath, repo));
     return;
@@ -158,7 +168,7 @@ export async function getDartSassEmbedded(
 
   const source = 'path' in options ? options.path : p.join(BUILD_PATH, repo);
   buildDartSassEmbedded(source);
-  await link(p.join(source, 'build'), p.join(outPath, repo));
+  await link(p.join(source, 'build'), p.join(outPath, repo), os);
 }
 
 /**
@@ -208,6 +218,7 @@ async function checkForMusl(): Promise<void> {
  */
 export async function getJSApi(
   outPath: string,
+  os: OSKind,
   options?: {ref: string} | {path: string}
 ): Promise<void> {
   const repo = 'sass';
@@ -224,7 +235,7 @@ export async function getJSApi(
     source = options.path;
   }
 
-  await link(p.join(source, 'js-api-doc'), p.join(outPath, repo));
+  await link(p.join(source, 'js-api-doc'), p.join(outPath, repo), os);
 }
 
 // Downloads the release for `repo` located at `assetUrl`, then unzips it into
@@ -233,6 +244,7 @@ async function downloadRelease(options: {
   repo: string;
   assetUrl: string;
   outPath: string;
+  os: OSKind;
 }): Promise<void> {
   console.log(`Downloading ${options.repo} release asset.`);
   const response = await fetch(options.assetUrl, {
@@ -247,9 +259,11 @@ async function downloadRelease(options: {
 
   console.log(`Unzipping ${options.repo} release asset to ${options.outPath}.`);
   await cleanDir(p.join(options.outPath, options.repo));
-  const zippedAssetPath = `${options.outPath}/${options.repo}${ARCHIVE_EXTENSION}`;
+  const zippedAssetPath = `${options.outPath}/${
+    options.repo
+  }${getArchiveExtension(options.os)}`;
   await fs.writeFile(zippedAssetPath, releaseAsset);
-  if (OS === 'windows') {
+  if (options.os === 'windows') {
     await extractZip(zippedAssetPath, {
       dir: p.join(process.cwd(), options.outPath),
     });
@@ -293,15 +307,15 @@ function fetchRepo(options: {
 }
 
 // Builds the embedded proto at `repoPath` into a pbjs with TS declaration file.
-function buildEmbeddedProtocol(repoPath: string): void {
+function buildEmbeddedProtocol(repoPath: string, os: OSKind): void {
   const proto = p.join(repoPath, 'embedded_sass.proto');
   console.log(`Building pbjs and TS declaration file from ${proto}.`);
   const protocPath =
-    OS === 'windows'
+    os === 'windows'
       ? '%CD%/node_modules/protoc/protoc/bin/protoc.exe'
       : 'node_modules/protoc/protoc/bin/protoc';
   const pluginPath =
-    OS === 'windows'
+    os === 'windows'
       ? '%CD%/node_modules/.bin/protoc-gen-ts.cmd'
       : 'node_modules/.bin/protoc-gen-ts';
   mkdirSync('build/embedded-protocol', {recursive: true});
@@ -341,9 +355,13 @@ function defaultVersionOption(
 }
 
 // Links or copies the contents of `source` into `destination`.
-async function link(source: string, destination: string): Promise<void> {
+async function link(
+  source: string,
+  destination: string,
+  os: OSKind
+): Promise<void> {
   await cleanDir(destination);
-  if (OS === 'windows') {
+  if (os === 'windows') {
     console.log(`Copying ${source} into ${destination}.`);
     shell.cp('-R', source, destination);
   } else {

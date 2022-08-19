@@ -1,5 +1,9 @@
 import yargs from 'yargs';
-import {ArchKind, getArch, getDartSassEmbedded, getOS, OSKind} from './utils';
+import {
+  getDartSassEmbedded,
+  nodePlatformToDartPlatform,
+  nodeArchToDartArch,
+} from './utils';
 
 import * as pkg from '../package.json';
 
@@ -20,8 +24,8 @@ const argv = yargs(process.argv.slice(2))
     const [platform, arch] = argv.package.split('-');
     await getDartSassEmbedded(
       `npm/${argv.package}`,
-      getOS(platform),
-      getArch(arch)
+      nodePlatformToDartPlatform(platform),
+      nodeArchToDartArch(arch)
     );
   } catch (error) {
     console.error(error);

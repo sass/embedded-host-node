@@ -5,11 +5,11 @@
 import yargs from 'yargs';
 
 import {
-  getArch,
+  nodeArchToDartArch,
   getDartSassEmbedded,
   getEmbeddedProtocol,
   getJSApi,
-  getOS,
+  nodePlatformToDartPlatform,
 } from './utils';
 
 const argv = yargs(process.argv.slice(2))
@@ -63,53 +63,57 @@ const argv = yargs(process.argv.slice(2))
 (async () => {
   try {
     const outPath = 'lib/src/vendor';
-    const os = getOS(process.env.npm_config_platform || process.platform);
-    const arch = getArch(process.env.npm_config_arch || process.arch);
+    const platform = nodePlatformToDartPlatform(
+      process.env.npm_config_platform || process.platform
+    );
+    const arch = nodeArchToDartArch(
+      process.env.npm_config_arch || process.arch
+    );
 
     if (argv['protocol-version']) {
-      await getEmbeddedProtocol(outPath, os, {
+      await getEmbeddedProtocol(outPath, platform, {
         version: argv['protocol-version'],
       });
     } else if (argv['protocol-ref']) {
-      await getEmbeddedProtocol(outPath, os, {
+      await getEmbeddedProtocol(outPath, platform, {
         ref: argv['protocol-ref'],
       });
     } else if (argv['protocol-path']) {
-      await getEmbeddedProtocol(outPath, os, {
+      await getEmbeddedProtocol(outPath, platform, {
         path: argv['protocol-path'],
       });
     } else {
-      await getEmbeddedProtocol(outPath, os);
+      await getEmbeddedProtocol(outPath, platform);
     }
 
     if (!argv['skip-compiler']) {
       if (argv['compiler-version']) {
-        await getDartSassEmbedded(outPath, os, arch, {
+        await getDartSassEmbedded(outPath, platform, arch, {
           version: argv['compiler-version'],
         });
       } else if (argv['compiler-ref']) {
-        await getDartSassEmbedded(outPath, os, arch, {
+        await getDartSassEmbedded(outPath, platform, arch, {
           ref: argv['compiler-ref'],
         });
       } else if (argv['compiler-path']) {
-        await getDartSassEmbedded(outPath, os, arch, {
+        await getDartSassEmbedded(outPath, platform, arch, {
           path: argv['compiler-path'],
         });
       } else {
-        await getDartSassEmbedded(outPath, os, arch);
+        await getDartSassEmbedded(outPath, platform, arch);
       }
     }
 
     if (argv['api-ref']) {
-      await getJSApi(outPath, os, {
+      await getJSApi(outPath, {
         ref: argv['api-ref'],
       });
     } else if (argv['api-path']) {
-      await getJSApi(outPath, os, {
+      await getJSApi(outPath, {
         path: argv['api-path'],
       });
     } else {
-      await getJSApi(outPath, os);
+      await getJSApi(outPath);
     }
   } catch (error) {
     console.error(error);

@@ -19,12 +19,12 @@ shell.config.fatal = true;
 // Directory that holds source files.
 const BUILD_PATH = 'build';
 
-export type OSKind = 'linux' | 'macos' | 'windows';
-export type ArchKind = 'ia32' | 'x64' | 'arm64';
+export type DartPlatform = 'linux' | 'macos' | 'windows';
+export type DartArch = 'ia32' | 'x64' | 'arm64';
 
 // Get the platform's operating system. Throws if the operating system
 // is not supported by Dart Sass Embedded.
-export function getOS(platform: string): OSKind {
+export function nodePlatformToDartPlatform(platform: string): DartPlatform {
   switch (platform) {
     case 'linux':
       return 'linux';
@@ -39,7 +39,7 @@ export function getOS(platform: string): OSKind {
 
 // Get the platform's architecture. Throws if the architecture is not
 // supported by Dart Sass Embedded.
-export function getArch(arch: string): ArchKind {
+export function nodeArchToDartArch(arch: string): DartArch {
   switch (arch) {
     case 'ia32':
       return 'ia32';
@@ -55,8 +55,8 @@ export function getArch(arch: string): ArchKind {
 }
 
 // Get the platform's file extension for archives.
-function getArchiveExtension(os: OSKind): '.zip' | '.tar.gz' {
-  return os === 'windows' ? '.zip' : '.tar.gz';
+function getArchiveExtension(platform: DartPlatform): '.zip' | '.tar.gz' {
+  return platform === 'windows' ? '.zip' : '.tar.gz';
 }
 
 /**
@@ -70,7 +70,7 @@ function getArchiveExtension(os: OSKind): '.zip' | '.tar.gz' {
  */
 export async function getEmbeddedProtocol(
   outPath: string,
-  os: OSKind,
+  platform: DartPlatform,
   options?:
     | {
         version: string;
@@ -90,10 +90,10 @@ export async function getEmbeddedProtocol(
     await downloadRelease({
       repo,
       assetUrl: `https://github.com/sass/${repo}/archive/${version}${getArchiveExtension(
-        os
+        platform
       )}`,
       outPath: BUILD_PATH,
-      os,
+      platform,
     });
     await fs.rename(
       p.join(BUILD_PATH, `${repo}-${version}`),
@@ -109,8 +109,8 @@ export async function getEmbeddedProtocol(
 
   const source =
     options && 'path' in options ? options.path : p.join(BUILD_PATH, repo);
-  buildEmbeddedProtocol(source, os);
-  await link('build/embedded-protocol', p.join(outPath, repo), os);
+  buildEmbeddedProtocol(source);
+  await link('build/embedded-protocol', p.join(outPath, repo));
 }
 
 /**
@@ -124,8 +124,8 @@ export async function getEmbeddedProtocol(
  */
 export async function getDartSassEmbedded(
   outPath: string,
-  os: OSKind,
-  arch: ArchKind,
+  platform: DartPlatform,
+  arch: DartArch,
   options?:
     | {
         version: string;
@@ -149,9 +149,9 @@ export async function getDartSassEmbedded(
       assetUrl:
         `https://github.com/sass/${repo}/releases/download/` +
         `${version}/sass_embedded-${version}-` +
-        `${os}-${arch}${getArchiveExtension(os)}`,
+        `${platform}-${arch}${getArchiveExtension(platform)}`,
       outPath,
-      os,
+      platform,
     });
     await fs.rename(p.join(outPath, 'sass_embedded'), p.join(outPath, repo));
     return;
@@ -168,7 +168,7 @@ export async function getDartSassEmbedded(
 
   const source = 'path' in options ? options.path : p.join(BUILD_PATH, repo);
   buildDartSassEmbedded(source);
-  await link(p.join(source, 'build'), p.join(outPath, repo), os);
+  await link(p.join(source, 'build'), p.join(outPath, repo));
 }
 
 /**
@@ -218,7 +218,6 @@ async function checkForMusl(): Promise<void> {
  */
 export async function getJSApi(
   outPath: string,
-  os: OSKind,
   options?: {ref: string} | {path: string}
 ): Promise<void> {
   const repo = 'sass';
@@ -235,7 +234,7 @@ export async function getJSApi(
     source = options.path;
   }
 
-  await link(p.join(source, 'js-api-doc'), p.join(outPath, repo), os);
+  await link(p.join(source, 'js-api-doc'), p.join(outPath, repo));
 }
 
 // Downloads the release for `repo` located at `assetUrl`, then unzips it into
@@ -244,7 +243,7 @@ async function downloadRelease(options: {
   repo: string;
   assetUrl: string;
   outPath: string;
-  os: OSKind;
+  platform: DartPlatform;
 }): Promise<void> {
   console.log(`Downloading ${options.repo} release asset.`);
   const response = await fetch(options.assetUrl, {
@@ -261,9 +260,9 @@ async function downloadRelease(options: {
   await cleanDir(p.join(options.outPath, options.repo));
   const zippedAssetPath = `${options.outPath}/${
     options.repo
-  }${getArchiveExtension(options.os)}`;
+  }${getArchiveExtension(options.platform)}`;
   await fs.writeFile(zippedAssetPath, releaseAsset);
-  if (options.os === 'windows') {
+  if (options.platform === 'windows') {
     await extractZip(zippedAssetPath, {
       dir: p.join(process.cwd(), options.outPath),
     });
@@ -307,15 +306,15 @@ function fetchRepo(options: {
 }
 
 // Builds the embedded proto at `repoPath` into a pbjs with TS declaration file.
-function buildEmbeddedProtocol(repoPath: string, os: OSKind): void {
+function buildEmbeddedProtocol(repoPath: string): void {
   const proto = p.join(repoPath, 'embedded_sass.proto');
   console.log(`Building pbjs and TS declaration file from ${proto}.`);
   const protocPath =
-    os === 'windows'
+    process.platform === 'win32'
       ? '%CD%/node_modules/protoc/protoc/bin/protoc.exe'
       : 'node_modules/protoc/protoc/bin/protoc';
   const pluginPath =
-    os === 'windows'
+    process.platform === 'win32'
       ? '%CD%/node_modules/.bin/protoc-gen-ts.cmd'
       : 'node_modules/.bin/protoc-gen-ts';
   mkdirSync('build/embedded-protocol', {recursive: true});
@@ -355,13 +354,9 @@ function defaultVersionOption(
 }
 
 // Links or copies the contents of `source` into `destination`.
-async function link(
-  source: string,
-  destination: string,
-  os: OSKind
-): Promise<void> {
+async function link(source: string, destination: string): Promise<void> {
   await cleanDir(destination);
-  if (os === 'windows') {
+  if (process.platform === 'win32') {
     console.log(`Copying ${source} into ${destination}.`);
     shell.cp('-R', source, destination);
   } else {

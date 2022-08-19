@@ -6,19 +6,25 @@ import {promises as fs} from 'fs';
 import * as shell from 'shelljs';
 
 import * as pkg from '../package.json';
-import {getEmbeddedProtocol, getJSApi, getOS} from './utils';
+import {
+  getEmbeddedProtocol,
+  getJSApi,
+  nodePlatformToDartPlatform,
+} from './utils';
 
 shell.config.fatal = true;
 
 (async () => {
   try {
-    const os = getOS(process.env.npm_config_platform || process.platform);
+    const platform = nodePlatformToDartPlatform(
+      process.env.npm_config_platform || process.platform
+    );
 
     await sanityCheckBeforeRelease();
 
-    await getEmbeddedProtocol('lib/src/vendor', os);
+    await getEmbeddedProtocol('lib/src/vendor', platform);
 
-    await getJSApi('lib/src/vendor', os);
+    await getJSApi('lib/src/vendor');
 
     console.log('Transpiling TS into dist.');
     shell.exec('tsc');

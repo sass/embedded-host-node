@@ -198,6 +198,14 @@ jobs:
       - name: "Check we're not using a -dev version of the embedded compiler"
         run: jq -r '.["compiler-version"]' package.json | grep -qv -- '-dev$'
 
+      - name: Publish optional dependencies
+        env:
+          NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}'
+        run: |
+          for pkg in linux-arm64 linux-ia32 linux-x64 darwin-arm64 darwin-x64 win32-ia32 win32-x64; do
+            npx ts-node ./tool/prepare-optional-release.ts --package=$pkg && npm publish ./npm/$pkg
+          done
+
       - run: npm publish
         env:
           NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}'

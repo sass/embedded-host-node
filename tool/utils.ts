@@ -16,10 +16,16 @@ const fetch = initMakeFetchHappen();
 
 shell.config.fatal = true;
 
-// The current platform's operating system. Throws if the operating system
-// is not supported by Dart Sass Embedded.
-const OS: 'linux' | 'macos' | 'windows' = (() => {
-  const platform = process.env.npm_config_platform || process.platform;
+// Directory that holds source files.
+const BUILD_PATH = 'build';
+
+export type DartPlatform = 'linux' | 'macos' | 'windows';
+export type DartArch = 'ia32' | 'x64' | 'arm64';
+
+// Converts a Node-style platform name as returned by `process.platform` into a
+// name used by Dart Sass. Throws if the operating system is not supported by
+// Dart Sass Embedded.
+export function nodePlatformToDartPlatform(platform: string): DartPlatform {
   switch (platform) {
     case 'linux':
       return 'linux';
@@ -30,12 +36,12 @@ const OS: 'linux' | 'macos' | 'windows' = (() => {
     default:
       throw Error(`Platform ${platform} is not supported.`);
   }
-})();
+}
 
-// The current platform's architecture. Throws if the architecture is not
-// supported by Dart Sass Embedded.
-const ARCH: 'ia32' | 'x64' | 'arm64' = (() => {
-  const arch = process.env.npm_config_arch || process.arch;
+// Converts a Node-style architecture name as returned by `process.arch` into a
+// name used by Dart Sass. Throws if the architecture is not supported by Dart
+// Sass Embedded.
+export function nodeArchToDartArch(arch: string): DartArch {
   switch (arch) {
     case 'ia32':
       return 'ia32';
@@ -48,13 +54,12 @@ const ARCH: 'ia32' | 'x64' | 'arm64' = (() => {
     default:
       throw Error(`Architecture ${arch} is not supported.`);
   }
-})();
+}
 
-// The current platform's file extension for archives.
-const ARCHIVE_EXTENSION = OS === 'windows' ? '.zip' : '.tar.gz';
-
-// Directory that holds source files.
-const BUILD_PATH = 'build';
+// Get the platform's file extension for archives.
+function getArchiveExtension(platform: DartPlatform): '.zip' | '.tar.gz' {
+  return platform === 'windows' ? '.zip' : '.tar.gz';
+}
 
 /**
  * Gets the Embedded Protocol.
@@ -85,7 +90,7 @@ export async function getEmbeddedProtocol(
     const version = options?.version;
     await downloadRelease({
       repo,
-      assetUrl: `https://github.com/sass/${repo}/archive/${version}${ARCHIVE_EXTENSION}`,
+      assetUrl: `https://github.com/sass/${repo}/archive/${version}.tar.gz`,
       outPath: BUILD_PATH,
     });
     await fs.rename(
@@ -117,6 +122,8 @@ export async function getEmbeddedProtocol(
  */
 export async function getDartSassEmbedded(
   outPath: string,
+  platform: DartPlatform,
+  arch: DartArch,
   options?:
     | {
         version: string;
@@ -140,7 +147,7 @@ export async function getDartSassEmbedded(
       assetUrl:
         `https://github.com/sass/${repo}/releases/download/` +
         `${version}/sass_embedded-${version}-` +
-        `${OS}-${ARCH}${ARCHIVE_EXTENSION}`,
+        `${platform}-${arch}${getArchiveExtension(platform)}`,
       outPath,
     });
     await fs.rename(p.join(outPath, 'sass_embedded'), p.join(outPath, repo));
@@ -247,9 +254,14 @@ async function downloadRelease(options: {
 
   console.log(`Unzipping ${options.repo} release asset to ${options.outPath}.`);
   await cleanDir(p.join(options.outPath, options.repo));
-  const zippedAssetPath = `${options.outPath}/${options.repo}${ARCHIVE_EXTENSION}`;
+
+  const archiveExtension = options.assetUrl.endsWith('.zip')
+    ? '.zip'
+    : '.tar.gz';
+  const zippedAssetPath =
+    options.outPath + '/' + options.repo + archiveExtension;
   await fs.writeFile(zippedAssetPath, releaseAsset);
-  if (OS === 'windows') {
+  if (archiveExtension === '.zip') {
     await extractZip(zippedAssetPath, {
       dir: p.join(process.cwd(), options.outPath),
     });
@@ -297,11 +309,11 @@ function buildEmbeddedProtocol(repoPath: string): void {
   const proto = p.join(repoPath, 'embedded_sass.proto');
   console.log(`Building pbjs and TS declaration file from ${proto}.`);
   const protocPath =
-    OS === 'windows'
+    process.platform === 'win32'
       ? '%CD%/node_modules/protoc/protoc/bin/protoc.exe'
       : 'node_modules/protoc/protoc/bin/protoc';
   const pluginPath =
-    OS === 'windows'
+    process.platform === 'win32'
       ? '%CD%/node_modules/.bin/protoc-gen-ts.cmd'
       : 'node_modules/.bin/protoc-gen-ts';
   mkdirSync('build/embedded-protocol', {recursive: true});
@@ -343,7 +355,7 @@ function defaultVersionOption(
 // Links or copies the contents of `source` into `destination`.
 async function link(source: string, destination: string): Promise<void> {
   await cleanDir(destination);
-  if (OS === 'windows') {
+  if (process.platform === 'win32') {
     console.log(`Copying ${source} into ${destination}.`);
     shell.cp('-R', source, destination);
   } else {

@@ -22,8 +22,9 @@ const BUILD_PATH = 'build';
 export type DartPlatform = 'linux' | 'macos' | 'windows';
 export type DartArch = 'ia32' | 'x64' | 'arm64';
 
-// Get the platform's operating system. Throws if the operating system
-// is not supported by Dart Sass Embedded.
+// Converts a Node-style platform name as returned by `process.platform` into a
+// name used by Dart Sass. Throws if the operating system is not supported by
+// Dart Sass Embedded.
 export function nodePlatformToDartPlatform(platform: string): DartPlatform {
   switch (platform) {
     case 'linux':
@@ -37,8 +38,9 @@ export function nodePlatformToDartPlatform(platform: string): DartPlatform {
   }
 }
 
-// Get the platform's architecture. Throws if the architecture is not
-// supported by Dart Sass Embedded.
+// Converts a Node-style architecture name as returned by `process.arch` into a
+// name used by Dart Sass. Throws if the architecture is not supported by Dart
+// Sass Embedded.
 export function nodeArchToDartArch(arch: string): DartArch {
   switch (arch) {
     case 'ia32':
@@ -70,7 +72,6 @@ function getArchiveExtension(platform: DartPlatform): '.zip' | '.tar.gz' {
  */
 export async function getEmbeddedProtocol(
   outPath: string,
-  platform: DartPlatform,
   options?:
     | {
         version: string;
@@ -89,11 +90,8 @@ export async function getEmbeddedProtocol(
     const version = options?.version;
     await downloadRelease({
       repo,
-      assetUrl: `https://github.com/sass/${repo}/archive/${version}${getArchiveExtension(
-        platform
-      )}`,
+      assetUrl: `https://github.com/sass/${repo}/archive/${version}.tar.gz`,
       outPath: BUILD_PATH,
-      platform,
     });
     await fs.rename(
       p.join(BUILD_PATH, `${repo}-${version}`),
@@ -151,7 +149,6 @@ export async function getDartSassEmbedded(
         `${version}/sass_embedded-${version}-` +
         `${platform}-${arch}${getArchiveExtension(platform)}`,
       outPath,
-      platform,
     });
     await fs.rename(p.join(outPath, 'sass_embedded'), p.join(outPath, repo));
     return;
@@ -243,7 +240,6 @@ async function downloadRelease(options: {
   repo: string;
   assetUrl: string;
   outPath: string;
-  platform: DartPlatform;
 }): Promise<void> {
   console.log(`Downloading ${options.repo} release asset.`);
   const response = await fetch(options.assetUrl, {
@@ -258,11 +254,14 @@ async function downloadRelease(options: {
 
   console.log(`Unzipping ${options.repo} release asset to ${options.outPath}.`);
   await cleanDir(p.join(options.outPath, options.repo));
-  const zippedAssetPath = `${options.outPath}/${
-    options.repo
-  }${getArchiveExtension(options.platform)}`;
+
+  const archiveExtension = options.assetUrl.endsWith('.zip')
+    ? '.zip'
+    : '.tar.gz';
+  const zippedAssetPath =
+    options.outPath + '/' + options.repo + archiveExtension;
   await fs.writeFile(zippedAssetPath, releaseAsset);
-  if (options.platform === 'windows') {
+  if (archiveExtension === '.zip') {
     await extractZip(zippedAssetPath, {
       dir: p.join(process.cwd(), options.outPath),
     });

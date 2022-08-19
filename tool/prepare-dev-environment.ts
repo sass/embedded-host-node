@@ -71,19 +71,19 @@ const argv = yargs(process.argv.slice(2))
     );
 
     if (argv['protocol-version']) {
-      await getEmbeddedProtocol(outPath, platform, {
+      await getEmbeddedProtocol(outPath, {
         version: argv['protocol-version'],
       });
     } else if (argv['protocol-ref']) {
-      await getEmbeddedProtocol(outPath, platform, {
+      await getEmbeddedProtocol(outPath, {
         ref: argv['protocol-ref'],
       });
     } else if (argv['protocol-path']) {
-      await getEmbeddedProtocol(outPath, platform, {
+      await getEmbeddedProtocol(outPath, {
         path: argv['protocol-path'],
       });
     } else {
-      await getEmbeddedProtocol(outPath, platform);
+      await getEmbeddedProtocol(outPath);
     }
 
     if (!argv['skip-compiler']) {

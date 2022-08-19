@@ -36,6 +36,9 @@ export const compilerPath = (() => {
   }
 
   throw new Error(
-    `Embedded Dart Sass couldn't find the embedded compiler executable. Please make sure there is an optional dependency @sass-embedded/${process.platform}-${process.arch} is installed in node_modules.`
+    "Embedded Dart Sass couldn't find the embedded compiler executable. " +
+      'Please make sure the optional dependency ' +
+      '@sass-embedded/${process.platform}-${process.arch} is installed in ' +
+      'node_modules.'
   );
 })();

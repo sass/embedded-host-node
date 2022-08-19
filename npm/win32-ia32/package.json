@@ -1,5 +1,5 @@
 {
-  "name": "@sass-embedded/win32-ia32",
+  "name": "sass-embedded-win32-ia32",
   "version": "1.54.4",
   "description": "The win32-ia32 binary for sass-embedded",
   "repository": "sass/embedded-host-node",

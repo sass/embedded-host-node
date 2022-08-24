@@ -1,5 +1,5 @@
 {
-  "name": "@sass-embedded/linux-arm64",
+  "name": "sass-embedded-linux-arm64",
   "version": "1.54.4",
   "description": "The linux-arm64 binary for sass-embedded",
   "repository": "sass/embedded-host-node",

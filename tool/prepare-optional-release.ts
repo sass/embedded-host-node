@@ -14,7 +14,7 @@ const argv = yargs(process.argv.slice(2))
       'Directory name under `npm` directory that contains optional dependencies.',
     demandOption: true,
     choices: Object.keys(pkg.optionalDependencies).map(
-      name => name.split('@sass-embedded/')[1]
+      name => name.split('sass-embedded-')[1]
     ),
   })
   .parseSync();

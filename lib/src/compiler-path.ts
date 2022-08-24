@@ -10,11 +10,9 @@ import {isErrnoException} from './utils';
 export const compilerPath = (() => {
   try {
     return require.resolve(
-      `@sass-embedded/${process.platform}-${
-        process.arch
-      }/dart-sass-embedded/dart-sass-embedded${
-        process.platform === 'win32' ? '.bat' : ''
-      }`
+      `sass-embedded-${process.platform}-${process.arch}/` +
+        'dart-sass-embedded/dart-sass-embedded' +
+        (process.platform === 'win32' ? '.bat' : '')
     );
   } catch (e: unknown) {
     if (!(isErrnoException(e) && e.code === 'MODULE_NOT_FOUND')) {
@@ -38,7 +36,7 @@ export const compilerPath = (() => {
   throw new Error(
     "Embedded Dart Sass couldn't find the embedded compiler executable. " +
       'Please make sure the optional dependency ' +
-      '@sass-embedded/${process.platform}-${process.arch} is installed in ' +
+      'sass-embedded-${process.platform}-${process.arch} is installed in ' +
       'node_modules.'
   );
 })();

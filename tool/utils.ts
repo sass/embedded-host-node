@@ -20,7 +20,7 @@ shell.config.fatal = true;
 const BUILD_PATH = 'build';
 
 export type DartPlatform = 'linux' | 'macos' | 'windows';
-export type DartArch = 'ia32' | 'x64' | 'arm64';
+export type DartArch = 'ia32' | 'x64' | 'arm' | 'arm64';
 
 // Converts a Node-style platform name as returned by `process.platform` into a
 // name used by Dart Sass. Throws if the operating system is not supported by
@@ -49,6 +49,8 @@ export function nodeArchToDartArch(arch: string): DartArch {
       return 'ia32';
     case 'x64':
       return 'x64';
+    case 'arm':
+      return 'arm';
     case 'arm64':
       return 'arm64';
     default:

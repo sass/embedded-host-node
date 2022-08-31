@@ -6,13 +6,14 @@
     "resolveJsonModule": true,
     "rootDir": ".",
     "useUnknownInCatchVariables": false,
+    "resolveJsonModule": true,
     "declaration": false,
     "lib": ["DOM"]
   },
   "include": [
     "lib/**/*.ts",
     "lib/src/vendor/embedded-protocol/embedded_sass_pb.js",
-    "tool/utils.ts"
+    "tool/*.ts"
   ],
   "exclude": ["**/*.test.ts"]
 }

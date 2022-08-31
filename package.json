@@ -26,6 +26,7 @@
     "test": "jest"
   },
   "optionalDependencies": {
+    "sass-embedded-linux-arm": "1.54.7",
     "sass-embedded-linux-arm64": "1.54.7",
     "sass-embedded-linux-ia32": "1.54.7",
     "sass-embedded-linux-x64": "1.54.7",

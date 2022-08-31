@@ -1,3 +1,13 @@
+## 1.54.7
+
+* Add support for 32-bit ARM releases on Linux.
+
+## 1.54.6
+
+* Fix a bug where a `@media` query could be incorrectly omitted from a
+  stylesheet if it had multiple levels of nested `@media` queries within it
+  *and* the inner queries were mergeable but the outer query was not.
+
 ## 1.54.5
 
 * Properly consider `a ~ c` to be a superselector of `a ~ b ~ c` and `a + b +

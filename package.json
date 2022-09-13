@@ -10,8 +10,7 @@
   "main": "dist/lib/index.js",
   "types": "dist/types/index.d.ts",
   "files": [
-    "dist/**/*",
-    "download-compiler-for-end-user.js"
+    "dist/**/*"
   ],
   "engines": {
     "node": ">=14.0.0"
@@ -28,27 +27,21 @@
     "test": "jest"
   },
   "optionalDependencies": {
+    "sass-embedded-darwin-arm64": "1.54.9",
+    "sass-embedded-darwin-x64": "1.54.9",
     "sass-embedded-linux-arm": "1.54.9",
     "sass-embedded-linux-arm64": "1.54.9",
     "sass-embedded-linux-ia32": "1.54.9",
     "sass-embedded-linux-x64": "1.54.9",
-    "sass-embedded-darwin-arm64": "1.54.9",
-    "sass-embedded-darwin-x64": "1.54.9",
     "sass-embedded-win32-ia32": "1.54.9",
     "sass-embedded-win32-x64": "1.54.9"
   },
   "dependencies": {
     "buffer-builder": "^0.2.0",
-    "extract-zip": "^2.0.1",
     "google-protobuf": "^3.11.4",
     "immutable": "^4.0.0",
-    "make-fetch-happen": "^10.1.2",
     "rxjs": "^7.4.0",
-    "semver": "^7.3.5",
-    "shelljs": "^0.8.4",
-    "supports-color": "^8.1.1",
-    "tar": "^6.0.5",
-    "yaml": "^1.10.2"
+    "supports-color": "^8.1.1"
   },
   "devDependencies": {
     "@types/buffer-builder": "^0.2.0",
@@ -56,22 +49,26 @@
     "@types/jest": "^27.0.2",
     "@types/make-fetch-happen": "^9.0.2",
     "@types/node": "^16.10.3",
-    "@types/semver": "^7.3.4",
     "@types/shelljs": "^0.8.8",
     "@types/supports-color": "^8.1.1",
     "@types/tar": "^6.1.0",
     "@types/yargs": "^17.0.4",
     "del": "^6.0.0",
+    "extract-zip": "^2.0.1",
     "gts": "^4.0.0",
     "jest": "^27.2.5",
+    "make-fetch-happen": "^10.1.2",
     "minipass": "3.2.1",
     "npm-run-all": "^4.1.5",
     "protoc": "^1.0.4",
+    "shelljs": "^0.8.4",
     "source-map-js": "^0.6.1",
+    "tar": "^6.0.5",
     "ts-jest": "^27.0.5",
     "ts-node": "^10.2.1",
     "ts-protoc-gen": "^0.15.0",
     "typescript": "^4.4.3",
+    "yaml": "^1.10.2",
     "yargs": "^17.2.1"
   }
 }

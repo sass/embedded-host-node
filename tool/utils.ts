@@ -307,11 +307,17 @@ function fetchRepo(options: {
 // Builds the embedded proto at `repoPath` into a pbjs with TS declaration file.
 function buildEmbeddedProtocol(repoPath: string): void {
   const proto = p.join(repoPath, 'embedded_sass.proto');
-  console.log(`Building pbjs and TS declaration file from ${proto}.`);
   const protocPath =
     process.platform === 'win32'
       ? '%CD%/node_modules/protoc/protoc/bin/protoc.exe'
       : 'node_modules/protoc/protoc/bin/protoc';
+  const version = shell
+    .exec(`${protocPath} --version`, {silent: true})
+    .stdout.trim();
+  console.log(
+    `Building pbjs and TS declaration file from ${proto} with ${version}.`
+  );
+
   const pluginPath =
     process.platform === 'win32'
       ? '%CD%/node_modules/.bin/protoc-gen-ts.cmd'

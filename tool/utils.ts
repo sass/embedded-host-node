@@ -2,17 +2,15 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-import {defaults as initMakeFetchHappen} from 'make-fetch-happen';
 import extractZip = require('extract-zip');
 import {promises as fs, existsSync, mkdirSync} from 'fs';
+import fetch from 'node-fetch';
 import * as p from 'path';
 import * as yaml from 'yaml';
 import * as shell from 'shelljs';
 import {extract as extractTar} from 'tar';
 
 import * as pkg from '../package.json';
-
-const fetch = initMakeFetchHappen();
 
 shell.config.fatal = true;
 
@@ -309,11 +307,17 @@ function fetchRepo(options: {
 // Builds the embedded proto at `repoPath` into a pbjs with TS declaration file.
 function buildEmbeddedProtocol(repoPath: string): void {
   const proto = p.join(repoPath, 'embedded_sass.proto');
-  console.log(`Building pbjs and TS declaration file from ${proto}.`);
   const protocPath =
     process.platform === 'win32'
       ? '%CD%/node_modules/protoc/protoc/bin/protoc.exe'
       : 'node_modules/protoc/protoc/bin/protoc';
+  const version = shell
+    .exec(`${protocPath} --version`, {silent: true})
+    .stdout.trim();
+  console.log(
+    `Building pbjs and TS declaration file from ${proto} with ${version}.`
+  );
+
   const pluginPath =
     process.platform === 'win32'
       ? '%CD%/node_modules/.bin/protoc-gen-ts.cmd'

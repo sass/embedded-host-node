@@ -260,9 +260,22 @@ export class LegacyImporterWrapper<sync extends 'sync' | 'async'>
       thenOr(
         this.invokeCallback(this.callbacks[n], self, url, prev),
         result => {
-          if (result !== null) return result;
-          if (n === this.callbacks.length - 1) return null;
-          return invokeNthCallback(n + 1);
+          if (result === null) {
+            if (n === this.callbacks.length - 1) return null;
+            return invokeNthCallback(n + 1);
+          }
+          if (
+            'contents' in result &&
+            result.contents &&
+            typeof result.contents !== 'string'
+          ) {
+            throw new Error(
+              `Invalid argument (contents): must be a string but was: ${
+                (result.contents as {}).constructor.name
+              }`
+            );
+          }
+          return result;
         }
       );
 

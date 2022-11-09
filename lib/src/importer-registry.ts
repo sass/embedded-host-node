@@ -110,6 +110,21 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
         return thenOr(importer.load(new URL(request.getUrl())), result => {
           const proto = new InboundMessage.ImportResponse();
           if (result) {
+            if (typeof result.contents !== 'string') {
+              throw Error(
+                `Invalid argument (contents): must be a string but was: ${
+                  (result.contents as {}).constructor.name
+                }`
+              );
+            }
+
+            if (result.sourceMapUrl && !result.sourceMapUrl.protocol) {
+              throw Error(
+                'Invalid argument (sourceMapUrl): must be absolute but was: ' +
+                  result.sourceMapUrl
+              );
+            }
+
             const success = new InboundMessage.ImportResponse.ImportSuccess();
             success.setContents(result.contents);
             success.setSyntax(utils.protofySyntax(result.syntax));

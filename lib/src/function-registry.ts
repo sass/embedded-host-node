@@ -37,7 +37,7 @@ export class FunctionRegistry<sync extends 'sync' | 'async'> {
         throw new Error(`options.functions: "${signature}" is missing "("`);
       }
 
-      this.functionsByName.set(signature.substring(0, openParen), fn);
+      this.functionsByName.set(signature.substring(0, openParen).trim(), fn);
     }
   }
 

@@ -57,11 +57,11 @@ export class FunctionRegistry<sync extends 'sync' | 'async'> {
   call(
     request: OutboundMessage.FunctionCallRequest
   ): PromiseOr<InboundMessage.FunctionCallResponse, sync> {
-    const protofier = new Protofier(this);
-    const fn = this.get(request);
-
     return catchOr(
       () => {
+        const protofier = new Protofier(this);
+        const fn = this.get(request);
+
         return thenOr(
           fn(
             request

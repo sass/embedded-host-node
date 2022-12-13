@@ -288,8 +288,7 @@ function fetchRepo(options: {
       `git clone \
       --depth=1 \
       https://github.com/sass/${options.repo} \
-      ${p.join(options.outPath, options.repo)}`,
-      {silent: true}
+      ${p.join(options.outPath, options.repo)}`
     );
   }
 
@@ -298,10 +297,7 @@ function fetchRepo(options: {
   console.log(`Fetching ${version} for ${options.repo}.`);
   shell.exec(
     `git fetch --depth=1 origin ${options.ref} && git reset --hard FETCH_HEAD`,
-    {
-      silent: true,
-      cwd: p.join(options.outPath, options.repo),
-    }
+    {cwd: p.join(options.outPath, options.repo)}
   );
 }
 
@@ -330,24 +326,17 @@ function buildEmbeddedProtocol(repoPath: string): void {
       --js_out="import_style=commonjs,binary:build/embedded-protocol" \
       --ts_out="build/embedded-protocol" \
       --proto_path="${repoPath}" \
-      ${proto}`,
-    {silent: true}
+      ${proto}`
   );
 }
 
 // Builds the Embedded Dart Sass executable from the source at `repoPath`.
 function buildDartSassEmbedded(repoPath: string): void {
   console.log('Downloading dart-sass-embedded dependencies.');
-  shell.exec('dart pub upgrade', {
-    cwd: repoPath,
-    silent: true,
-  });
+  shell.exec('dart pub upgrade', {cwd: repoPath});
 
   console.log('Building dart-sass-embedded executable.');
-  shell.exec('dart run grinder protobuf pkg-standalone-dev', {
-    cwd: repoPath,
-    silent: true,
-  });
+  shell.exec('dart run grinder protobuf pkg-standalone-dev', {cwd: repoPath});
 }
 
 // Given the name of a field in `package.json`, returns the default version

@@ -8,6 +8,7 @@ import fetch from 'node-fetch';
 import * as p from 'path';
 import * as yaml from 'yaml';
 import * as shell from 'shelljs';
+import {simpleGit} from 'simple-git';
 import {extract as extractTar} from 'tar';
 
 import * as pkg from '../package.json';
@@ -85,7 +86,7 @@ export async function getEmbeddedProtocol(
 ): Promise<void> {
   const repo = 'embedded-protocol';
 
-  options ??= defaultVersionOption('protocol-version');
+  options ??= await defaultVersionOption('protocol-version');
   if ('version' in options) {
     const version = options?.version;
     await downloadRelease({
@@ -136,7 +137,7 @@ export async function getDartSassEmbedded(
       }
 ): Promise<void> {
   const repo = 'dart-sass-embedded';
-  options ??= defaultVersionOption('compiler-version');
+  options ??= await defaultVersionOption('compiler-version');
 
   await checkForMusl();
 
@@ -351,9 +352,16 @@ function buildDartSassEmbedded(repoPath: string): void {
 
 // Given the name of a field in `package.json`, returns the default version
 // option described by that field.
-function defaultVersionOption(
+async function defaultVersionOption(
   pkgField: keyof typeof pkg
-): {version: string} | {ref: string} {
+): Promise<{version: string} | {ref: string}> {
+  // If we're on a feature branch, fetch the matching feature branch from the
+  // compiler.
+  if (pkgField === 'compiler-version') {
+    const branch = (await simpleGit().branch()).current;
+    if (branch.startsWith('feature.')) return {ref: branch};
+  }
+
   const version = pkg[pkgField] as string;
   return version.endsWith('-dev') ? {ref: 'main'} : {version};
 }

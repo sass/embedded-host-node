@@ -112,7 +112,7 @@ export async function getEmbeddedProtocol(
 
   // Make the VERSION consistently accessible for the dependency test and any
   // curious users.
-  await link(p.join(source, 'VERSION'), 'build/embedded-protocol-out');
+  await link(p.join(source, 'VERSION'), 'build/embedded-protocol-out/VERSION');
   await link('build/embedded-protocol-out', p.join(outPath, repo));
 }
 

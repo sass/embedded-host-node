@@ -109,7 +109,11 @@ export async function getEmbeddedProtocol(
   const source =
     options && 'path' in options ? options.path : p.join(BUILD_PATH, repo);
   buildEmbeddedProtocol(source);
-  await link('build/embedded-protocol', p.join(outPath, repo));
+
+  // Make the VERSION consistently accessible for the dependency test and any
+  // curious users.
+  await link(p.join(source, 'VERSION'), 'build/embedded-protocol-out');
+  await link('build/embedded-protocol-out', p.join(outPath, repo));
 }
 
 /**
@@ -319,12 +323,12 @@ function buildEmbeddedProtocol(repoPath: string): void {
     process.platform === 'win32'
       ? '%CD%/node_modules/.bin/protoc-gen-ts.cmd'
       : 'node_modules/.bin/protoc-gen-ts';
-  mkdirSync('build/embedded-protocol', {recursive: true});
+  mkdirSync('build/embedded-protocol-out', {recursive: true});
   shell.exec(
     `${protocPath} \
       --plugin="protoc-gen-ts=${pluginPath}" \
-      --js_out="import_style=commonjs,binary:build/embedded-protocol" \
-      --ts_out="build/embedded-protocol" \
+      --js_out="import_style=commonjs,binary:build/embedded-protocol-out" \
+      --ts_out="build/embedded-protocol-out" \
       --proto_path="${repoPath}" \
       ${proto}`
   );

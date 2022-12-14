@@ -8,6 +8,7 @@ import fetch from 'node-fetch';
 import * as p from 'path';
 import * as yaml from 'yaml';
 import * as shell from 'shelljs';
+import {simpleGit} from 'simple-git';
 import {extract as extractTar} from 'tar';
 
 import * as pkg from '../package.json';
@@ -85,7 +86,7 @@ export async function getEmbeddedProtocol(
 ): Promise<void> {
   const repo = 'embedded-protocol';
 
-  options ??= defaultVersionOption('protocol-version');
+  options ??= await defaultVersionOption('protocol-version');
   if ('version' in options) {
     const version = options?.version;
     await downloadRelease({
@@ -108,7 +109,11 @@ export async function getEmbeddedProtocol(
   const source =
     options && 'path' in options ? options.path : p.join(BUILD_PATH, repo);
   buildEmbeddedProtocol(source);
-  await link('build/embedded-protocol', p.join(outPath, repo));
+
+  // Make the VERSION consistently accessible for the dependency test and any
+  // curious users.
+  await link(p.join(source, 'VERSION'), 'build/embedded-protocol-out/VERSION');
+  await link('build/embedded-protocol-out', p.join(outPath, repo));
 }
 
 /**
@@ -136,7 +141,7 @@ export async function getDartSassEmbedded(
       }
 ): Promise<void> {
   const repo = 'dart-sass-embedded';
-  options ??= defaultVersionOption('compiler-version');
+  options ??= await defaultVersionOption('compiler-version');
 
   await checkForMusl();
 
@@ -287,8 +292,7 @@ function fetchRepo(options: {
       `git clone \
       --depth=1 \
       https://github.com/sass/${options.repo} \
-      ${p.join(options.outPath, options.repo)}`,
-      {silent: true}
+      ${p.join(options.outPath, options.repo)}`
     );
   }
 
@@ -297,10 +301,7 @@ function fetchRepo(options: {
   console.log(`Fetching ${version} for ${options.repo}.`);
   shell.exec(
     `git fetch --depth=1 origin ${options.ref} && git reset --hard FETCH_HEAD`,
-    {
-      silent: true,
-      cwd: p.join(options.outPath, options.repo),
-    }
+    {cwd: p.join(options.outPath, options.repo)}
   );
 }
 
@@ -322,38 +323,38 @@ function buildEmbeddedProtocol(repoPath: string): void {
     process.platform === 'win32'
       ? '%CD%/node_modules/.bin/protoc-gen-ts.cmd'
       : 'node_modules/.bin/protoc-gen-ts';
-  mkdirSync('build/embedded-protocol', {recursive: true});
+  mkdirSync('build/embedded-protocol-out', {recursive: true});
   shell.exec(
     `${protocPath} \
       --plugin="protoc-gen-ts=${pluginPath}" \
-      --js_out="import_style=commonjs,binary:build/embedded-protocol" \
-      --ts_out="build/embedded-protocol" \
+      --js_out="import_style=commonjs,binary:build/embedded-protocol-out" \
+      --ts_out="build/embedded-protocol-out" \
       --proto_path="${repoPath}" \
-      ${proto}`,
-    {silent: true}
+      ${proto}`
   );
 }
 
 // Builds the Embedded Dart Sass executable from the source at `repoPath`.
 function buildDartSassEmbedded(repoPath: string): void {
   console.log('Downloading dart-sass-embedded dependencies.');
-  shell.exec('dart pub upgrade', {
-    cwd: repoPath,
-    silent: true,
-  });
+  shell.exec('dart pub upgrade', {cwd: repoPath});
 
   console.log('Building dart-sass-embedded executable.');
-  shell.exec('dart run grinder protobuf pkg-standalone-dev', {
-    cwd: repoPath,
-    silent: true,
-  });
+  shell.exec('dart run grinder protobuf pkg-standalone-dev', {cwd: repoPath});
 }
 
 // Given the name of a field in `package.json`, returns the default version
 // option described by that field.
-function defaultVersionOption(
+async function defaultVersionOption(
   pkgField: keyof typeof pkg
-): {version: string} | {ref: string} {
+): Promise<{version: string} | {ref: string}> {
+  // If we're on a feature branch, fetch the matching feature branch from the
+  // compiler.
+  if (pkgField === 'compiler-version') {
+    const branch = (await simpleGit().branch()).current;
+    if (branch.startsWith('feature.')) return {ref: branch};
+  }
+
   const version = pkg[pkgField] as string;
   return version.endsWith('-dev') ? {ref: 'main'} : {version};
 }

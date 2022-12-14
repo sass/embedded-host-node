@@ -21,6 +21,9 @@ export class SyncEmbeddedCompiler {
   /** The buffers emitted by the child process's stderr. */
   readonly stderr$ = new Subject<Buffer>();
 
+  /** Whether the underlying compiler has already exited. */
+  private exited = false;
+
   /** Writes `buffer` to the child process's stdin. */
   writeStdin(buffer: Buffer): void {
     this.process.stdin.write(buffer);
@@ -38,14 +41,15 @@ export class SyncEmbeddedCompiler {
         return true;
 
       case 'exit':
+        this.exited = true;
         return false;
     }
   }
 
   /** Blocks until the underlying process exits. */
   yieldUntilExit(): void {
-    while (this.yield()) {
-      // Any events will be handled by `this.yield()`.
+    while (!this.exited) {
+      this.yield();
     }
   }
 

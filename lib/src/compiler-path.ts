@@ -8,18 +8,6 @@ import {isErrnoException} from './utils';
 
 /** The path to the embedded compiler executable. */
 export const compilerPath = (() => {
-  try {
-    return require.resolve(
-      `sass-embedded-${process.platform}-${process.arch}/` +
-        'dart-sass-embedded/dart-sass-embedded' +
-        (process.platform === 'win32' ? '.bat' : '')
-    );
-  } catch (e: unknown) {
-    if (!(isErrnoException(e) && e.code === 'MODULE_NOT_FOUND')) {
-      throw e;
-    }
-  }
-
   // find for development
   for (const path of ['vendor', '../../../lib/src/vendor']) {
     const executable = p.resolve(
@@ -31,6 +19,18 @@ export const compilerPath = (() => {
     );
 
     if (fs.existsSync(executable)) return executable;
+  }
+
+  try {
+    return require.resolve(
+      `sass-embedded-${process.platform}-${process.arch}/` +
+        'dart-sass-embedded/dart-sass-embedded' +
+        (process.platform === 'win32' ? '.bat' : '')
+    );
+  } catch (e: unknown) {
+    if (!(isErrnoException(e) && e.code === 'MODULE_NOT_FOUND')) {
+      throw e;
+    }
   }
 
   throw new Error(

@@ -153,6 +153,7 @@ async function compileRequestAsync(
 ): Promise<CompileResult> {
   const functions = new FunctionRegistry(options?.functions);
   const embeddedCompiler = new AsyncEmbeddedCompiler();
+  embeddedCompiler.stderr$.subscribe(data => process.stderr.write(data));
 
   try {
     const dispatcher = createDispatcher<'async'>(
@@ -198,6 +199,7 @@ function compileRequestSync(
 ): CompileResult {
   const functions = new FunctionRegistry(options?.functions);
   const embeddedCompiler = new SyncEmbeddedCompiler();
+  embeddedCompiler.stderr$.subscribe(data => process.stderr.write(data));
 
   try {
     const dispatcher = createDispatcher<'sync'>(

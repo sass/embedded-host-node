@@ -73,13 +73,19 @@ jobs:
         uses: sass/clone-linked-repo@v1
         with: {repo: sass/embedded-protocol, default-ref: null}
 
-      - name: Check out the embedded compiler
-        uses: sass/clone-linked-repo@v1
-        with: {repo: sass/dart-sass-embedded, default-ref: null}
-
       - name: Check out Dart Sass
+        id: clone-dart-sass
         uses: sass/clone-linked-repo@v1
         with: {repo: sass/dart-sass, default-ref: null}
+
+      - name: Check out the embedded compiler
+        uses: sass/clone-linked-repo@v1
+        with:
+          repo: sass/dart-sass-embedded
+          # If we check out a specific version of Dart Sass, always check out
+          # the embedded compiler as well so we can actually use that Dart Sass
+          # version.
+          default-ref: ${{ !steps.clone-dart-sass.skip && 'main' || null }}
 
       - name: Link the embedded compiler to Dart Sass
         run: |
@@ -135,13 +141,19 @@ jobs:
         uses: sass/clone-linked-repo@v1
         with: {repo: sass/embedded-protocol, default-ref: null}
 
-      - name: Check out the embedded compiler
-        uses: sass/clone-linked-repo@v1
-        with: {repo: sass/dart-sass-embedded, default-ref: null}
-
       - name: Check out Dart Sass
+        id: clone-dart-sass
         uses: sass/clone-linked-repo@v1
         with: {repo: sass/dart-sass, default-ref: null}
+
+      - name: Check out the embedded compiler
+        uses: sass/clone-linked-repo@v1
+        with:
+          repo: sass/dart-sass-embedded
+          # If we check out a specific version of Dart Sass, always check out
+          # the embedded compiler as well so we can actually use that Dart Sass
+          # version.
+          default-ref: ${{ !steps.clone-dart-sass.skip && 'main' || null }}
 
       - name: Link the embedded compiler to Dart Sass
         run: |

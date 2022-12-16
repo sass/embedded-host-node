@@ -1,0 +1,209 @@
+name: CI
+
+defaults:
+  run: {shell: bash}
+
+env:
+  PROTOC_VERSION: 3.x
+  DEFAULT_NODE_VERSION: 15.x # If changing this, also change jobs.tests.strategy.matrix.node_version
+
+on:
+  push:
+    branches: [main, feature.*]
+    tags: ['**']
+  pull_request:
+
+jobs:
+  static_analysis:
+    name: Static analysis
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.DEFAULT_NODE_VERSION }}
+          check-latest: true
+      - uses: arduino/setup-protoc@v1
+        with:
+          version: ${{ env.PROTOC_VERSION }}
+          repo-token: '${{ github.token }}'
+
+      - name: Check out the embedded protocol
+        uses: sass/clone-linked-repo@v1
+        with: {repo: sass/embedded-protocol, default-ref: null}
+
+      - name: Check out the JS API definition
+        uses: sass/clone-linked-repo@v1
+        with: {repo: sass/sass, path: language}
+
+      - run: npm install
+      - name: npm run init
+        run: |
+          if [[ -d embedded-protocol ]]; then args=--protocol-path=embedded-protocol; fi
+          npm run init -- --skip-compiler --api-path=language $args
+
+      - run: npm run check
+
+  tests:
+    name: 'Tests | Node ${{ matrix.node-version }} | ${{ matrix.os }}'
+    runs-on: ${{ matrix.os }}-latest
+
+    strategy:
+      matrix:
+        os: [ubuntu, macos, windows]
+        node-version: [15.x, 14.x, 12.x] # If changing this, also change env.DEFAULT_NODE_VERSION
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+          check-latest: true
+      - uses: frenck/action-setup-yq@v1
+        with: {version: v4.30.5} # frenck/action-setup-yq#35
+      - uses: arduino/setup-protoc@v1
+        with:
+          version: ${{ env.PROTOC_VERSION }}
+          repo-token: '${{ github.token }}'
+      - uses: dart-lang/setup-dart@v1
+        with: {sdk: stable}
+      - run: dart --version
+
+      - name: Check out the embedded protocol
+        uses: sass/clone-linked-repo@v1
+        with: {repo: sass/embedded-protocol, default-ref: null}
+
+      - name: Check out Dart Sass
+        uses: sass/clone-linked-repo@v1
+        with: {repo: sass/dart-sass}
+
+      - name: Check out the embedded compiler
+        uses: sass/clone-linked-repo@v1
+        with: {repo: sass/dart-sass-embedded}
+
+      - name: Link the embedded compiler to Dart Sass
+        run: |
+          yq -i '.dependency_overrides.sass = {"path": "../dart-sass"}' \
+              dart-sass-embedded/pubspec.yaml
+
+      - name: Check out the JS API definition
+        uses: sass/clone-linked-repo@v1
+        with: {repo: sass/sass, path: language}
+
+      - run: npm install
+      - name: npm run init
+        run: |
+          if [[ -d embedded-protocol ]]; then args=--protocol-path=embedded-protocol; fi
+          npm run init -- --compiler-path=dart-sass-embedded --api-path=language $args
+
+      - run: npm run test
+
+  # The versions should be kept up-to-date with the latest LTS Node releases.
+  # They next need to be rotated October 2021. See
+  # https://github.com/nodejs/Release.
+  sass_spec:
+    name: 'JS API Tests | Node ${{ matrix.node_version }} | ${{ matrix.os }}'
+    runs-on: ${{ matrix.os }}-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu, windows, macos]
+        node_version: [16]
+        include:
+          # Include LTS versions on Ubuntu
+          - os: ubuntu
+            node_version: 14
+          - os: ubuntu
+            node_version: 12
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dart-lang/setup-dart@v1
+        with: {sdk: stable}
+      - uses: actions/setup-node@v2
+        with: {node-version: "${{ matrix.node_version }}"}
+      - uses: frenck/action-setup-yq@v1
+        with: {version: v4.30.5} # frenck/action-setup-yq#35
+      - uses: arduino/setup-protoc@v1
+        with:
+          version: ${{ env.PROTOC_VERSION }}
+          repo-token: '${{ github.token }}'
+
+      - name: Check out the embedded protocol
+        uses: sass/clone-linked-repo@v1
+        with: {repo: sass/embedded-protocol, default-ref: null}
+
+      - name: Check out Dart Sass
+        uses: sass/clone-linked-repo@v1
+        with: {repo: sass/dart-sass}
+
+      - name: Check out the embedded compiler
+        uses: sass/clone-linked-repo@v1
+        with: {repo: sass/dart-sass-embedded}
+
+      - name: Link the embedded compiler to Dart Sass
+        run: |
+          yq -i '.dependency_overrides.sass = {"path": "../dart-sass"}' \
+              dart-sass-embedded/pubspec.yaml
+
+      - name: Check out the JS API definition
+        uses: sass/clone-linked-repo@v1
+        with: {repo: sass/sass, path: language}
+
+      - run: npm install
+      - name: npm run init
+        run: |
+          if [[ -d embedded-protocol ]]; then args=--protocol-path=embedded-protocol; fi
+          npm run init -- --compiler-path=dart-sass-embedded --api-path=language $args
+
+      - name: Check out sass-spec
+        uses: sass/clone-linked-repo@v1
+        with: {repo: sass/sass-spec}
+
+      - name: Install sass-spec dependencies
+        run: npm install
+        working-directory: sass-spec
+
+      - name: Compile
+        run: |
+          npm run compile
+          ln -s {`pwd`/,dist/}lib/src/vendor/dart-sass-embedded
+
+      - name: Run tests
+        run: npm run js-api-spec -- --sassPackage .. --sassSassRepo ../language
+        working-directory: sass-spec
+
+  deploy_npm:
+    name: Deploy npm
+    runs-on: ubuntu-latest
+    if: "startsWith(github.ref, 'refs/tags/') && github.repository == 'sass/embedded-host-node'"
+    needs: [static_analysis, tests, sass_spec]
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.DEFAULT_NODE_VERSION }}
+          check-latest: true
+          registry-url: 'https://registry.npmjs.org'
+      - run: npm install
+
+      - name: "Check we're not using a -dev version of the embedded protocol"
+        run: jq -r '.["protocol-version"]' package.json | grep -qv -- '-dev$'
+      - name: "Check we're not using a -dev version of the embedded compiler"
+        run: jq -r '.["compiler-version"]' package.json | grep -qv -- '-dev$'
+
+      - name: Publish optional dependencies
+        env:
+          NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}'
+        run: |
+          for pkg in linux-arm linux-arm64 linux-ia32 linux-x64 darwin-arm64 darwin-x64 win32-ia32 win32-x64; do
+            npx ts-node ./tool/prepare-optional-release.ts --package=$pkg && npm publish ./npm/$pkg
+          done
+
+      - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}'

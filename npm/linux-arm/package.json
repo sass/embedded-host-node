@@ -1,0 +1,20 @@
+{
+  "name": "sass-embedded-linux-arm",
+  "version": "1.56.2",
+  "description": "The linux-arm binary for sass-embedded",
+  "repository": "sass/embedded-host-node",
+  "author": "Google Inc.",
+  "license": "MIT",
+  "files": [
+    "dart-sass-embedded/**/*"
+  ],
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "os": [
+    "linux"
+  ],
+  "cpu": [
+    "arm"
+  ]
+}

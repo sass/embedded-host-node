@@ -1,0 +1,19 @@
+{
+  "extends": "./node_modules/gts/tsconfig-google.json",
+  "compilerOptions": {
+    "allowJs": true,
+    "outDir": "dist",
+    "resolveJsonModule": true,
+    "rootDir": ".",
+    "useUnknownInCatchVariables": false,
+    "resolveJsonModule": true,
+    "declaration": false,
+    "lib": ["DOM"]
+  },
+  "include": [
+    "lib/**/*.ts",
+    "lib/src/vendor/embedded-protocol/embedded_sass_pb.js",
+    "tool/*.ts"
+  ],
+  "exclude": ["**/*.test.ts"]
+}

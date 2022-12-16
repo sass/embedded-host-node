@@ -1,0 +1,64 @@
+// Copyright 2020 Google Inc. Use of this source code is governed by an
+// MIT-style license that can be found in the LICENSE file or at
+// https://opensource.org/licenses/MIT.
+
+import {promises as fs, existsSync} from 'fs';
+import * as p from 'path';
+import * as shell from 'shelljs';
+
+shell.config.fatal = true;
+
+// Directory that holds source files.
+export const BUILD_PATH = 'build';
+
+// Clones `repo` into `outPath`, then checks out the given Git `ref`.
+export function fetchRepo(options: {
+  repo: string;
+  outPath: string;
+  ref: string;
+}): void {
+  if (!existsSync(p.join(options.outPath, options.repo))) {
+    console.log(`Cloning ${options.repo} into ${options.outPath}.`);
+    shell.exec(
+      `git clone \
+      --depth=1 \
+      https://github.com/sass/${options.repo} \
+      ${p.join(options.outPath, options.repo)}`,
+      {silent: true}
+    );
+  }
+
+  const version =
+    options.ref === 'main' ? 'latest update' : `commit ${options.ref}`;
+  console.log(`Fetching ${version} for ${options.repo}.`);
+  shell.exec(
+    `git fetch --depth=1 origin ${options.ref} && git reset --hard FETCH_HEAD`,
+    {
+      silent: true,
+      cwd: p.join(options.outPath, options.repo),
+    }
+  );
+}
+
+// Links or copies the contents of `source` into `destination`.
+export async function link(source: string, destination: string): Promise<void> {
+  await cleanDir(destination);
+  if (process.platform === 'win32') {
+    console.log(`Copying ${source} into ${destination}.`);
+    shell.cp('-R', source, destination);
+  } else {
+    console.log(`Linking ${source} into ${destination}.`);
+    // Symlinking doesn't play nice with Jasmine's test globbing on Windows.
+    await fs.symlink(p.resolve(source), destination);
+  }
+}
+
+// Ensures that `dir` does not exist, but its parent directory does.
+export async function cleanDir(dir: string): Promise<void> {
+  await fs.mkdir(p.dirname(dir), {recursive: true});
+  try {
+    await fs.rmdir(dir, {recursive: true});
+  } catch (_) {
+    // If dir doesn't exist yet, that's fine.
+  }
+}

@@ -1,0 +1,60 @@
+// Copyright 2021 Google LLC. Use of this source code is governed by an
+// MIT-style license that can be found in the LICENSE file or at
+// https://opensource.org/licenses/MIT.
+
+import {isOrderedMap, List, OrderedMap} from 'immutable';
+
+import {ListSeparator, SassList} from './list';
+import {Value} from './index';
+
+export class SassArgumentList extends SassList {
+  /**
+   * The `FunctionCallRequest`-scoped ID of this argument list, used to tell the
+   * compiler which argument lists have had their keywords accessed during a
+   * function call.
+   *
+   * The special ID 0 indicates an argument list constructed in the host.
+   *
+   * This is marked as public so that the protofier can access it, but it's not
+   * part of the package's public API and should not be accessed by user code.
+   * It may be renamed or removed without warning in the future.
+   */
+  readonly id: number;
+
+  /**
+   * The argument list's keywords. This isn't exposed directly so that we can
+   * set `keywordsAccessed` when the user reads it.
+   *
+   * This is marked as public so that the protofier can access it, but it's not
+   * part of the package's public API and should not be accessed by user code.
+   * It may be renamed or removed without warning in the future.
+   */
+  readonly keywordsInternal: OrderedMap<string, Value>;
+
+  /**
+   * Whether the `keywords` getter has been accessed.
+   *
+   * This is marked as public so that the protofier can access it, but it's not
+   * part of the package's public API and should not be accessed by user code.
+   * It may be renamed or removed without warning in the future.
+   */
+  keywordsAccessed = false;
+
+  get keywords(): OrderedMap<string, Value> {
+    this.keywordsAccessed = true;
+    return this.keywordsInternal;
+  }
+
+  constructor(
+    contents: Value[] | List<Value>,
+    keywords: Record<string, Value> | OrderedMap<string, Value>,
+    separator?: ListSeparator,
+    id?: number
+  ) {
+    super(contents, {separator});
+    this.keywordsInternal = isOrderedMap(keywords)
+      ? keywords
+      : OrderedMap(keywords);
+    this.id = id ?? 0;
+  }
+}

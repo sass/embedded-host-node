@@ -67,30 +67,18 @@ JS API):
 * `--<type>-ref`: A Git reference for the GitHub repository of the package to
   clone.
 
-* `--<type>-version`: The released version of the package to use. This isn't
-  available for `api`, because the JS API definition doesn't have its own tagged
-  versions.
-
 By default:
 
 * This uses the version of the embedded protocol and compiler specified by
-  `protocol-version` and `compiler-version` in `package.json`, *unless* these
-  versions end in `-dev` in which case it checks out the latest revision on
-  GitHub.
+  `protocol-version` in `package.json`, *unless* that version ends in `-dev` in
+  which case it checks out the latest revision on GitHub.
 
-* This uses the JS API definition from the latest revision on GitHub.
+* This uses the embedded compiler version and JS API definition from the latest
+  revision on GitHub.
 
-`npm run init` chooses the Dart Sass version as follows:
-
-* If a released version of the embedded compiler was specified, it uses the
-  version of Dart Sass compiled into that release.
-
-* If `--compiler-path` was specified, it uses the version of Dart Sass linked to
-  that compiler.
-
-* If the embedded compiler was cloned from GitHub, it uses the version of Dart
-  Sass specified in its pubspec *unless* that version ends in `-dev`, in which
-  case it checks out the latest revision on GitHub.
+* This uses the Dart Sass version from the latest revision on GitHub, unless the
+  embedded `--compiler-path` was passed in which case it uses whatever version
+  of Dart Sass that package references.
 
 ## Continuous Integration
 

@@ -16,7 +16,7 @@
     "node": ">=14.0.0"
   },
   "scripts": {
-    "init": "ts-node ./tool/prepare-dev-environment.ts",
+    "init": "ts-node ./tool/init.ts",
     "check": "npm-run-all check:gts check:tsc",
     "check:gts": "gts check",
     "check:tsc": "tsc --noEmit",

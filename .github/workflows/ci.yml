@@ -9,7 +9,7 @@ env:
 
 on:
   push:
-    branches: [main]
+    branches: [main, feature.*]
     tags: ['**']
   pull_request:
 
@@ -61,6 +61,8 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           check-latest: true
+      - uses: frenck/action-setup-yq@v1
+        with: {version: v4.30.5} # frenck/action-setup-yq#35
       - uses: arduino/setup-protoc@v1
         with:
           version: ${{ env.PROTOC_VERSION }}
@@ -90,8 +92,8 @@ jobs:
       - name: Link the embedded compiler to Dart Sass
         run: |
           if [[ -d dart-sass ]]; then
-            echo "dependency_overrides: {sass: {path: ../dart-sass}}" \
-                >> dart-sass-embedded/pubspec.yaml
+            yq -i '.dependency_overrides.sass = {"path": "../dart-sass"}' \
+                dart-sass-embedded/pubspec.yaml
           fi
 
       - name: Check out the JS API definition
@@ -132,6 +134,8 @@ jobs:
         with: {sdk: stable}
       - uses: actions/setup-node@v2
         with: {node-version: "${{ matrix.node_version }}"}
+      - uses: frenck/action-setup-yq@v1
+        with: {version: v4.30.5} # frenck/action-setup-yq#35
       - uses: arduino/setup-protoc@v1
         with:
           version: ${{ env.PROTOC_VERSION }}
@@ -158,8 +162,8 @@ jobs:
       - name: Link the embedded compiler to Dart Sass
         run: |
           if [[ -d dart-sass ]]; then
-            echo "dependency_overrides: {sass: {path: ../dart-sass}}" \
-                >> dart-sass-embedded/pubspec.yaml
+            yq -i '.dependency_overrides.sass = {"path": "../dart-sass"}' \
+                dart-sass-embedded/pubspec.yaml
           fi
 
       - name: Check out the JS API definition

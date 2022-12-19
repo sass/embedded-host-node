@@ -47,7 +47,7 @@
     "@types/buffer-builder": "^0.2.0",
     "@types/google-protobuf": "^3.7.2",
     "@types/jest": "^27.0.2",
-    "@types/node": "^16.10.3",
+    "@types/node": "^18.11.17",
     "@types/node-fetch": "^2.6.0",
     "@types/shelljs": "^0.8.8",
     "@types/supports-color": "^8.1.1",

@@ -53,7 +53,7 @@
     "@types/supports-color": "^8.1.1",
     "@types/tar": "^6.1.0",
     "@types/yargs": "^17.0.4",
-    "del": "^6.0.0",
+    "del": "^7.0.0",
     "extract-zip": "^2.0.1",
     "gts": "^4.0.0",
     "jest": "^27.2.5",

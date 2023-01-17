@@ -5,7 +5,7 @@ defaults:
 
 env:
   PROTOC_VERSION: 3.x
-  DEFAULT_NODE_VERSION: 15.x # If changing this, also change jobs.tests.strategy.matrix.node_version
+  DEFAULT_NODE_VERSION: 18.x # If changing this, also change jobs.tests.strategy.matrix.node_version
 
 on:
   push:
@@ -52,7 +52,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu, macos, windows]
-        node-version: [15.x, 14.x, 12.x] # If changing this, also change env.DEFAULT_NODE_VERSION
+        node-version: [18.x, 16.x, 14.x] # If changing this, also change env.DEFAULT_NODE_VERSION
       fail-fast: false
 
     steps:
@@ -111,13 +111,13 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu, windows, macos]
-        node_version: [16]
+        node_version: [18]
         include:
           # Include LTS versions on Ubuntu
           - os: ubuntu
-            node_version: 14
+            node_version: 16
           - os: ubuntu
-            node_version: 12
+            node_version: 14
 
     steps:
       - uses: actions/checkout@v2

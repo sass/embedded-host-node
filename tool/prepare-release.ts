@@ -6,9 +6,8 @@ import {promises as fs} from 'fs';
 import * as shell from 'shelljs';
 
 import * as pkg from '../package.json';
-import {getEmbeddedProtocol, getJSApi} from './utils';
-
-shell.config.fatal = true;
+import {getEmbeddedProtocol} from './get-embedded-protocol';
+import {getJSApi} from './get-js-api';
 
 (async () => {
   try {

@@ -75,20 +75,18 @@ jobs:
         uses: sass/clone-linked-repo@v1
         with: {repo: sass/embedded-protocol, default-ref: null}
 
-      - name: Check out the embedded compiler
-        uses: sass/clone-linked-repo@v1
-        with: {repo: sass/dart-sass-embedded, default-ref: null}
-
       - name: Check out Dart Sass
         uses: sass/clone-linked-repo@v1
-        with: {repo: sass/dart-sass, default-ref: null}
+        with: {repo: sass/dart-sass}
+
+      - name: Check out the embedded compiler
+        uses: sass/clone-linked-repo@v1
+        with: {repo: sass/dart-sass-embedded}
 
       - name: Link the embedded compiler to Dart Sass
         run: |
-          if [[ -d dart-sass ]]; then
-            yq -i '.dependency_overrides.sass = {"path": "../dart-sass"}' \
-                dart-sass-embedded/pubspec.yaml
-          fi
+          yq -i '.dependency_overrides.sass = {"path": "../dart-sass"}' \
+              dart-sass-embedded/pubspec.yaml
 
       - name: Check out the JS API definition
         uses: sass/clone-linked-repo@v1
@@ -98,8 +96,7 @@ jobs:
       - name: npm run init
         run: |
           if [[ -d embedded-protocol ]]; then args=--protocol-path=embedded-protocol; fi
-          if [[ -d dart-sass-embedded ]]; then args="$args --compiler-path=dart-sass-embedded"; fi
-          npm run init -- --api-path=language $args
+          npm run init -- --compiler-path=dart-sass-embedded --api-path=language $args
 
       - run: npm run test
 
@@ -139,20 +136,18 @@ jobs:
         uses: sass/clone-linked-repo@v1
         with: {repo: sass/embedded-protocol, default-ref: null}
 
-      - name: Check out the embedded compiler
-        uses: sass/clone-linked-repo@v1
-        with: {repo: sass/dart-sass-embedded, default-ref: null}
-
       - name: Check out Dart Sass
         uses: sass/clone-linked-repo@v1
-        with: {repo: sass/dart-sass, default-ref: null}
+        with: {repo: sass/dart-sass}
+
+      - name: Check out the embedded compiler
+        uses: sass/clone-linked-repo@v1
+        with: {repo: sass/dart-sass-embedded}
 
       - name: Link the embedded compiler to Dart Sass
         run: |
-          if [[ -d dart-sass ]]; then
-            yq -i '.dependency_overrides.sass = {"path": "../dart-sass"}' \
-                dart-sass-embedded/pubspec.yaml
-          fi
+          yq -i '.dependency_overrides.sass = {"path": "../dart-sass"}' \
+              dart-sass-embedded/pubspec.yaml
 
       - name: Check out the JS API definition
         uses: sass/clone-linked-repo@v1
@@ -162,8 +157,7 @@ jobs:
       - name: npm run init
         run: |
           if [[ -d embedded-protocol ]]; then args=--protocol-path=embedded-protocol; fi
-          if [[ -d dart-sass-embedded ]]; then args="$args --compiler-path=dart-sass-embedded"; fi
-          npm run init -- --api-path=language $args
+          npm run init -- --compiler-path=dart-sass-embedded --api-path=language $args
 
       - name: Check out sass-spec
         uses: sass/clone-linked-repo@v1

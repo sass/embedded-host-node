@@ -131,7 +131,7 @@ function convertOptions<sync extends 'sync' | 'async'>(
     // does not.
     if (!signature.includes('(')) signature += '()';
 
-    functions[signature] = wrapFunction(self, callback, sync);
+    functions[signature.trimLeft()] = wrapFunction(self, callback, sync);
   }
 
   const importers =

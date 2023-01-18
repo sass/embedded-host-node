@@ -4,13 +4,9 @@
 
 import yargs from 'yargs';
 
-import {
-  nodeArchToDartArch,
-  getDartSassEmbedded,
-  getEmbeddedProtocol,
-  getJSApi,
-  nodePlatformToDartPlatform,
-} from './utils';
+import {getEmbeddedCompiler} from './get-embedded-compiler';
+import {getEmbeddedProtocol} from './get-embedded-protocol';
+import {getJSApi} from './get-js-api';
 
 const argv = yargs(process.argv.slice(2))
   .option('compiler-path', {
@@ -21,10 +17,6 @@ const argv = yargs(process.argv.slice(2))
   .option('compiler-ref', {
     type: 'string',
     description: 'Build the Embedded Dart Sass binary from this Git ref.',
-  })
-  .option('compiler-version', {
-    type: 'string',
-    description: 'Download this version of the Embedded Dart Sass binary.',
   })
   .option('skip-compiler', {
     type: 'boolean',
@@ -38,10 +30,6 @@ const argv = yargs(process.argv.slice(2))
     type: 'string',
     description: 'Build the Embedded Protocol from this Git ref.',
   })
-  .option('protocol-version', {
-    type: 'string',
-    description: 'Build the Embedded Protocol from this release version.',
-  })
   .option('api-path', {
     type: 'string',
     description: 'Use the JS API definitions from the source at this path.',
@@ -51,11 +39,9 @@ const argv = yargs(process.argv.slice(2))
     description: 'Build the JS API definitions from this Git ref.',
   })
   .conflicts({
-    'compiler-path': ['compiler-ref', 'compiler-version', 'skip-compiler'],
-    'compiler-ref': ['compiler-version', 'skip-compiler'],
-    'compiler-version': 'skip-compiler',
-    'protocol-path': ['protocol-ref', 'protocol-version'],
-    'protocol-ref': 'protocol-version',
+    'compiler-path': ['compiler-ref', 'skip-compiler'],
+    'compiler-ref': ['skip-compiler'],
+    'protocol-path': ['protocol-ref'],
     'api-path': 'api-ref',
   })
   .parseSync();
@@ -63,18 +49,8 @@ const argv = yargs(process.argv.slice(2))
 (async () => {
   try {
     const outPath = 'lib/src/vendor';
-    const platform = nodePlatformToDartPlatform(
-      process.env.npm_config_platform || process.platform
-    );
-    const arch = nodeArchToDartArch(
-      process.env.npm_config_arch || process.arch
-    );
 
-    if (argv['protocol-version']) {
-      await getEmbeddedProtocol(outPath, {
-        version: argv['protocol-version'],
-      });
-    } else if (argv['protocol-ref']) {
+    if (argv['protocol-ref']) {
       await getEmbeddedProtocol(outPath, {
         ref: argv['protocol-ref'],
       });
@@ -87,20 +63,16 @@ const argv = yargs(process.argv.slice(2))
     }
 
     if (!argv['skip-compiler']) {
-      if (argv['compiler-version']) {
-        await getDartSassEmbedded(outPath, platform, arch, {
-          version: argv['compiler-version'],
-        });
-      } else if (argv['compiler-ref']) {
-        await getDartSassEmbedded(outPath, platform, arch, {
+      if (argv['compiler-ref']) {
+        await getEmbeddedCompiler(outPath, {
           ref: argv['compiler-ref'],
         });
       } else if (argv['compiler-path']) {
-        await getDartSassEmbedded(outPath, platform, arch, {
+        await getEmbeddedCompiler(outPath, {
           path: argv['compiler-path'],
         });
       } else {
-        await getDartSassEmbedded(outPath, platform, arch);
+        await getEmbeddedCompiler(outPath);
       }
     }
 

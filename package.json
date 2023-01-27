@@ -1,8 +1,8 @@
 {
   "name": "sass-embedded",
-  "version": "1.56.2",
+  "version": "1.57.1",
   "protocol-version": "1.2.0",
-  "compiler-version": "1.56.2",
+  "compiler-version": "1.58.0-dev",
   "description": "Node.js library that communicates with Embedded Dart Sass using the Embedded Sass protocol",
   "repository": "sass/embedded-host-node",
   "author": "Google Inc.",
@@ -16,7 +16,7 @@
     "node": ">=14.0.0"
   },
   "scripts": {
-    "init": "ts-node ./tool/prepare-dev-environment.ts",
+    "init": "ts-node ./tool/init.ts",
     "check": "npm-run-all check:gts check:tsc",
     "check:gts": "gts check",
     "check:tsc": "tsc --noEmit",
@@ -27,14 +27,14 @@
     "test": "jest"
   },
   "optionalDependencies": {
-    "sass-embedded-darwin-arm64": "1.56.2",
-    "sass-embedded-darwin-x64": "1.56.2",
-    "sass-embedded-linux-arm": "1.56.2",
-    "sass-embedded-linux-arm64": "1.56.2",
-    "sass-embedded-linux-ia32": "1.56.2",
-    "sass-embedded-linux-x64": "1.56.2",
-    "sass-embedded-win32-ia32": "1.56.2",
-    "sass-embedded-win32-x64": "1.56.2"
+    "sass-embedded-darwin-arm64": "1.57.1",
+    "sass-embedded-darwin-x64": "1.57.1",
+    "sass-embedded-linux-arm": "1.57.1",
+    "sass-embedded-linux-arm64": "1.57.1",
+    "sass-embedded-linux-ia32": "1.57.1",
+    "sass-embedded-linux-x64": "1.57.1",
+    "sass-embedded-win32-ia32": "1.57.1",
+    "sass-embedded-win32-x64": "1.57.1"
   },
   "dependencies": {
     "buffer-builder": "^0.2.0",
@@ -47,7 +47,7 @@
     "@types/buffer-builder": "^0.2.0",
     "@types/google-protobuf": "^3.7.2",
     "@types/jest": "^27.0.2",
-    "@types/node": "^16.10.3",
+    "@types/node": "^18.11.18",
     "@types/node-fetch": "^2.6.0",
     "@types/shelljs": "^0.8.8",
     "@types/supports-color": "^8.1.1",
@@ -63,7 +63,7 @@
     "protoc": "1.0.4",
     "shelljs": "^0.8.4",
     "simple-git": "^3.15.1",
-    "source-map-js": "^0.6.1",
+    "source-map-js": "^1.0.2",
     "tar": "^6.0.5",
     "ts-jest": "^27.0.5",
     "ts-node": "^10.2.1",

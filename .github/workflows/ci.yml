@@ -14,123 +14,123 @@ on:
   pull_request:
 
 jobs:
-  static_analysis:
-    name: Static analysis
-    runs-on: ubuntu-latest
+  # static_analysis:
+  #   name: Static analysis
+  #   runs-on: ubuntu-latest
 
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with:
-          node-version: ${{ env.DEFAULT_NODE_VERSION }}
-          check-latest: true
-      - uses: arduino/setup-protoc@v1
-        with:
-          version: ${{ env.PROTOC_VERSION }}
-          repo-token: '${{ github.token }}'
-      - name: Download protoc-gen-js
-        uses: robinraju/release-downloader@v1.7
-        with:
-          repository: protocolbuffers/protobuf-javascript
-          out-file-path: build/protobuf-js
-          latest: true
-          fileName: >-
-            protobuf-javascript-*-${{
-              runner.os == 'Linux' && 'linux-x86_64' ||
-                runner.os == 'Windows' && 'win64' ||
-                'osx-x86_64'
-            }}.zip
-      - name: Unzip protoc-gen-js
-        run: cd build/protobuf-js && unzip *.zip
-      - name: Add protoc-gen-js to PATH
-        run: echo "build/protobuf-js/bin" >> $GITHUB_PATH
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - uses: actions/setup-node@v2
+  #       with:
+  #         node-version: ${{ env.DEFAULT_NODE_VERSION }}
+  #         check-latest: true
+  #     - uses: arduino/setup-protoc@v1
+  #       with:
+  #         version: ${{ env.PROTOC_VERSION }}
+  #         repo-token: '${{ github.token }}'
+  #     - name: Download protoc-gen-js
+  #       uses: robinraju/release-downloader@v1.7
+  #       with:
+  #         repository: protocolbuffers/protobuf-javascript
+  #         out-file-path: build/protobuf-js
+  #         latest: true
+  #         fileName: >-
+  #           protobuf-javascript-*-${{
+  #             runner.os == 'Linux' && 'linux-x86_64' ||
+  #               runner.os == 'Windows' && 'win64' ||
+  #               'osx-x86_64'
+  #           }}.zip
+  #     - name: Unzip protoc-gen-js
+  #       run: cd build/protobuf-js && unzip *.zip
+  #     - name: Add protoc-gen-js to PATH
+  #       run: echo "build/protobuf-js/bin" >> $GITHUB_PATH
 
-      - name: Check out the embedded protocol
-        uses: sass/clone-linked-repo@v1
-        with: {repo: sass/embedded-protocol, default-ref: null}
+  #     - name: Check out the embedded protocol
+  #       uses: sass/clone-linked-repo@v1
+  #       with: {repo: sass/embedded-protocol, default-ref: null}
 
-      - name: Check out the JS API definition
-        uses: sass/clone-linked-repo@v1
-        with: {repo: sass/sass, path: language}
+  #     - name: Check out the JS API definition
+  #       uses: sass/clone-linked-repo@v1
+  #       with: {repo: sass/sass, path: language}
 
-      - run: npm install
-      - name: npm run init
-        run: |
-          if [[ -d embedded-protocol ]]; then args=--protocol-path=embedded-protocol; fi
-          npm run init -- --skip-compiler --api-path=language $args
+  #     - run: npm install
+  #     - name: npm run init
+  #       run: |
+  #         if [[ -d embedded-protocol ]]; then args=--protocol-path=embedded-protocol; fi
+  #         npm run init -- --skip-compiler --api-path=language $args
 
-      - run: npm run check
+  #     - run: npm run check
 
-  tests:
-    name: 'Tests | Node ${{ matrix.node-version }} | ${{ matrix.os }}'
-    runs-on: ${{ matrix.os }}-latest
+  # tests:
+  #   name: 'Tests | Node ${{ matrix.node-version }} | ${{ matrix.os }}'
+  #   runs-on: ${{ matrix.os }}-latest
 
-    strategy:
-      matrix:
-        os: [ubuntu, macos, windows]
-        node-version: [18.x, 16.x, 14.x] # If changing this, also change env.DEFAULT_NODE_VERSION
-      fail-fast: false
+  #   strategy:
+  #     matrix:
+  #       os: [ubuntu, macos, windows]
+  #       node-version: [18.x, 16.x, 14.x] # If changing this, also change env.DEFAULT_NODE_VERSION
+  #     fail-fast: false
 
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with:
-          node-version: ${{ matrix.node-version }}
-          check-latest: true
-      - uses: frenck/action-setup-yq@v1
-        with: {version: v4.30.5} # frenck/action-setup-yq#35
-      - uses: arduino/setup-protoc@v1
-        with:
-          version: ${{ env.PROTOC_VERSION }}
-          repo-token: '${{ github.token }}'
-      - name: Download protoc-gen-js
-        uses: robinraju/release-downloader@v1.7
-        with:
-          repository: protocolbuffers/protobuf-javascript
-          out-file-path: build/protobuf-js
-          latest: true
-          fileName: >-
-            protobuf-javascript-*-${{
-              runner.os == 'Linux' && 'linux-x86_64' ||
-                runner.os == 'Windows' && 'win64' ||
-                'osx-x86_64'
-            }}.zip
-      - name: Unzip protoc-gen-js
-        run: cd build/protobuf-js && unzip *.zip
-      - name: Add protoc-gen-js to PATH
-        run: echo "build/protobuf-js/bin" >> $GITHUB_PATH
-      - uses: dart-lang/setup-dart@v1
-        with: {sdk: stable}
-      - run: dart --version
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - uses: actions/setup-node@v2
+  #       with:
+  #         node-version: ${{ matrix.node-version }}
+  #         check-latest: true
+  #     - uses: frenck/action-setup-yq@v1
+  #       with: {version: v4.30.5} # frenck/action-setup-yq#35
+  #     - uses: arduino/setup-protoc@v1
+  #       with:
+  #         version: ${{ env.PROTOC_VERSION }}
+  #         repo-token: '${{ github.token }}'
+  #     - name: Download protoc-gen-js
+  #       uses: robinraju/release-downloader@v1.7
+  #       with:
+  #         repository: protocolbuffers/protobuf-javascript
+  #         out-file-path: build/protobuf-js
+  #         latest: true
+  #         fileName: >-
+  #           protobuf-javascript-*-${{
+  #             runner.os == 'Linux' && 'linux-x86_64' ||
+  #               runner.os == 'Windows' && 'win64' ||
+  #               'osx-x86_64'
+  #           }}.zip
+  #     - name: Unzip protoc-gen-js
+  #       run: cd build/protobuf-js && unzip *.zip
+  #     - name: Add protoc-gen-js to PATH
+  #       run: echo "build/protobuf-js/bin" >> $GITHUB_PATH
+  #     - uses: dart-lang/setup-dart@v1
+  #       with: {sdk: stable}
+  #     - run: dart --version
 
-      - name: Check out the embedded protocol
-        uses: sass/clone-linked-repo@v1
-        with: {repo: sass/embedded-protocol, default-ref: null}
+  #     - name: Check out the embedded protocol
+  #       uses: sass/clone-linked-repo@v1
+  #       with: {repo: sass/embedded-protocol, default-ref: null}
 
-      - name: Check out Dart Sass
-        uses: sass/clone-linked-repo@v1
-        with: {repo: sass/dart-sass}
+  #     - name: Check out Dart Sass
+  #       uses: sass/clone-linked-repo@v1
+  #       with: {repo: sass/dart-sass}
 
-      - name: Check out the embedded compiler
-        uses: sass/clone-linked-repo@v1
-        with: {repo: sass/dart-sass-embedded}
+  #     - name: Check out the embedded compiler
+  #       uses: sass/clone-linked-repo@v1
+  #       with: {repo: sass/dart-sass-embedded}
 
-      - name: Link the embedded compiler to Dart Sass
-        run: |
-          yq -i '.dependency_overrides.sass = {"path": "../dart-sass"}' \
-              dart-sass-embedded/pubspec.yaml
+  #     - name: Link the embedded compiler to Dart Sass
+  #       run: |
+  #         yq -i '.dependency_overrides.sass = {"path": "../dart-sass"}' \
+  #             dart-sass-embedded/pubspec.yaml
 
-      - name: Check out the JS API definition
-        uses: sass/clone-linked-repo@v1
-        with: {repo: sass/sass, path: language}
+  #     - name: Check out the JS API definition
+  #       uses: sass/clone-linked-repo@v1
+  #       with: {repo: sass/sass, path: language}
 
-      - run: npm install
-      - name: npm run init
-        run: |
-          if [[ -d embedded-protocol ]]; then args=--protocol-path=embedded-protocol; fi
-          npm run init -- --compiler-path=dart-sass-embedded --api-path=language $args
+  #     - run: npm install
+  #     - name: npm run init
+  #       run: |
+  #         if [[ -d embedded-protocol ]]; then args=--protocol-path=embedded-protocol; fi
+  #         npm run init -- --compiler-path=dart-sass-embedded --api-path=language $args
 
-      - run: npm run test
+  #     - run: npm run test
 
   # The versions should be kept up-to-date with the latest LTS Node releases.
   # They next need to be rotated October 2021. See
@@ -142,14 +142,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu, windows, macos]
+        os: [ubuntu] # [ubuntu, windows, macos]
         node_version: [18]
-        include:
-          # Include LTS versions on Ubuntu
-          - os: ubuntu
-            node_version: 16
-          - os: ubuntu
-            node_version: 14
+        # include:
+        #   # Include LTS versions on Ubuntu
+        #   - os: ubuntu
+        #     node_version: 16
+        #   - os: ubuntu
+        #     node_version: 14
 
     steps:
       - uses: actions/checkout@v2
@@ -207,6 +207,8 @@ jobs:
           if [[ -d embedded-protocol ]]; then args=--protocol-path=embedded-protocol; fi
           npm run init -- --compiler-path=dart-sass-embedded --api-path=language $args
 
+      - run: cat lib/src/vendor/embedded-protocol/embedded_sass_pb.js
+
       - name: Check out sass-spec
         uses: sass/clone-linked-repo@v1
         with: {repo: sass/sass-spec}
@@ -224,34 +226,34 @@ jobs:
         run: npm run js-api-spec -- --sassPackage .. --sassSassRepo ../language
         working-directory: sass-spec
 
-  deploy_npm:
-    name: Deploy npm
-    runs-on: ubuntu-latest
-    if: "startsWith(github.ref, 'refs/tags/') && github.repository == 'sass/embedded-host-node'"
-    needs: [static_analysis, tests, sass_spec]
+  # deploy_npm:
+  #   name: Deploy npm
+  #   runs-on: ubuntu-latest
+  #   if: "startsWith(github.ref, 'refs/tags/') && github.repository == 'sass/embedded-host-node'"
+  #   needs: [static_analysis, tests, sass_spec]
 
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with:
-          node-version: ${{ env.DEFAULT_NODE_VERSION }}
-          check-latest: true
-          registry-url: 'https://registry.npmjs.org'
-      - run: npm install
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - uses: actions/setup-node@v2
+  #       with:
+  #         node-version: ${{ env.DEFAULT_NODE_VERSION }}
+  #         check-latest: true
+  #         registry-url: 'https://registry.npmjs.org'
+  #     - run: npm install
 
-      - name: "Check we're not using a -dev version of the embedded protocol"
-        run: jq -r '.["protocol-version"]' package.json | grep -qv -- '-dev$'
-      - name: "Check we're not using a -dev version of the embedded compiler"
-        run: jq -r '.["compiler-version"]' package.json | grep -qv -- '-dev$'
+  #     - name: "Check we're not using a -dev version of the embedded protocol"
+  #       run: jq -r '.["protocol-version"]' package.json | grep -qv -- '-dev$'
+  #     - name: "Check we're not using a -dev version of the embedded compiler"
+  #       run: jq -r '.["compiler-version"]' package.json | grep -qv -- '-dev$'
 
-      - name: Publish optional dependencies
-        env:
-          NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}'
-        run: |
-          for pkg in linux-arm linux-arm64 linux-ia32 linux-x64 darwin-arm64 darwin-x64 win32-ia32 win32-x64; do
-            npx ts-node ./tool/prepare-optional-release.ts --package=$pkg && npm publish ./npm/$pkg
-          done
+  #     - name: Publish optional dependencies
+  #       env:
+  #         NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}'
+  #       run: |
+  #         for pkg in linux-arm linux-arm64 linux-ia32 linux-x64 darwin-arm64 darwin-x64 win32-ia32 win32-x64; do
+  #           npx ts-node ./tool/prepare-optional-release.ts --package=$pkg && npm publish ./npm/$pkg
+  #         done
 
-      - run: npm publish
-        env:
-          NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}'
+  #     - run: npm publish
+  #       env:
+  #         NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}'

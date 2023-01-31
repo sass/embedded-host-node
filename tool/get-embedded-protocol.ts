@@ -60,6 +60,15 @@ function buildEmbeddedProtocol(repoPath: string): void {
       ? '%CD%/node_modules/.bin/protoc-gen-ts.cmd'
       : 'node_modules/.bin/protoc-gen-ts';
   mkdirSync('build/embedded-protocol', {recursive: true});
+  console.debug(
+`${protocPath} \
+      --plugin="protoc-gen-ts=${pluginPath}" \
+      --plugin="protoc-gen-js=${protocGenJsPath}" \
+      --js_out="import_style=commonjs,binary:build/embedded-protocol" \
+      --ts_out="build/embedded-protocol" \
+      --proto_path="${repoPath}" \
+      ${proto}`
+  );
   shell.exec(
     `${protocPath} \
       --plugin="protoc-gen-ts=${pluginPath}" \

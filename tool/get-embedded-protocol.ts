@@ -2,6 +2,7 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
+import * as chalk from 'chalk';
 import {mkdirSync} from 'fs';
 import * as p from 'path';
 import * as shell from 'shelljs';
@@ -43,16 +44,15 @@ export async function getEmbeddedProtocol(
 
 // Builds the embedded proto at `repoPath` into a pbjs with TS declaration file.
 function buildEmbeddedProtocol(repoPath: string): void {
+  const protocPath = assertOnPath('protoc');
+  const protocGenJsPath = assertOnPath('protoc-gen-js');
+
   const proto = p.join(repoPath, 'embedded_sass.proto');
-  const protocPath =
-    process.platform === 'win32'
-      ? '%CD%/node_modules/protoc/protoc/bin/protoc.exe'
-      : 'node_modules/protoc/protoc/bin/protoc';
   const version = shell
     .exec(`${protocPath} --version`, {silent: true})
     .stdout.trim();
   console.log(
-    `Building pbjs and TS declaration file from ${proto} with ${version}.`
+    `Building JS and TS protobuf files from ${proto} with ${version}.`
   );
 
   const pluginPath =
@@ -63,10 +63,22 @@ function buildEmbeddedProtocol(repoPath: string): void {
   shell.exec(
     `${protocPath} \
       --plugin="protoc-gen-ts=${pluginPath}" \
+      --plugin="protoc-gen-js=${protocGenJsPath}" \
       --js_out="import_style=commonjs,binary:build/embedded-protocol" \
       --ts_out="build/embedded-protocol" \
       --proto_path="${repoPath}" \
       ${proto}`,
     {silent: true}
+  );
+}
+
+// Asserts that `executable` is available in the PATH environment variable and
+// returns its absolute pathif so.
+function assertOnPath(executable: string): string {
+  const result = shell.which(executable);
+  if (result) return result.toString();
+  throw (
+    `${chalk.bold.red('Error:')} You must have ${chalk.blue(executable)} ` +
+    'on your PATH to build embedded-host-node.'
   );
 }

@@ -28,6 +28,22 @@ jobs:
         with:
           version: ${{ env.PROTOC_VERSION }}
           repo-token: '${{ github.token }}'
+      - name: Download protoc-gen-js
+        uses: robinraju/release-downloader@v1.7
+        with:
+          repository: protocolbuffers/protobuf-javascript
+          out-file-path: build/protobuf-js
+          latest: true
+          fileName: >-
+            protobuf-javascript-*-${{
+              runner.os == 'Linux' && 'linux-x86_64' ||
+                runner.os == 'Windows' && 'win64' ||
+                'osx-x86_64'
+            }}.zip
+      - name: Unzip protoc-gen-js
+        run: cd build/protobuf-js && unzip *.zip
+      - name: Add protoc-gen-js to PATH
+        run: echo "build/protobuf-js/bin" >> $GITHUB_PATH
 
       - name: Check out the embedded protocol
         uses: sass/clone-linked-repo@v1
@@ -67,6 +83,22 @@ jobs:
         with:
           version: ${{ env.PROTOC_VERSION }}
           repo-token: '${{ github.token }}'
+      - name: Download protoc-gen-js
+        uses: robinraju/release-downloader@v1.7
+        with:
+          repository: protocolbuffers/protobuf-javascript
+          out-file-path: build/protobuf-js
+          latest: true
+          fileName: >-
+            protobuf-javascript-*-${{
+              runner.os == 'Linux' && 'linux-x86_64' ||
+                runner.os == 'Windows' && 'win64' ||
+                'osx-x86_64'
+            }}.zip
+      - name: Unzip protoc-gen-js
+        run: cd build/protobuf-js && unzip *.zip
+      - name: Add protoc-gen-js to PATH
+        run: echo "build/protobuf-js/bin" >> $GITHUB_PATH
       - uses: dart-lang/setup-dart@v1
         with: {sdk: stable}
       - run: dart --version
@@ -131,6 +163,22 @@ jobs:
         with:
           version: ${{ env.PROTOC_VERSION }}
           repo-token: '${{ github.token }}'
+      - name: Download protoc-gen-js
+        uses: robinraju/release-downloader@v1.7
+        with:
+          repository: protocolbuffers/protobuf-javascript
+          out-file-path: build/protobuf-js
+          latest: true
+          fileName: >-
+            protobuf-javascript-*-${{
+              runner.os == 'Linux' && 'linux-x86_64' ||
+                runner.os == 'Windows' && 'win64' ||
+                'osx-x86_64'
+            }}.zip
+      - name: Unzip protoc-gen-js
+        run: cd build/protobuf-js && unzip *.zip
+      - name: Add protoc-gen-js to PATH
+        run: echo "build/protobuf-js/bin" >> $GITHUB_PATH
 
       - name: Check out the embedded protocol
         uses: sass/clone-linked-repo@v1

@@ -94,6 +94,19 @@ library as a stand-alone package at some point in the future.
 [synchronous message-passing library]: https://github.com/sass/embedded-host-node/blob/main/lib/src/sync-process/sync-message-port.ts
 [`Atomics.wait()`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Atomics/wait
 
+## Local Development
+
+To work on this project locally, you'll need to download:
+
+* A recent release of [the protocol buffers compiler].
+* A recent release of [the JavaScript plugin for the protocol buffers compiler].
+
+[the protocol buffers compiler]: https://github.com/protocolbuffers/protobuf/releases
+[the JavaScript plugin for the protocol buffers compiler]: https://github.com/protocolbuffers/protobuf-javascript/releases
+
+Make sure the `protoc` and `protoc-gen-js` executables are both on your system
+path.
+
 ---
 
 Disclaimer: this is not an official Google product.

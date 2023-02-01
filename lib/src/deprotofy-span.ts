@@ -5,53 +5,41 @@
 import {URL} from 'url';
 
 import * as proto from './vendor/embedded-protocol/embedded_sass_pb';
-import {SourceLocation, SourceSpan} from './vendor/sass';
+import {SourceSpan} from './vendor/sass';
 import {compilerError} from './utils';
 
 // Creates a SourceSpan from the given protocol `buffer`. Throws if the buffer
 // has invalid fields.
 export function deprotofySourceSpan(buffer: proto.SourceSpan): SourceSpan {
-  const text = buffer.getText();
+  const text = buffer.text;
 
-  if (buffer.getStart() === undefined) {
+  if (buffer.start === undefined) {
     throw compilerError('Expected SourceSpan to have start.');
   }
-  const start = deprotofySourceLocation(buffer.getStart()!);
 
   let end;
-  if (buffer.getEnd() === undefined) {
+  if (buffer.end === undefined) {
     if (text !== '') {
       throw compilerError('Expected SourceSpan text to be empty.');
     } else {
-      end = start;
+      end = buffer.start;
     }
   } else {
-    end = deprotofySourceLocation(buffer.getEnd()!);
-    if (end.offset < start.offset) {
+    end = buffer.end;
+    if (end.offset < buffer.start.offset) {
       throw compilerError('Expected SourceSpan end to be after start.');
     }
   }
 
-  const url = buffer.getUrl() === '' ? undefined : new URL(buffer.getUrl());
+  const url = buffer.url === '' ? undefined : new URL(buffer.url);
 
-  const context = buffer.getContext() === '' ? undefined : buffer.getContext();
+  const context = buffer.context === '' ? undefined : buffer.context;
 
   return {
     text,
-    start,
+    start: buffer.start,
     end,
     url,
     context,
-  };
-}
-
-// Creates a SourceLocation from the given protocol `buffer`.
-function deprotofySourceLocation(
-  buffer: proto.SourceSpan.SourceLocation
-): SourceLocation {
-  return {
-    offset: buffer.getOffset(),
-    line: buffer.getLine(),
-    column: buffer.getColumn(),
   };
 }

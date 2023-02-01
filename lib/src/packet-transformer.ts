@@ -35,7 +35,7 @@ export class PacketTransformer {
   readonly outboundProtobufs$ = this.outboundProtobufsInternal$.pipe();
 
   constructor(
-    private readonly outboundBuffers$: Observable<Buffer>,
+    private readonly outboundBuffers$: Observable<Uint8Array>,
     private readonly writeInboundBuffer: (buffer: Buffer) => void
   ) {
     this.outboundBuffers$
@@ -47,7 +47,7 @@ export class PacketTransformer {
    * Encodes a packet by pre-fixing `protobuf` with a header that describes its
    * length.
    */
-  writeInboundProtobuf(protobuf: Buffer): void {
+  writeInboundProtobuf(protobuf: Uint8Array): void {
     try {
       let length = protobuf.length;
       if (length === 0) {
@@ -77,7 +77,7 @@ export class PacketTransformer {
 
   // Decodes a buffer, filling up the packet that is actively being decoded.
   // Returns a list of decoded payloads.
-  private decode(buffer: Buffer): Buffer[] {
+  private decode(buffer: Uint8Array): Buffer[] {
     const payloads: Buffer[] = [];
     let decodedBytes = 0;
     while (decodedBytes < buffer.length) {
@@ -124,7 +124,7 @@ class Packet {
    * packet. This method can be called repeatedly, incrementally building
    * up the packet until it is complete.
    */
-  write(source: Buffer): number {
+  write(source: Uint8Array): number {
     if (this.isComplete) {
       throw Error('Cannot write to a completed Packet.');
     }

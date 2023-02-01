@@ -15,12 +15,16 @@ export function expectObservableToError<T>(
   done: () => void
 ): void {
   observable.subscribe({
-    next: () => fail('expected error'),
+    next: () => {
+      throw new Error('expected error');
+    },
     error: error => {
       expect(error.message).toBe(errorMessage);
       done();
     },
-    complete: () => fail('expected error'),
+    complete: () => {
+      throw new Error('expected error');
+    },
   });
 }
 

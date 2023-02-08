@@ -202,7 +202,7 @@ export class Dispatcher<sync extends 'sync' | 'async'> {
     }
   }
 
-  // Sends `request` inbound. Once it's done, calls `callback with either the
+  // Sends `request` inbound. Once it's done, calls `callback` with either the
   // corresponding outbound response of type `responseType`, or an error if any
   // protocol errors were encountered.
   private handleInboundRequest(

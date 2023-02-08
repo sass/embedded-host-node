@@ -121,9 +121,7 @@ export function withoutExtension(path: string): string {
 }
 
 /** Converts a JS syntax string into a protobuf syntax enum. */
-export function protofySyntax(
-  syntax: Syntax
-): proto.SyntaxMap[keyof proto.SyntaxMap] {
+export function protofySyntax(syntax: Syntax): proto.Syntax {
   switch (syntax) {
     case 'scss':
       return proto.Syntax.SCSS;

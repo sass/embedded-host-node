@@ -24,10 +24,6 @@ jobs:
         with:
           node-version: ${{ env.DEFAULT_NODE_VERSION }}
           check-latest: true
-      - uses: arduino/setup-protoc@v1
-        with:
-          version: ${{ env.PROTOC_VERSION }}
-          repo-token: '${{ github.token }}'
 
       - name: Check out the embedded protocol
         uses: sass/clone-linked-repo@v1
@@ -63,10 +59,6 @@ jobs:
           check-latest: true
       - uses: frenck/action-setup-yq@v1
         with: {version: v4.30.5} # frenck/action-setup-yq#35
-      - uses: arduino/setup-protoc@v1
-        with:
-          version: ${{ env.PROTOC_VERSION }}
-          repo-token: '${{ github.token }}'
       - uses: dart-lang/setup-dart@v1
         with: {sdk: stable}
       - run: dart --version
@@ -127,10 +119,6 @@ jobs:
         with: {node-version: "${{ matrix.node_version }}"}
       - uses: frenck/action-setup-yq@v1
         with: {version: v4.30.5} # frenck/action-setup-yq#35
-      - uses: arduino/setup-protoc@v1
-        with:
-          version: ${{ env.PROTOC_VERSION }}
-          repo-token: '${{ github.token }}'
 
       - name: Check out the embedded protocol
         uses: sass/clone-linked-repo@v1

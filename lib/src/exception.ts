@@ -11,12 +11,12 @@ export class Exception extends Error implements SassException {
   readonly sassStack: string;
   readonly span: SourceSpan;
 
-  constructor(failure: proto.OutboundMessage.CompileResponse.CompileFailure) {
-    super(failure.getFormatted());
+  constructor(failure: proto.OutboundMessage_CompileResponse_CompileFailure) {
+    super(failure.formatted);
 
-    this.sassMessage = failure.getMessage();
-    this.sassStack = failure.getStackTrace();
-    this.span = deprotofySourceSpan(failure.getSpan()!);
+    this.sassMessage = failure.message;
+    this.sassStack = failure.stackTrace;
+    this.span = deprotofySourceSpan(failure.span!);
   }
 
   toString() {

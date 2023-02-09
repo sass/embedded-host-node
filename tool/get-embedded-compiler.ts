@@ -25,10 +25,10 @@ export async function getEmbeddedCompiler(
   if (!options || 'ref' in options) {
     utils.fetchRepo({
       repo,
-      outPath: utils.BUILD_PATH,
+      outPath: 'build',
       ref: options?.ref ?? 'main',
     });
-    source = p.join(utils.BUILD_PATH, repo);
+    source = p.join('build', repo);
     await maybeOverrideSassDependency(source);
   } else {
     source = options.path;

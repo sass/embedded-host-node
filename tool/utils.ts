@@ -57,7 +57,7 @@ export async function link(source: string, destination: string): Promise<void> {
 export async function cleanDir(dir: string): Promise<void> {
   await fs.mkdir(p.dirname(dir), {recursive: true});
   try {
-    await fs.rmdir(dir, {recursive: true});
+    await fs.rm(dir, {force: true, recursive: true});
   } catch (_) {
     // If dir doesn't exist yet, that's fine.
   }

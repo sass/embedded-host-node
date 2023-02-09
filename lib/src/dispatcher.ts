@@ -10,7 +10,7 @@ import {
   OutboundResponse,
   OutboundResponseType,
 } from './messages';
-import * as proto from './vendor/embedded-protocol/embedded_sass_pb';
+import * as proto from './vendor/embedded_sass_pb';
 import {RequestTracker} from './request-tracker';
 import {PromiseOr, compilerError, thenOr, hostError} from './utils';
 

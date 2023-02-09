@@ -2,8 +2,7 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-import {mkdirSync} from 'fs';
-import * as p from 'path';
+import {pathEqual} from 'path-equal';
 import * as shell from 'shelljs';
 
 import * as pkg from '../package.json';
@@ -21,9 +20,6 @@ export async function getEmbeddedProtocol(
   outPath: string,
   options?: {ref: string} | {path: string}
 ): Promise<void> {
-  const repo = 'embedded-protocol';
-
-  let source: string;
   if (!options || 'ref' in options) {
     let ref = options?.ref;
     if (ref === undefined) {
@@ -31,33 +27,18 @@ export async function getEmbeddedProtocol(
       ref = version.endsWith('-dev') ? 'main' : version;
     }
 
-    utils.fetchRepo({repo, outPath: utils.BUILD_PATH, ref});
-    source = p.join(utils.BUILD_PATH, repo);
-  } else {
-    source = options.path;
+    utils.fetchRepo({repo: 'embedded-protocol', outPath: 'build', ref});
+  } else if (!pathEqual(options.path, 'build/embedded-protocol')) {
+    await utils.cleanDir('build/embedded-protocol');
+    await utils.link(options.path, 'build/embedded-protocol');
   }
 
-  buildEmbeddedProtocol(source);
-  await utils.link('build/embedded-protocol', p.join(outPath, repo));
+  buildEmbeddedProtocol();
 }
 
-// Builds the embedded proto at `repoPath` into a pbjs with TS declaration file.
-function buildEmbeddedProtocol(repoPath: string): void {
-  const proto = p.join(repoPath, 'embedded_sass.proto');
-  const version = shell
-    .exec('npx protoc --version', {silent: true})
-    .stdout.trim();
-  console.log(
-    `Building pbjs and TS declaration file from ${proto} with protoc ` +
-      `${version}.`
-  );
-
-  mkdirSync('build/embedded-protocol', {recursive: true});
-  shell.exec(
-    `npx protoc \
-      --es_out="target=ts:build/embedded-protocol" \
-      --proto_path="${repoPath}" \
-      ${proto}`,
-    {silent: true}
-  );
+// Builds the embedded proto into a TS file.
+function buildEmbeddedProtocol(): void {
+  const version = shell.exec('npx buf --version', {silent: true}).stdout.trim();
+  console.log(`Building TS with buf ${version}.`);
+  shell.exec('npx buf generate');
 }

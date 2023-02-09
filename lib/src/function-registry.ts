@@ -7,7 +7,7 @@ import {inspect} from 'util';
 import * as types from './vendor/sass';
 import * as utils from './utils';
 import {CustomFunction} from './vendor/sass';
-import * as proto from './vendor/embedded-protocol/embedded_sass_pb';
+import * as proto from './vendor/embedded_sass_pb';
 import {PromiseOr, catchOr, compilerError, thenOr} from './utils';
 import {Protofier} from './protofier';
 import {Value} from './value';

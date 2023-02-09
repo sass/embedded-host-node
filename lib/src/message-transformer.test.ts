@@ -6,7 +6,7 @@ import {Subject, Observable} from 'rxjs';
 
 import {expectObservableToError} from '../../test/utils';
 import {MessageTransformer} from './message-transformer';
-import * as proto from './vendor/embedded-protocol/embedded_sass_pb';
+import * as proto from './vendor/embedded_sass_pb';
 
 describe('message transformer', () => {
   let messages: MessageTransformer;

@@ -6,7 +6,7 @@ import * as p from 'path';
 import {Observable} from 'rxjs';
 import * as supportsColor from 'supports-color';
 
-import * as proto from './vendor/embedded-protocol/embedded_sass_pb';
+import * as proto from './vendor/embedded_sass_pb';
 import * as utils from './utils';
 import {AsyncEmbeddedCompiler} from './async-compiler';
 import {CompileResult, Options, SourceSpan, StringOptions} from './vendor/sass';

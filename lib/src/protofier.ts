@@ -4,7 +4,7 @@
 
 import {OrderedMap} from 'immutable';
 
-import * as proto from './vendor/embedded-protocol/embedded_sass_pb';
+import * as proto from './vendor/embedded_sass_pb';
 import * as utils from './utils';
 import {FunctionRegistry} from './function-registry';
 import {SassArgumentList} from './value/argument-list';

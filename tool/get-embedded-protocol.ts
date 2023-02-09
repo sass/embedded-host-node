@@ -2,8 +2,7 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-import * as p from 'path';
-import {pathEqual} from 'path-equal'
+import {pathEqual} from 'path-equal';
 import * as shell from 'shelljs';
 
 import * as pkg from '../package.json';

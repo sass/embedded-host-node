@@ -6,10 +6,7 @@ import {Observable, Subject} from 'rxjs';
 import {map} from 'rxjs/operators';
 
 import {compilerError} from './utils';
-import {
-  InboundMessage,
-  OutboundMessage,
-} from './vendor/embedded-protocol/embedded_sass_pb';
+import {InboundMessage, OutboundMessage} from './vendor/embedded_sass_pb';
 
 /**
  * Encodes InboundMessages into protocol buffers and decodes protocol buffers

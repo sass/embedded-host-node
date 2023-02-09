@@ -4,7 +4,7 @@
 
 import {URL} from 'url';
 
-import * as proto from './vendor/embedded-protocol/embedded_sass_pb';
+import * as proto from './vendor/embedded_sass_pb';
 import {SourceSpan} from './vendor/sass';
 import {compilerError} from './utils';
 

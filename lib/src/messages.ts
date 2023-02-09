@@ -2,10 +2,7 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-import {
-  InboundMessage,
-  OutboundMessage,
-} from './vendor/embedded-protocol/embedded_sass_pb';
+import {InboundMessage, OutboundMessage} from './vendor/embedded_sass_pb';
 
 // Given a message type `M` (either `InboundMessage` or `OutboundMessage`) and a
 // union of possible message cases `T`, returns all the child types `M` contains

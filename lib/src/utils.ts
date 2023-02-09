@@ -6,7 +6,7 @@ import {List} from 'immutable';
 import * as p from 'path';
 import * as url from 'url';
 
-import * as proto from './vendor/embedded-protocol/embedded_sass_pb';
+import * as proto from './vendor/embedded_sass_pb';
 import {Syntax} from './vendor/sass';
 
 export type PromiseOr<

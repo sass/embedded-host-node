@@ -1,5 +1,5 @@
 version: v1
 plugins:
 - plugin: es
-  out: build/embedded-protocol
+  out: lib/src/vendor
   opt: target=ts

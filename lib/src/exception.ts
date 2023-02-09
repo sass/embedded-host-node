@@ -2,7 +2,7 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-import * as proto from './vendor/embedded-protocol/embedded_sass_pb';
+import * as proto from './vendor/embedded_sass_pb';
 import {Exception as SassException, SourceSpan} from './vendor/sass';
 import {deprotofySourceSpan} from './deprotofy-span';
 

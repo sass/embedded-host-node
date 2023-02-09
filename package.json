@@ -38,14 +38,14 @@
   },
   "dependencies": {
     "@bufbuild/protobuf": "^1.0.0",
-    "@bufbuild/protoc-gen-es": "^1.0.0",
     "buffer-builder": "^0.2.0",
     "immutable": "^4.0.0",
     "rxjs": "^7.4.0",
     "supports-color": "^8.1.1"
   },
   "devDependencies": {
-    "@protobuf-ts/protoc": "^2.8.2",
+    "@bufbuild/buf": "^1.13.1-4",
+    "@bufbuild/protoc-gen-es": "^1.0.0",
     "@types/buffer-builder": "^0.2.0",
     "@types/google-protobuf": "^3.7.2",
     "@types/jest": "^29.4.0",

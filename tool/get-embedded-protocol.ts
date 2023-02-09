@@ -43,21 +43,9 @@ export async function getEmbeddedProtocol(
 
 // Builds the embedded proto at `repoPath` into a pbjs with TS declaration file.
 function buildEmbeddedProtocol(repoPath: string): void {
-  const proto = p.join(repoPath, 'embedded_sass.proto');
   const version = shell
-    .exec('npx protoc --version', {silent: true})
+    .exec('npx buf --version', {silent: true})
     .stdout.trim();
-  console.log(
-    `Building pbjs and TS declaration file from ${proto} with protoc ` +
-      `${version}.`
-  );
-
-  mkdirSync('build/embedded-protocol', {recursive: true});
-  shell.exec(
-    `npx protoc \
-      --es_out="target=ts:build/embedded-protocol" \
-      --proto_path="${repoPath}" \
-      ${proto}`,
-    {silent: true}
-  );
+  console.log(`Building TS with buf ${version}.`);
+  shell.exec(`npx buf generate`);
 }

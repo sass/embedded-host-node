@@ -1,6 +1,5 @@
 import extractZip = require('extract-zip');
 import {promises as fs} from 'fs';
-import fetch from 'node-fetch';
 import * as p from 'path';
 import {extract as extractTar} from 'tar';
 import yargs from 'yargs';
@@ -80,7 +79,7 @@ async function downloadRelease(options: {
       `Failed to download ${options.repo} release asset: ${response.statusText}`
     );
   }
-  const releaseAsset = await response.buffer();
+  const releaseAsset = Buffer.from(await response.arrayBuffer());
 
   console.log(`Unzipping ${options.repo} release asset to ${options.outPath}.`);
   await utils.cleanDir(p.join(options.outPath, options.repo));

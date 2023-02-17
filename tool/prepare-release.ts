@@ -24,11 +24,6 @@ import {getJSApi} from './get-js-api';
     shell.cp('-R', 'lib/src/vendor/sass', 'dist/types');
     await fs.unlink('dist/types/README.md');
 
-    // .gitignore needs to exist in dist for `npm publish` to correctly exclude
-    // files from the published tarball.
-    console.log('Copying .gitignore to dist.');
-    await fs.copyFile('.gitignore', 'dist/.gitignore');
-
     console.log('Ready for publishing to npm.');
   } catch (error) {
     console.error(error);

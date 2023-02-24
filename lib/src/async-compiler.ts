@@ -6,7 +6,7 @@ import {spawn} from 'child_process';
 import {Observable} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
 
-import {compilerPath} from './compiler-path';
+import {compilerCommand} from './compiler-path';
 
 /**
  * An asynchronous wrapper for the embedded Sass compiler that exposes its stdio
@@ -14,7 +14,11 @@ import {compilerPath} from './compiler-path';
  */
 export class AsyncEmbeddedCompiler {
   /** The underlying process that's being wrapped. */
-  private readonly process = spawn(compilerPath, {windowsHide: true});
+  private readonly process = spawn(
+    compilerCommand[0],
+    compilerCommand.slice(1),
+    {windowsHide: true}
+  );
 
   /** The child process's exit event. */
   readonly exit$ = new Promise<number | null>(resolve => {

@@ -5,7 +5,7 @@
 import {Subject} from 'rxjs';
 
 import {SyncProcess} from './sync-process';
-import {compilerPath} from './compiler-path';
+import {compilerCommand} from './compiler-path';
 
 /**
  * A synchronous wrapper for the embedded Sass compiler that exposes its stdio
@@ -13,7 +13,11 @@ import {compilerPath} from './compiler-path';
  */
 export class SyncEmbeddedCompiler {
   /** The underlying process that's being wrapped. */
-  private readonly process = new SyncProcess(compilerPath, {windowsHide: true});
+  private readonly process = new SyncProcess(
+    compilerCommand[0],
+    compilerCommand.slice(1),
+    {windowsHide: true}
+  );
 
   /** The buffers emitted by the child process's stdout. */
   readonly stdout$ = new Subject<Buffer>();

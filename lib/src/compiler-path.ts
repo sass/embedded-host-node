@@ -6,8 +6,8 @@ import * as fs from 'fs';
 import * as p from 'path';
 import {isErrnoException} from './utils';
 
-/** The path to the embedded compiler executable. */
-export const compilerPath = (() => {
+/** The full command for the embedded compiler executable. */
+export const compilerCommand = (() => {
   // find for development
   for (const path of ['vendor', '../../../lib/src/vendor']) {
     const executable = p.resolve(
@@ -18,15 +18,33 @@ export const compilerPath = (() => {
       }`
     );
 
-    if (fs.existsSync(executable)) return executable;
+    if (fs.existsSync(executable)) return [executable];
   }
 
   try {
-    return require.resolve(
-      `sass-embedded-${process.platform}-${process.arch}/` +
-        'dart-sass-embedded/dart-sass-embedded' +
-        (process.platform === 'win32' ? '.bat' : '')
-    );
+    return [
+      require.resolve(
+        `sass-embedded-${process.platform}-${process.arch}/` +
+          'dart-sass-embedded/src/dart' +
+          (process.platform === 'win32' ? '.exe' : '')
+      ),
+      require.resolve(
+        `sass-embedded-${process.platform}-${process.arch}/` +
+          'dart-sass-embedded/src/dart-sass-embedded.snapshot'
+      ),
+    ];
+  } catch (ignored) {
+    // ignored
+  }
+
+  try {
+    return [
+      require.resolve(
+        `sass-embedded-${process.platform}-${process.arch}/` +
+          'dart-sass-embedded/dart-sass-embedded' +
+          (process.platform === 'win32' ? '.bat' : '')
+      ),
+    ];
   } catch (e: unknown) {
     if (!(isErrnoException(e) && e.code === 'MODULE_NOT_FOUND')) {
       throw e;

@@ -5,6 +5,7 @@
   "repository": "sass/embedded-host-node",
   "author": "Google Inc.",
   "license": "MIT",
+  "main": "./dart-sass-embedded/dart-sass-embedded.bat",
   "files": [
     "dart-sass-embedded/**/*"
   ],

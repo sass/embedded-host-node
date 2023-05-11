@@ -118,17 +118,13 @@ async function downloadRelease(options: {
     const dartArch = nodeArchToDartArch(nodeArch);
     const outPath = p.join('npm', argv.package);
     await downloadRelease({
-      repo: 'dart-sass-embedded',
+      repo: 'dart-sass',
       assetUrl:
-        'https://github.com/sass/dart-sass-embedded/releases/download/' +
-        `${version}/sass_embedded-${version}-` +
+        'https://github.com/sass/dart-sass/releases/download/' +
+        `${version}/sass-${version}-` +
         `${dartPlatform}-${dartArch}${getArchiveExtension(dartPlatform)}`,
       outPath,
     });
-    await fs.rename(
-      p.join(outPath, 'sass_embedded'),
-      p.join(outPath, 'dart-sass-embedded')
-    );
   } catch (error) {
     console.error(error);
     process.exitCode = 1;

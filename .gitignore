@@ -6,7 +6,7 @@ node_modules
 npm-debug.log*
 package-lock.json
 test/sandbox
-npm/*/dart-sass-embedded/
+npm/*/dart-sass/
 
 # Editors
 .idea

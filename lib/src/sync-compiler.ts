@@ -15,7 +15,7 @@ export class SyncEmbeddedCompiler {
   /** The underlying process that's being wrapped. */
   private readonly process = new SyncProcess(
     compilerCommand[0],
-    compilerCommand.slice(1),
+    [...compilerCommand.slice(1), '--embedded'],
     {windowsHide: true}
   );
 

@@ -6,10 +6,13 @@
   "author": "Google Inc.",
   "license": "MIT",
   "files": [
-    "dart-sass-embedded/**/*"
+    "dart-sass/**/*"
   ],
   "engines": {
     "node": ">=14.0.0"
+  },
+  "bin": {
+    "sass": "./dart-sass/sass.bat"
   },
   "os": [
     "win32"

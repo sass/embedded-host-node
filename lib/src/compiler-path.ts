@@ -13,9 +13,7 @@ export const compilerCommand = (() => {
     const executable = p.resolve(
       __dirname,
       path,
-      `dart-sass-embedded/dart-sass-embedded${
-        process.platform === 'win32' ? '.bat' : ''
-      }`
+      `dart-sass/sass${process.platform === 'win32' ? '.bat' : ''}`
     );
 
     if (fs.existsSync(executable)) return [executable];
@@ -25,12 +23,12 @@ export const compilerCommand = (() => {
     return [
       require.resolve(
         `sass-embedded-${process.platform}-${process.arch}/` +
-          'dart-sass-embedded/src/dart' +
+          'dart-sass/src/dart' +
           (process.platform === 'win32' ? '.exe' : '')
       ),
       require.resolve(
         `sass-embedded-${process.platform}-${process.arch}/` +
-          'dart-sass-embedded/src/dart-sass-embedded.snapshot'
+          'dart-sass/src/sass.snapshot'
       ),
     ];
   } catch (ignored) {
@@ -41,7 +39,7 @@ export const compilerCommand = (() => {
     return [
       require.resolve(
         `sass-embedded-${process.platform}-${process.arch}/` +
-          'dart-sass-embedded/dart-sass-embedded' +
+          'dart-sass/sass' +
           (process.platform === 'win32' ? '.bat' : '')
       ),
     ];

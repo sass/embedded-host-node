@@ -31,10 +31,8 @@ it('declares a compatible dependency on the embedded compiler', () => {
 
   const version = JSON.parse(
     child_process.execSync(
-      p.join(
-        __dirname,
-        '../lib/src/vendor/dart-sass-embedded/dart-sass-embedded'
-      ) + ' --version',
+      p.join(__dirname, '../lib/src/vendor/dart-sass/sass') +
+        ' --embedded --version',
       {encoding: 'utf-8'}
     )
   );

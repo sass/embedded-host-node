@@ -16,7 +16,7 @@ export class AsyncEmbeddedCompiler {
   /** The underlying process that's being wrapped. */
   private readonly process = spawn(
     compilerCommand[0],
-    compilerCommand.slice(1),
+    [...compilerCommand.slice(1), '--embedded'],
     {windowsHide: true}
   );
 

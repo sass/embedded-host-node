@@ -19,7 +19,7 @@ it('declares a compatible dependency on the embedded protocol', () => {
   expect(
     fs
       .readFileSync(
-        p.join(__dirname, '../build/embedded-protocol/VERSION'),
+        p.join(__dirname, '../build/sass/spec/EMBEDDED_PROTOCOL_VERSION'),
         'utf-8'
       )
       .trim()

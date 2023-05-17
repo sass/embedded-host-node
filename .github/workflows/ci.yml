@@ -25,19 +25,14 @@ jobs:
           node-version: ${{ env.DEFAULT_NODE_VERSION }}
           check-latest: true
 
-      - name: Check out the embedded protocol
-        uses: sass/clone-linked-repo@v1
-        with: {repo: sass/embedded-protocol, default-ref: null}
-
-      - name: Check out the JS API definition
+      - name: Check out the language repo
         uses: sass/clone-linked-repo@v1
         with: {repo: sass/sass, path: language}
 
       - run: npm install
       - name: npm run init
         run: |
-          if [[ -d embedded-protocol ]]; then args=--protocol-path=embedded-protocol; fi
-          npm run init -- --skip-compiler --api-path=language $args
+          npm run init -- --skip-compiler --language-path=language $args
 
       - run: npm run check
 
@@ -63,23 +58,18 @@ jobs:
         with: {sdk: stable}
       - run: dart --version
 
-      - name: Check out the embedded protocol
-        uses: sass/clone-linked-repo@v1
-        with: {repo: sass/embedded-protocol, default-ref: null}
-
       - name: Check out Dart Sass
         uses: sass/clone-linked-repo@v1
         with: {repo: sass/dart-sass}
 
-      - name: Check out the JS API definition
+      - name: Check out the language repo
         uses: sass/clone-linked-repo@v1
         with: {repo: sass/sass, path: language}
 
       - run: npm install
       - name: npm run init
         run: |
-          if [[ -d embedded-protocol ]]; then args=--protocol-path=embedded-protocol; fi
-          npm run init -- --compiler-path=dart-sass --api-path=language $args
+          npm run init -- --compiler-path=dart-sass --language-path=language $args
 
       - run: npm run test
 
@@ -111,23 +101,18 @@ jobs:
       - uses: frenck/action-setup-yq@v1
         with: {version: v4.30.5} # frenck/action-setup-yq#35
 
-      - name: Check out the embedded protocol
-        uses: sass/clone-linked-repo@v1
-        with: {repo: sass/embedded-protocol, default-ref: null}
-
       - name: Check out Dart Sass
         uses: sass/clone-linked-repo@v1
         with: {repo: sass/dart-sass}
 
-      - name: Check out the JS API definition
+      - name: Check out the language repo
         uses: sass/clone-linked-repo@v1
         with: {repo: sass/sass, path: language}
 
       - run: npm install
       - name: npm run init
         run: |
-          if [[ -d embedded-protocol ]]; then args=--protocol-path=embedded-protocol; fi
-          npm run init -- --compiler-path=dart-sass --api-path=language $args
+          npm run init -- --compiler-path=dart-sass --language-path=language $args
 
       - name: Check out sass-spec
         uses: sass/clone-linked-repo@v1

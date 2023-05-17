@@ -14,5 +14,8 @@
     "lib/**/*.ts",
     "tool/*.ts"
   ],
-  "exclude": ["**/*.test.ts"]
+  "exclude": [
+    "**/*.test.ts",
+    "lib/src/vendor/dart-sass/**"
+  ]
 }

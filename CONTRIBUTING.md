@@ -46,7 +46,7 @@ different repositories:
 * The [Sass JS API definition].
 
 [Dart Sass compiler]: https://github.com/sass/dart-sass
-[Sass embedded protocol]: https://github.com/sass/embedded-protocol
+[Sass embedded protocol]: https://github.com/sass/sass/tree/main/spec/embedded-protocol.md
 [JS API definition]: https://github.com/sass/sass/tree/main/spec/js-api
 
 These dependencies are made available in different ways depending on context.

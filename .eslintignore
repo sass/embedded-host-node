@@ -1,6 +1,5 @@
 build/
 dist/
 language/
-embedded-protocol/
 lib/src/vendor/
 **/*.js

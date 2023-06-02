@@ -259,6 +259,11 @@ function createDispatcher<sync extends 'sync' | 'async'>(
   );
 
   return new Dispatcher<sync>(
+    // Since we only use one compilation per process, we can get away with
+    // hardcoding a compilation ID. Once we support multiple concurrent
+    // compilations with the same process, we'll need to ensure each one uses a
+    // unique ID.
+    1,
     messageTransformer.outboundMessages$,
     message => messageTransformer.writeInboundMessage(message),
     handlers
@@ -310,7 +315,7 @@ function handleCompileResponse(
     const success = response.result.value;
     const result: CompileResult = {
       css: success.css,
-      loadedUrls: success.loadedUrls.map(url => new URL(url)),
+      loadedUrls: response.loadedUrls.map(url => new URL(url)),
     };
 
     const sourceMap = success.sourceMap;

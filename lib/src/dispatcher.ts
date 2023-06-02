@@ -5,17 +5,13 @@
 import {Observable, Subject} from 'rxjs';
 import {filter, map, mergeMap} from 'rxjs/operators';
 
-import {
-  InboundRequestType,
-  OutboundResponse,
-  OutboundResponseType,
-} from './messages';
+import {OutboundResponse} from './messages';
 import * as proto from './vendor/embedded_sass_pb';
 import {RequestTracker} from './request-tracker';
 import {PromiseOr, compilerError, thenOr, hostError} from './utils';
 
 /**
- * Dispatches requests, responses, and events.
+ * Dispatches requests, responses, and events for a single compilation.
  *
  * Accepts callbacks for processing different types of outbound requests. When
  * an outbound request arrives, this runs the appropriate callback to process
@@ -35,16 +31,12 @@ import {PromiseOr, compilerError, thenOr, hostError} from './utils';
  * perform proper error handling.
  */
 export class Dispatcher<sync extends 'sync' | 'async'> {
-  // Tracks the IDs of all inbound requests. An outbound response with matching
-  // ID and type will remove the ID.
-  private readonly pendingInboundRequests = new RequestTracker();
-
   // Tracks the IDs of all outbound requests. An inbound response with matching
   // ID and type will remove the ID.
   private readonly pendingOutboundRequests = new RequestTracker();
 
-  // All outbound messages. If we detect any errors while dispatching messages,
-  // this completes.
+  // All outbound messages for this compilation. If we detect any errors while
+  // dispatching messages, this completes.
   private readonly messages$ = new Subject<proto.OutboundMessage>();
 
   // If the dispatcher encounters an error, this errors out. It is publicly
@@ -68,14 +60,23 @@ export class Dispatcher<sync extends 'sync' | 'async'> {
   );
 
   constructor(
-    private readonly outboundMessages$: Observable<proto.OutboundMessage>,
+    private readonly compilationId: number,
+    private readonly outboundMessages$: Observable<
+      [number, proto.OutboundMessage]
+    >,
     private readonly writeInboundMessage: (
-      message: proto.InboundMessage
+      message: [number, proto.InboundMessage]
     ) => void,
     private readonly outboundRequestHandlers: DispatcherHandlers<sync>
   ) {
+    if (compilationId < 1) {
+      throw Error(`Invalid compilation ID ${compilationId}.`);
+    }
+
     this.outboundMessages$
       .pipe(
+        filter(([compilationId]) => compilationId === this.compilationId),
+        map(([, message]) => message),
         mergeMap(message => {
           const result = this.handleOutboundMessage(message);
           return result instanceof Promise
@@ -108,11 +109,30 @@ export class Dispatcher<sync extends 'sync' | 'async'> {
       response: proto.OutboundMessage_CompileResponse | undefined
     ) => void
   ): void {
-    this.handleInboundRequest(
-      {value: request, case: 'compileRequest'},
-      'compileResponse',
-      callback
-    );
+    if (this.messages$.isStopped) {
+      callback(new Error('Tried writing to closed dispatcher'), undefined);
+      return;
+    }
+
+    this.messages$
+      .pipe(
+        filter(message => message.message.case === 'compileResponse'),
+        map(message => message.message.value as OutboundResponse)
+      )
+      .subscribe({next: response => callback(null, response)});
+
+    this.error$.subscribe({error: error => callback(error, undefined)});
+
+    try {
+      this.writeInboundMessage([
+        this.compilationId,
+        new proto.InboundMessage({
+          message: {value: request, case: 'compileRequest'},
+        }),
+      ]);
+    } catch (error) {
+      this.throwAndClose(error);
+    }
   }
 
   // Rejects with `error` all promises awaiting an outbound response, and
@@ -135,10 +155,7 @@ export class Dispatcher<sync extends 'sync' | 'async'> {
         return undefined;
 
       case 'compileResponse':
-        this.pendingInboundRequests.resolve(
-          message.message.value.id,
-          message.message.case
-        );
+        // Handled separately by `sendCompileRequest`.
         return undefined;
 
       case 'importRequest': {
@@ -202,57 +219,31 @@ export class Dispatcher<sync extends 'sync' | 'async'> {
     }
   }
 
-  // Sends `request` inbound. Once it's done, calls `callback` with either the
-  // corresponding outbound response of type `responseType`, or an error if any
-  // protocol errors were encountered.
-  private handleInboundRequest(
-    request: proto.InboundMessage['message'] & {case: InboundRequestType},
-    responseType: OutboundResponseType,
-    callback: (err: unknown, response: OutboundResponse | undefined) => void
-  ): void {
-    if (this.messages$.isStopped) {
-      callback(new Error('Tried writing to closed dispatcher'), undefined);
-      return;
-    }
-
-    this.messages$
-      .pipe(
-        filter(message => message.message.case === responseType),
-        map(message => message.message.value as OutboundResponse),
-        filter(response => response.id === request.value.id)
-      )
-      .subscribe({next: response => callback(null, response)});
-
-    this.error$.subscribe({error: error => callback(error, undefined)});
-
-    try {
-      this.sendInboundMessage(this.pendingInboundRequests.nextId, request);
-    } catch (error) {
-      this.throwAndClose(error);
-    }
-  }
-
   // Sends a message inbound. Keeps track of all pending inbound requests.
   private sendInboundMessage(
-    id: number,
-    message: Exclude<proto.InboundMessage['message'], {case: undefined}>
+    requestId: number,
+    message: Exclude<
+      proto.InboundMessage['message'],
+      {case: undefined | 'compileRequest'}
+    >
   ): void {
-    message.value.id = id;
+    message.value.id = requestId;
 
-    if (message.case === 'compileRequest') {
-      this.pendingInboundRequests.add(id, 'compileResponse');
-    } else if (
+    if (
       message.case === 'importResponse' ||
       message.case === 'fileImportResponse' ||
       message.case === 'canonicalizeResponse' ||
       message.case === 'functionCallResponse'
     ) {
-      this.pendingOutboundRequests.resolve(id, message.case);
+      this.pendingOutboundRequests.resolve(requestId, message.case);
     } else {
       throw Error(`Unknown message type ${message.case}`);
     }
 
-    this.writeInboundMessage(new proto.InboundMessage({message}));
+    this.writeInboundMessage([
+      this.compilationId,
+      new proto.InboundMessage({message}),
+    ]);
   }
 }
 

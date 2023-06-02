@@ -31,6 +31,9 @@ export async function getEmbeddedCompiler(
     source = options.path;
   }
 
+  await utils.cleanDir(p.join(source, 'build/language'));
+  await utils.link('build/sass', p.join(source, 'build/language'));
+
   buildDartSassEmbedded(source);
   await utils.link(p.join(source, 'build'), p.join(outPath, repo));
 }
@@ -46,6 +49,6 @@ function buildDartSassEmbedded(repoPath: string): void {
   console.log('Building the Dart Sass executable.');
   shell.exec('dart run grinder protobuf pkg-standalone-dev', {
     cwd: repoPath,
-    silent: true,
+    env: {...process.env, UPDATE_SASS_PROTOCOL: 'false'},
   });
 }

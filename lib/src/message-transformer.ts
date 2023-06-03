@@ -72,7 +72,7 @@ function decode(buffer: Uint8Array): [number, OutboundMessage] {
     return [
       compilationId,
       OutboundMessage.fromBinary(
-        new Uint8Array(buffer.buffer, varint.decode.length)
+        new Uint8Array(buffer.buffer, varint.decode.bytes)
       ),
     ];
   } catch (error) {

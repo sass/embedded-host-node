@@ -44,7 +44,7 @@ export class MessageTransformer {
   ]): void {
     const compilationIdLength = varint.encodingLength(compilationId);
     const encodedMessage = message.toBinary();
-    const buffer = Buffer.alloc(compilationIdLength + encodedMessage.length);
+    const buffer = new Uint8Array(compilationIdLength + encodedMessage.length);
     varint.encode(compilationId, buffer);
     buffer.set(encodedMessage, compilationIdLength);
 
@@ -71,7 +71,9 @@ function decode(buffer: Uint8Array): [number, OutboundMessage] {
   try {
     return [
       compilationId,
-      OutboundMessage.fromBinary(Buffer.from(buffer, varint.decode.length)),
+      OutboundMessage.fromBinary(
+        new Uint8Array(buffer.buffer, varint.decode.length)
+      ),
     ];
   } catch (error) {
     throw compilerError(`Invalid protobuf: ${error}`);

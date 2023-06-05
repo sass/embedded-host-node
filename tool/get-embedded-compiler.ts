@@ -31,8 +31,15 @@ export async function getEmbeddedCompiler(
     source = options.path;
   }
 
-  await utils.cleanDir(p.join(source, 'build/language'));
-  await utils.link('build/sass', p.join(source, 'build/language'));
+  // Make sure the compiler sees the same version of the language repo that the
+  // host is using, but if they're already the same directory (as in the Dart
+  // Sass CI environment), we don't need to do anything.
+  const languageInHost = p.resolve('build/sass');
+  const languageInCompiler = p.resolve(p.join(source, 'build/language'));
+  if (languageInHost !== languageInCompiler) {
+    await utils.cleanDir(languageInCompiler);
+    await utils.link(languageInHost, languageInCompiler);
+  }
 
   buildDartSassEmbedded(source);
   await utils.link(p.join(source, 'build'), p.join(outPath, repo));

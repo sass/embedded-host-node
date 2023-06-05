@@ -47,9 +47,10 @@ export async function link(source: string, destination: string): Promise<void> {
     console.log(`Copying ${source} into ${destination}.`);
     shell.cp('-R', source, destination);
   } else {
+    source = p.resolve(source);
     console.log(`Linking ${source} into ${destination}.`);
     // Symlinking doesn't play nice with Jasmine's test globbing on Windows.
-    await fs.symlink(p.resolve(source), destination);
+    await fs.symlink(source, destination);
   }
 }
 

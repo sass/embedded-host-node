@@ -37,10 +37,7 @@ export async function getEmbeddedCompiler(
   // Sass CI environment) we don't need to do anything.
   const languageInHost = p.resolve('build/sass');
   const languageInCompiler = p.resolve(p.join(source, 'build/language'));
-  if (
-    (await fs.realpath(languageInHost)) !==
-    (await fs.realpath(languageInCompiler))
-  ) {
+  if (!await utils.sameTarget(languageInHost, languageInCompiler)) {
     await utils.cleanDir(languageInCompiler);
     await utils.link(languageInHost, languageInCompiler);
   }

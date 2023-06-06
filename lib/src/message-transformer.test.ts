@@ -3,6 +3,7 @@
 // https://opensource.org/licenses/MIT.
 
 import {Subject, Observable} from 'rxjs';
+import * as varint from 'varint';
 
 import {expectObservableToError} from '../../test/utils';
 import {MessageTransformer} from './message-transformer';
@@ -39,14 +40,16 @@ describe('message transformer', () => {
 
     it('encodes an InboundMessage to buffer', () => {
       const message = validInboundMessage('a {b: c}');
-      messages.writeInboundMessage(message);
-      expect(encodedProtobufs).toEqual([message.toBinary()]);
+      messages.writeInboundMessage([1234, message]);
+      expect(encodedProtobufs).toEqual([
+        Uint8Array.from([...varint.encode(1234), ...message.toBinary()]),
+      ]);
     });
   });
 
   describe('decode', () => {
-    let protobufs$: Subject<Buffer>;
-    let decodedMessages: proto.OutboundMessage[];
+    let protobufs$: Subject<Uint8Array>;
+    let decodedMessages: Array<[number, proto.OutboundMessage]>;
 
     beforeEach(() => {
       protobufs$ = new Subject();
@@ -55,14 +58,14 @@ describe('message transformer', () => {
     });
 
     it('decodes buffer to OutboundMessage', done => {
-      const message = validInboundMessage('a {b: c}');
-
       messages.outboundMessages$.subscribe({
         next: message => decodedMessages.push(message),
         complete: () => {
           expect(decodedMessages.length).toBe(1);
-          expect(decodedMessages[0].message.case).toBe('compileResponse');
-          const response = decodedMessages[0].message
+          const [id, message] = decodedMessages[0];
+          expect(id).toBe(1234);
+          expect(message.message.case).toBe('compileResponse');
+          const response = message.message
             .value as proto.OutboundMessage_CompileResponse;
           expect(response.result.case).toBe('success');
           expect(
@@ -75,7 +78,12 @@ describe('message transformer', () => {
         },
       });
 
-      protobufs$.next(Buffer.from(message.toBinary()));
+      protobufs$.next(
+        Uint8Array.from([
+          ...varint.encode(1234),
+          ...validInboundMessage('a {b: c}').toBinary(),
+        ])
+      );
       protobufs$.complete();
     });
 
@@ -83,7 +91,8 @@ describe('message transformer', () => {
       it('fails on invalid buffer', done => {
         expectObservableToError(
           messages.outboundMessages$,
-          'Compiler caused error: Invalid buffer.',
+          'Compiler caused error: Invalid compilation ID varint: RangeError: ' +
+            'Could not decode varint.',
           done
         );
 

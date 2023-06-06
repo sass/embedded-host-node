@@ -4,6 +4,7 @@
 
 import {Observable, Subject} from 'rxjs';
 import {map} from 'rxjs/operators';
+import * as varint from 'varint';
 
 import {compilerError} from './utils';
 import {InboundMessage, OutboundMessage} from './vendor/embedded_sass_pb';
@@ -15,7 +16,9 @@ import {InboundMessage, OutboundMessage} from './vendor/embedded_sass_pb';
 export class MessageTransformer {
   // The decoded messages are written to this Subject. It is publicly exposed
   // as a readonly Observable.
-  private readonly outboundMessagesInternal$ = new Subject<OutboundMessage>();
+  private readonly outboundMessagesInternal$ = new Subject<
+    [number, OutboundMessage]
+  >();
 
   /**
    * The OutboundMessages, decoded from protocol buffers. If this fails to
@@ -33,24 +36,46 @@ export class MessageTransformer {
   }
 
   /**
-   * Converts the inbound `message` to a protocol buffer.
+   * Converts the inbound `compilationId` and `message` to a protocol buffer.
    */
-  writeInboundMessage(message: InboundMessage): void {
+  writeInboundMessage([compilationId, message]: [
+    number,
+    InboundMessage
+  ]): void {
+    const compilationIdLength = varint.encodingLength(compilationId);
+    const encodedMessage = message.toBinary();
+    const buffer = new Uint8Array(compilationIdLength + encodedMessage.length);
+    varint.encode(compilationId, buffer);
+    buffer.set(encodedMessage, compilationIdLength);
+
     try {
-      this.writeInboundProtobuf(message.toBinary());
+      this.writeInboundProtobuf(buffer);
     } catch (error) {
       this.outboundMessagesInternal$.error(error);
     }
   }
 }
 
-// Decodes a protobuf `buffer` into an OutboundMessage, ensuring that all
-// mandatory message fields are populated. Throws if `buffer` cannot be decoded
-// into a valid message, or if the message itself contains a Protocol Error.
-function decode(buffer: Uint8Array): OutboundMessage {
+// Decodes a protobuf `buffer` into a compilation ID and an OutboundMessage,
+// ensuring that all mandatory message fields are populated. Throws if `buffer`
+// cannot be decoded into a valid message, or if the message itself contains a
+// Protocol Error.
+function decode(buffer: Uint8Array): [number, OutboundMessage] {
+  let compilationId: number;
   try {
-    return OutboundMessage.fromBinary(buffer);
+    compilationId = varint.decode(buffer);
   } catch (error) {
-    throw compilerError('Invalid buffer');
+    throw compilerError(`Invalid compilation ID varint: ${error}`);
+  }
+
+  try {
+    return [
+      compilationId,
+      OutboundMessage.fromBinary(
+        new Uint8Array(buffer.buffer, varint.decode.bytes)
+      ),
+    ];
+  } catch (error) {
+    throw compilerError(`Invalid protobuf: ${error}`);
   }
 }

@@ -2,6 +2,7 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
+import {promises as fs} from 'fs';
 import * as p from 'path';
 import * as shell from 'shelljs';
 
@@ -36,7 +37,10 @@ export async function getEmbeddedCompiler(
   // Sass CI environment) we don't need to do anything.
   const languageInHost = p.resolve('build/sass');
   const languageInCompiler = p.resolve(p.join(source, 'build/language'));
-  if (fs.realpathSync(languageInHost) != fs.realpathSync(languageInCompiler)) { 
+  if (
+    (await fs.realpath(languageInHost)) !==
+    (await fs.realpath(languageInCompiler))
+  ) {
     await utils.cleanDir(languageInCompiler);
     await utils.link(languageInHost, languageInCompiler);
   }

@@ -126,7 +126,7 @@ jobs:
         run: |
           npm run compile
           if [[ "$RUNNER_OS" == "Windows" ]]; then
-            cp -r {`pwd`/,dist/}lib/src/vendor/dart-sass
+            cp -rL {`pwd`/,dist/}lib/src/vendor/dart-sass
           else
             ln -s {`pwd`/,dist/}lib/src/vendor/dart-sass
           fi

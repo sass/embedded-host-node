@@ -126,7 +126,11 @@ jobs:
         run: |
           npm run compile
           if [[ "$RUNNER_OS" == "Windows" ]]; then
-            cp -rL {`pwd`/,dist/}lib/src/vendor/dart-sass
+            # Avoid copying the entire Dart Sass build directory on Windows,
+            # since it may contain symlinks that cp will choke on.
+            mkdir -p dist/lib/src/vendor/dart-sass/
+            cp {`pwd`/,dist/}lib/src/vendor/dart-sass/sass.bat
+            cp {`pwd`/,dist/}lib/src/vendor/dart-sass/sass.snapshot
           else
             ln -s {`pwd`/,dist/}lib/src/vendor/dart-sass
           fi

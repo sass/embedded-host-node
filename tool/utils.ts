@@ -65,15 +65,18 @@ export async function cleanDir(dir: string): Promise<void> {
 }
 
 /// Returns whether [path1] and [path2] are symlinks that refer to the same file.
-export async function sameTarget(path1: string, path2: string): Promise<boolean> {
+export async function sameTarget(
+  path1: string,
+  path2: string
+): Promise<boolean> {
   const realpath1 = await tryRealpath(path1);
   if (realpath1 === null) return false;
 
-  return realpath1 === await tryRealpath(path2);
+  return realpath1 === (await tryRealpath(path2));
 }
 
 /// Like `fs.realpath()`, but returns `null` if the path doesn't exist on disk.
-async function tryRealpath(path: string): Promise<string|null> {
+async function tryRealpath(path: string): Promise<string | null> {
   try {
     return await fs.realpath(p.resolve(path));
   } catch (_) {

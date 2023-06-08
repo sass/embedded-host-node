@@ -121,7 +121,7 @@ async function downloadRelease(options: {
       repo: 'dart-sass',
       assetUrl:
         'https://github.com/sass/dart-sass/releases/download/' +
-        `${version}/sass-${version}-` +
+        `${version}/dart-sass-${version}-` +
         `${dartPlatform}-${dartArch}${getArchiveExtension(dartPlatform)}`,
       outPath,
     });

@@ -8,9 +8,14 @@
     "useUnknownInCatchVariables": false,
     "resolveJsonModule": true,
     "declaration": false,
-    "lib": ["DOM"],
-    "skipLibCheck": true
+    "lib": ["DOM"]
   },
-  "include": ["lib/**/*.ts", "tool/*.ts"],
-  "exclude": ["**/*.test.ts", "lib/src/vendor/dart-sass/**"]
+  "include": [
+    "lib/**/*.ts",
+    "tool/*.ts"
+  ],
+  "exclude": [
+    "**/*.test.ts",
+    "lib/src/vendor/dart-sass/**"
+  ]
 }

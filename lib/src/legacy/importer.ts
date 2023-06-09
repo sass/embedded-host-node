@@ -127,7 +127,7 @@ export class LegacyImporterWrapper<sync extends 'sync' | 'async'>
       return null;
     } else if (!url.startsWith('file:')) {
       // We'll only search for another relative import when the URL isn't
-      // canonicalized already.
+      // absolute.
       this.expectingRelativeLoad = true;
     }
 

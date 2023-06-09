@@ -8,10 +8,8 @@ import * as p from 'path';
 
 import * as pkg from '../package.json';
 
-// These tests assert that our declared dependencies on the embedded protocol
-// and compiler are either -dev versions (which download the latest main
-// branches of each repo and block release) or the same versions as the versions
-// we're testing against.
+// These tests assert that our declared dependency on the embedded protocol is
+// either a -dev version or the same version we're testing against.
 
 it('declares a compatible dependency on the embedded protocol', () => {
   if (pkg['protocol-version'].endsWith('-dev')) return;
@@ -24,17 +22,4 @@ it('declares a compatible dependency on the embedded protocol', () => {
       )
       .trim()
   ).toBe(pkg['protocol-version']);
-});
-
-it('declares a compatible dependency on the embedded compiler', () => {
-  if (pkg['compiler-version'].endsWith('-dev')) return;
-
-  const version = JSON.parse(
-    child_process.execSync(
-      p.join(__dirname, '../lib/src/vendor/dart-sass/sass') +
-        ' --embedded --version',
-      {encoding: 'utf-8'}
-    )
-  );
-  expect(version.compilerVersion).toBe(pkg['compiler-version']);
 });

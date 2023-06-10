@@ -16,6 +16,7 @@ import {getLanguageRepo} from './get-language-repo';
 
     console.log('Transpiling TS into dist.');
     shell.exec('tsc');
+    shell.cp('lib/index.mjs', 'dist/lib/index.mjs');
 
     console.log('Copying JS API types to dist.');
     shell.cp('-R', 'lib/src/vendor/sass', 'dist/types');

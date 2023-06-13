@@ -7,6 +7,10 @@
   "repository": "sass/embedded-host-node",
   "author": "Google Inc.",
   "license": "MIT",
+  "exports": {
+    "import": "dist/lib/index.mjs",
+    "default": "dist/lib/index.js"
+  },
   "main": "dist/lib/index.js",
   "types": "dist/types/index.d.ts",
   "files": [
@@ -21,7 +25,7 @@
     "check:gts": "gts check",
     "check:tsc": "tsc --noEmit",
     "clean": "gts clean",
-    "compile": "tsc",
+    "compile": "tsc && cp lib/index.mjs dist/lib/index.mjs",
     "fix": "gts fix",
     "prepublishOnly": "npm run clean && ts-node ./tool/prepare-release.ts",
     "test": "jest"

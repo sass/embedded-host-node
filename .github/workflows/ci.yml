@@ -52,8 +52,6 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           check-latest: true
-      - uses: frenck/action-setup-yq@v1
-        with: {version: v4.30.5} # frenck/action-setup-yq#35
       - uses: dart-lang/setup-dart@v1
         with: {sdk: stable}
       - run: dart --version
@@ -72,6 +70,8 @@ jobs:
           npm run init -- --compiler-path=dart-sass --language-path=language $args
 
       - run: npm run test
+      - run: npm run compile
+      - run: node test/after-compile-test.mjs
 
   # The versions should be kept up-to-date with the latest LTS Node releases.
   # They next need to be rotated October 2021. See
@@ -98,8 +98,6 @@ jobs:
         with: {sdk: stable}
       - uses: actions/setup-node@v2
         with: {node-version: "${{ matrix.node_version }}"}
-      - uses: frenck/action-setup-yq@v1
-        with: {version: v4.30.5} # frenck/action-setup-yq#35
 
       - name: Check out Dart Sass
         uses: sass/clone-linked-repo@v1

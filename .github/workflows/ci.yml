@@ -52,8 +52,6 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           check-latest: true
-      - uses: frenck/action-setup-yq@v1
-        with: {version: v4.30.5} # frenck/action-setup-yq#35
       - uses: dart-lang/setup-dart@v1
         with: {sdk: stable}
       - run: dart --version
@@ -100,8 +98,6 @@ jobs:
         with: {sdk: stable}
       - uses: actions/setup-node@v2
         with: {node-version: "${{ matrix.node_version }}"}
-      - uses: frenck/action-setup-yq@v1
-        with: {version: v4.30.5} # frenck/action-setup-yq#35
 
       - name: Check out Dart Sass
         uses: sass/clone-linked-repo@v1

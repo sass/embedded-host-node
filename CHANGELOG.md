@@ -1,3 +1,26 @@
+## 1.63.4
+
+### JavaScript API
+
+* Re-enable support for `import sass from 'sass'` when loading the package from
+  an ESM module in Node.js. However, this syntax is now deprecated; ESM users
+  should use `import * as sass from 'sass'` instead.
+
+  On the browser and other ESM-only platforms, only `import * as sass from
+  'sass'` is supported.
+
+* Properly export the legacy API values `TRUE`, `FALSE`, `NULL`, and `types` from
+  the ECMAScript module API.
+
+### Embedded Sass
+
+* Fix a race condition where closing standard input while requests are in-flight
+  could sometimes cause the process to hang rather than shutting down
+  gracefully.
+
+* Properly include the root stylesheet's URL in the set of loaded URLs when it
+  fails to parse.
+
 ## 1.63.3
 
 ### JavaScript API

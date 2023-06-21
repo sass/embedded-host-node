@@ -8,8 +8,8 @@
   "author": "Google Inc.",
   "license": "MIT",
   "exports": {
-    "import": "dist/lib/index.mjs",
-    "default": "dist/lib/index.js"
+    "import": "./dist/lib/index.mjs",
+    "default": "./dist/lib/index.js"
   },
   "main": "dist/lib/index.js",
   "types": "dist/types/index.d.ts",

@@ -6,6 +6,7 @@ import * as p from 'path';
 import * as shell from 'shelljs';
 
 import * as utils from './utils';
+import {spawnSync} from 'child_process';
 
 /**
  * Downloads the Sass language repo and buids the Embedded Sass protocol
@@ -25,8 +26,30 @@ export async function getLanguageRepo(
       ref: options?.ref ?? 'main',
     });
   } else {
+    const before = spawnSync('ls', ['-l', 'language\\spec']);
+    const beforeCat = spawnSync('cat', ['language\\spec\\README.md']);
+    console.log(
+      '========================BEFORE==================================',
+      before.error,
+      before.stdout?.toString() ?? '',
+      before.stderr?.toString() ?? '',
+      '================================================================',
+      beforeCat.stdout?.toString ?? '',
+      '================================================================'
+    );
     await utils.cleanDir('build/sass');
     await utils.link(options.path, 'build/sass');
+    const after = spawnSync('ls', ['-l', 'build\\sass\\spec']);
+    const afterCat = spawnSync('cat', ['build\\sass\\spec\\README.md']);
+    console.log(
+      '========================AFTER===================================',
+      after.error,
+      after.stdout?.toString() ?? '',
+      after.stderr?.toString() ?? '',
+      '================================================================',
+      afterCat.stdout?.toString ?? '',
+      '================================================================'
+    );
   }
 
   await utils.link('build/sass/js-api-doc', p.join(outPath, 'sass'));

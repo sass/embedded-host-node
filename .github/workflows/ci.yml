@@ -14,36 +14,14 @@ on:
   pull_request:
 
 jobs:
-  static_analysis:
-    name: Static analysis
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with:
-          node-version: ${{ env.DEFAULT_NODE_VERSION }}
-          check-latest: true
-
-      - name: Check out the language repo
-        uses: sass/clone-linked-repo@v1
-        with: {repo: sass/sass, path: language}
-
-      - run: npm install
-      - name: npm run init
-        run: |
-          npm run init -- --skip-compiler --language-path=language $args
-
-      - run: npm run check
-
   tests:
     name: 'Tests | Node ${{ matrix.node-version }} | ${{ matrix.os }}'
     runs-on: ${{ matrix.os }}-latest
 
     strategy:
       matrix:
-        os: [ubuntu, macos, windows]
-        node-version: [18.x, 16.x, 14.x] # If changing this, also change env.DEFAULT_NODE_VERSION
+        os: [windows]
+        node-version: [18.x] # If changing this, also change env.DEFAULT_NODE_VERSION
       fail-fast: false
 
     steps:
@@ -64,6 +42,11 @@ jobs:
         uses: sass/clone-linked-repo@v1
         with: {repo: sass/sass, path: language}
 
+      - name: Check language/spec
+        run: |
+          ls -l language/spec;
+          cat language/spec/README.md;
+
       - run: npm install
       - name: npm run init
         run: |
@@ -72,99 +55,3 @@ jobs:
       - run: npm run test
       - run: npm run compile
       - run: node test/after-compile-test.mjs
-
-  # The versions should be kept up-to-date with the latest LTS Node releases.
-  # They next need to be rotated October 2021. See
-  # https://github.com/nodejs/Release.
-  sass_spec:
-    name: 'JS API Tests | Node ${{ matrix.node_version }} | ${{ matrix.os }}'
-    runs-on: ${{ matrix.os }}-latest
-
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu, windows, macos]
-        node_version: [18]
-        include:
-          # Include LTS versions on Ubuntu
-          - os: ubuntu
-            node_version: 16
-          - os: ubuntu
-            node_version: 14
-
-    steps:
-      - uses: actions/checkout@v2
-      - uses: dart-lang/setup-dart@v1
-        with: {sdk: stable}
-      - uses: actions/setup-node@v2
-        with: {node-version: "${{ matrix.node_version }}"}
-
-      - name: Check out Dart Sass
-        uses: sass/clone-linked-repo@v1
-        with: {repo: sass/dart-sass}
-
-      - name: Check out the language repo
-        uses: sass/clone-linked-repo@v1
-        with: {repo: sass/sass, path: language}
-
-      - run: npm install
-      - name: npm run init
-        run: |
-          npm run init -- --compiler-path=dart-sass --language-path=language $args
-
-      - name: Check out sass-spec
-        uses: sass/clone-linked-repo@v1
-        with: {repo: sass/sass-spec}
-
-      - name: Install sass-spec dependencies
-        run: npm install
-        working-directory: sass-spec
-
-      - name: Compile
-        run: |
-          npm run compile
-          if [[ "$RUNNER_OS" == "Windows" ]]; then
-            # Avoid copying the entire Dart Sass build directory on Windows,
-            # since it may contain symlinks that cp will choke on.
-            mkdir -p dist/lib/src/vendor/dart-sass/
-            cp {`pwd`/,dist/}lib/src/vendor/dart-sass/sass.bat
-            cp {`pwd`/,dist/}lib/src/vendor/dart-sass/sass.snapshot
-          else
-            ln -s {`pwd`/,dist/}lib/src/vendor/dart-sass
-          fi
-
-      - name: Run tests
-        run: npm run js-api-spec -- --sassPackage .. --sassSassRepo ../language
-        working-directory: sass-spec
-
-  deploy_npm:
-    name: Deploy npm
-    runs-on: ubuntu-latest
-    if: "startsWith(github.ref, 'refs/tags/') && github.repository == 'sass/embedded-host-node'"
-    needs: [static_analysis, tests, sass_spec]
-
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with:
-          node-version: ${{ env.DEFAULT_NODE_VERSION }}
-          check-latest: true
-          registry-url: 'https://registry.npmjs.org'
-      - run: npm install
-
-      - name: "Check we're not using a -dev version of the embedded protocol"
-        run: jq -r '.["protocol-version"]' package.json | grep -qv -- '-dev$'
-      - name: "Check we're not using a -dev version of the embedded compiler"
-        run: jq -r '.["compiler-version"]' package.json | grep -qv -- '-dev$'
-
-      - name: Publish optional dependencies
-        env:
-          NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}'
-        run: |
-          for pkg in linux-arm linux-arm64 linux-ia32 linux-x64 darwin-arm64 darwin-x64 win32-ia32 win32-x64; do
-            npx ts-node ./tool/prepare-optional-release.ts --package=$pkg && npm publish ./npm/$pkg
-          done
-
-      - run: npm publish
-        env:
-          NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}'

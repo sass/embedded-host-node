@@ -27,6 +27,11 @@ export async function getLanguageRepo(
   } else {
     await utils.cleanDir('build/sass');
     await utils.link(options.path, 'build/sass');
+
+    // Workaround for https://github.com/shelljs/shelljs/issues/198
+    // This file is a symlink which gets messed up by `shell.cp` (called from
+    // `utils.link`) on Windows.
+    shell.rm('build/sass/spec/README.md');
   }
 
   await utils.link('build/sass/js-api-doc', p.join(outPath, 'sass'));

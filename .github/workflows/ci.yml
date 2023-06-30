@@ -64,9 +64,6 @@ jobs:
         uses: sass/clone-linked-repo@v1
         with: {repo: sass/sass, path: language}
 
-      # Workaround for https://github.com/shelljs/shelljs/issues/198
-      - run: rm language/spec/README.md
-
       - run: npm install
       - name: npm run init
         run: |
@@ -109,9 +106,6 @@ jobs:
       - name: Check out the language repo
         uses: sass/clone-linked-repo@v1
         with: {repo: sass/sass, path: language}
-
-      # Workaround for https://github.com/shelljs/shelljs/issues/198
-      - run: rm language/spec/README.md
 
       - run: npm install
       - name: npm run init

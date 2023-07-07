@@ -69,9 +69,9 @@ export class SassCalculation extends Value {
       );
       if (values[0] === undefined) {
         throw error;
-      } else if (values.length == 2) {
+      } else if (values.length === 2) {
         [min, value] = values;
-      } else if (values.length == 3) {
+      } else if (values.length === 3) {
         [min, value, max] = values;
       } else {
         throw error;

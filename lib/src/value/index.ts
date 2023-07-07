@@ -11,6 +11,7 @@ import {SassMap} from './map';
 import {SassNumber} from './number';
 import {SassString} from './string';
 import {valueError} from '../utils';
+import {SassCalculation} from './calculations';
 
 /**
  * A SassScript value.
@@ -104,6 +105,16 @@ export abstract class Value implements ValueObject {
    */
   assertBoolean(name?: string): SassBoolean {
     throw valueError(`${this} is not a boolean`, name);
+  }
+
+  /**
+   * Casts `this` to `SassCalculation`; throws if `this` isn't a calculation.
+   *
+   * If `this` came from a function argument, `name` is the argument name
+   * (without the `$`) and is used for error reporting.
+   */
+  assertCalculation(name?: string): SassCalculation {
+    throw valueError(`${this} is not a calculation`, name);
   }
 
   /**

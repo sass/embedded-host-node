@@ -111,7 +111,8 @@ export class SassCalculation extends Value {
   }
 }
 
-export type CalculationOperator = '+' | '-' | '*' | '/';
+const operators = ['+', '-', '*', '/'] as const;
+export type CalculationOperator = typeof operators[number];
 
 export class CalculationOperation implements ValueObject {
   readonly operator: CalculationOperator;
@@ -123,6 +124,9 @@ export class CalculationOperation implements ValueObject {
     left: CalculationValue,
     right: CalculationValue
   ) {
+    if (!operators.includes(operator)) {
+      throw new Error(`Unknown operator ${operator}`);
+    }
     this.operator = operator;
     this.left = left;
     this.right = right;

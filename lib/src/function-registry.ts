@@ -72,7 +72,7 @@ export class FunctionRegistry<sync extends 'sync' | 'async'> {
             )
           ),
           result => {
-            result = simplify(result) as any;
+            result = simplify(result) as types.Value;
             if (!(result instanceof Value)) {
               const name =
                 request.identifier.case === 'name'
@@ -136,11 +136,11 @@ function simplify(value: unknown): unknown {
     const simplifiedArgs = value.arguments.map(
       simplify
     ) as List<CalculationValue>;
-    if (value.name == 'calc') {
+    if (value.name === 'calc') {
       return simplifiedArgs.get(0);
     }
-    if (value.name == 'clamp') {
-      if (simplifiedArgs.size != 3) {
+    if (value.name === 'clamp') {
+      if (simplifiedArgs.size !== 3) {
         throw new Error('clamp() requires exactly 3 arguments.');
       }
       return SassCalculation.clamp(
@@ -149,10 +149,10 @@ function simplify(value: unknown): unknown {
         simplifiedArgs.get(2)
       );
     }
-    if (value.name == 'min') {
+    if (value.name === 'min') {
       return SassCalculation.min(simplifiedArgs);
     }
-    if (value.name == 'max') {
+    if (value.name === 'max') {
       return SassCalculation.max(simplifiedArgs);
     }
     // @ts-expect-error: Constructor is private, but we need a new instance here

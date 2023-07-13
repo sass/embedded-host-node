@@ -17,26 +17,30 @@ export type CalculationValue =
 
 type CalculationValueIterable = CalculationValue[] | List<CalculationValue>;
 
-function assertUnquotedString(value: unknown): void {
+function assertCalculationValue(value: unknown): void {
+  // Keep in sync with the CalculationValue type
+  const calculationValueClasses = [
+    SassNumber,
+    SassCalculation,
+    SassString,
+    CalculationOperation,
+    CalculationInterpolation,
+  ];
+  if (!calculationValueClasses.some(type => value instanceof type)) {
+    throw new Error(
+      `Expected ${value} to be one of SassNumber, SassString, SassCalculation, CalculationOperation, CalculationInterpolation`
+    );
+  }
   if (value instanceof SassString && value.hasQuotes) {
     throw new Error(`Expected ${value} to be an unquoted string.`);
   }
-  if (value instanceof CalculationOperation) {
-    assertUnquotedString(value.left);
-    assertUnquotedString(value.right);
-  }
 }
 
-function assertUnquotedStringOrInterpolation(value: unknown): void {
-  if (
-    (!(value instanceof SassString) &&
-      !(value instanceof CalculationInterpolation)) ||
-    (value instanceof SassString && value.hasQuotes)
-  ) {
-    throw new Error(
-      `Expected ${value} to be an unquoted SassString or CalculationInterpolation.`
-    );
-  }
+function isValidClampArg(value: unknown): boolean {
+  return (
+    value instanceof CalculationInterpolation ||
+    (value instanceof SassString && !value.hasQuotes)
+  );
 }
 
 /* A SassScript calculation */
@@ -49,17 +53,17 @@ export class SassCalculation extends Value {
   }
 
   static calc(argument: CalculationValue): SassCalculation {
-    assertUnquotedString(argument);
+    assertCalculationValue(argument);
     return new SassCalculation('calc', [argument]);
   }
 
   static min(args: CalculationValueIterable): SassCalculation {
-    args.forEach(assertUnquotedString);
+    args.forEach(assertCalculationValue);
     return new SassCalculation('min', args);
   }
 
   static max(args: CalculationValueIterable): SassCalculation {
-    args.forEach(assertUnquotedString);
+    args.forEach(assertCalculationValue);
     return new SassCalculation('max', args);
   }
 
@@ -68,16 +72,18 @@ export class SassCalculation extends Value {
     value?: CalculationValue,
     max?: CalculationValue
   ): SassCalculation {
-    if (value === undefined) {
-      assertUnquotedStringOrInterpolation(min);
-    } else if (max === undefined) {
-      assertUnquotedStringOrInterpolation(min);
-      assertUnquotedStringOrInterpolation(value);
+    if (
+      (value === undefined && !isValidClampArg(min)) ||
+      (max === undefined && ![min, value].some(isValidClampArg))
+    ) {
+      throw new Error(
+        'Argument must be an unquoted SassString or CalculationInterpolation.'
+      );
     }
     const args = [min];
     if (value !== undefined) args.push(value);
     if (max !== undefined) args.push(max);
-    args.forEach(assertUnquotedString);
+    args.forEach(assertCalculationValue);
     return new SassCalculation('clamp', args);
   }
 
@@ -112,8 +118,10 @@ export class CalculationOperation implements ValueObject {
     readonly right: CalculationValue
   ) {
     if (!operators.includes(operator)) {
-      throw new Error(`Unknown operator ${operator}`);
+      throw new Error(`Invalid operator: ${operator}`);
     }
+    assertCalculationValue(left);
+    assertCalculationValue(right);
   }
 
   equals(other: unknown): boolean {

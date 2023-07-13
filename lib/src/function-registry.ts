@@ -11,6 +11,12 @@ import * as proto from './vendor/embedded_sass_pb';
 import {PromiseOr, catchOr, compilerError, thenOr} from './utils';
 import {Protofier} from './protofier';
 import {Value} from './value';
+import {
+  CalculationOperation,
+  CalculationValue,
+  SassCalculation,
+} from './value/calculations';
+import {List} from 'immutable';
 
 /**
  * The next ID to use for a function. The embedded protocol requires that
@@ -66,6 +72,7 @@ export class FunctionRegistry<sync extends 'sync' | 'async'> {
             )
           ),
           result => {
+            result = simplify(result) as any;
             if (!(result instanceof Value)) {
               const name =
                 request.identifier.case === 'name'
@@ -118,4 +125,47 @@ export class FunctionRegistry<sync extends 'sync' | 'async'> {
       );
     }
   }
+}
+
+/**
+ * Implements the simplification algorithm for custom function return values.
+ *  {@link https://github.com/sass/sass/blob/main/spec/types/calculation.md#simplifying-a-calculationvalue}
+ */
+function simplify(value: unknown): unknown {
+  if (value instanceof SassCalculation) {
+    const simplifiedArgs = value.arguments.map(
+      simplify
+    ) as List<CalculationValue>;
+    if (value.name == 'calc') {
+      return simplifiedArgs.get(0);
+    }
+    if (value.name == 'clamp') {
+      if (simplifiedArgs.size != 3) {
+        throw new Error('clamp() requires exactly 3 arguments.');
+      }
+      return SassCalculation.clamp(
+        simplifiedArgs.get(0) as CalculationValue,
+        simplifiedArgs.get(1),
+        simplifiedArgs.get(2)
+      );
+    }
+    if (value.name == 'min') {
+      return SassCalculation.min(simplifiedArgs);
+    }
+    if (value.name == 'max') {
+      return SassCalculation.max(simplifiedArgs);
+    }
+    // @ts-expect-error: Constructor is private, but we need a new instance here
+    return new SassCalculation(value.name, simplifiedArgs);
+  }
+  if (value instanceof CalculationOperation) {
+    return simplify(
+      new CalculationOperation(
+        value.operator,
+        simplify(value.left) as CalculationValue,
+        simplify(value.right) as CalculationValue
+      )
+    );
+  }
+  return value;
 }

@@ -17,31 +17,15 @@ export type CalculationValue =
 
 type CalculationValueIterable = CalculationValue[] | List<CalculationValue>;
 
-function assertCalculationValue(value: unknown): void {
-  // Keep in sync with the CalculationValue type
-  const calculationValueClasses = [
-    SassNumber,
-    SassCalculation,
-    SassString,
-    CalculationOperation,
-    CalculationInterpolation,
-  ];
-  if (!calculationValueClasses.some(type => value instanceof type)) {
-    throw new Error(
-      `Expected ${value} to be one of SassNumber, SassString, SassCalculation, CalculationOperation, CalculationInterpolation`
-    );
-  }
+function assertCalculationValue(value: CalculationValue): void {
   if (value instanceof SassString && value.hasQuotes) {
     throw new Error(`Expected ${value} to be an unquoted string.`);
   }
 }
 
-function isValidClampArg(value: unknown): boolean {
-  return (
-    value instanceof CalculationInterpolation ||
-    (value instanceof SassString && !value.hasQuotes)
-  );
-}
+const isValidClampArg = (value: CalculationValue): boolean =>
+  value instanceof CalculationInterpolation ||
+  (value instanceof SassString && !value.hasQuotes);
 
 /* A SassScript calculation */
 export class SassCalculation extends Value {
@@ -74,7 +58,7 @@ export class SassCalculation extends Value {
   ): SassCalculation {
     if (
       (value === undefined && !isValidClampArg(min)) ||
-      (max === undefined && ![min, value].some(isValidClampArg))
+      (max === undefined && ![min, value].some(x => x && isValidClampArg(x)))
     ) {
       throw new Error(
         'Argument must be an unquoted SassString or CalculationInterpolation.'

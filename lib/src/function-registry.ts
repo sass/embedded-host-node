@@ -137,6 +137,9 @@ function simplify(value: unknown): unknown {
       simplify
     ) as List<CalculationValue>;
     if (value.name === 'calc') {
+      if (simplifiedArgs.size !== 1) {
+        throw new Error('calc() requires exactly 1 argument.');
+      }
       return simplifiedArgs.get(0);
     }
     if (value.name === 'clamp') {
@@ -155,8 +158,7 @@ function simplify(value: unknown): unknown {
     if (value.name === 'max') {
       return SassCalculation.max(simplifiedArgs);
     }
-    // @ts-expect-error: Constructor is private, but we need a new instance here
-    return new SassCalculation(value.name, simplifiedArgs);
+    throw new Error(`Unknown calculation function: ${value.name}`);
   }
   if (value instanceof CalculationOperation) {
     return simplify(

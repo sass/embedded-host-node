@@ -158,15 +158,13 @@ function simplify(value: unknown): unknown {
     if (value.name === 'max') {
       return SassCalculation.max(simplifiedArgs);
     }
-    throw new Error(`Unknown calculation function: ${value.name}`);
+    throw new Error(`Unknown calculation function: ${value.name}.`);
   }
   if (value instanceof CalculationOperation) {
-    return simplify(
-      new CalculationOperation(
-        value.operator,
-        simplify(value.left) as CalculationValue,
-        simplify(value.right) as CalculationValue
-      )
+    return new CalculationOperation(
+      value.operator,
+      simplify(value.left) as CalculationValue,
+      simplify(value.right) as CalculationValue
     );
   }
   return value;

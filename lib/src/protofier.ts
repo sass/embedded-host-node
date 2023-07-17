@@ -173,7 +173,7 @@ export class Protofier {
   private protofyCalculationValue(
     value: Object
   ): proto.Value_Calculation_CalculationValue {
-    var result = new proto.Value_Calculation_CalculationValue();
+    const result = new proto.Value_Calculation_CalculationValue();
     if (value instanceof SassCalculation) {
       result.value = {
         case: 'calculation',
@@ -363,7 +363,7 @@ export class Protofier {
   ): SassCalculation {
     switch (calculation.name) {
       case 'calc':
-        if (calculation.arguments.length != 1) {
+        if (calculation.arguments.length !== 1) {
           throw utils.compilerError(
             'Value.Calculation.arguments must have exactly one argument for calc().'
           );
@@ -372,7 +372,7 @@ export class Protofier {
           this.deprotofyCalculationValue(calculation.arguments[0])
         );
       case 'clamp':
-        if (calculation.arguments.length != 3) {
+        if (calculation.arguments.length !== 3) {
           throw utils.compilerError(
             'Value.Calculation.arguments must have exactly 3 arguments for clamp().'
           );

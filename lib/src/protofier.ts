@@ -341,6 +341,7 @@ export class Protofier {
     }
   }
 
+  /** Converts `number` to its JS representation. */
   private deprotofyNumber(number: proto.Value_Number): SassNumber {
     return new SassNumber(number.value, {
       numeratorUnits: number.numerators,

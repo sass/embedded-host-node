@@ -63,11 +63,7 @@ export class Protofier {
       string.quoted = value.hasQuotes;
       result.value = {case: 'string', value: string};
     } else if (value instanceof SassNumber) {
-      const number = new proto.Value_Number();
-      number.value = value.value;
-      number.numerators = value.numeratorUnits.toArray();
-      number.denominators = value.denominatorUnits.toArray();
-      result.value = {case: 'number', value: number};
+      result.value = {case: 'number', value: this.protofyNumber(value)};
     } else if (value instanceof SassColor) {
       if (value.hasCalculatedHsl) {
         const color = new proto.Value_HslColor();
@@ -140,6 +136,15 @@ export class Protofier {
     return result;
   }
 
+  /** Converts `number` to its protocol buffer representation. */
+  private protofyNumber(number: SassNumber): proto.Value_Number {
+    return new proto.Value_Number({
+      value: number.value,
+      numerators: number.numeratorUnits.toArray(),
+      denominators: number.denominatorUnits.toArray(),
+    });
+  }
+
   /** Converts `separator` to its protocol buffer representation. */
   private protofySeparator(separator: ListSeparator): proto.ListSeparator {
     switch (separator) {
@@ -193,8 +198,7 @@ export class Protofier {
     } else if (value instanceof SassString) {
       result.value = {case: 'string', value: value.text};
     } else if (value instanceof SassNumber) {
-      // @ts-ignore
-      result.value = this.protofy(value).value;
+      result.value = {case: 'number', value: this.protofyNumber(value)};
     } else {
       throw utils.compilerError(`Unknown CalculationValue ${value}`);
     }
@@ -230,11 +234,7 @@ export class Protofier {
       }
 
       case 'number': {
-        const number = value.value.value;
-        return new SassNumber(number.value, {
-          numeratorUnits: number.numerators,
-          denominatorUnits: number.denominators,
-        });
+        return this.deprotofyNumber(value.value.value);
       }
 
       case 'rgbColor': {
@@ -341,6 +341,13 @@ export class Protofier {
     }
   }
 
+  private deprotofyNumber(number: proto.Value_Number): SassNumber {
+    return new SassNumber(number.value, {
+      numeratorUnits: number.numerators,
+      denominatorUnits: number.denominators,
+    });
+  }
+
   /** Converts `separator` to its JS representation. */
   private deprotofySeparator(separator: proto.ListSeparator): ListSeparator {
     switch (separator) {
@@ -413,8 +420,7 @@ export class Protofier {
   ): CalculationValue {
     switch (value.value.case) {
       case 'number':
-        // @ts-ignore
-        return this.deprotofy(value) as SassNumber;
+        return this.deprotofyNumber(value.value.value);
       case 'calculation':
         return this.deprotofyCalculation(value.value.value);
       case 'string':

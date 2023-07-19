@@ -17,6 +17,13 @@ import {SassString} from './value/string';
 import {Value} from './value';
 import {sassNull} from './value/null';
 import {sassTrue, sassFalse} from './value/boolean';
+import {
+  CalculationValue,
+  SassCalculation,
+  CalculationInterpolation,
+  CalculationOperation,
+  CalculationOperator,
+} from './value/calculations';
 
 /**
  * A class that converts [Value] objects into protobufs.
@@ -56,11 +63,7 @@ export class Protofier {
       string.quoted = value.hasQuotes;
       result.value = {case: 'string', value: string};
     } else if (value instanceof SassNumber) {
-      const number = new proto.Value_Number();
-      number.value = value.value;
-      number.numerators = value.numeratorUnits.toArray();
-      number.denominators = value.denominatorUnits.toArray();
-      result.value = {case: 'number', value: number};
+      result.value = {case: 'number', value: this.protofyNumber(value)};
     } else if (value instanceof SassColor) {
       if (value.hasCalculatedHsl) {
         const color = new proto.Value_HslColor();
@@ -116,6 +119,11 @@ export class Protofier {
         fn.signature = value.signature!;
         result.value = {case: 'hostFunction', value: fn};
       }
+    } else if (value instanceof SassCalculation) {
+      result.value = {
+        case: 'calculation',
+        value: this.protofyCalculation(value),
+      };
     } else if (value === sassTrue) {
       result.value = {case: 'singleton', value: proto.SingletonValue.TRUE};
     } else if (value === sassFalse) {
@@ -126,6 +134,15 @@ export class Protofier {
       throw utils.compilerError(`Unknown Value ${value}`);
     }
     return result;
+  }
+
+  /** Converts `number` to its protocol buffer representation. */
+  private protofyNumber(number: SassNumber): proto.Value_Number {
+    return new proto.Value_Number({
+      value: number.value,
+      numerators: number.numeratorUnits.toArray(),
+      denominators: number.denominatorUnits.toArray(),
+    });
   }
 
   /** Converts `separator` to its protocol buffer representation. */
@@ -144,6 +161,68 @@ export class Protofier {
     }
   }
 
+  /** Converts `calculation` to its protocol buffer representation. */
+  private protofyCalculation(
+    calculation: SassCalculation
+  ): proto.Value_Calculation {
+    return new proto.Value_Calculation({
+      name: calculation.name,
+      arguments: calculation.arguments
+        .map(this.protofyCalculationValue.bind(this))
+        .toArray(),
+    });
+  }
+
+  /** Converts a CalculationValue that appears within a `SassCalculation` to
+   * its protocol buffer representation. */
+  private protofyCalculationValue(
+    value: Object
+  ): proto.Value_Calculation_CalculationValue {
+    const result = new proto.Value_Calculation_CalculationValue();
+    if (value instanceof SassCalculation) {
+      result.value = {
+        case: 'calculation',
+        value: this.protofyCalculation(value),
+      };
+    } else if (value instanceof CalculationOperation) {
+      result.value = {
+        case: 'operation',
+        value: new proto.Value_Calculation_CalculationOperation({
+          operator: this.protofyCalculationOperator(value.operator),
+          left: this.protofyCalculationValue(value.left),
+          right: this.protofyCalculationValue(value.right),
+        }),
+      };
+    } else if (value instanceof CalculationInterpolation) {
+      result.value = {case: 'interpolation', value: value.value};
+    } else if (value instanceof SassString) {
+      result.value = {case: 'string', value: value.text};
+    } else if (value instanceof SassNumber) {
+      result.value = {case: 'number', value: this.protofyNumber(value)};
+    } else {
+      throw utils.compilerError(`Unknown CalculationValue ${value}`);
+    }
+    return result;
+  }
+
+  /** Converts `operator` to its protocol buffer representation. */
+  private protofyCalculationOperator(
+    operator: CalculationOperator
+  ): proto.CalculationOperator {
+    switch (operator) {
+      case '+':
+        return proto.CalculationOperator.PLUS;
+      case '-':
+        return proto.CalculationOperator.MINUS;
+      case '*':
+        return proto.CalculationOperator.TIMES;
+      case '/':
+        return proto.CalculationOperator.DIVIDE;
+      default:
+        throw utils.compilerError(`Unknown CalculationOperator ${operator}`);
+    }
+  }
+
   /** Converts `value` to its JS representation. */
   deprotofy(value: proto.Value): Value {
     switch (value.value.case) {
@@ -155,11 +234,7 @@ export class Protofier {
       }
 
       case 'number': {
-        const number = value.value.value;
-        return new SassNumber(number.value, {
-          numeratorUnits: number.numerators,
-          denominatorUnits: number.denominators,
-        });
+        return this.deprotofyNumber(value.value.value);
       }
 
       case 'rgbColor': {
@@ -247,6 +322,9 @@ export class Protofier {
           'The compiler may not send Value.host_function.'
         );
 
+      case 'calculation':
+        return this.deprotofyCalculation(value.value.value);
+
       case 'singleton':
         switch (value.value.value) {
           case proto.SingletonValue.TRUE:
@@ -263,6 +341,14 @@ export class Protofier {
     }
   }
 
+  /** Converts `number` to its JS representation. */
+  private deprotofyNumber(number: proto.Value_Number): SassNumber {
+    return new SassNumber(number.value, {
+      numeratorUnits: number.numerators,
+      denominatorUnits: number.denominators,
+    });
+  }
+
   /** Converts `separator` to its JS representation. */
   private deprotofySeparator(separator: proto.ListSeparator): ListSeparator {
     switch (separator) {
@@ -276,6 +362,102 @@ export class Protofier {
         return null;
       default:
         throw utils.compilerError(`Unknown separator ${separator}`);
+    }
+  }
+
+  /** Converts `calculation` to its Sass representation. */
+  private deprotofyCalculation(
+    calculation: proto.Value_Calculation
+  ): SassCalculation {
+    switch (calculation.name) {
+      case 'calc':
+        if (calculation.arguments.length !== 1) {
+          throw utils.compilerError(
+            'Value.Calculation.arguments must have exactly one argument for calc().'
+          );
+        }
+        return SassCalculation.calc(
+          this.deprotofyCalculationValue(calculation.arguments[0])
+        );
+      case 'clamp':
+        if (calculation.arguments.length !== 3) {
+          throw utils.compilerError(
+            'Value.Calculation.arguments must have exactly 3 arguments for clamp().'
+          );
+        }
+        return SassCalculation.clamp(
+          this.deprotofyCalculationValue(calculation.arguments[0]),
+          this.deprotofyCalculationValue(calculation.arguments[1]),
+          this.deprotofyCalculationValue(calculation.arguments[2])
+        );
+      case 'min':
+        if (calculation.arguments.length === 0) {
+          throw utils.compilerError(
+            'Value.Calculation.arguments must have at least 1 argument for min().'
+          );
+        }
+        return SassCalculation.min(
+          calculation.arguments.map(this.deprotofyCalculationValue)
+        );
+      case 'max':
+        if (calculation.arguments.length === 0) {
+          throw utils.compilerError(
+            'Value.Calculation.arguments must have at least 1 argument for max().'
+          );
+        }
+        return SassCalculation.max(
+          calculation.arguments.map(this.deprotofyCalculationValue)
+        );
+      default:
+        throw utils.compilerError(
+          `Value.Calculation.name "${calculation.name}" is not a recognized calculation type.`
+        );
+    }
+  }
+
+  /** Converts `value` to its Sass representation. */
+  private deprotofyCalculationValue(
+    value: proto.Value_Calculation_CalculationValue
+  ): CalculationValue {
+    switch (value.value.case) {
+      case 'number':
+        return this.deprotofyNumber(value.value.value);
+      case 'calculation':
+        return this.deprotofyCalculation(value.value.value);
+      case 'string':
+        return new SassString(value.value.value, {quotes: false});
+      case 'operation':
+        return new CalculationOperation(
+          this.deprotofyCalculationOperator(value.value.value.operator),
+          this.deprotofyCalculationValue(
+            value.value.value.left as proto.Value_Calculation_CalculationValue
+          ),
+          this.deprotofyCalculationValue(
+            value.value.value.right as proto.Value_Calculation_CalculationValue
+          )
+        );
+      case 'interpolation':
+        return new CalculationInterpolation(value.value.value);
+      default:
+        throw utils.mandatoryError('Calculation.CalculationValue.value');
+    }
+  }
+
+  /** Converts `operator` to its Sass representation. */
+  private deprotofyCalculationOperator(
+    operator: proto.CalculationOperator
+  ): CalculationOperator {
+    switch (operator) {
+      case proto.CalculationOperator.PLUS:
+        return '+';
+      case proto.CalculationOperator.MINUS:
+        return '-';
+      case proto.CalculationOperator.TIMES:
+        return '*';
+      case proto.CalculationOperator.DIVIDE:
+        return '/';
+      default:
+        throw utils.compilerError(`Unknown CalculationOperator ${operator}`);
     }
   }
 }

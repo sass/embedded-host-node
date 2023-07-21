@@ -380,15 +380,22 @@ export class Protofier {
           this.deprotofyCalculationValue(calculation.arguments[0])
         );
       case 'clamp':
-        if (calculation.arguments.length !== 3) {
+        if (
+          calculation.arguments.length === 0 ||
+          calculation.arguments.length > 3
+        ) {
           throw utils.compilerError(
-            'Value.Calculation.arguments must have exactly 3 arguments for clamp().'
+            'Value.Calculation.arguments must have 1 to 3 arguments for clamp().'
           );
         }
         return SassCalculation.clamp(
           this.deprotofyCalculationValue(calculation.arguments[0]),
-          this.deprotofyCalculationValue(calculation.arguments[1]),
-          this.deprotofyCalculationValue(calculation.arguments[2])
+          calculation.arguments.length > 1
+            ? this.deprotofyCalculationValue(calculation.arguments[1])
+            : undefined,
+          calculation.arguments.length > 2
+            ? this.deprotofyCalculationValue(calculation.arguments[2])
+            : undefined
         );
       case 'min':
         if (calculation.arguments.length === 0) {

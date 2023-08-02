@@ -6,7 +6,7 @@ import * as p from 'path';
 import {Observable} from 'rxjs';
 import * as supportsColor from 'supports-color';
 
-import * as proto from './vendor/embedded-protocol/embedded_sass_pb';
+import * as proto from './vendor/embedded_sass_pb';
 import * as utils from './utils';
 import {AsyncEmbeddedCompiler} from './async-compiler';
 import {CompileResult, Options, SourceSpan, StringOptions} from './vendor/sass';
@@ -73,9 +73,9 @@ function newCompilePathRequest(
   path: string,
   importers: ImporterRegistry<'sync' | 'async'>,
   options?: Options<'sync' | 'async'>
-): proto.InboundMessage.CompileRequest {
+): proto.InboundMessage_CompileRequest {
   const request = newCompileRequest(importers, options);
-  request.setPath(path);
+  request.input = {case: 'path', value: path};
   return request;
 }
 
@@ -84,29 +84,30 @@ function newCompileStringRequest(
   source: string,
   importers: ImporterRegistry<'sync' | 'async'>,
   options?: StringOptions<'sync' | 'async'>
-): proto.InboundMessage.CompileRequest {
-  const input = new proto.InboundMessage.CompileRequest.StringInput();
-  input.setSource(source);
-  input.setSyntax(utils.protofySyntax(options?.syntax ?? 'scss'));
+): proto.InboundMessage_CompileRequest {
+  const input = new proto.InboundMessage_CompileRequest_StringInput({
+    source,
+    syntax: utils.protofySyntax(options?.syntax ?? 'scss'),
+  });
 
   const url = options?.url?.toString();
   if (url && url !== legacyImporterProtocol) {
-    input.setUrl(url);
+    input.url = url;
   }
 
   if (options && 'importer' in options && options.importer) {
-    input.setImporter(importers.register(options.importer));
+    input.importer = importers.register(options.importer);
   } else if (url === legacyImporterProtocol) {
-    const importer = new proto.InboundMessage.CompileRequest.Importer();
-    importer.setPath(p.resolve('.'));
-    input.setImporter(importer);
+    input.importer = new proto.InboundMessage_CompileRequest_Importer({
+      importer: {case: 'path', value: p.resolve('.')},
+    });
   } else {
     // When importer is not set on the host, the compiler will set a
     // FileSystemImporter if `url` is set to a file: url or a NoOpImporter.
   }
 
   const request = newCompileRequest(importers, options);
-  request.setString(input);
+  request.input = {case: 'string', value: input};
   return request;
 }
 
@@ -115,25 +116,26 @@ function newCompileStringRequest(
 function newCompileRequest(
   importers: ImporterRegistry<'sync' | 'async'>,
   options?: Options<'sync' | 'async'>
-): proto.InboundMessage.CompileRequest {
-  const request = new proto.InboundMessage.CompileRequest();
-  request.setImportersList(importers.importers);
-  request.setGlobalFunctionsList(Object.keys(options?.functions ?? {}));
-  request.setSourceMap(!!options?.sourceMap);
-  request.setSourceMapIncludeSources(!!options?.sourceMapIncludeSources);
-  request.setAlertColor(options?.alertColor ?? !!supportsColor.stdout);
-  request.setAlertAscii(!!options?.alertAscii);
-  request.setQuietDeps(!!options?.quietDeps);
-  request.setVerbose(!!options?.verbose);
-  request.setCharset(!!(options?.charset ?? true));
+): proto.InboundMessage_CompileRequest {
+  const request = new proto.InboundMessage_CompileRequest({
+    importers: importers.importers,
+    globalFunctions: Object.keys(options?.functions ?? {}),
+    sourceMap: !!options?.sourceMap,
+    sourceMapIncludeSources: !!options?.sourceMapIncludeSources,
+    alertColor: options?.alertColor ?? !!supportsColor.stdout,
+    alertAscii: !!options?.alertAscii,
+    quietDeps: !!options?.quietDeps,
+    verbose: !!options?.verbose,
+    charset: !!(options?.charset ?? true),
+  });
 
   switch (options?.style ?? 'expanded') {
     case 'expanded':
-      request.setStyle(proto.OutputStyle.EXPANDED);
+      request.style = proto.OutputStyle.EXPANDED;
       break;
 
     case 'compressed':
-      request.setStyle(proto.OutputStyle.COMPRESSED);
+      request.style = proto.OutputStyle.COMPRESSED;
       break;
 
     default:
@@ -147,7 +149,7 @@ function newCompileRequest(
 // resolves with the CompileResult. Throws if there were any protocol or
 // compilation errors. Shuts down the compiler after compilation.
 async function compileRequestAsync(
-  request: proto.InboundMessage.CompileRequest,
+  request: proto.InboundMessage_CompileRequest,
   importers: ImporterRegistry<'async'>,
   options?: Options<'async'>
 ): Promise<CompileResult> {
@@ -172,7 +174,7 @@ async function compileRequestAsync(
     dispatcher.logEvents$.subscribe(event => handleLogEvent(options, event));
 
     return handleCompileResponse(
-      await new Promise<proto.OutboundMessage.CompileResponse>(
+      await new Promise<proto.OutboundMessage_CompileResponse>(
         (resolve, reject) =>
           dispatcher.sendCompileRequest(request, (err, response) => {
             if (err) {
@@ -193,7 +195,7 @@ async function compileRequestAsync(
 // resolves with the CompileResult. Throws if there were any protocol or
 // compilation errors. Shuts down the compiler after compilation.
 function compileRequestSync(
-  request: proto.InboundMessage.CompileRequest,
+  request: proto.InboundMessage_CompileRequest,
   importers: ImporterRegistry<'sync'>,
   options?: Options<'sync'>
 ): CompileResult {
@@ -218,7 +220,7 @@ function compileRequestSync(
     dispatcher.logEvents$.subscribe(event => handleLogEvent(options, event));
 
     let error: unknown;
-    let response: proto.OutboundMessage.CompileResponse | undefined;
+    let response: proto.OutboundMessage_CompileResponse | undefined;
     dispatcher.sendCompileRequest(request, (error_, response_) => {
       if (error_) {
         error = error_;
@@ -257,6 +259,11 @@ function createDispatcher<sync extends 'sync' | 'async'>(
   );
 
   return new Dispatcher<sync>(
+    // Since we only use one compilation per process, we can get away with
+    // hardcoding a compilation ID. Once we support multiple concurrent
+    // compilations with the same process, we'll need to ensure each one uses a
+    // unique ID.
+    1,
     messageTransformer.outboundMessages$,
     message => messageTransformer.writeInboundMessage(message),
     handlers
@@ -266,33 +273,32 @@ function createDispatcher<sync extends 'sync' | 'async'>(
 /** Handles a log event according to `options`. */
 function handleLogEvent(
   options: Options<'sync' | 'async'> | undefined,
-  event: proto.OutboundMessage.LogEvent
+  event: proto.OutboundMessage_LogEvent
 ): void {
-  if (event.getType() === proto.LogEventType.DEBUG) {
+  if (event.type === proto.LogEventType.DEBUG) {
     if (options?.logger?.debug) {
-      options.logger.debug(event.getMessage(), {
-        span: deprotofySourceSpan(event.getSpan()!),
+      options.logger.debug(event.message, {
+        span: deprotofySourceSpan(event.span!),
       });
     } else {
-      console.error(event.getFormatted());
+      console.error(event.formatted);
     }
   } else {
     if (options?.logger?.warn) {
       const params: {deprecation: boolean; span?: SourceSpan; stack?: string} =
         {
-          deprecation:
-            event.getType() === proto.LogEventType.DEPRECATION_WARNING,
+          deprecation: event.type === proto.LogEventType.DEPRECATION_WARNING,
         };
 
-      const spanProto = event.getSpan();
+      const spanProto = event.span;
       if (spanProto) params.span = deprotofySourceSpan(spanProto);
 
-      const stack = event.getStackTrace();
+      const stack = event.stackTrace;
       if (stack) params.stack = stack;
 
-      options.logger.warn(event.getMessage(), params);
+      options.logger.warn(event.message, params);
     } else {
-      console.error(event.getFormatted());
+      console.error(event.formatted);
     }
   }
 }
@@ -303,20 +309,20 @@ function handleLogEvent(
  * Throws a `SassException` if the compilation failed.
  */
 function handleCompileResponse(
-  response: proto.OutboundMessage.CompileResponse
+  response: proto.OutboundMessage_CompileResponse
 ): CompileResult {
-  if (response.getSuccess()) {
-    const success = response.getSuccess()!;
+  if (response.result.case === 'success') {
+    const success = response.result.value;
     const result: CompileResult = {
-      css: success.getCss(),
-      loadedUrls: success.getLoadedUrlsList().map(url => new URL(url)),
+      css: success.css,
+      loadedUrls: response.loadedUrls.map(url => new URL(url)),
     };
 
-    const sourceMap = success.getSourceMap();
+    const sourceMap = success.sourceMap;
     if (sourceMap) result.sourceMap = JSON.parse(sourceMap);
     return result;
-  } else if (response.getFailure()) {
-    throw new Exception(response.getFailure()!);
+  } else if (response.result.case === 'failure') {
+    throw new Exception(response.result.value);
   } else {
     throw utils.compilerError('Compiler sent empty CompileResponse.');
   }

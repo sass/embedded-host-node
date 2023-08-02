@@ -83,6 +83,10 @@ function adjustOptions<sync extends 'sync' | 'async'>(
     throw new Error('Either options.data or options.file must be set.');
   }
 
+  // In legacy API, the current working directory is always attempted before
+  // any load path.
+  options.includePaths = [process.cwd(), ...(options.includePaths ?? [])];
+
   if (
     !isStringOptions(options) &&
     // The `indentedSyntax` option takes precedence over the file extension in the
@@ -200,9 +204,7 @@ function pluginThis(
       context: undefined as unknown as LegacyPluginThis,
       file: options.file,
       data: options.data,
-      includePaths: [process.cwd(), ...(options.includePaths ?? [])].join(
-        p.delimiter
-      ),
+      includePaths: (options.includePaths ?? []).join(p.delimiter),
       precision: 10,
       style: 1,
       indentType: 0,

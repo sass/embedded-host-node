@@ -2,7 +2,7 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-import {InboundResponseType, OutboundResponseType} from './message-transformer';
+import {InboundResponseType, OutboundResponseType} from './messages';
 
 /**
  * Manages pending inbound and outbound requests. Ensures that requests and

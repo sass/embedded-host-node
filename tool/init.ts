@@ -5,8 +5,7 @@
 import yargs from 'yargs';
 
 import {getEmbeddedCompiler} from './get-embedded-compiler';
-import {getEmbeddedProtocol} from './get-embedded-protocol';
-import {getJSApi} from './get-js-api';
+import {getLanguageRepo} from './get-language-repo';
 
 const argv = yargs(process.argv.slice(2))
   .option('compiler-path', {
@@ -22,27 +21,18 @@ const argv = yargs(process.argv.slice(2))
     type: 'boolean',
     description: "Don't Embedded Dart Sass at all.",
   })
-  .option('protocol-path', {
+  .option('language-path', {
     type: 'string',
-    description: 'Build the Embedded Protocol from the source at this path.',
+    description: 'Use the Sass language repo from the source at this path.',
   })
-  .option('protocol-ref', {
+  .option('language-ref', {
     type: 'string',
-    description: 'Build the Embedded Protocol from this Git ref.',
-  })
-  .option('api-path', {
-    type: 'string',
-    description: 'Use the JS API definitions from the source at this path.',
-  })
-  .option('api-ref', {
-    type: 'string',
-    description: 'Build the JS API definitions from this Git ref.',
+    description: 'Use the Sass language repo from this Git ref.',
   })
   .conflicts({
     'compiler-path': ['compiler-ref', 'skip-compiler'],
     'compiler-ref': ['skip-compiler'],
-    'protocol-path': ['protocol-ref'],
-    'api-path': 'api-ref',
+    'language-path': ['language-ref'],
   })
   .parseSync();
 
@@ -50,16 +40,16 @@ const argv = yargs(process.argv.slice(2))
   try {
     const outPath = 'lib/src/vendor';
 
-    if (argv['protocol-ref']) {
-      await getEmbeddedProtocol(outPath, {
-        ref: argv['protocol-ref'],
+    if (argv['language-ref']) {
+      await getLanguageRepo(outPath, {
+        ref: argv['language-ref'],
       });
-    } else if (argv['protocol-path']) {
-      await getEmbeddedProtocol(outPath, {
-        path: argv['protocol-path'],
+    } else if (argv['language-path']) {
+      await getLanguageRepo(outPath, {
+        path: argv['language-path'],
       });
     } else {
-      await getEmbeddedProtocol(outPath);
+      await getLanguageRepo(outPath);
     }
 
     if (!argv['skip-compiler']) {
@@ -74,18 +64,6 @@ const argv = yargs(process.argv.slice(2))
       } else {
         await getEmbeddedCompiler(outPath);
       }
-    }
-
-    if (argv['api-ref']) {
-      await getJSApi(outPath, {
-        ref: argv['api-ref'],
-      });
-    } else if (argv['api-path']) {
-      await getJSApi(outPath, {
-        path: argv['api-path'],
-      });
-    } else {
-      await getJSApi(outPath);
     }
   } catch (error) {
     console.error(error);

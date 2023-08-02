@@ -6,7 +6,7 @@ import {List} from 'immutable';
 import * as p from 'path';
 import * as url from 'url';
 
-import * as proto from './vendor/embedded-protocol/embedded_sass_pb';
+import * as proto from './vendor/embedded_sass_pb';
 import {Syntax} from './vendor/sass';
 
 export type PromiseOr<
@@ -121,9 +121,7 @@ export function withoutExtension(path: string): string {
 }
 
 /** Converts a JS syntax string into a protobuf syntax enum. */
-export function protofySyntax(
-  syntax: Syntax
-): proto.SyntaxMap[keyof proto.SyntaxMap] {
+export function protofySyntax(syntax: Syntax): proto.Syntax {
   switch (syntax) {
     case 'scss':
       return proto.Syntax.SCSS;

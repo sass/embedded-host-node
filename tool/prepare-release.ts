@@ -6,28 +6,21 @@ import {promises as fs} from 'fs';
 import * as shell from 'shelljs';
 
 import * as pkg from '../package.json';
-import {getEmbeddedProtocol} from './get-embedded-protocol';
-import {getJSApi} from './get-js-api';
+import {getLanguageRepo} from './get-language-repo';
 
 (async () => {
   try {
     await sanityCheckBeforeRelease();
 
-    await getEmbeddedProtocol('lib/src/vendor');
-
-    await getJSApi('lib/src/vendor');
+    await getLanguageRepo('lib/src/vendor');
 
     console.log('Transpiling TS into dist.');
     shell.exec('tsc');
+    shell.cp('lib/index.mjs', 'dist/lib/index.mjs');
 
     console.log('Copying JS API types to dist.');
     shell.cp('-R', 'lib/src/vendor/sass', 'dist/types');
     await fs.unlink('dist/types/README.md');
-
-    // .gitignore needs to exist in dist for `npm publish` to correctly exclude
-    // files from the published tarball.
-    console.log('Copying .gitignore to dist.');
-    await fs.copyFile('.gitignore', 'dist/.gitignore');
 
     console.log('Ready for publishing to npm.');
   } catch (error) {

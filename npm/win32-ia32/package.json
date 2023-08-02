@@ -1,15 +1,18 @@
 {
   "name": "sass-embedded-win32-ia32",
-  "version": "1.57.1",
+  "version": "1.64.2",
   "description": "The win32-ia32 binary for sass-embedded",
   "repository": "sass/embedded-host-node",
   "author": "Google Inc.",
   "license": "MIT",
   "files": [
-    "dart-sass-embedded/**/*"
+    "dart-sass/**/*"
   ],
   "engines": {
     "node": ">=14.0.0"
+  },
+  "bin": {
+    "sass": "./dart-sass/sass.bat"
   },
   "os": [
     "win32"

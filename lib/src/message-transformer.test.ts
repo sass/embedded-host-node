@@ -3,30 +3,33 @@
 // https://opensource.org/licenses/MIT.
 
 import {Subject, Observable} from 'rxjs';
+import * as varint from 'varint';
 
 import {expectObservableToError} from '../../test/utils';
-import {MessageTransformer, OutboundTypedMessage} from './message-transformer';
-import {
-  InboundMessage,
-  OutboundMessage,
-  ProtocolError,
-} from './vendor/embedded-protocol/embedded_sass_pb';
+import {MessageTransformer} from './message-transformer';
+import * as proto from './vendor/embedded_sass_pb';
 
 describe('message transformer', () => {
   let messages: MessageTransformer;
 
-  function validInboundMessage(source: string): InboundMessage {
-    const input = new InboundMessage.CompileRequest.StringInput();
-    input.setSource(source);
-    const request = new InboundMessage.CompileRequest();
-    request.setString(input);
-    const message = new InboundMessage();
-    message.setCompileRequest(request);
-    return message;
+  function validInboundMessage(source: string): proto.InboundMessage {
+    return new proto.InboundMessage({
+      message: {
+        case: 'compileRequest',
+        value: new proto.InboundMessage_CompileRequest({
+          input: {
+            case: 'string',
+            value: new proto.InboundMessage_CompileRequest_StringInput({
+              source,
+            }),
+          },
+        }),
+      },
+    });
   }
 
   describe('encode', () => {
-    let encodedProtobufs: Buffer[];
+    let encodedProtobufs: Uint8Array[];
 
     beforeEach(() => {
       encodedProtobufs = [];
@@ -37,21 +40,16 @@ describe('message transformer', () => {
 
     it('encodes an InboundMessage to buffer', () => {
       const message = validInboundMessage('a {b: c}');
-
-      messages.writeInboundMessage({
-        payload: message.getCompileRequest()!,
-        type: InboundMessage.MessageCase.COMPILE_REQUEST,
-      });
-
+      messages.writeInboundMessage([1234, message]);
       expect(encodedProtobufs).toEqual([
-        Buffer.from(message.serializeBinary()),
+        Uint8Array.from([...varint.encode(1234), ...message.toBinary()]),
       ]);
     });
   });
 
   describe('decode', () => {
-    let protobufs$: Subject<Buffer>;
-    let decodedMessages: OutboundTypedMessage[];
+    let protobufs$: Subject<Uint8Array>;
+    let decodedMessages: Array<[number, proto.OutboundMessage]>;
 
     beforeEach(() => {
       protobufs$ = new Subject();
@@ -60,22 +58,32 @@ describe('message transformer', () => {
     });
 
     it('decodes buffer to OutboundMessage', done => {
-      const message = validInboundMessage('a {b: c}');
-
       messages.outboundMessages$.subscribe({
         next: message => decodedMessages.push(message),
         complete: () => {
           expect(decodedMessages.length).toBe(1);
-          const response = decodedMessages[0]
-            .payload as OutboundMessage.CompileResponse;
-          expect(response.getSuccess()?.getCss()).toBe('a {b: c}');
-          const type = decodedMessages[0].type;
-          expect(type).toEqual(OutboundMessage.MessageCase.COMPILE_RESPONSE);
+          const [id, message] = decodedMessages[0];
+          expect(id).toBe(1234);
+          expect(message.message.case).toBe('compileResponse');
+          const response = message.message
+            .value as proto.OutboundMessage_CompileResponse;
+          expect(response.result.case).toBe('success');
+          expect(
+            (
+              response.result
+                .value as proto.OutboundMessage_CompileResponse_CompileSuccess
+            ).css
+          ).toBe('a {b: c}');
           done();
         },
       });
 
-      protobufs$.next(Buffer.from(message.serializeBinary()));
+      protobufs$.next(
+        Uint8Array.from([
+          ...varint.encode(1234),
+          ...validInboundMessage('a {b: c}').toBinary(),
+        ])
+      );
       protobufs$.complete();
     });
 
@@ -83,62 +91,12 @@ describe('message transformer', () => {
       it('fails on invalid buffer', done => {
         expectObservableToError(
           messages.outboundMessages$,
-          'Compiler caused error: Invalid buffer.',
+          'Compiler caused error: Invalid compilation ID varint: RangeError: ' +
+            'Could not decode varint.',
           done
         );
 
         protobufs$.next(Buffer.from([-1]));
-      });
-
-      it('fails on empty message', done => {
-        expectObservableToError(
-          messages.outboundMessages$,
-          'Compiler caused error: OutboundMessage.message is not set.',
-          done
-        );
-
-        protobufs$.next(Buffer.from(new OutboundMessage().serializeBinary()));
-      });
-
-      it('fails on compile response with missing result', done => {
-        expectObservableToError(
-          messages.outboundMessages$,
-          'Compiler caused error: OutboundMessage.CompileResponse.result is not set.',
-          done
-        );
-
-        const response = new OutboundMessage.CompileResponse();
-        const message = new OutboundMessage();
-        message.setCompileResponse(response);
-        protobufs$.next(Buffer.from(message.serializeBinary()));
-      });
-
-      it('fails on function call request with missing identifier', done => {
-        expectObservableToError(
-          messages.outboundMessages$,
-          'Compiler caused error: OutboundMessage.FunctionCallRequest.identifier is not set.',
-          done
-        );
-
-        const request = new OutboundMessage.FunctionCallRequest();
-        const message = new OutboundMessage();
-        message.setFunctionCallRequest(request);
-        protobufs$.next(Buffer.from(message.serializeBinary()));
-      });
-
-      it('fails if message contains a protocol error', done => {
-        const errorMessage = 'sad';
-        expectObservableToError(
-          messages.outboundMessages$,
-          `Compiler reported error: ${errorMessage}.`,
-          done
-        );
-
-        const error = new ProtocolError();
-        error.setMessage(errorMessage);
-        const message = new OutboundMessage();
-        message.setError(error);
-        protobufs$.next(Buffer.from(message.serializeBinary()));
       });
     });
   });

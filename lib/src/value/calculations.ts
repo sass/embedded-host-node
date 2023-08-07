@@ -31,7 +31,10 @@ const isValidClampArg = (value: CalculationValue): boolean =>
 export class SassCalculation extends Value {
   readonly arguments: List<CalculationValue>;
 
-  private constructor(readonly name: string, args: CalculationValueIterable) {
+  private constructor(
+    readonly name: string,
+    args: CalculationValueIterable
+  ) {
     super();
     this.arguments = List(args);
   }
@@ -93,7 +96,7 @@ export class SassCalculation extends Value {
 }
 
 const operators = ['+', '-', '*', '/'] as const;
-export type CalculationOperator = typeof operators[number];
+export type CalculationOperator = (typeof operators)[number];
 
 export class CalculationOperation implements ValueObject {
   constructor(

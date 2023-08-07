@@ -40,7 +40,7 @@ export class MessageTransformer {
    */
   writeInboundMessage([compilationId, message]: [
     number,
-    InboundMessage
+    InboundMessage,
   ]): void {
     const compilationIdLength = varint.encodingLength(compilationId);
     const encodedMessage = message.toBinary();

@@ -11,7 +11,7 @@ import {Syntax} from './vendor/sass';
 
 export type PromiseOr<
   T,
-  sync extends 'sync' | 'async' = 'async'
+  sync extends 'sync' | 'async' = 'async',
 > = sync extends 'async' ? T | Promise<T> : T;
 
 // A boolean type that's `true` if `sync` requires synchronous APIs only and

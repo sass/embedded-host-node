@@ -43,9 +43,10 @@ export async function link(source: string, destination: string): Promise<void> {
     console.log(`Copying ${source} into ${destination}.`);
     shell.cp('-R', source, destination);
   } else {
+    source = p.resolve(source);
     console.log(`Linking ${source} into ${destination}.`);
     // Symlinking doesn't play nice with Jasmine's test globbing on Windows.
-    await fs.symlink(p.resolve(source), destination);
+    await fs.symlink(source, destination);
   }
 }
 
@@ -53,8 +54,28 @@ export async function link(source: string, destination: string): Promise<void> {
 export async function cleanDir(dir: string): Promise<void> {
   await fs.mkdir(p.dirname(dir), {recursive: true});
   try {
-    await fs.rmdir(dir, {recursive: true});
+    await fs.rm(dir, {force: true, recursive: true});
   } catch (_) {
     // If dir doesn't exist yet, that's fine.
+  }
+}
+
+/// Returns whether [path1] and [path2] are symlinks that refer to the same file.
+export async function sameTarget(
+  path1: string,
+  path2: string
+): Promise<boolean> {
+  const realpath1 = await tryRealpath(path1);
+  if (realpath1 === null) return false;
+
+  return realpath1 === (await tryRealpath(path2));
+}
+
+/// Like `fs.realpath()`, but returns `null` if the path doesn't exist on disk.
+async function tryRealpath(path: string): Promise<string | null> {
+  try {
+    return await fs.realpath(p.resolve(path));
+  } catch (_) {
+    return null;
   }
 }

@@ -12,8 +12,10 @@
   },
   "include": [
     "lib/**/*.ts",
-    "lib/src/vendor/embedded-protocol/embedded_sass_pb.js",
     "tool/*.ts"
   ],
-  "exclude": ["**/*.test.ts"]
+  "exclude": [
+    "**/*.test.ts",
+    "lib/src/vendor/dart-sass/**"
+  ]
 }

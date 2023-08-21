@@ -5,25 +5,13 @@
 import {Observable, Subject} from 'rxjs';
 import {filter, map, mergeMap} from 'rxjs/operators';
 
-import {
-  InboundMessage,
-  OutboundMessage,
-} from './vendor/embedded-protocol/embedded_sass_pb';
-import {
-  InboundRequest,
-  InboundRequestType,
-  InboundResponse,
-  InboundResponseType,
-  InboundTypedMessage,
-  OutboundResponse,
-  OutboundResponseType,
-  OutboundTypedMessage,
-} from './message-transformer';
+import {OutboundResponse} from './messages';
+import * as proto from './vendor/embedded_sass_pb';
 import {RequestTracker} from './request-tracker';
-import {PromiseOr, thenOr} from './utils';
+import {PromiseOr, compilerError, thenOr, hostError} from './utils';
 
 /**
- * Dispatches requests, responses, and events.
+ * Dispatches requests, responses, and events for a single compilation.
  *
  * Accepts callbacks for processing different types of outbound requests. When
  * an outbound request arrives, this runs the appropriate callback to process
@@ -43,17 +31,13 @@ import {PromiseOr, thenOr} from './utils';
  * perform proper error handling.
  */
 export class Dispatcher<sync extends 'sync' | 'async'> {
-  // Tracks the IDs of all inbound requests. An outbound response with matching
-  // ID and type will remove the ID.
-  private readonly pendingInboundRequests = new RequestTracker();
-
   // Tracks the IDs of all outbound requests. An inbound response with matching
   // ID and type will remove the ID.
   private readonly pendingOutboundRequests = new RequestTracker();
 
-  // All outbound messages. If we detect any errors while dispatching messages,
-  // this completes.
-  private readonly messages$ = new Subject<OutboundTypedMessage>();
+  // All outbound messages for this compilation. If we detect any errors while
+  // dispatching messages, this completes.
+  private readonly messages$ = new Subject<proto.OutboundMessage>();
 
   // If the dispatcher encounters an error, this errors out. It is publicly
   // exposed as a readonly Observable.
@@ -71,19 +55,28 @@ export class Dispatcher<sync extends 'sync' | 'async'> {
    * silently.
    */
   readonly logEvents$ = this.messages$.pipe(
-    filter(message => message.type === OutboundMessage.MessageCase.LOG_EVENT),
-    map(message => message.payload as OutboundMessage.LogEvent)
+    filter(message => message.message.case === 'logEvent'),
+    map(message => message.message.value as proto.OutboundMessage_LogEvent)
   );
 
   constructor(
-    private readonly outboundMessages$: Observable<OutboundTypedMessage>,
+    private readonly compilationId: number,
+    private readonly outboundMessages$: Observable<
+      [number, proto.OutboundMessage]
+    >,
     private readonly writeInboundMessage: (
-      message: InboundTypedMessage
+      message: [number, proto.InboundMessage]
     ) => void,
     private readonly outboundRequestHandlers: DispatcherHandlers<sync>
   ) {
+    if (compilationId < 1) {
+      throw Error(`Invalid compilation ID ${compilationId}.`);
+    }
+
     this.outboundMessages$
       .pipe(
+        filter(([compilationId]) => compilationId === this.compilationId),
+        map(([, message]) => message),
         mergeMap(message => {
           const result = this.handleOutboundMessage(message);
           return result instanceof Promise
@@ -110,18 +103,36 @@ export class Dispatcher<sync extends 'sync' | 'async'> {
    * events synchronously, `callback` will be called synchronously.
    */
   sendCompileRequest(
-    request: InboundMessage.CompileRequest,
+    request: proto.InboundMessage_CompileRequest,
     callback: (
       err: unknown,
-      response: OutboundMessage.CompileResponse | undefined
+      response: proto.OutboundMessage_CompileResponse | undefined
     ) => void
   ): void {
-    this.handleInboundRequest(
-      request,
-      InboundMessage.MessageCase.COMPILE_REQUEST,
-      OutboundMessage.MessageCase.COMPILE_RESPONSE,
-      callback
-    );
+    if (this.messages$.isStopped) {
+      callback(new Error('Tried writing to closed dispatcher'), undefined);
+      return;
+    }
+
+    this.messages$
+      .pipe(
+        filter(message => message.message.case === 'compileResponse'),
+        map(message => message.message.value as OutboundResponse)
+      )
+      .subscribe({next: response => callback(null, response)});
+
+    this.error$.subscribe({error: error => callback(error, undefined)});
+
+    try {
+      this.writeInboundMessage([
+        this.compilationId,
+        new proto.InboundMessage({
+          message: {value: request, case: 'compileRequest'},
+        }),
+      ]);
+    } catch (error) {
+      this.throwAndClose(error);
+    }
   }
 
   // Rejects with `error` all promises awaiting an outbound response, and
@@ -136,140 +147,103 @@ export class Dispatcher<sync extends 'sync' | 'async'> {
   // contains a request, runs the appropriate callback to generate an inbound
   // response, and then sends it inbound.
   private handleOutboundMessage(
-    message: OutboundTypedMessage
+    message: proto.OutboundMessage
   ): PromiseOr<void, sync> {
-    switch (message.type) {
-      case OutboundMessage.MessageCase.LOG_EVENT:
+    switch (message.message.case) {
+      case 'logEvent':
+        // Handled separately by `logEvents$`.
         return undefined;
 
-      case OutboundMessage.MessageCase.COMPILE_RESPONSE:
-        this.pendingInboundRequests.resolve(
-          (message.payload as OutboundResponse).getId(),
-          message.type
-        );
+      case 'compileResponse':
+        // Handled separately by `sendCompileRequest`.
         return undefined;
 
-      case OutboundMessage.MessageCase.IMPORT_REQUEST: {
-        const request = message.payload as OutboundMessage.ImportRequest;
-        const id = request.getId();
-        const type = InboundMessage.MessageCase.IMPORT_RESPONSE;
+      case 'importRequest': {
+        const request = message.message.value;
+        const id = request.id;
+        const type = 'importResponse';
         this.pendingOutboundRequests.add(id, type);
 
         return thenOr(
           this.outboundRequestHandlers.handleImportRequest(request),
           response => {
-            this.sendInboundMessage(id, response, type);
+            this.sendInboundMessage(id, {case: type, value: response});
           }
         );
       }
 
-      case OutboundMessage.MessageCase.FILE_IMPORT_REQUEST: {
-        const request = message.payload as OutboundMessage.FileImportRequest;
-        const id = request.getId();
-        const type = InboundMessage.MessageCase.FILE_IMPORT_RESPONSE;
+      case 'fileImportRequest': {
+        const request = message.message.value;
+        const id = request.id;
+        const type = 'fileImportResponse';
         this.pendingOutboundRequests.add(id, type);
         return thenOr(
           this.outboundRequestHandlers.handleFileImportRequest(request),
           response => {
-            this.sendInboundMessage(id, response, type);
+            this.sendInboundMessage(id, {case: type, value: response});
           }
         );
       }
 
-      case OutboundMessage.MessageCase.CANONICALIZE_REQUEST: {
-        const request = message.payload as OutboundMessage.CanonicalizeRequest;
-        const id = request.getId();
-        const type = InboundMessage.MessageCase.CANONICALIZE_RESPONSE;
+      case 'canonicalizeRequest': {
+        const request = message.message.value;
+        const id = request.id;
+        const type = 'canonicalizeResponse';
         this.pendingOutboundRequests.add(id, type);
         return thenOr(
           this.outboundRequestHandlers.handleCanonicalizeRequest(request),
           response => {
-            this.sendInboundMessage(id, response, type);
+            this.sendInboundMessage(id, {case: type, value: response});
           }
         );
       }
 
-      case OutboundMessage.MessageCase.FUNCTION_CALL_REQUEST: {
-        const request = message.payload as OutboundMessage.FunctionCallRequest;
-        const id = request.getId();
-        const type = InboundMessage.MessageCase.FUNCTION_CALL_RESPONSE;
+      case 'functionCallRequest': {
+        const request = message.message.value;
+        const id = request.id;
+        const type = 'functionCallResponse';
         this.pendingOutboundRequests.add(id, type);
         return thenOr(
           this.outboundRequestHandlers.handleFunctionCallRequest(request),
           response => {
-            this.sendInboundMessage(id, response, type);
+            this.sendInboundMessage(id, {case: type, value: response});
           }
         );
       }
 
+      case 'error':
+        throw hostError(message.message.value.message);
+
       default:
-        throw Error(`Unknown message type ${message.type}`);
-    }
-  }
-
-  // Sends a `request` of type `requestType` inbound. Returns a promise that
-  // will either resolve with the corresponding outbound response of type
-  // `responseType`, or error if any Protocol Errors were encountered.
-  private handleInboundRequest(
-    request: InboundRequest,
-    requestType: InboundRequestType,
-    responseType: OutboundResponseType,
-    callback: (err: unknown, response: OutboundResponse | undefined) => void
-  ): void {
-    if (this.messages$.isStopped) {
-      callback(new Error('Tried writing to closed dispatcher'), undefined);
-      return;
-    }
-
-    this.messages$
-      .pipe(
-        filter(message => message.type === responseType),
-        map(message => message.payload as OutboundResponse),
-        filter(response => response.getId() === request.getId())
-      )
-      .subscribe({next: response => callback(null, response)});
-
-    this.error$.subscribe({error: error => callback(error, undefined)});
-
-    try {
-      this.sendInboundMessage(
-        this.pendingInboundRequests.nextId,
-        request,
-        requestType
-      );
-    } catch (error) {
-      this.throwAndClose(error);
+        throw compilerError(`Unknown message type ${message.message.case}`);
     }
   }
 
   // Sends a message inbound. Keeps track of all pending inbound requests.
   private sendInboundMessage(
-    id: number,
-    payload: InboundRequest | InboundResponse,
-    type: InboundRequestType | InboundResponseType
+    requestId: number,
+    message: Exclude<
+      proto.InboundMessage['message'],
+      {case: undefined | 'compileRequest'}
+    >
   ): void {
-    payload.setId(id);
+    message.value.id = requestId;
 
-    if (type === InboundMessage.MessageCase.COMPILE_REQUEST) {
-      this.pendingInboundRequests.add(
-        id,
-        OutboundMessage.MessageCase.COMPILE_RESPONSE
-      );
-    } else if (
-      type === InboundMessage.MessageCase.IMPORT_RESPONSE ||
-      type === InboundMessage.MessageCase.FILE_IMPORT_RESPONSE ||
-      type === InboundMessage.MessageCase.CANONICALIZE_RESPONSE ||
-      type === InboundMessage.MessageCase.FUNCTION_CALL_RESPONSE
+    if (
+      message.case === 'importResponse' ||
+      message.case === 'fileImportResponse' ||
+      message.case === 'canonicalizeResponse' ||
+      message.case === 'functionCallResponse'
     ) {
-      this.pendingOutboundRequests.resolve(id, type);
+      this.pendingOutboundRequests.resolve(requestId, message.case);
     } else {
-      throw Error(`Unknown message type ${type}`);
+      throw Error(`Unknown message type ${message.case}`);
     }
 
-    this.writeInboundMessage({
-      payload,
-      type,
-    });
+    this.writeInboundMessage([
+      this.compilationId,
+      new proto.InboundMessage({message}),
+    ]);
   }
 }
 
@@ -278,15 +252,15 @@ export class Dispatcher<sync extends 'sync' | 'async'> {
  */
 export interface DispatcherHandlers<sync extends 'sync' | 'async'> {
   handleImportRequest: (
-    request: OutboundMessage.ImportRequest
-  ) => PromiseOr<InboundMessage.ImportResponse, sync>;
+    request: proto.OutboundMessage_ImportRequest
+  ) => PromiseOr<proto.InboundMessage_ImportResponse, sync>;
   handleFileImportRequest: (
-    request: OutboundMessage.FileImportRequest
-  ) => PromiseOr<InboundMessage.FileImportResponse, sync>;
+    request: proto.OutboundMessage_FileImportRequest
+  ) => PromiseOr<proto.InboundMessage_FileImportResponse, sync>;
   handleCanonicalizeRequest: (
-    request: OutboundMessage.CanonicalizeRequest
-  ) => PromiseOr<InboundMessage.CanonicalizeResponse, sync>;
+    request: proto.OutboundMessage_CanonicalizeRequest
+  ) => PromiseOr<proto.InboundMessage_CanonicalizeResponse, sync>;
   handleFunctionCallRequest: (
-    request: OutboundMessage.FunctionCallRequest
-  ) => PromiseOr<InboundMessage.FunctionCallResponse, sync>;
+    request: proto.OutboundMessage_FunctionCallRequest
+  ) => PromiseOr<proto.InboundMessage_FunctionCallResponse, sync>;
 }

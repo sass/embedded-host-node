@@ -7,11 +7,8 @@ import {inspect} from 'util';
 import * as types from './vendor/sass';
 import * as utils from './utils';
 import {CustomFunction} from './vendor/sass';
-import {
-  InboundMessage,
-  OutboundMessage,
-} from './vendor/embedded-protocol/embedded_sass_pb';
-import {PromiseOr, catchOr, thenOr} from './utils';
+import * as proto from './vendor/embedded_sass_pb';
+import {PromiseOr, catchOr, compilerError, thenOr} from './utils';
 import {Protofier} from './protofier';
 import {Value} from './value';
 
@@ -55,8 +52,8 @@ export class FunctionRegistry<sync extends 'sync' | 'async'> {
    * Returns the function to which `request` refers and returns its response.
    */
   call(
-    request: OutboundMessage.FunctionCallRequest
-  ): PromiseOr<InboundMessage.FunctionCallResponse, sync> {
+    request: proto.OutboundMessage_FunctionCallRequest
+  ): PromiseOr<proto.InboundMessage_FunctionCallResponse, sync> {
     const protofier = new Protofier(this);
     const fn = this.get(request);
 
@@ -64,61 +61,60 @@ export class FunctionRegistry<sync extends 'sync' | 'async'> {
       () => {
         return thenOr(
           fn(
-            request
-              .getArgumentsList()
-              .map(value => protofier.deprotofy(value) as types.Value)
+            request.arguments.map(
+              value => protofier.deprotofy(value) as types.Value
+            )
           ),
           result => {
             if (!(result instanceof Value)) {
               const name =
-                request.getName().length === 0
-                  ? 'anonymous function'
-                  : `"${request.getName()}"`;
+                request.identifier.case === 'name'
+                  ? `"${request.identifier.value}"`
+                  : 'anonymous function';
               throw (
                 `options.functions: ${name} returned non-Value: ` +
                 inspect(result)
               );
             }
 
-            const response = new InboundMessage.FunctionCallResponse();
-            response.setSuccess(protofier.protofy(result));
-            response.setAccessedArgumentListsList(
-              protofier.accessedArgumentLists
-            );
-            return response;
+            return new proto.InboundMessage_FunctionCallResponse({
+              result: {case: 'success', value: protofier.protofy(result)},
+              accessedArgumentLists: protofier.accessedArgumentLists,
+            });
           }
         );
       },
-      error => {
-        const response = new InboundMessage.FunctionCallResponse();
-        response.setError(`${error}`);
-        return response;
-      }
+      error =>
+        new proto.InboundMessage_FunctionCallResponse({
+          result: {case: 'error', value: `${error}`},
+        })
     );
   }
 
   /** Returns the function to which `request` refers. */
   private get(
-    request: OutboundMessage.FunctionCallRequest
+    request: proto.OutboundMessage_FunctionCallRequest
   ): CustomFunction<sync> {
-    if (
-      request.getIdentifierCase() ===
-      OutboundMessage.FunctionCallRequest.IdentifierCase.NAME
-    ) {
-      const fn = this.functionsByName.get(request.getName());
+    if (request.identifier.case === 'name') {
+      const fn = this.functionsByName.get(request.identifier.value);
       if (fn) return fn;
 
-      throw new Error(
-        'Invalid OutboundMessage.FunctionCallRequest: there is no function ' +
-          `named "${request.getName()}"`
+      throw compilerError(
+        'Invalid OutboundMessage_FunctionCallRequest: there is no function ' +
+          `named "${request.identifier.value}"`
+      );
+    } else if (request.identifier.case === 'functionId') {
+      const fn = this.functionsById.get(request.identifier.value);
+      if (fn) return fn;
+
+      throw compilerError(
+        'Invalid OutboundMessage_FunctionCallRequest: there is no function ' +
+          `with ID "${request.identifier.value}"`
       );
     } else {
-      const fn = this.functionsById.get(request.getFunctionId());
-      if (fn) return fn;
-
-      throw new Error(
-        'Invalid OutboundMessage.FunctionCallRequest: there is no function ' +
-          `with ID "${request.getFunctionId()}"`
+      throw compilerError(
+        'Invalid OutboundMessage_FunctionCallRequest: function identifier is ' +
+          'unset'
       );
     }
   }

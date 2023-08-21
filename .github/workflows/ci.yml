@@ -5,7 +5,7 @@ defaults:
 
 env:
   PROTOC_VERSION: 3.x
-  DEFAULT_NODE_VERSION: 15.x # If changing this, also change jobs.tests.strategy.matrix.node_version
+  DEFAULT_NODE_VERSION: 18.x # If changing this, also change jobs.tests.strategy.matrix.node_version
 
 on:
   push:
@@ -24,24 +24,15 @@ jobs:
         with:
           node-version: ${{ env.DEFAULT_NODE_VERSION }}
           check-latest: true
-      - uses: arduino/setup-protoc@v1
-        with:
-          version: ${{ env.PROTOC_VERSION }}
-          repo-token: '${{ github.token }}'
 
-      - name: Check out the embedded protocol
-        uses: sass/clone-linked-repo@v1
-        with: {repo: sass/embedded-protocol, default-ref: null}
-
-      - name: Check out the JS API definition
+      - name: Check out the language repo
         uses: sass/clone-linked-repo@v1
         with: {repo: sass/sass, path: language}
 
       - run: npm install
       - name: npm run init
         run: |
-          if [[ -d embedded-protocol ]]; then args=--protocol-path=embedded-protocol; fi
-          npm run init -- --skip-compiler --api-path=language $args
+          npm run init -- --skip-compiler --language-path=language $args
 
       - run: npm run check
 
@@ -52,7 +43,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu, macos, windows]
-        node-version: [15.x, 14.x, 12.x] # If changing this, also change env.DEFAULT_NODE_VERSION
+        node-version: [18.x, 16.x, 14.x] # If changing this, also change env.DEFAULT_NODE_VERSION
       fail-fast: false
 
     steps:
@@ -61,44 +52,26 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           check-latest: true
-      - uses: frenck/action-setup-yq@v1
-        with: {version: v4.30.5} # frenck/action-setup-yq#35
-      - uses: arduino/setup-protoc@v1
-        with:
-          version: ${{ env.PROTOC_VERSION }}
-          repo-token: '${{ github.token }}'
       - uses: dart-lang/setup-dart@v1
         with: {sdk: stable}
       - run: dart --version
-
-      - name: Check out the embedded protocol
-        uses: sass/clone-linked-repo@v1
-        with: {repo: sass/embedded-protocol, default-ref: null}
 
       - name: Check out Dart Sass
         uses: sass/clone-linked-repo@v1
         with: {repo: sass/dart-sass}
 
-      - name: Check out the embedded compiler
-        uses: sass/clone-linked-repo@v1
-        with: {repo: sass/dart-sass-embedded}
-
-      - name: Link the embedded compiler to Dart Sass
-        run: |
-          yq -i '.dependency_overrides.sass = {"path": "../dart-sass"}' \
-              dart-sass-embedded/pubspec.yaml
-
-      - name: Check out the JS API definition
+      - name: Check out the language repo
         uses: sass/clone-linked-repo@v1
         with: {repo: sass/sass, path: language}
 
       - run: npm install
       - name: npm run init
         run: |
-          if [[ -d embedded-protocol ]]; then args=--protocol-path=embedded-protocol; fi
-          npm run init -- --compiler-path=dart-sass-embedded --api-path=language $args
+          npm run init -- --compiler-path=dart-sass --language-path=language $args
 
       - run: npm run test
+      - run: npm run compile
+      - run: node test/after-compile-test.mjs
 
   # The versions should be kept up-to-date with the latest LTS Node releases.
   # They next need to be rotated October 2021. See
@@ -111,13 +84,13 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu, windows, macos]
-        node_version: [16]
+        node_version: [18]
         include:
           # Include LTS versions on Ubuntu
           - os: ubuntu
-            node_version: 14
+            node_version: 16
           - os: ubuntu
-            node_version: 12
+            node_version: 14
 
     steps:
       - uses: actions/checkout@v2
@@ -125,39 +98,19 @@ jobs:
         with: {sdk: stable}
       - uses: actions/setup-node@v2
         with: {node-version: "${{ matrix.node_version }}"}
-      - uses: frenck/action-setup-yq@v1
-        with: {version: v4.30.5} # frenck/action-setup-yq#35
-      - uses: arduino/setup-protoc@v1
-        with:
-          version: ${{ env.PROTOC_VERSION }}
-          repo-token: '${{ github.token }}'
-
-      - name: Check out the embedded protocol
-        uses: sass/clone-linked-repo@v1
-        with: {repo: sass/embedded-protocol, default-ref: null}
 
       - name: Check out Dart Sass
         uses: sass/clone-linked-repo@v1
         with: {repo: sass/dart-sass}
 
-      - name: Check out the embedded compiler
-        uses: sass/clone-linked-repo@v1
-        with: {repo: sass/dart-sass-embedded}
-
-      - name: Link the embedded compiler to Dart Sass
-        run: |
-          yq -i '.dependency_overrides.sass = {"path": "../dart-sass"}' \
-              dart-sass-embedded/pubspec.yaml
-
-      - name: Check out the JS API definition
+      - name: Check out the language repo
         uses: sass/clone-linked-repo@v1
         with: {repo: sass/sass, path: language}
 
       - run: npm install
       - name: npm run init
         run: |
-          if [[ -d embedded-protocol ]]; then args=--protocol-path=embedded-protocol; fi
-          npm run init -- --compiler-path=dart-sass-embedded --api-path=language $args
+          npm run init -- --compiler-path=dart-sass --language-path=language $args
 
       - name: Check out sass-spec
         uses: sass/clone-linked-repo@v1
@@ -170,7 +123,15 @@ jobs:
       - name: Compile
         run: |
           npm run compile
-          ln -s {`pwd`/,dist/}lib/src/vendor/dart-sass-embedded
+          if [[ "$RUNNER_OS" == "Windows" ]]; then
+            # Avoid copying the entire Dart Sass build directory on Windows,
+            # since it may contain symlinks that cp will choke on.
+            mkdir -p dist/lib/src/vendor/dart-sass/
+            cp {`pwd`/,dist/}lib/src/vendor/dart-sass/sass.bat
+            cp {`pwd`/,dist/}lib/src/vendor/dart-sass/sass.snapshot
+          else
+            ln -s {`pwd`/,dist/}lib/src/vendor/dart-sass
+          fi
 
       - name: Run tests
         run: npm run js-api-spec -- --sassPackage .. --sassSassRepo ../language

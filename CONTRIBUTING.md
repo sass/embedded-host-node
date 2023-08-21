@@ -41,14 +41,12 @@ such, manual commits should never:
 The embedded host depends on several different components which come from
 different repositories:
 
-* The [Dart Sass embedded compiler].
-* [Dart Sass] (transitively through the embedded compiler).
+* The [Dart Sass compiler].
 * The [Sass embedded protocol].
 * The [Sass JS API definition].
 
-[Dart Sass embedded compiler]: https://github.com/sass/dart-sass-embedded
-[Dart Sass]: https://github.com/sass/dart-sass
-[Sass embedded protocol]: https://github.com/sass/embedded-protocol
+[Dart Sass compiler]: https://github.com/sass/dart-sass
+[Sass embedded protocol]: https://github.com/sass/sass/tree/main/spec/embedded-protocol.md
 [JS API definition]: https://github.com/sass/sass/tree/main/spec/js-api
 
 These dependencies are made available in different ways depending on context.
@@ -77,15 +75,14 @@ By default:
   revision on GitHub.
 
 * This uses the Dart Sass version from the latest revision on GitHub, unless the
-  embedded `--compiler-path` was passed in which case it uses whatever version
-  of Dart Sass that package references.
+  `--compiler-path` was passed in which case it uses that version of Dart Sass.
 
 ## Continuous Integration
 
 CI tests also use `npm run init`, so they use the same defaults as local
 development. However, if the pull request description includes a link to a pull
-request for the embedded compiler, Dart Sass, the embedded protocol, or the JS
-API, this will check out that version and run tests against it instead.
+request for Dart Sass, the embedded protocol, or the JS API, this will check out
+that version and run tests against it instead.
 
 ## Release
 
@@ -93,11 +90,11 @@ When this package is released to npm, it downloads the embedded protocol version
 that matches `protocol-version` in `package.json`. It downloads the latest JS
 API revision on GitHub.
 
-The release version of the `sass-embedded` package does *not* include the
-embedded compiler or Dart Sass. Instead, we release optional packages of the
-form `sass-embedded-<os>-<arch>`. Each of these contains the published version
-of the embedded compiler that matches `compiler-version` in `package.json` for
-the given operating system/architecture combination.
+The release version of the `sass-embedded` package does *not* include Dart Sass.
+Instead, we release optional packages of the form `sass-embedded-<os>-<arch>`.
+Each of these contains the published version of Dart Sass that matches
+`compiler-version` in `package.json` for the given operating system/architecture
+combination.
 
 If either `protocol-version` or `compiler-version` ends with `-dev`, the release
 will fail.

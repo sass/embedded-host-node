@@ -8,10 +8,7 @@ import {inspect} from 'util';
 
 import * as utils from './utils';
 import {FileImporter, Importer, Options} from './vendor/sass';
-import {
-  InboundMessage,
-  OutboundMessage,
-} from './vendor/embedded-protocol/embedded_sass_pb';
+import * as proto from './vendor/embedded_sass_pb';
 import {catchOr, thenOr, PromiseOr} from './utils';
 
 /**
@@ -20,7 +17,7 @@ import {catchOr, thenOr, PromiseOr} from './utils';
  */
 export class ImporterRegistry<sync extends 'sync' | 'async'> {
   /** Protocol buffer representations of the registered importers. */
-  readonly importers: InboundMessage.CompileRequest.Importer[];
+  readonly importers: proto.InboundMessage_CompileRequest_Importer[];
 
   /** A map from importer IDs to their corresponding importers. */
   private readonly importersById = new Map<number, Importer<sync>>();
@@ -35,19 +32,20 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
     this.importers = (options?.importers ?? [])
       .map(importer => this.register(importer))
       .concat(
-        (options?.loadPaths ?? []).map(path => {
-          const proto = new InboundMessage.CompileRequest.Importer();
-          proto.setPath(p.resolve(path));
-          return proto;
-        })
+        (options?.loadPaths ?? []).map(
+          path =>
+            new proto.InboundMessage_CompileRequest_Importer({
+              importer: {case: 'path', value: p.resolve(path)},
+            })
+        )
       );
   }
 
   /** Converts an importer to a proto without adding it to `this.importers`. */
   register(
     importer: Importer<sync> | FileImporter<sync>
-  ): InboundMessage.CompileRequest.Importer {
-    const proto = new InboundMessage.CompileRequest.Importer();
+  ): proto.InboundMessage_CompileRequest_Importer {
+    const response = new proto.InboundMessage_CompileRequest_Importer();
     if ('canonicalize' in importer) {
       if ('findFileUrl' in importer) {
         throw new Error(
@@ -56,21 +54,21 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
         );
       }
 
-      proto.setImporterId(this.id);
+      response.importer = {case: 'importerId', value: this.id};
       this.importersById.set(this.id, importer);
     } else {
-      proto.setFileImporterId(this.id);
+      response.importer = {case: 'fileImporterId', value: this.id};
       this.fileImportersById.set(this.id, importer);
     }
     this.id += 1;
-    return proto;
+    return response;
   }
 
   /** Handles a canonicalization request. */
   canonicalize(
-    request: OutboundMessage.CanonicalizeRequest
-  ): PromiseOr<InboundMessage.CanonicalizeResponse, sync> {
-    const importer = this.importersById.get(request.getImporterId());
+    request: proto.OutboundMessage_CanonicalizeRequest
+  ): PromiseOr<proto.InboundMessage_CanonicalizeResponse, sync> {
+    const importer = this.importersById.get(request.importerId);
     if (!importer) {
       throw utils.compilerError('Unknown CanonicalizeRequest.importer_id');
     }
@@ -78,77 +76,78 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
     return catchOr(
       () => {
         return thenOr(
-          importer.canonicalize(request.getUrl(), {
-            fromImport: request.getFromImport(),
+          importer.canonicalize(request.url, {
+            fromImport: request.fromImport,
           }),
-          url => {
-            const proto = new InboundMessage.CanonicalizeResponse();
-            if (url !== null) proto.setUrl(url.toString());
-            return proto;
-          }
+          url =>
+            new proto.InboundMessage_CanonicalizeResponse({
+              result:
+                url === null
+                  ? {case: undefined}
+                  : {case: 'url', value: url.toString()},
+            })
         );
       },
-      error => {
-        const proto = new InboundMessage.CanonicalizeResponse();
-        proto.setError(`${error}`);
-        return proto;
-      }
+      error =>
+        new proto.InboundMessage_CanonicalizeResponse({
+          result: {case: 'error', value: `${error}`},
+        })
     );
   }
 
   /** Handles an import request. */
   import(
-    request: OutboundMessage.ImportRequest
-  ): PromiseOr<InboundMessage.ImportResponse, sync> {
-    const importer = this.importersById.get(request.getImporterId());
+    request: proto.OutboundMessage_ImportRequest
+  ): PromiseOr<proto.InboundMessage_ImportResponse, sync> {
+    const importer = this.importersById.get(request.importerId);
     if (!importer) {
       throw utils.compilerError('Unknown ImportRequest.importer_id');
     }
 
     return catchOr(
       () => {
-        return thenOr(importer.load(new URL(request.getUrl())), result => {
-          const proto = new InboundMessage.ImportResponse();
-          if (result) {
-            if (typeof result.contents !== 'string') {
-              throw Error(
-                `Invalid argument (contents): must be a string but was: ${
-                  (result.contents as {}).constructor.name
-                }`
-              );
-            }
+        return thenOr(importer.load(new URL(request.url)), result => {
+          if (!result) return new proto.InboundMessage_ImportResponse();
 
-            if (result.sourceMapUrl && !result.sourceMapUrl.protocol) {
-              throw Error(
-                'Invalid argument (sourceMapUrl): must be absolute but was: ' +
-                  result.sourceMapUrl
-              );
-            }
-
-            const success = new InboundMessage.ImportResponse.ImportSuccess();
-            success.setContents(result.contents);
-            success.setSyntax(utils.protofySyntax(result.syntax));
-            if (result.sourceMapUrl) {
-              success.setSourceMapUrl(result.sourceMapUrl.toString());
-            }
-            proto.setSuccess(success);
+          if (typeof result.contents !== 'string') {
+            throw Error(
+              `Invalid argument (contents): must be a string but was: ${
+                (result.contents as {}).constructor.name
+              }`
+            );
           }
-          return proto;
+
+          if (result.sourceMapUrl && !result.sourceMapUrl.protocol) {
+            throw Error(
+              'Invalid argument (sourceMapUrl): must be absolute but was: ' +
+                result.sourceMapUrl
+            );
+          }
+
+          return new proto.InboundMessage_ImportResponse({
+            result: {
+              case: 'success',
+              value: new proto.InboundMessage_ImportResponse_ImportSuccess({
+                contents: result.contents,
+                syntax: utils.protofySyntax(result.syntax),
+                sourceMapUrl: result.sourceMapUrl?.toString() ?? '',
+              }),
+            },
+          });
         });
       },
-      error => {
-        const proto = new InboundMessage.ImportResponse();
-        proto.setError(`${error}`);
-        return proto;
-      }
+      error =>
+        new proto.InboundMessage_ImportResponse({
+          result: {case: 'error', value: `${error}`},
+        })
     );
   }
 
   /** Handles a file import request. */
   fileImport(
-    request: OutboundMessage.FileImportRequest
-  ): PromiseOr<InboundMessage.FileImportResponse, sync> {
-    const importer = this.fileImportersById.get(request.getImporterId());
+    request: proto.OutboundMessage_FileImportRequest
+  ): PromiseOr<proto.InboundMessage_FileImportResponse, sync> {
+    const importer = this.fileImportersById.get(request.importerId);
     if (!importer) {
       throw utils.compilerError('Unknown FileImportRequest.importer_id');
     }
@@ -156,29 +155,27 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
     return catchOr(
       () => {
         return thenOr(
-          importer.findFileUrl(request.getUrl(), {
-            fromImport: request.getFromImport(),
+          importer.findFileUrl(request.url, {
+            fromImport: request.fromImport,
           }),
           url => {
-            const proto = new InboundMessage.FileImportResponse();
-            if (url) {
-              if (url.protocol !== 'file:') {
-                throw (
-                  `FileImporter ${inspect(importer)} returned non-file: URL ` +
-                  +`"${url}" for URL "${request.getUrl()}".`
-                );
-              }
-              proto.setFileUrl(url.toString());
+            if (!url) return new proto.InboundMessage_FileImportResponse();
+            if (url.protocol !== 'file:') {
+              throw (
+                `FileImporter ${inspect(importer)} returned non-file: URL ` +
+                +`"${url}" for URL "${request.url}".`
+              );
             }
-            return proto;
+            return new proto.InboundMessage_FileImportResponse({
+              result: {case: 'fileUrl', value: url.toString()},
+            });
           }
         );
       },
-      error => {
-        const proto = new InboundMessage.FileImportResponse();
-        proto.setError(`${error}`);
-        return proto;
-      }
+      error =>
+        new proto.InboundMessage_FileImportResponse({
+          result: {case: 'error', value: `${error}`},
+        })
     );
   }
 }

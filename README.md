@@ -82,8 +82,8 @@ to start a Sass compilation, but to control aspects of it that are exposed by an
 API. This includes defining custom importers, functions, and loggers, all of
 which are invoked by messages from the embedded compiler back to the host.
 
-[embedded compiler]: https://github.com/sass/dart-sass-embedded
-[Embedded Sass Protocol]: https://github.com/sass/embedded-protocol#readme
+[embedded compiler]: https://github.com/sass/dart-sass#embedded-dart-sass
+[Embedded Sass Protocol]: https://github.com/sass/sass/tree/main/spec/embedded-protocol.md
 
 Although this sort of two-way communication with an embedded process is
 inherently asynchronous in Node.js, this package supports the synchronous

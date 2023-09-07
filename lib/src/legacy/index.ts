@@ -4,7 +4,7 @@
 
 import * as fs from 'fs';
 import * as p from 'path';
-import {URL} from 'url';
+import {pathToFileURL, URL} from 'url';
 
 import {Exception} from '../exception';
 import {
@@ -181,7 +181,9 @@ function convertStringOptions<sync extends 'sync' | 'async'>(
   return {
     ...modernOptions,
     url: options.file
-      ? pathToLegacyFileUrl(options.file)
+      ? options.importer
+        ? pathToLegacyFileUrl(options.file)
+        : pathToFileURL(options.file)
       : new URL(legacyImporterProtocol),
     importer: modernOptions.importers ? modernOptions.importers[0] : undefined,
     syntax: options.indentedSyntax ? 'indented' : 'scss',

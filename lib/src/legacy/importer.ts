@@ -3,7 +3,6 @@
 // https://opensource.org/licenses/MIT.
 
 import {strict as assert} from 'assert';
-import {pathToFileURL, URL as NodeURL} from 'url';
 import * as fs from 'fs';
 import * as p from 'path';
 import * as util from 'util';
@@ -26,6 +25,12 @@ import {
   LegacyPluginThis,
   LegacySyncImporter,
 } from '../vendor/sass';
+import {
+  pathToLegacyFileUrl,
+  legacyFileUrlToPath,
+  legacyImporterProtocol,
+  legacyImporterProtocolPrefix,
+} from './utils';
 
 /**
  * A special URL protocol we use to signal when a stylesheet has finished
@@ -36,9 +41,9 @@ import {
 export const endOfLoadProtocol = 'sass-embedded-legacy-load-done:';
 
 /**
- * The URL protocol to use for URLs canonicalized using `LegacyImporterWrapper`.
+ * The `file:` URL protocol with [legacyImporterProtocolPrefix] at the beginning.
  */
-export const legacyImporterProtocol = 'legacy-importer:';
+export const legacyImporterFileProtocol = 'legacy-importer-file:';
 
 // A count of `endOfLoadProtocol` imports that have been generated. Each one
 // must be a different URL to ensure that the importer results aren't cached.
@@ -68,11 +73,6 @@ export class LegacyImporterWrapper<sync extends 'sync' | 'async'>
   // `this.callbacks`, if it returned one.
   private lastContents: string | undefined;
 
-  // Whether we're expecting the next call to `canonicalize()` to be a relative
-  // load. The legacy importer API doesn't handle these loads in the same way as
-  // the modern API, so we always return `null` in this case.
-  private expectingRelativeLoad = true;
-
   constructor(
     private readonly self: LegacyPluginThis,
     private readonly callbacks: Array<LegacyImporter<sync>>,
@@ -90,14 +90,23 @@ export class LegacyImporterWrapper<sync extends 'sync' | 'async'>
   ): PromiseOr<URL | null, sync> {
     if (url.startsWith(endOfLoadProtocol)) return new URL(url);
 
-    // Since there's only ever one modern importer in legacy mode, we can be
-    // sure that all normal loads are preceded by exactly one relative load.
-    if (this.expectingRelativeLoad) {
-      if (url.startsWith('file:')) {
+    if (
+      url.startsWith(legacyImporterProtocolPrefix) ||
+      url.startsWith(legacyImporterProtocol)
+    ) {
+      // A load starts with `legacyImporterProtocolPrefix` if and only if it's a
+      // relative load for the current importer rather than an absolute load.
+      // For the most part, we want to ignore these, but for `file:` URLs
+      // specifically we want to resolve them on the filesystem to ensure
+      // locality.
+      const urlWithoutPrefix = url.substring(
+        legacyImporterProtocolPrefix.length
+      );
+      if (urlWithoutPrefix.startsWith('file:')) {
         let resolved: string | null = null;
 
         try {
-          const path = fileUrlToPathCrossPlatform(url);
+          const path = fileUrlToPathCrossPlatform(urlWithoutPrefix);
           resolved = resolvePath(path, options.fromImport);
         } catch (error: unknown) {
           if (
@@ -119,16 +128,11 @@ export class LegacyImporterWrapper<sync extends 'sync' | 'async'>
 
         if (resolved !== null) {
           this.prev.push({url: resolved, path: true});
-          return pathToFileURL(resolved);
+          return pathToLegacyFileUrl(resolved);
         }
       }
 
-      this.expectingRelativeLoad = false;
       return null;
-    } else if (!url.startsWith('file:')) {
-      // We'll only search for another relative import when the URL isn't
-      // absolute.
-      this.expectingRelativeLoad = true;
     }
 
     const prev = this.prev[this.prev.length - 1];
@@ -153,14 +157,14 @@ export class LegacyImporterWrapper<sync extends 'sync' | 'async'>
                 encodeURI((result as {file: string}).file)
             );
           } else if (/^[A-Za-z+.-]+:/.test(url)) {
-            return new URL(url);
+            return new URL(`${legacyImporterProtocolPrefix}${url}`);
           } else {
             return new URL(legacyImporterProtocol + encodeURI(url));
           }
         } else {
           if (p.isAbsolute(result.file)) {
             const resolved = resolvePath(result.file, options.fromImport);
-            return resolved ? pathToFileURL(resolved) : null;
+            return resolved ? pathToLegacyFileUrl(resolved) : null;
           }
 
           const prefixes = [...this.loadPaths, '.'];
@@ -171,16 +175,16 @@ export class LegacyImporterWrapper<sync extends 'sync' | 'async'>
               p.join(prefix, result.file),
               options.fromImport
             );
-            if (resolved !== null) return pathToFileURL(resolved);
+            if (resolved !== null) return pathToLegacyFileUrl(resolved);
           }
           return null;
         }
       }),
       result => {
         if (result !== null) {
-          const path = result.protocol === 'file:';
+          const path = result.protocol === legacyImporterFileProtocol;
           this.prev.push({
-            url: path ? fileUrlToPathCrossPlatform(result as NodeURL) : url,
+            url: path ? legacyFileUrlToPath(result) : url,
             path,
           });
           return result;
@@ -190,7 +194,7 @@ export class LegacyImporterWrapper<sync extends 'sync' | 'async'>
               p.join(loadPath, url),
               options.fromImport
             );
-            if (resolved !== null) return pathToFileURL(resolved);
+            if (resolved !== null) return pathToLegacyFileUrl(resolved);
           }
           return null;
         }
@@ -208,7 +212,7 @@ export class LegacyImporterWrapper<sync extends 'sync' | 'async'>
       };
     }
 
-    if (canonicalUrl.protocol === 'file:') {
+    if (canonicalUrl.protocol === legacyImporterFileProtocol) {
       const syntax = canonicalUrl.pathname.endsWith('.sass')
         ? 'indented'
         : canonicalUrl.pathname.endsWith('.css')
@@ -217,10 +221,7 @@ export class LegacyImporterWrapper<sync extends 'sync' | 'async'>
 
       let contents =
         this.lastContents ??
-        fs.readFileSync(
-          fileUrlToPathCrossPlatform(canonicalUrl as NodeURL),
-          'utf-8'
-        );
+        fs.readFileSync(legacyFileUrlToPath(canonicalUrl), 'utf-8');
       this.lastContents = undefined;
       if (syntax === 'scss') {
         contents += this.endOfLoadImport;
@@ -311,7 +312,7 @@ export class LegacyImporterWrapper<sync extends 'sync' | 'async'>
   // The `@import` statement to inject after the contents of files to ensure
   // that we know when a load has completed so we can pass the correct `prev`
   // argument to callbacks.
-  private get endOfLoadImport() {
+  private get endOfLoadImport(): string {
     return `\n;@import "${endOfLoadProtocol}${endOfLoadCount++}";`;
   }
 }

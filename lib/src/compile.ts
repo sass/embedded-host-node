@@ -18,11 +18,32 @@ import {MessageTransformer} from './message-transformer';
 import {PacketTransformer} from './packet-transformer';
 import {SyncEmbeddedCompiler} from './sync-compiler';
 import {deprotofySourceSpan} from './deprotofy-span';
-import {legacyImporterProtocol} from './legacy/importer';
+import {
+  removeLegacyImporter,
+  removeLegacyImporterFromSpan,
+  legacyImporterProtocol,
+} from './legacy/utils';
+
+/// Allow the legacy API to pass in an option signaling to the modern API that
+/// it's being run in legacy mode.
+///
+/// This is not intended for API users to pass in, and may be broken without
+/// warning in the future.
+type OptionsWithLegacy<sync extends 'sync' | 'async'> = Options<sync> & {
+  legacy?: boolean;
+};
+
+/// Allow the legacy API to pass in an option signaling to the modern API that
+/// it's being run in legacy mode.
+///
+/// This is not intended for API users to pass in, and may be broken without
+/// warning in the future.
+type StringOptionsWithLegacy<sync extends 'sync' | 'async'> =
+  StringOptions<sync> & {legacy?: boolean};
 
 export function compile(
   path: string,
-  options?: Options<'sync'>
+  options?: OptionsWithLegacy<'sync'>
 ): CompileResult {
   const importers = new ImporterRegistry(options);
   return compileRequestSync(
@@ -34,7 +55,7 @@ export function compile(
 
 export function compileString(
   source: string,
-  options?: StringOptions<'sync'>
+  options?: StringOptionsWithLegacy<'sync'>
 ): CompileResult {
   const importers = new ImporterRegistry(options);
   return compileRequestSync(
@@ -46,7 +67,7 @@ export function compileString(
 
 export function compileAsync(
   path: string,
-  options?: Options<'async'>
+  options?: OptionsWithLegacy<'async'>
 ): Promise<CompileResult> {
   const importers = new ImporterRegistry(options);
   return compileRequestAsync(
@@ -58,7 +79,7 @@ export function compileAsync(
 
 export function compileStringAsync(
   source: string,
-  options?: StringOptions<'async'>
+  options?: StringOptionsWithLegacy<'async'>
 ): Promise<CompileResult> {
   const importers = new ImporterRegistry(options);
   return compileRequestAsync(
@@ -151,7 +172,7 @@ function newCompileRequest(
 async function compileRequestAsync(
   request: proto.InboundMessage_CompileRequest,
   importers: ImporterRegistry<'async'>,
-  options?: Options<'async'>
+  options?: OptionsWithLegacy<'async'> & {legacy?: boolean}
 ): Promise<CompileResult> {
   const functions = new FunctionRegistry(options?.functions);
   const embeddedCompiler = new AsyncEmbeddedCompiler();
@@ -197,7 +218,7 @@ async function compileRequestAsync(
 function compileRequestSync(
   request: proto.InboundMessage_CompileRequest,
   importers: ImporterRegistry<'sync'>,
-  options?: Options<'sync'>
+  options?: OptionsWithLegacy<'sync'>
 ): CompileResult {
   const functions = new FunctionRegistry(options?.functions);
   const embeddedCompiler = new SyncEmbeddedCompiler();
@@ -272,16 +293,23 @@ function createDispatcher<sync extends 'sync' | 'async'>(
 
 /** Handles a log event according to `options`. */
 function handleLogEvent(
-  options: Options<'sync' | 'async'> | undefined,
+  options: OptionsWithLegacy<'sync' | 'async'> | undefined,
   event: proto.OutboundMessage_LogEvent
 ): void {
+  let span = event.span ? deprotofySourceSpan(event.span) : null;
+  if (span && options?.legacy) span = removeLegacyImporterFromSpan(span);
+  let message = event.message;
+  if (options?.legacy) message = removeLegacyImporter(message);
+  let formatted = event.formatted;
+  if (options?.legacy) formatted = removeLegacyImporter(formatted);
+
   if (event.type === proto.LogEventType.DEBUG) {
     if (options?.logger?.debug) {
-      options.logger.debug(event.message, {
-        span: deprotofySourceSpan(event.span!),
+      options.logger.debug(message, {
+        span: span!,
       });
     } else {
-      console.error(event.formatted);
+      console.error(formatted);
     }
   } else {
     if (options?.logger?.warn) {
@@ -289,16 +317,16 @@ function handleLogEvent(
         {
           deprecation: event.type === proto.LogEventType.DEPRECATION_WARNING,
         };
-
-      const spanProto = event.span;
-      if (spanProto) params.span = deprotofySourceSpan(spanProto);
+      if (span) params.span = span;
 
       const stack = event.stackTrace;
-      if (stack) params.stack = stack;
+      if (stack) {
+        params.stack = options?.legacy ? removeLegacyImporter(stack) : stack;
+      }
 
-      options.logger.warn(event.message, params);
+      options.logger.warn(message, params);
     } else {
-      console.error(event.formatted);
+      console.error(formatted);
     }
   }
 }

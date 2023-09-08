@@ -303,6 +303,10 @@ function newLegacyResult(
       includedFiles: result.loadedUrls
         .filter(url => url.protocol !== endOfLoadProtocol)
         .map(url => {
+          if (url.protocol === legacyImporterProtocol) {
+            return decodeURI(url.pathname);
+          }
+
           const urlString = removeLegacyImporter(url.toString());
           return urlString.startsWith('file:')
             ? fileUrlToPathCrossPlatform(urlString)

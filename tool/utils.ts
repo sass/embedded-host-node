@@ -2,7 +2,7 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-import {promises as fs, existsSync} from 'fs';
+import {promises as fs, existsSync, lstatSync} from 'fs';
 import * as p from 'path';
 import * as shell from 'shelljs';
 
@@ -17,13 +17,21 @@ export function fetchRepo(options: {
   outPath: string;
   ref: string;
 }): void {
-  if (!existsSync(p.join(options.outPath, options.repo))) {
+  const path = p.join(options.outPath, options.repo);
+  if (lstatSync(path).isSymbolicLink() && existsSync(p.join(path, '.git'))) {
+    throw (
+      `${path} is a symlink to a git repo, not overwriting.\n` +
+      `Run "rm ${path}" and try again.`
+    );
+  }
+
+  if (!existsSync(path)) {
     console.log(`Cloning ${options.repo} into ${options.outPath}.`);
     shell.exec(
       `git clone \
       --depth=1 \
       https://github.com/sass/${options.repo} \
-      ${p.join(options.outPath, options.repo)}`,
+      ${path}`,
       {silent: true}
     );
   }
@@ -35,7 +43,7 @@ export function fetchRepo(options: {
     `git fetch --depth=1 origin ${options.ref} && git reset --hard FETCH_HEAD`,
     {
       silent: true,
-      cwd: p.join(options.outPath, options.repo),
+      cwd: path,
     }
   );
 }

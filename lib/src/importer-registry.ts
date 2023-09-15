@@ -45,7 +45,7 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
   register(
     importer: Importer<sync> | FileImporter<sync>
   ): proto.InboundMessage_CompileRequest_Importer {
-    const response = new proto.InboundMessage_CompileRequest_Importer();
+    const message = new proto.InboundMessage_CompileRequest_Importer();
     if ('canonicalize' in importer) {
       if ('findFileUrl' in importer) {
         throw new Error(
@@ -54,14 +54,18 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
         );
       }
 
-      response.importer = {case: 'importerId', value: this.id};
+      message.importer = {case: 'importerId', value: this.id};
+      message.nonCanonicalScheme =
+        typeof importer.nonCanonicalScheme === 'string'
+          ? [importer.nonCanonicalScheme]
+          : importer.nonCanonicalScheme ?? [];
       this.importersById.set(this.id, importer);
     } else {
-      response.importer = {case: 'fileImporterId', value: this.id};
+      message.importer = {case: 'fileImporterId', value: this.id};
       this.fileImportersById.set(this.id, importer);
     }
     this.id += 1;
-    return response;
+    return message;
   }
 
   /** Handles a canonicalization request. */
@@ -78,6 +82,9 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
         return thenOr(
           importer.canonicalize(request.url, {
             fromImport: request.fromImport,
+            containingUrl: request.containingUrl
+              ? new URL(request.containingUrl)
+              : null,
           }),
           url =>
             new proto.InboundMessage_CanonicalizeResponse({
@@ -157,6 +164,9 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
         return thenOr(
           importer.findFileUrl(request.url, {
             fromImport: request.fromImport,
+            containingUrl: request.containingUrl
+              ? new URL(request.containingUrl)
+              : null,
           }),
           url => {
             if (!url) return new proto.InboundMessage_FileImportResponse();

@@ -1,3 +1,40 @@
+## 1.68.0
+
+* Fix the source spans associated with the `abs-percent` deprecation.
+
+### JS API
+
+* Non-filesystem importers can now set the `nonCanonicalScheme` field, which
+  declares that one or more URL schemes (without `:`) will never be used for
+  URLs returned by the `canonicalize()` method.
+
+* Add a `containingUrl` field to the `canonicalize()` and `findFileUrl()`
+  methods of importers, which is set to the canonical URL of the stylesheet that
+  contains the current load. For filesystem importers, this is always set; for
+  other importers, it's set only if the current load has no URL scheme, or if
+  its URL scheme is declared as non-canonical by the importer.
+
+### Dart API
+
+* Add `AsyncImporter.isNonCanonicalScheme`, which importers (async or sync) can
+  use to indicate that a certain URL scheme will never be used for URLs returned
+  by the `canonicalize()` method.
+
+* Add `AsyncImporter.containingUrl`, which is set during calls to the
+  `canonicalize()` method to the canonical URL of the stylesheet that contains
+  the current load. This is set only if the current load has no URL scheme, or
+  if its URL scheme is declared as non-canonical by the importer.
+
+### Embedded Sass
+
+* The `CalculationValue.interpolation` field is deprecated and will be removed
+  in a future version. It will no longer be set by the compiler, and if the host
+  sets it it will be treated as equivalent to `CalculationValue.string` except
+  that `"("` and `")"` will be added to the beginning and end of the string
+  values.
+
+* Properly include TypeScript types in the `sass-embedded` package.
+
 ## 1.67.0
 
 * All functions defined in CSS Values and Units 4 are now once again parsed as
@@ -13,18 +50,13 @@
   CSS calculations (including `abs()`, `min()`, `max()`, and `round()` whose
   names overlap with global Sass functions).
 
-* As a consequence of the change in calculation parsing described above,
-  calculation functions containing interpolation are now parsed more strictly
-  than before. However, all interpolations that would have produced valid CSS
-  will continue to work, so this is not considered a breaking change.
-
-* Interpolations in calculation functions that aren't used in a position that
-  could also have a normal calculation value are now deprecated. For example,
-  `calc(1px #{"+ 2px"})` is deprecated, but `calc(1px + #{"2px"})` is still
-  allowed. This deprecation is named `calc-interp`. See [the Sass website] for
-  more information.
-
-  [the Sass website]: https://sass-lang.com/d/calc-interp
+* **Breaking change**: As a consequence of the change in calculation parsing
+  described above, calculation functions containing interpolation are now parsed
+  more strictly than before. However, _almost_ all interpolations that would
+  have produced valid CSS will continue to work. The only exception is
+  `#{$variable}%` which is not valid in Sass and is no longer valid in
+  calculations. Instead of this, either use `$variable` directly and ensure it
+  already has the `%` unit, or write `($variable * 1%)`.
 
 * **Potentially breaking bug fix**: The importer used to load a given file is no
   longer used to load absolute URLs that appear in that file. This was

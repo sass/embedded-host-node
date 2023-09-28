@@ -3,6 +3,15 @@
 We'd love to accept your patches and contributions to this project. There are
 just a few small guidelines you need to follow.
 
+* [Contributor License Agreement](#contributor-license-agreement)
+* [Code Reviews](#code-reviews)
+* [Large Language Models](#large-language-models)
+* [Release Process](#release-process)
+* [Keeping in Sync With Other Packages](#keeping-in-sync-with-other-packages)
+  * [Local Development](#local-development)
+  * [Continuous Integration](#continuous-integration)
+  * [Release](#release)
+
 ## Contributor License Agreement
 
 Contributions to this project must be accompanied by a Contributor License
@@ -15,12 +24,23 @@ You generally only need to submit a CLA once, so if you've already submitted one
 (even if it was for a different project), you probably don't need to do it
 again.
 
-## Code reviews
+## Code Reviews
 
 All submissions, including submissions by project members, require review. We
 use GitHub pull requests for this purpose. Consult
 [GitHub Help](https://help.github.com/articles/about-pull-requests/) for more
 information on using pull requests.
+
+## Large Language Models
+
+Do not submit any code or prose written or modified by large language models or
+"artificial intelligence" such as GitHub Copilot or ChatGPT to this project.
+These tools produce code that looks plausible, which means that not only is it
+likely to contain bugs those bugs are likely to be difficult to notice on
+review. In addition, because these models were trained indiscriminately and
+non-consensually on open-source code with a variety of licenses, it's not
+obvious that we have the moral or legal right to redistribute code they
+generate.
 
 ## Release process
 
@@ -36,7 +56,7 @@ such, manual commits should never:
 * Update the `package.json`'s `"compiler-version"` field to a non-`-dev` number.
   Changing it from non-`-dev` to dev when using a new feature is fine.
 
-# Keeping in Sync With Other Packages
+## Keeping in Sync With Other Packages
 
 The embedded host depends on several different components which come from
 different repositories:
@@ -51,7 +71,7 @@ different repositories:
 
 These dependencies are made available in different ways depending on context.
 
-## Local Development
+### Local Development
 
 When developing locally, you can download all of these dependencies by running
 `npm run init`. This provides the following options for `compiler` (for the
@@ -77,14 +97,14 @@ By default:
 * This uses the Dart Sass version from the latest revision on GitHub, unless the
   `--compiler-path` was passed in which case it uses that version of Dart Sass.
 
-## Continuous Integration
+### Continuous Integration
 
 CI tests also use `npm run init`, so they use the same defaults as local
 development. However, if the pull request description includes a link to a pull
 request for Dart Sass, the embedded protocol, or the JS API, this will check out
 that version and run tests against it instead.
 
-## Release
+### Release
 
 When this package is released to npm, it downloads the embedded protocol version
 that matches `protocol-version` in `package.json`. It downloads the latest JS

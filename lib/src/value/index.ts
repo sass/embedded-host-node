@@ -12,7 +12,7 @@ import {SassNumber} from './number';
 import {SassString} from './string';
 import {valueError} from '../utils';
 import {SassCalculation} from './calculations';
-import { SassMixin } from './mixin';
+import {SassMixin} from './mixin';
 
 /**
  * A SassScript value.

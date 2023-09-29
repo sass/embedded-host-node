@@ -9,14 +9,14 @@ import {Value} from './index';
 /** A first-class SassScript mixin. */
 export class SassMixin extends Value {
   /**
-   * If this mixin is defined in the compiler, this is the unique ID that the
-   * compiler uses to determine which mixin it refers to.
+   * This is the unique ID that the compiler uses to determine which mixin it
+   * refers to.
    *
    * This is marked as public so that the protofier can access it, but it's not
    * part of the package's public API and should not be accessed by user code.
    * It may be renamed or removed without warning in the future.
    */
-  readonly id: number | undefined;
+  readonly id: number;
 
   constructor(id: number) {
     super();
@@ -24,9 +24,7 @@ export class SassMixin extends Value {
   }
 
   equals(other: Value): boolean {
-    return this.id === undefined
-      ? other === this
-      : other instanceof SassMixin && other.id === this.id;
+    return other instanceof SassMixin && other.id === this.id;
   }
 
   hashCode(): number {

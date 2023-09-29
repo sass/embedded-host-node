@@ -24,7 +24,7 @@ import {
   CalculationOperation,
   CalculationOperator,
 } from './value/calculations';
-import { SassMixin } from './value/mixin';
+import {SassMixin} from './value/mixin';
 
 /**
  * A class that converts [Value] objects into protobufs.
@@ -329,7 +329,6 @@ export class Protofier {
 
       case 'compilerMixin':
         return new SassMixin(value.value.value.id);
-  
 
       case 'calculation':
         return this.deprotofyCalculation(value.value.value);

@@ -104,7 +104,7 @@ async function downloadRelease(options: {
   await fs.unlink(zippedAssetPath);
 }
 
-(async () => {
+void (async () => {
   try {
     const version = pkg['compiler-version'] as string;
     if (version.endsWith('-dev')) {

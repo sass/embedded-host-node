@@ -18,7 +18,7 @@ export function fetchRepo(options: {
   ref: string;
 }): void {
   const path = p.join(options.outPath, options.repo);
-  if (lstatSync(path).isSymbolicLink() && existsSync(p.join(path, '.git'))) {
+  if (existsSync(p.join(path, '.git')) && lstatSync(path).isSymbolicLink()) {
     throw (
       `${path} is a symlink to a git repo, not overwriting.\n` +
       `Run "rm ${path}" and try again.`

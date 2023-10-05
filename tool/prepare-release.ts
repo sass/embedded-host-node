@@ -8,7 +8,7 @@ import * as shell from 'shelljs';
 import * as pkg from '../package.json';
 import {getLanguageRepo} from './get-language-repo';
 
-(async () => {
+void (async () => {
   try {
     await sanityCheckBeforeRelease();
 

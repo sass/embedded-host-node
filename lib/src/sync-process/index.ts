@@ -141,7 +141,7 @@ export class SyncProcess {
   /** Closes down the worker thread and the stdin stream. */
   private close(): void {
     this.port.close();
-    this.worker.terminate();
+    void this.worker.terminate();
     this.stdin.destroy();
   }
 }

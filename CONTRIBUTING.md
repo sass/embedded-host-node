@@ -74,9 +74,9 @@ These dependencies are made available in different ways depending on context.
 ### Local Development
 
 When developing locally, you can download all of these dependencies by running
-`npm run init`. This provides the following options for `compiler` (for the
-embedded compiler), `protocol` (for the embedded protocol), and `api` (for the
-JS API):
+`npm install` and then `npm run init`. This provides the following options for
+`compiler` (for the embedded compiler), `protocol` (for the embedded protocol),
+and `api` (for the JS API):
 
 * `--<type>-path`: The local filesystem path of the package to use. This is
   useful when doing local development on both the host and its dependencies at
@@ -84,6 +84,9 @@ JS API):
 
 * `--<type>-ref`: A Git reference for the GitHub repository of the package to
   clone.
+
+If developing locally, you will need to specify both the compiler and language.
+For example: `npm run init -- --compiler-path=dart-sass --language-path=language`.
 
 By default:
 

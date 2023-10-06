@@ -36,7 +36,7 @@ const argv = yargs(process.argv.slice(2))
   })
   .parseSync();
 
-(async () => {
+void (async () => {
   try {
     const outPath = 'lib/src/vendor';
 

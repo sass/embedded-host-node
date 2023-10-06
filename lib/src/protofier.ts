@@ -24,6 +24,7 @@ import {
   CalculationOperation,
   CalculationOperator,
 } from './value/calculations';
+import {SassMixin} from './value/mixin';
 
 /**
  * A class that converts [Value] objects into protobufs.
@@ -119,6 +120,10 @@ export class Protofier {
         fn.signature = value.signature!;
         result.value = {case: 'hostFunction', value: fn};
       }
+    } else if (value instanceof SassMixin) {
+      const mixin = new proto.Value_CompilerMixin();
+      mixin.id = value.id;
+      result.value = {case: 'compilerMixin', value: mixin};
     } else if (value instanceof SassCalculation) {
       result.value = {
         case: 'calculation',
@@ -321,6 +326,9 @@ export class Protofier {
         throw utils.compilerError(
           'The compiler may not send Value.host_function.'
         );
+
+      case 'compilerMixin':
+        return new SassMixin(value.value.value.id);
 
       case 'calculation':
         return this.deprotofyCalculation(value.value.value);

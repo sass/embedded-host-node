@@ -12,6 +12,7 @@ export {sassFalse, sassTrue} from './src/value/boolean';
 export {SassColor} from './src/value/color';
 export {SassFunction} from './src/value/function';
 export {SassMap} from './src/value/map';
+export {SassMixin} from './src/value/mixin';
 export {SassNumber} from './src/value/number';
 export {SassString} from './src/value/string';
 export {Value} from './src/value';

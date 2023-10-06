@@ -8,7 +8,7 @@ import * as shell from 'shelljs';
 import * as utils from './utils';
 
 /**
- * Downlaods and builds the Embedded Dart Sass compiler.
+ * Downloads and builds the Embedded Dart Sass compiler.
  *
  * Can check out and build the source from a Git `ref` or build from the source
  * at `path`. By default, checks out the latest revision from GitHub.

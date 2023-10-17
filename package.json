@@ -12,8 +12,8 @@
       "types": "./dist/types/index.m.d.ts",
       "default": "./dist/lib/index.mjs"
     },
-    "types": "./dist/lib/index.d.ts",
-    "default": "./dist/types/index.js"
+    "types": "./dist/types/index.d.ts",
+    "default": "./dist/lib/index.js"
   },
   "main": "dist/lib/index.js",
   "types": "dist/types/index.d.ts",

@@ -3,202 +3,299 @@
 // https://opensource.org/licenses/MIT.
 
 import {Value} from './index';
+import {valueError} from '../utils';
+import {fuzzyAssertInRange, fuzzyEquals} from './utils';
+import {hash, List} from 'immutable';
 import {
-  fuzzyAssertInRange,
-  fuzzyEquals,
-  fuzzyRound,
-  positiveMod,
-} from './utils';
-import {hash} from 'immutable';
+  get,
+  getColor,
+  A98RGB,
+  ColorSpace,
+  HSL,
+  HWB,
+  LCH,
+  Lab,
+  OKLCH,
+  OKLab,
+  P3,
+  ProPhoto,
+  REC_2020,
+  XYZ_D50,
+  XYZ_D65,
+  sRGB,
+  sRGB_Linear,
+} from 'colorjs.io/fn';
+import type {PlainColorObject} from 'colorjs.io/types/src/color';
 
-interface RgbColor {
-  red: number;
-  green: number;
-  blue: number;
-  alpha?: number;
+// Register supported color spaces
+ColorSpace.register(A98RGB);
+ColorSpace.register(HSL);
+ColorSpace.register(HWB);
+ColorSpace.register(LCH);
+ColorSpace.register(Lab);
+ColorSpace.register(OKLCH);
+ColorSpace.register(OKLab);
+ColorSpace.register(P3);
+ColorSpace.register(ProPhoto);
+ColorSpace.register(REC_2020);
+ColorSpace.register(XYZ_D50);
+ColorSpace.register(XYZ_D65);
+ColorSpace.register(sRGB);
+ColorSpace.register(sRGB_Linear);
+
+/** The HSL color space name. */
+type ColorSpaceHsl = 'hsl';
+
+/** The HSL color space channel names. */
+type ChannelNameHsl = 'hue' | 'saturation' | 'lightness' | 'alpha';
+
+/** The HWB color space name. */
+type ColorSpaceHwb = 'hwb';
+
+/** The HWB color space channel names. */
+type ChannelNameHwb = 'hue' | 'whiteness' | 'blackness' | 'alpha';
+
+/** The Lab / Oklab color space names. */
+type ColorSpaceLab = 'lab' | 'oklab';
+
+/** The Lab / Oklab color space channel names. */
+type ChannelNameLab = 'lightness' | 'a' | 'b' | 'alpha';
+
+/** The LCH / Oklch color space names. */
+type ColorSpaceLch = 'lch' | 'oklch';
+
+/** The LCH / Oklch color space channel names. */
+type ChannelNameLch = 'lightness' | 'chroma' | 'hue' | 'alpha';
+
+/** Names of color spaces with RGB channels. */
+type ColorSpaceRgb =
+  | 'a98-rgb'
+  | 'display-p3'
+  | 'prophoto-rgb'
+  | 'rec2020'
+  | 'rgb'
+  | 'srgb'
+  | 'srgb-linear';
+
+/** RGB channel names. */
+type ChannelNameRgb = 'red' | 'green' | 'blue' | 'alpha';
+
+/** Names of color spaces with XYZ channels. */
+type ColorSpaceXyz = 'xyz' | 'xyz-d50' | 'xyz-d65';
+
+/** XYZ channel names. */
+type ChannelNameXyz = 'x' | 'y' | 'z' | 'alpha';
+
+/** All supported color space channel names. */
+type ChannelName =
+  | ChannelNameHsl
+  | ChannelNameHwb
+  | ChannelNameLab
+  | ChannelNameLch
+  | ChannelNameRgb
+  | ChannelNameXyz;
+
+/** All supported color space names. */
+export type KnownColorSpace =
+  | ColorSpaceHsl
+  | ColorSpaceHwb
+  | ColorSpaceLab
+  | ColorSpaceLch
+  | ColorSpaceRgb
+  | ColorSpaceXyz;
+
+type Channels = {
+  [key in ChannelName]?: number | null;
+};
+
+function getColorSpace(options: Channels) {
+  if (typeof options.red === 'number') {
+    return 'rgb';
+  }
+  if (typeof options.saturation === 'number') {
+    return 'hsl';
+  }
+  if (typeof options.whiteness === 'number') {
+    return 'hwb';
+  }
+  throw valueError('No color space found');
 }
 
-interface HslColor {
-  hue: number;
-  saturation: number;
-  lightness: number;
-  alpha?: number;
-}
-
-interface HwbColor {
-  hue: number;
-  whiteness: number;
-  blackness: number;
-  alpha?: number;
+function emitColor4ApiDeprecation(name: string) {
+  console.warn(`\`${name}\` is deprecated, use \`channel\` instead.`);
 }
 
 /** A SassScript color. */
 export class SassColor extends Value {
-  private redInternal?: number;
-  private greenInternal?: number;
-  private blueInternal?: number;
-  private hueInternal?: number;
-  private saturationInternal?: number;
-  private lightnessInternal?: number;
-  private readonly alphaInternal: number;
+  private color: PlainColorObject;
 
-  constructor(color: RgbColor);
-  constructor(color: HslColor);
-  constructor(color: HwbColor);
-  constructor(color: RgbColor | HslColor | HwbColor) {
+  constructor(options: Channels & {space?: KnownColorSpace}) {
     super();
 
-    if ('red' in color) {
-      this.redInternal = fuzzyAssertInRange(
-        Math.round(color.red),
-        0,
-        255,
-        'red'
-      );
-      this.greenInternal = fuzzyAssertInRange(
-        Math.round(color.green),
-        0,
-        255,
-        'green'
-      );
-      this.blueInternal = fuzzyAssertInRange(
-        Math.round(color.blue),
-        0,
-        255,
-        'blue'
-      );
-    } else if ('saturation' in color) {
-      this.hueInternal = positiveMod(color.hue, 360);
-      this.saturationInternal = fuzzyAssertInRange(
-        color.saturation,
-        0,
-        100,
-        'saturation'
-      );
-      this.lightnessInternal = fuzzyAssertInRange(
-        color.lightness,
-        0,
-        100,
-        'lightness'
-      );
-    } else {
-      // From https://www.w3.org/TR/css-color-4/#hwb-to-rgb
-      const scaledHue = positiveMod(color.hue, 360) / 360;
-      let scaledWhiteness =
-        fuzzyAssertInRange(color.whiteness, 0, 100, 'whiteness') / 100;
-      let scaledBlackness =
-        fuzzyAssertInRange(color.blackness, 0, 100, 'blackness') / 100;
-
-      const sum = scaledWhiteness + scaledBlackness;
-      if (sum > 1) {
-        scaledWhiteness /= sum;
-        scaledBlackness /= sum;
-      }
-
-      // Because HWB is (currently) used much less frequently than HSL or RGB, we
-      // don't cache its values because we expect the memory overhead of doing so
-      // to outweigh the cost of recalculating it on access. Instead, we eagerly
-      // convert it to RGB and then convert back if necessary.
-      this.redInternal = hwbToRgb(
-        scaledHue + 1 / 3,
-        scaledWhiteness,
-        scaledBlackness
-      );
-      this.greenInternal = hwbToRgb(
-        scaledHue,
-        scaledWhiteness,
-        scaledBlackness
-      );
-      this.blueInternal = hwbToRgb(
-        scaledHue - 1 / 3,
-        scaledWhiteness,
-        scaledBlackness
+    if (options.alpha === null && !options.space) {
+      console.warn(
+        'Passing `alpha: null` without setting `space` is deprecated.\n\nMore info: https://sass-lang.com/d/null-alpha'
       );
     }
 
-    this.alphaInternal =
-      color.alpha === undefined
+    const space = options.space ?? getColorSpace(options);
+    // TODO(jgerigmeyer) What to do about `null` alpha?
+    const alpha =
+      options.alpha === undefined || options.alpha === null
         ? 1
-        : fuzzyAssertInRange(color.alpha, 0, 1, 'alpha');
+        : fuzzyAssertInRange(options.alpha, 0, 1, 'alpha');
+
+    switch (space) {
+      // TODO(jgerigmeyer) Is "rgb" a valid space for colorjs.io?
+      case 'rgb':
+      case 'srgb':
+      case 'srgb-linear':
+      case 'display-p3':
+      case 'a98-rgb':
+      case 'prophoto-rgb':
+      case 'rec2020':
+        this.color = getColor({
+          spaceId: space,
+          // TODO(jgerigmeyer) What to do about `null` or `undefined` channels?
+          coords: [options.red ?? 0, options.green ?? 0, options.blue ?? 0],
+          alpha,
+        });
+        break;
+
+      case 'hsl':
+        this.color = getColor({
+          spaceId: space,
+          coords: [
+            options.hue ?? 0,
+            options.saturation ?? 0,
+            options.lightness ?? 0,
+          ],
+          alpha,
+        });
+        break;
+
+      case 'hwb':
+        this.color = getColor({
+          spaceId: space,
+          coords: [
+            options.hue ?? 0,
+            options.whiteness ?? 0,
+            options.blackness ?? 0,
+          ],
+          alpha,
+        });
+        break;
+
+      case 'lab':
+      case 'oklab':
+        this.color = getColor({
+          spaceId: space,
+          coords: [options.lightness ?? 0, options.a ?? 0, options.b ?? 0],
+          alpha,
+        });
+        break;
+
+      case 'lch':
+      case 'oklch':
+        this.color = getColor({
+          spaceId: space,
+          coords: [
+            options.lightness ?? 0,
+            options.chroma ?? 0,
+            options.hue ?? 0,
+          ],
+          alpha,
+        });
+        break;
+
+      case 'xyz':
+      case 'xyz-d65':
+      case 'xyz-d50':
+        this.color = getColor({
+          spaceId: space,
+          coords: [options.x ?? 0, options.y ?? 0, options.z ?? 0],
+          alpha,
+        });
+        break;
+    }
   }
 
   /** `this`'s red channel. */
   get red(): number {
-    if (this.redInternal === undefined) {
-      this.hslToRgb();
-    }
-    return this.redInternal!;
+    emitColor4ApiDeprecation('red');
+    return get(this.color, 'red');
   }
 
   /** `this`'s blue channel. */
   get blue(): number {
-    if (this.blueInternal === undefined) {
-      this.hslToRgb();
-    }
-    return this.blueInternal!;
+    emitColor4ApiDeprecation('blue');
+    return get(this.color, 'blue');
   }
 
   /** `this`'s green channel. */
   get green(): number {
-    if (this.greenInternal === undefined) {
-      this.hslToRgb();
-    }
-    return this.greenInternal!;
+    emitColor4ApiDeprecation('green');
+    return get(this.color, 'green');
   }
 
   /** `this`'s hue value. */
   get hue(): number {
-    if (this.hueInternal === undefined) {
-      this.rgbToHsl();
-    }
-    return this.hueInternal!;
+    emitColor4ApiDeprecation('hue');
+    return get(this.color, 'hue');
   }
 
   /** `this`'s saturation value. */
   get saturation(): number {
-    if (this.saturationInternal === undefined) {
-      this.rgbToHsl();
-    }
-    return this.saturationInternal!;
+    emitColor4ApiDeprecation('saturation');
+    return get(this.color, 'saturation');
   }
 
   /** `this`'s hue value. */
   get lightness(): number {
-    if (this.lightnessInternal === undefined) {
-      this.rgbToHsl();
-    }
-    return this.lightnessInternal!;
+    emitColor4ApiDeprecation('lightness');
+    return get(this.color, 'lightness');
   }
 
   /** `this`'s whiteness value. */
   get whiteness(): number {
-    // Because HWB is (currently) used much less frequently than HSL or RGB, we
-    // don't cache its values because we expect the memory overhead of doing so
-    // to outweigh the cost of recalculating it on access.
-    return (Math.min(this.red, this.green, this.blue) / 255) * 100;
+    emitColor4ApiDeprecation('whiteness');
+    return get(this.color, 'whiteness');
   }
 
   /** `this`'s blackness value. */
   get blackness(): number {
-    // Because HWB is (currently) used much less frequently than HSL or RGB, we
-    // don't cache its values because we expect the memory overhead of doing so
-    // to outweigh the cost of recalculating it on access.
-    return 100 - (Math.max(this.red, this.green, this.blue) / 255) * 100;
+    emitColor4ApiDeprecation('blackness');
+    return get(this.color, 'blackness');
   }
 
   /** `this`'s alpha channel. */
   get alpha(): number {
-    return this.alphaInternal;
+    return this.color.alpha;
   }
 
-  /**
-   * Whether `this` has already calculated the HSL components for the color.
+  /** `this`'s color space. */
+  get space(): string {
+    return this.color.space.id;
+  }
+
+  /** Whether `this` is in a legacy color space. */
+  get isLegacy(): boolean {
+    return ['rgb', 'hsl', 'hwb'].includes(this.color.space.id);
+  }
+
+  /** The values of this color's channels (excluding the alpha channel), or
+   * `null` for [missing] channels.
    *
-   * This is an internal property that's not an official part of Sass's JS API,
-   * and may be broken at any time.
+   * [missing]: https://www.w3.org/TR/css-color-4/#missing
    */
-  get hasCalculatedHsl(): boolean {
-    return !!this.hueInternal;
+  get channelsOrNull(): List<number | null> {
+    // TODO(jgerigmeyer) What to do about `null` channels?
+    return List(this.color.coords);
+  }
+
+  /** The values of this color's channels (excluding the alpha channel). */
+  get channels(): List<number> {
+    return List(this.color.coords);
   }
 
   assertColor(): SassColor {
@@ -208,54 +305,54 @@ export class SassColor extends Value {
   /**
    * Returns a copy of `this` with its channels changed to match `color`.
    */
-  change(color: Partial<RgbColor>): SassColor;
-  change(color: Partial<HslColor>): SassColor;
-  change(color: Partial<HwbColor>): SassColor;
-  change(
-    color: Partial<RgbColor> | Partial<HslColor> | Partial<HwbColor>
-  ): SassColor {
-    if ('whiteness' in color || 'blackness' in color) {
-      return new SassColor({
-        hue: color.hue ?? this.hue,
-        whiteness: color.whiteness ?? this.whiteness,
-        blackness: color.blackness ?? this.blackness,
-        alpha: color.alpha ?? this.alpha,
-      });
-    } else if (
-      'hue' in color ||
-      'saturation' in color ||
-      'lightness' in color
-    ) {
-      // Tell TypeScript this isn't a Partial<HwbColor>.
-      const hsl = color as Partial<HslColor>;
-      return new SassColor({
-        hue: hsl.hue ?? this.hue,
-        saturation: hsl.saturation ?? this.saturation,
-        lightness: hsl.lightness ?? this.lightness,
-        alpha: hsl.alpha ?? this.alpha,
-      });
-    } else if (
-      'red' in color ||
-      'green' in color ||
-      'blue' in color ||
-      this.redInternal
-    ) {
-      const rgb = color as Partial<RgbColor>;
-      return new SassColor({
-        red: rgb.red ?? this.red,
-        green: rgb.green ?? this.green,
-        blue: rgb.blue ?? this.blue,
-        alpha: rgb.alpha ?? this.alpha,
-      });
-    } else {
-      return new SassColor({
-        hue: this.hue,
-        saturation: this.saturation,
-        lightness: this.lightness,
-        alpha: color.alpha ?? this.alpha,
-      });
-    }
-  }
+  // change(color: Partial<RgbColor>): SassColor;
+  // change(color: Partial<HslColor>): SassColor;
+  // change(color: Partial<HwbColor>): SassColor;
+  // change(
+  //   color: Partial<RgbColor> | Partial<HslColor> | Partial<HwbColor>
+  // ): SassColor {
+  //   if ('whiteness' in color || 'blackness' in color) {
+  //     return new SassColor({
+  //       hue: color.hue ?? this.hue,
+  //       whiteness: color.whiteness ?? this.whiteness,
+  //       blackness: color.blackness ?? this.blackness,
+  //       alpha: color.alpha ?? this.alpha,
+  //     });
+  //   } else if (
+  //     'hue' in color ||
+  //     'saturation' in color ||
+  //     'lightness' in color
+  //   ) {
+  //     // Tell TypeScript this isn't a Partial<HwbColor>.
+  //     const hsl = color as Partial<HslColor>;
+  //     return new SassColor({
+  //       hue: hsl.hue ?? this.hue,
+  //       saturation: hsl.saturation ?? this.saturation,
+  //       lightness: hsl.lightness ?? this.lightness,
+  //       alpha: hsl.alpha ?? this.alpha,
+  //     });
+  //   } else if (
+  //     'red' in color ||
+  //     'green' in color ||
+  //     'blue' in color ||
+  //     this.redInternal
+  //   ) {
+  //     const rgb = color as Partial<RgbColor>;
+  //     return new SassColor({
+  //       red: rgb.red ?? this.red,
+  //       green: rgb.green ?? this.green,
+  //       blue: rgb.blue ?? this.blue,
+  //       alpha: rgb.alpha ?? this.alpha,
+  //     });
+  //   } else {
+  //     return new SassColor({
+  //       hue: this.hue,
+  //       saturation: this.saturation,
+  //       lightness: this.lightness,
+  //       alpha: color.alpha ?? this.alpha,
+  //     });
+  //   }
+  // }
 
   equals(other: Value): boolean {
     return (
@@ -277,97 +374,5 @@ export class SassColor extends Value {
     string += `${this.red}, ${this.green}, ${this.blue}`;
     string += isOpaque ? ')' : `, ${this.alpha})`;
     return string;
-  }
-
-  // Computes `this`'s `hue`, `saturation`, and `lightness` values based on
-  // `red`, `green`, and `blue`.
-  //
-  // Algorithm from https://en.wikipedia.org/wiki/HSL_and_HSV#RGB_to_HSL_and_HSV
-  private rgbToHsl(): void {
-    const scaledRed = this.red / 255;
-    const scaledGreen = this.green / 255;
-    const scaledBlue = this.blue / 255;
-
-    const max = Math.max(scaledRed, scaledGreen, scaledBlue);
-    const min = Math.min(scaledRed, scaledGreen, scaledBlue);
-    const delta = max - min;
-
-    if (max === min) {
-      this.hueInternal = 0;
-    } else if (max === scaledRed) {
-      this.hueInternal = positiveMod(
-        (60 * (scaledGreen - scaledBlue)) / delta,
-        360
-      );
-    } else if (max === scaledGreen) {
-      this.hueInternal = positiveMod(
-        120 + (60 * (scaledBlue - scaledRed)) / delta,
-        360
-      );
-    } else if (max === scaledBlue) {
-      this.hueInternal = positiveMod(
-        240 + (60 * (scaledRed - scaledGreen)) / delta,
-        360
-      );
-    }
-
-    this.lightnessInternal = 50 * (max + min);
-
-    if (max === min) {
-      this.saturationInternal = 0;
-    } else if (this.lightnessInternal < 50) {
-      this.saturationInternal = (100 * delta) / (max + min);
-    } else {
-      this.saturationInternal = (100 * delta) / (2 - max - min);
-    }
-  }
-
-  // Computes `this`'s red`, `green`, and `blue` channels based on `hue`,
-  // `saturation`, and `value`.
-  //
-  // Algorithm from the CSS3 spec: https://www.w3.org/TR/css3-color/#hsl-color.
-  private hslToRgb(): void {
-    const scaledHue = this.hue / 360;
-    const scaledSaturation = this.saturation / 100;
-    const scaledLightness = this.lightness / 100;
-
-    const m2 =
-      scaledLightness <= 0.5
-        ? scaledLightness * (scaledSaturation + 1)
-        : scaledLightness +
-          scaledSaturation -
-          scaledLightness * scaledSaturation;
-    const m1 = scaledLightness * 2 - m2;
-
-    this.redInternal = fuzzyRound(hueToRgb(m1, m2, scaledHue + 1 / 3) * 255);
-    this.greenInternal = fuzzyRound(hueToRgb(m1, m2, scaledHue) * 255);
-    this.blueInternal = fuzzyRound(hueToRgb(m1, m2, scaledHue - 1 / 3) * 255);
-  }
-}
-
-// A helper for converting HWB colors to RGB.
-function hwbToRgb(
-  hue: number,
-  scaledWhiteness: number,
-  scaledBlackness: number
-) {
-  const factor = 1 - scaledWhiteness - scaledBlackness;
-  const channel = hueToRgb(0, 1, hue) * factor + scaledWhiteness;
-  return fuzzyRound(channel * 255);
-}
-
-// An algorithm from the CSS3 spec: http://www.w3.org/TR/css3-color/#hsl-color.
-function hueToRgb(m1: number, m2: number, hue: number): number {
-  if (hue < 0) hue += 1;
-  if (hue > 1) hue -= 1;
-
-  if (hue < 1 / 6) {
-    return m1 + (m2 - m1) * hue * 6;
-  } else if (hue < 1 / 2) {
-    return m2;
-  } else if (hue < 2 / 3) {
-    return m1 + (m2 - m1) * (2 / 3 - hue) * 6;
-  } else {
-    return m1;
   }
 }

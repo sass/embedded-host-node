@@ -47,6 +47,7 @@
   "dependencies": {
     "@bufbuild/protobuf": "^1.0.0",
     "buffer-builder": "^0.2.0",
+    "colorjs.io": "^0.4.5",
     "immutable": "^4.0.0",
     "rxjs": "^7.4.0",
     "supports-color": "^8.1.1",

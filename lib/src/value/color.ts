@@ -354,10 +354,7 @@ export class SassColor extends Value {
 
   /** Whether `this` is in a legacy color space. */
   get isLegacy(): boolean {
-    return (
-      (this.space === 'srgb' && this.format === 'rgb') ||
-      ['hsl', 'hwb'].includes(this.space)
-    );
+    return ['rgb', 'hsl', 'hwb'].includes(this.space);
   }
 
   /** The values of this color's channels (excluding the alpha channel), or

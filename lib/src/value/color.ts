@@ -7,10 +7,14 @@ import {valueError} from '../utils';
 import {fuzzyAssertInRange, fuzzyEquals} from './utils';
 import {hash, List} from 'immutable';
 import {
+  // Functions
   get,
   getColor,
-  A98RGB,
+  to,
+  // Color space registry
   ColorSpace,
+  // Color spaces
+  A98RGB,
   HSL,
   HWB,
   LCH,
@@ -128,6 +132,7 @@ function emitColor4ApiDeprecation(name: string) {
 /** A SassScript color. */
 export class SassColor extends Value {
   private color: PlainColorObject;
+  private format: 'rgb' | null = null;
 
   constructor(options: Channels & {space?: KnownColorSpace}) {
     super();
@@ -138,17 +143,43 @@ export class SassColor extends Value {
       );
     }
 
-    const space = options.space ?? getColorSpace(options);
-    // TODO(jgerigmeyer) What to do about `null` alpha?
+    let space = options.space ?? getColorSpace(options);
+    if (space === 'rgb') {
+      space = 'srgb';
+      this.format = 'rgb';
+    }
     const alpha =
-      options.alpha === undefined || options.alpha === null
+      options.alpha === null
+        ? NaN
+        : options.alpha === undefined
         ? 1
         : fuzzyAssertInRange(options.alpha, 0, 1, 'alpha');
 
     switch (space) {
-      // TODO(jgerigmeyer) Is "rgb" a valid space for colorjs.io?
-      case 'rgb':
       case 'srgb':
+        if (this.format === 'rgb') {
+          // Convert from 0-255 to 0-1
+          this.color = getColor({
+            spaceId: space,
+            coords: [
+              (options.red ?? NaN) / 255,
+              (options.green ?? NaN) / 255,
+              (options.blue ?? NaN) / 255,
+            ],
+            alpha,
+          });
+        } else {
+          this.color = getColor({
+            spaceId: space,
+            coords: [
+              options.red ?? NaN,
+              options.green ?? NaN,
+              options.blue ?? NaN,
+            ],
+            alpha,
+          });
+        }
+        break;
       case 'srgb-linear':
       case 'display-p3':
       case 'a98-rgb':
@@ -156,8 +187,11 @@ export class SassColor extends Value {
       case 'rec2020':
         this.color = getColor({
           spaceId: space,
-          // TODO(jgerigmeyer) What to do about `null` or `undefined` channels?
-          coords: [options.red ?? 0, options.green ?? 0, options.blue ?? 0],
+          coords: [
+            options.red ?? NaN,
+            options.green ?? NaN,
+            options.blue ?? NaN,
+          ],
           alpha,
         });
         break;
@@ -166,9 +200,9 @@ export class SassColor extends Value {
         this.color = getColor({
           spaceId: space,
           coords: [
-            options.hue ?? 0,
-            options.saturation ?? 0,
-            options.lightness ?? 0,
+            options.hue ?? NaN,
+            options.saturation ?? NaN,
+            options.lightness ?? NaN,
           ],
           alpha,
         });
@@ -178,9 +212,9 @@ export class SassColor extends Value {
         this.color = getColor({
           spaceId: space,
           coords: [
-            options.hue ?? 0,
-            options.whiteness ?? 0,
-            options.blackness ?? 0,
+            options.hue ?? NaN,
+            options.whiteness ?? NaN,
+            options.blackness ?? NaN,
           ],
           alpha,
         });
@@ -190,7 +224,11 @@ export class SassColor extends Value {
       case 'oklab':
         this.color = getColor({
           spaceId: space,
-          coords: [options.lightness ?? 0, options.a ?? 0, options.b ?? 0],
+          coords: [
+            options.lightness ?? NaN,
+            options.a ?? NaN,
+            options.b ?? NaN,
+          ],
           alpha,
         });
         break;
@@ -200,9 +238,9 @@ export class SassColor extends Value {
         this.color = getColor({
           spaceId: space,
           coords: [
-            options.lightness ?? 0,
-            options.chroma ?? 0,
-            options.hue ?? 0,
+            options.lightness ?? NaN,
+            options.chroma ?? NaN,
+            options.hue ?? NaN,
           ],
           alpha,
         });
@@ -213,7 +251,7 @@ export class SassColor extends Value {
       case 'xyz-d50':
         this.color = getColor({
           spaceId: space,
-          coords: [options.x ?? 0, options.y ?? 0, options.z ?? 0],
+          coords: [options.x ?? NaN, options.y ?? NaN, options.z ?? NaN],
           alpha,
         });
         break;
@@ -223,49 +261,81 @@ export class SassColor extends Value {
   /** `this`'s red channel. */
   get red(): number {
     emitColor4ApiDeprecation('red');
-    return get(this.color, 'red');
+    try {
+      return get(this.color, 'red');
+    } catch (error) {
+      return get(to(this.color, 'srgb'), 'red');
+    }
   }
 
   /** `this`'s blue channel. */
   get blue(): number {
     emitColor4ApiDeprecation('blue');
-    return get(this.color, 'blue');
+    try {
+      return get(this.color, 'blue');
+    } catch (error) {
+      return get(to(this.color, 'srgb'), 'blue');
+    }
   }
 
   /** `this`'s green channel. */
   get green(): number {
     emitColor4ApiDeprecation('green');
-    return get(this.color, 'green');
+    try {
+      return get(this.color, 'green');
+    } catch (error) {
+      return get(to(this.color, 'srgb'), 'green');
+    }
   }
 
   /** `this`'s hue value. */
   get hue(): number {
     emitColor4ApiDeprecation('hue');
-    return get(this.color, 'hue');
+    try {
+      return get(this.color, 'hue');
+    } catch (error) {
+      return get(to(this.color, 'hsl'), 'hue');
+    }
   }
 
   /** `this`'s saturation value. */
   get saturation(): number {
     emitColor4ApiDeprecation('saturation');
-    return get(this.color, 'saturation');
+    try {
+      return get(this.color, 'saturation');
+    } catch (error) {
+      return get(to(this.color, 'hsl'), 'saturation');
+    }
   }
 
   /** `this`'s hue value. */
   get lightness(): number {
     emitColor4ApiDeprecation('lightness');
-    return get(this.color, 'lightness');
+    try {
+      return get(this.color, 'lightness');
+    } catch (error) {
+      return get(to(this.color, 'hsl'), 'lightness');
+    }
   }
 
   /** `this`'s whiteness value. */
   get whiteness(): number {
     emitColor4ApiDeprecation('whiteness');
-    return get(this.color, 'whiteness');
+    try {
+      return get(this.color, 'whiteness');
+    } catch (error) {
+      return get(to(this.color, 'hwb'), 'whiteness');
+    }
   }
 
   /** `this`'s blackness value. */
   get blackness(): number {
     emitColor4ApiDeprecation('blackness');
-    return get(this.color, 'blackness');
+    try {
+      return get(this.color, 'blackness');
+    } catch (error) {
+      return get(to(this.color, 'hwb'), 'blackness');
+    }
   }
 
   /** `this`'s alpha channel. */
@@ -275,12 +345,19 @@ export class SassColor extends Value {
 
   /** `this`'s color space. */
   get space(): string {
-    return this.color.space.id;
+    const _space = this.color.space.id;
+    if (_space === 'srgb' && this.format === 'rgb') {
+      return 'rgb';
+    }
+    return _space;
   }
 
   /** Whether `this` is in a legacy color space. */
   get isLegacy(): boolean {
-    return ['rgb', 'hsl', 'hwb'].includes(this.color.space.id);
+    return (
+      (this.space === 'srgb' && this.format === 'rgb') ||
+      ['hsl', 'hwb'].includes(this.space)
+    );
   }
 
   /** The values of this color's channels (excluding the alpha channel), or
@@ -289,8 +366,7 @@ export class SassColor extends Value {
    * [missing]: https://www.w3.org/TR/css-color-4/#missing
    */
   get channelsOrNull(): List<number | null> {
-    // TODO(jgerigmeyer) What to do about `null` channels?
-    return List(this.color.coords);
+    return List(this.color.coords.map(c => (Number.isNaN(c) ? null : c)));
   }
 
   /** The values of this color's channels (excluding the alpha channel). */

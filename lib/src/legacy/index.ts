@@ -31,6 +31,8 @@ import {
   LegacyStringOptions,
   Options,
   StringOptions,
+  Importer,
+  FileImporter,
 } from '../vendor/sass';
 import {wrapFunction} from './value/wrap';
 import {endOfLoadProtocol, LegacyImporterWrapper} from './importer';
@@ -185,7 +187,11 @@ function convertStringOptions<sync extends 'sync' | 'async'>(
         ? pathToLegacyFileUrl(options.file)
         : pathToFileURL(options.file)
       : new URL(legacyImporterProtocol),
-    importer: modernOptions.importers ? modernOptions.importers[0] : undefined,
+    // TODO(jamesnw) Figure out where to switch out NodePackageImporter, remove
+    // this hack
+    importer: modernOptions.importers
+      ? (modernOptions.importers[0] as Importer<sync> | FileImporter<sync>)
+      : undefined,
     syntax: options.indentedSyntax ? 'indented' : 'scss',
   };
 }

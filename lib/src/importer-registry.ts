@@ -7,9 +7,18 @@ import {URL} from 'url';
 import {inspect} from 'util';
 
 import * as utils from './utils';
-import {FileImporter, Importer, Options} from './vendor/sass';
+import {
+  FileImporter,
+  Importer,
+  NodePackageImporter,
+  Options,
+} from './vendor/sass';
 import * as proto from './vendor/embedded_sass_pb';
 import {catchOr, thenOr, PromiseOr} from './utils';
+
+export const nodePackageImporter: NodePackageImporter = {
+  _NodePackageImporterBrand: '',
+};
 
 /**
  * A registry of importers defined in the host that can be invoked by the
@@ -30,6 +39,7 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
 
   constructor(options?: Options<sync>) {
     this.importers = (options?.importers ?? [])
+      .map(importer => this.replaceNodePackageImporter(importer))
       .map(importer => this.register(importer))
       .concat(
         (options?.loadPaths ?? []).map(
@@ -187,5 +197,27 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
           result: {case: 'error', value: `${error}`},
         })
     );
+  }
+
+  replaceNodePackageImporter(
+    importer: Importer<sync> | FileImporter<sync> | NodePackageImporter
+  ): Importer<sync> | FileImporter<sync> {
+    // type narrowing function
+    function isNodePackageImporter(
+      importer: Importer<sync> | FileImporter<sync> | NodePackageImporter
+    ): importer is NodePackageImporter {
+      return (
+        (importer as NodePackageImporter)._NodePackageImporterBrand !==
+        undefined
+      );
+    }
+    if (isNodePackageImporter(importer)) {
+      if (importer === nodePackageImporter) {
+        throw 'Exact match';
+      }
+      throw 'Incorrect Node Package Importer used';
+    } else {
+      return importer;
+    }
   }
 }

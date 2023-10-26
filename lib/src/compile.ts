@@ -24,6 +24,8 @@ import {
   legacyImporterProtocol,
 } from './legacy/utils';
 
+export {nodePackageImporter} from './importer-registry';
+
 /// Allow the legacy API to pass in an option signaling to the modern API that
 /// it's being run in legacy mode.
 ///

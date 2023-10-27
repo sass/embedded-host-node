@@ -39,7 +39,6 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
 
   constructor(options?: Options<sync>) {
     this.importers = (options?.importers ?? [])
-      .map(importer => this.replaceNodePackageImporter(importer))
       .map(importer => this.register(importer))
       .concat(
         (options?.loadPaths ?? []).map(
@@ -51,12 +50,37 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
       );
   }
 
+  // Type predicate for NodePackageImporter
+  isNodePackageImporter(
+    importer: Importer<sync> | FileImporter<sync> | NodePackageImporter
+  ): importer is NodePackageImporter {
+    return (
+      (importer as NodePackageImporter)._NodePackageImporterBrand !== undefined
+    );
+  }
+
   /** Converts an importer to a proto without adding it to `this.importers`. */
   register(
-    importer: Importer<sync> | FileImporter<sync>
+    importer: Importer<sync> | FileImporter<sync> | NodePackageImporter
   ): proto.InboundMessage_CompileRequest_Importer {
     const message = new proto.InboundMessage_CompileRequest_Importer();
-    if ('canonicalize' in importer) {
+    if (this.isNodePackageImporter(importer)) {
+      if (importer !== nodePackageImporter) {
+        throw 'Incorrect Node Package Importer used';
+      }
+      const importerMessage = new proto.NodePackageImporter();
+      const entryPointURL = require.main?.filename;
+      if (!entryPointURL) {
+        throw new Error(
+          'Node Package Importer requires access to a filesystem.'
+        );
+      }
+      importerMessage.entryPointUrl = entryPointURL;
+      message.importer = {
+        case: 'nodePackageImporter',
+        value: importerMessage,
+      };
+    } else if ('canonicalize' in importer) {
       if ('findFileUrl' in importer) {
         throw new Error(
           'Importer may not contain both canonicalize() and findFileUrl(): ' +
@@ -197,27 +221,5 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
           result: {case: 'error', value: `${error}`},
         })
     );
-  }
-
-  replaceNodePackageImporter(
-    importer: Importer<sync> | FileImporter<sync> | NodePackageImporter
-  ): Importer<sync> | FileImporter<sync> {
-    // type narrowing function
-    function isNodePackageImporter(
-      importer: Importer<sync> | FileImporter<sync> | NodePackageImporter
-    ): importer is NodePackageImporter {
-      return (
-        (importer as NodePackageImporter)._NodePackageImporterBrand !==
-        undefined
-      );
-    }
-    if (isNodePackageImporter(importer)) {
-      if (importer === nodePackageImporter) {
-        throw 'Exact match';
-      }
-      throw 'Incorrect Node Package Importer used';
-    } else {
-      return importer;
-    }
   }
 }

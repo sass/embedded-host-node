@@ -1,8 +1,8 @@
 {
   "name": "sass-embedded",
-  "version": "1.69.4",
+  "version": "1.69.5",
   "protocol-version": "3.0.0-dev",
-  "compiler-version": "1.69.4",
+  "compiler-version": "1.69.5",
   "description": "Node.js library that communicates with Embedded Dart Sass using the Embedded Sass protocol",
   "repository": "sass/embedded-host-node",
   "author": "Google Inc.",
@@ -35,14 +35,14 @@
     "test": "jest"
   },
   "optionalDependencies": {
-    "sass-embedded-darwin-arm64": "1.69.4",
-    "sass-embedded-darwin-x64": "1.69.4",
-    "sass-embedded-linux-arm": "1.69.4",
-    "sass-embedded-linux-arm64": "1.69.4",
-    "sass-embedded-linux-ia32": "1.69.4",
-    "sass-embedded-linux-x64": "1.69.4",
-    "sass-embedded-win32-ia32": "1.69.4",
-    "sass-embedded-win32-x64": "1.69.4"
+    "sass-embedded-darwin-arm64": "1.69.5",
+    "sass-embedded-darwin-x64": "1.69.5",
+    "sass-embedded-linux-arm": "1.69.5",
+    "sass-embedded-linux-arm64": "1.69.5",
+    "sass-embedded-linux-ia32": "1.69.5",
+    "sass-embedded-linux-x64": "1.69.5",
+    "sass-embedded-win32-ia32": "1.69.5",
+    "sass-embedded-win32-x64": "1.69.5"
   },
   "dependencies": {
     "@bufbuild/protobuf": "^1.0.0",

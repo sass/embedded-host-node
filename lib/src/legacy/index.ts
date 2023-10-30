@@ -5,6 +5,7 @@
 import * as fs from 'fs';
 import * as p from 'path';
 import {pathToFileURL, URL} from 'url';
+import {nodePackageImporter} from '../importer-registry';
 
 import {Exception} from '../exception';
 import {
@@ -142,21 +143,28 @@ function convertOptions<sync extends 'sync' | 'async'>(
     functions[signature.trimLeft()] = wrapFunction(self, callback, sync);
   }
 
-  const importers =
+  let importers;
+  if (
     options.importer &&
     (!(options.importer instanceof Array) || options.importer.length > 0)
-      ? [
-          new LegacyImporterWrapper(
-            self,
-            options.importer instanceof Array
-              ? options.importer
-              : [options.importer],
-            options.includePaths ?? [],
-            options.file ?? 'stdin',
-            sync
-          ),
-        ]
-      : undefined;
+  ) {
+    importers = [
+      new LegacyImporterWrapper(
+        self,
+        options.importer instanceof Array
+          ? options.importer
+          : [options.importer],
+        options.includePaths ?? [],
+        options.file ?? 'stdin',
+        sync
+      ),
+    ];
+  }
+  if (options.pkgImporter === 'node') {
+    importers = importers
+      ? [nodePackageImporter, ...importers]
+      : [nodePackageImporter];
+  }
 
   return {
     functions,
@@ -180,6 +188,12 @@ function convertStringOptions<sync extends 'sync' | 'async'>(
 ): StringOptions<sync> & {legacy: true} {
   const modernOptions = convertOptions(options, sync);
 
+  // Find the first non-nodePackageImporter to pass as legacy `importer` option.
+  // nodePackageImporter will be passed in `modrenOptions.importers`.
+  const importer = modernOptions.importers?.find(
+    _importer => _importer !== nodePackageImporter
+  ) as Importer<sync> | FileImporter<sync>;
+
   return {
     ...modernOptions,
     url: options.file
@@ -187,11 +201,7 @@ function convertStringOptions<sync extends 'sync' | 'async'>(
         ? pathToLegacyFileUrl(options.file)
         : pathToFileURL(options.file)
       : new URL(legacyImporterProtocol),
-    // TODO(jamesnw) Figure out where to switch out NodePackageImporter, remove
-    // this hack
-    importer: modernOptions.importers
-      ? (modernOptions.importers[0] as Importer<sync> | FileImporter<sync>)
-      : undefined,
+    importer,
     syntax: options.indentedSyntax ? 'indented' : 'scss',
   };
 }

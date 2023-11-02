@@ -6,46 +6,8 @@ import {Value} from './index';
 import {valueError} from '../utils';
 import {fuzzyAssertInRange, fuzzyEquals} from './utils';
 import {hash, List} from 'immutable';
-import {
-  // Functions
-  get,
-  getColor,
-  to,
-  // Color space registry
-  ColorSpace,
-  // Color spaces
-  A98RGB,
-  HSL,
-  HWB,
-  LCH,
-  Lab,
-  OKLCH,
-  OKLab,
-  P3,
-  ProPhoto,
-  REC_2020,
-  XYZ_D50,
-  XYZ_D65,
-  sRGB,
-  sRGB_Linear,
-} from 'colorjs.io/fn';
-import type {PlainColorObject} from 'colorjs.io/types/src/color';
-
-// Register supported color spaces
-ColorSpace.register(A98RGB);
-ColorSpace.register(HSL);
-ColorSpace.register(HWB);
-ColorSpace.register(LCH);
-ColorSpace.register(Lab);
-ColorSpace.register(OKLCH);
-ColorSpace.register(OKLab);
-ColorSpace.register(P3);
-ColorSpace.register(ProPhoto);
-ColorSpace.register(REC_2020);
-ColorSpace.register(XYZ_D50);
-ColorSpace.register(XYZ_D65);
-ColorSpace.register(sRGB);
-ColorSpace.register(sRGB_Linear);
+import Color from 'colorjs.io';
+import type ColorType from 'colorjs.io';
 
 /** The HSL color space name. */
 type ColorSpaceHsl = 'hsl';
@@ -129,37 +91,48 @@ function emitColor4ApiDeprecation(name: string) {
   console.warn(`\`${name}\` is deprecated, use \`channel\` instead.`);
 }
 
+function NaNtoNull(val: number) {
+  return Number.isNaN(val) ? null : val;
+}
+
+function NaNtoZero(val: number) {
+  return Number.isNaN(val) ? 0 : val;
+}
+
 /** A SassScript color. */
 export class SassColor extends Value {
-  private color: PlainColorObject;
-  private format: 'rgb' | null = null;
+  private color: ColorType;
+  private isRgb = false;
 
   constructor(options: Channels & {space?: KnownColorSpace}) {
     super();
 
     if (options.alpha === null && !options.space) {
       console.warn(
-        'Passing `alpha: null` without setting `space` is deprecated.\n\nMore info: https://sass-lang.com/d/null-alpha'
+        'Passing `alpha: null` without setting `space` is deprecated.\n\n' +
+          'More info: https://sass-lang.com/d/null-alpha'
       );
     }
 
     let space = options.space ?? getColorSpace(options);
     if (space === 'rgb') {
       space = 'srgb';
-      this.format = 'rgb';
+      this.isRgb = true;
     }
-    const alpha =
-      options.alpha === null
-        ? NaN
-        : options.alpha === undefined
-        ? 1
-        : fuzzyAssertInRange(options.alpha, 0, 1, 'alpha');
+    let alpha;
+    if (options.alpha === null) {
+      alpha = NaN;
+    } else if (options.alpha === undefined) {
+      alpha = 1;
+    } else {
+      alpha = fuzzyAssertInRange(options.alpha, 0, 1, 'alpha');
+    }
 
     switch (space) {
       case 'srgb':
-        if (this.format === 'rgb') {
+        if (this.isRgb) {
           // Convert from 0-255 to 0-1
-          this.color = getColor({
+          this.color = new Color({
             spaceId: space,
             coords: [
               (options.red ?? NaN) / 255,
@@ -169,7 +142,7 @@ export class SassColor extends Value {
             alpha,
           });
         } else {
-          this.color = getColor({
+          this.color = new Color({
             spaceId: space,
             coords: [
               options.red ?? NaN,
@@ -185,7 +158,7 @@ export class SassColor extends Value {
       case 'a98-rgb':
       case 'prophoto-rgb':
       case 'rec2020':
-        this.color = getColor({
+        this.color = new Color({
           spaceId: space,
           coords: [
             options.red ?? NaN,
@@ -197,7 +170,7 @@ export class SassColor extends Value {
         break;
 
       case 'hsl':
-        this.color = getColor({
+        this.color = new Color({
           spaceId: space,
           coords: [
             options.hue ?? NaN,
@@ -209,7 +182,7 @@ export class SassColor extends Value {
         break;
 
       case 'hwb':
-        this.color = getColor({
+        this.color = new Color({
           spaceId: space,
           coords: [
             options.hue ?? NaN,
@@ -222,7 +195,7 @@ export class SassColor extends Value {
 
       case 'lab':
       case 'oklab':
-        this.color = getColor({
+        this.color = new Color({
           spaceId: space,
           coords: [
             options.lightness ?? NaN,
@@ -235,7 +208,7 @@ export class SassColor extends Value {
 
       case 'lch':
       case 'oklch':
-        this.color = getColor({
+        this.color = new Color({
           spaceId: space,
           coords: [
             options.lightness ?? NaN,
@@ -249,7 +222,7 @@ export class SassColor extends Value {
       case 'xyz':
       case 'xyz-d65':
       case 'xyz-d50':
-        this.color = getColor({
+        this.color = new Color({
           spaceId: space,
           coords: [options.x ?? NaN, options.y ?? NaN, options.z ?? NaN],
           alpha,
@@ -261,92 +234,60 @@ export class SassColor extends Value {
   /** `this`'s red channel. */
   get red(): number {
     emitColor4ApiDeprecation('red');
-    try {
-      return get(this.color, 'red');
-    } catch (error) {
-      return get(to(this.color, 'srgb'), 'red');
-    }
+    return NaNtoZero(this.color.srgb.red * 255);
   }
 
   /** `this`'s blue channel. */
   get blue(): number {
     emitColor4ApiDeprecation('blue');
-    try {
-      return get(this.color, 'blue');
-    } catch (error) {
-      return get(to(this.color, 'srgb'), 'blue');
-    }
+    return NaNtoZero(this.color.srgb.blue * 255);
   }
 
   /** `this`'s green channel. */
   get green(): number {
     emitColor4ApiDeprecation('green');
-    try {
-      return get(this.color, 'green');
-    } catch (error) {
-      return get(to(this.color, 'srgb'), 'green');
-    }
+    return NaNtoZero(this.color.srgb.green * 255);
   }
 
   /** `this`'s hue value. */
   get hue(): number {
     emitColor4ApiDeprecation('hue');
-    try {
-      return get(this.color, 'hue');
-    } catch (error) {
-      return get(to(this.color, 'hsl'), 'hue');
-    }
+    return NaNtoZero(this.color.hsl.hue);
   }
 
   /** `this`'s saturation value. */
   get saturation(): number {
     emitColor4ApiDeprecation('saturation');
-    try {
-      return get(this.color, 'saturation');
-    } catch (error) {
-      return get(to(this.color, 'hsl'), 'saturation');
-    }
+    return NaNtoZero(this.color.hsl.saturation);
   }
 
-  /** `this`'s hue value. */
+  /** `this`'s lightness value. */
   get lightness(): number {
     emitColor4ApiDeprecation('lightness');
-    try {
-      return get(this.color, 'lightness');
-    } catch (error) {
-      return get(to(this.color, 'hsl'), 'lightness');
-    }
+    return NaNtoZero(this.color.hsl.lightness);
   }
 
   /** `this`'s whiteness value. */
   get whiteness(): number {
     emitColor4ApiDeprecation('whiteness');
-    try {
-      return get(this.color, 'whiteness');
-    } catch (error) {
-      return get(to(this.color, 'hwb'), 'whiteness');
-    }
+    return NaNtoZero(this.color.hwb.whiteness);
   }
 
   /** `this`'s blackness value. */
   get blackness(): number {
     emitColor4ApiDeprecation('blackness');
-    try {
-      return get(this.color, 'blackness');
-    } catch (error) {
-      return get(to(this.color, 'hwb'), 'blackness');
-    }
+    return NaNtoZero(this.color.hwb.blackness);
   }
 
   /** `this`'s alpha channel. */
   get alpha(): number {
-    return this.color.alpha;
+    return NaNtoZero(this.color.alpha);
   }
 
   /** `this`'s color space. */
   get space(): string {
     const _space = this.color.space.id;
-    if (_space === 'srgb' && this.format === 'rgb') {
+    if (_space === 'srgb' && this.isRgb) {
       return 'rgb';
     }
     return _space;
@@ -363,12 +304,12 @@ export class SassColor extends Value {
    * [missing]: https://www.w3.org/TR/css-color-4/#missing
    */
   get channelsOrNull(): List<number | null> {
-    return List(this.color.coords.map(c => (Number.isNaN(c) ? null : c)));
+    return List(this.color.coords.map(NaNtoNull));
   }
 
   /** The values of this color's channels (excluding the alpha channel). */
   get channels(): List<number> {
-    return List(this.color.coords);
+    return List(this.color.coords.map(NaNtoZero));
   }
 
   assertColor(): SassColor {

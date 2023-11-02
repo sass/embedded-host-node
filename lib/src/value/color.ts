@@ -99,6 +99,14 @@ function NaNtoZero(val: number) {
   return Number.isNaN(val) ? 0 : val;
 }
 
+function assertClamped(val: number, min: number, max: number, name: string) {
+  return Number.isNaN(val) ? val : fuzzyAssertInRange(val, min, max, name);
+}
+
+function coordToRgb(val: number) {
+  return val * 255;
+}
+
 /** A SassScript color. */
 export class SassColor extends Value {
   private color: ColorType;
@@ -129,30 +137,31 @@ export class SassColor extends Value {
     }
 
     switch (space) {
-      case 'srgb':
+      case 'srgb': {
+        let red = options.red ?? NaN;
+        let green = options.green ?? NaN;
+        let blue = options.blue ?? NaN;
         if (this.isRgb) {
-          // Convert from 0-255 to 0-1
+          if (!options.space) {
+            red = assertClamped(red, 0, 255, 'red');
+            green = assertClamped(green, 0, 255, 'green');
+            blue = assertClamped(blue, 0, 255, 'blue');
+          }
           this.color = new Color({
             spaceId: space,
-            coords: [
-              (options.red ?? NaN) / 255,
-              (options.green ?? NaN) / 255,
-              (options.blue ?? NaN) / 255,
-            ],
+            // convert from 0-255 to 0-1
+            coords: [red / 255, green / 255, blue / 255],
             alpha,
           });
         } else {
           this.color = new Color({
             spaceId: space,
-            coords: [
-              options.red ?? NaN,
-              options.green ?? NaN,
-              options.blue ?? NaN,
-            ],
+            coords: [red, green, blue],
             alpha,
           });
         }
         break;
+      }
       case 'srgb-linear':
       case 'display-p3':
       case 'a98-rgb':
@@ -169,55 +178,67 @@ export class SassColor extends Value {
         });
         break;
 
-      case 'hsl':
+      case 'hsl': {
+        const hue = options.hue ?? NaN;
+        let saturation = options.saturation ?? NaN;
+        let lightness = options.lightness ?? NaN;
+        if (!options.space) {
+          saturation = assertClamped(saturation, 0, 100, 'saturation');
+        }
+        lightness = assertClamped(lightness, 0, 100, 'lightness');
         this.color = new Color({
           spaceId: space,
-          coords: [
-            options.hue ?? NaN,
-            options.saturation ?? NaN,
-            options.lightness ?? NaN,
-          ],
+          coords: [hue, saturation, lightness],
           alpha,
         });
         break;
+      }
 
-      case 'hwb':
+      case 'hwb': {
+        const hue = options.hue ?? NaN;
+        let whiteness = options.whiteness ?? NaN;
+        let blackness = options.blackness ?? NaN;
+        if (!options.space) {
+          whiteness = assertClamped(whiteness, 0, 100, 'whiteness');
+          blackness = assertClamped(blackness, 0, 100, 'blackness');
+        }
         this.color = new Color({
           spaceId: space,
-          coords: [
-            options.hue ?? NaN,
-            options.whiteness ?? NaN,
-            options.blackness ?? NaN,
-          ],
+          coords: [hue, whiteness, blackness],
           alpha,
         });
         break;
+      }
 
       case 'lab':
-      case 'oklab':
+      case 'oklab': {
+        let lightness = options.lightness ?? NaN;
+        const a = options.a ?? NaN;
+        const b = options.b ?? NaN;
+        const maxLightness = space === 'lab' ? 100 : 1;
+        lightness = assertClamped(lightness, 0, maxLightness, 'lightness');
         this.color = new Color({
           spaceId: space,
-          coords: [
-            options.lightness ?? NaN,
-            options.a ?? NaN,
-            options.b ?? NaN,
-          ],
+          coords: [lightness, a, b],
           alpha,
         });
         break;
+      }
 
       case 'lch':
-      case 'oklch':
+      case 'oklch': {
+        let lightness = options.lightness ?? NaN;
+        const chroma = options.chroma ?? NaN;
+        const hue = options.hue ?? NaN;
+        const maxLightness = space === 'lch' ? 100 : 1;
+        lightness = assertClamped(lightness, 0, maxLightness, 'lightness');
         this.color = new Color({
           spaceId: space,
-          coords: [
-            options.lightness ?? NaN,
-            options.chroma ?? NaN,
-            options.hue ?? NaN,
-          ],
+          coords: [lightness, chroma, hue],
           alpha,
         });
         break;
+      }
 
       case 'xyz':
       case 'xyz-d65':
@@ -304,12 +325,20 @@ export class SassColor extends Value {
    * [missing]: https://www.w3.org/TR/css-color-4/#missing
    */
   get channelsOrNull(): List<number | null> {
-    return List(this.color.coords.map(NaNtoNull));
+    let coords = this.color.coords;
+    if (this.space === 'rgb') {
+      coords = coords.map(coordToRgb) as [number, number, number];
+    }
+    return List(coords.map(NaNtoNull));
   }
 
   /** The values of this color's channels (excluding the alpha channel). */
   get channels(): List<number> {
-    return List(this.color.coords.map(NaNtoZero));
+    let coords = this.color.coords;
+    if (this.space === 'rgb') {
+      coords = coords.map(coordToRgb) as [number, number, number];
+    }
+    return List(coords.map(NaNtoZero));
   }
 
   assertColor(): SassColor {

@@ -4,8 +4,8 @@
 
 import {Value} from './index';
 import {valueError} from '../utils';
-import {fuzzyAssertInRange, fuzzyEquals} from './utils';
-import {hash, List} from 'immutable';
+import {fuzzyAssertInRange, fuzzyEquals, fuzzyHashCode} from './utils';
+import {List} from 'immutable';
 import Color from 'colorjs.io';
 import type ColorType from 'colorjs.io';
 
@@ -398,24 +398,63 @@ export class SassColor extends Value {
   // }
 
   equals(other: Value): boolean {
+    if (!(other instanceof SassColor)) return false;
+    let coords = this.color.coords;
+    let otherCoords = other.color.coords;
+    if (this.isLegacy) {
+      if (!other.isLegacy) return false;
+      if (!fuzzyEquals(this.alpha, other.alpha)) return false;
+      if (!(this.space === 'rgb' && other.space === 'rgb')) {
+        coords = this.color.to('srgb').coords.map(coordToRgb) as [
+          number,
+          number,
+          number,
+        ];
+        otherCoords = other.color.to('srgb').coords.map(coordToRgb) as [
+          number,
+          number,
+          number,
+        ];
+      }
+      return (
+        fuzzyEquals(coords[0], otherCoords[0]) &&
+        fuzzyEquals(coords[1], otherCoords[1]) &&
+        fuzzyEquals(coords[2], otherCoords[2])
+      );
+    }
     return (
-      other instanceof SassColor &&
-      fuzzyEquals(this.red, other.red) &&
-      fuzzyEquals(this.green, other.green) &&
-      fuzzyEquals(this.blue, other.blue) &&
+      this.space === other.space &&
+      fuzzyEquals(coords[0], otherCoords[0]) &&
+      fuzzyEquals(coords[1], otherCoords[1]) &&
+      fuzzyEquals(coords[2], otherCoords[2]) &&
       fuzzyEquals(this.alpha, other.alpha)
     );
   }
 
   hashCode(): number {
-    return hash(this.red ^ this.green ^ this.blue ^ this.alpha);
+    let coords = this.color.coords;
+    if (this.isLegacy) {
+      coords = this.color.to('srgb').coords.map(coordToRgb) as [
+        number,
+        number,
+        number,
+      ];
+      return (
+        fuzzyHashCode(coords[0]) ^
+        fuzzyHashCode(coords[1]) ^
+        fuzzyHashCode(coords[2]) ^
+        fuzzyHashCode(this.alpha)
+      );
+    }
+    return (
+      fuzzyHashCode(coords[0]) ^
+      fuzzyHashCode(coords[1]) ^
+      fuzzyHashCode(coords[2]) ^
+      fuzzyHashCode(this.alpha)
+    );
   }
 
   toString(): string {
-    const isOpaque = fuzzyEquals(this.alpha, 1);
-    let string = isOpaque ? 'rgb(' : 'rgba(';
-    string += `${this.red}, ${this.green}, ${this.blue}`;
-    string += isOpaque ? ')' : `, ${this.alpha})`;
-    return string;
+    return this.color.toString({inGamut: false});
   }
 }

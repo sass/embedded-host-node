@@ -152,10 +152,16 @@ function encodeSpaceForColorJs(space?: KnownColorSpace) {
   return space;
 }
 
-function decodeSpaceFromColorJs(space: string, isRgb = false): KnownColorSpace {
+function decodeSpaceFromColorJs(
+  space: string,
+  isRgb = false,
+  isXyz = false
+): KnownColorSpace {
   switch (space) {
     case 'srgb':
       return isRgb ? 'rgb' : space;
+    case 'xyz-d65':
+      return isXyz ? 'xyz' : space;
     case 'a98rgb':
       return 'a98-rgb';
     case 'p3':
@@ -170,6 +176,7 @@ function decodeSpaceFromColorJs(space: string, isRgb = false): KnownColorSpace {
 export class SassColor extends Value {
   private color: ColorType;
   private isRgb = false;
+  private isXyz = false;
   private channel0Id: string;
   private channel1Id: string;
   private channel2Id: string;
@@ -199,6 +206,9 @@ export class SassColor extends Value {
     const space = options.space ?? getColorSpace(options);
     if (space === 'rgb') {
       this.isRgb = true;
+    }
+    if (space === 'xyz') {
+      this.isXyz = true;
     }
     let alpha;
     if (options.alpha === null) {
@@ -346,7 +356,7 @@ export class SassColor extends Value {
 
   /** `this`'s color space. */
   get space(): KnownColorSpace {
-    return decodeSpaceFromColorJs(this.color.spaceId, this.isRgb);
+    return decodeSpaceFromColorJs(this.color.spaceId, this.isRgb, this.isXyz);
   }
 
   /** Whether `this` is in a legacy color space. */
@@ -442,6 +452,7 @@ export class SassColor extends Value {
 
   _toSpaceInternal(space: KnownColorSpace) {
     this.isRgb = space === 'rgb';
+    this.isXyz = space === 'xyz';
     this.color = this.color.to(encodeSpaceForColorJs(space) as string);
   }
 
@@ -498,6 +509,7 @@ export class SassColor extends Value {
   channel(channel: ChannelNameRgb, options: {space: ColorSpaceRgb}): number;
   channel(channel: ChannelNameXyz, options: {space: ColorSpaceXyz}): number;
   channel(channel: ChannelName, options?: {space: KnownColorSpace}): number {
+    if (channel === 'alpha') return this.alpha;
     let val: number;
     const space = options?.space ?? this.space;
     if (options?.space) {
@@ -508,7 +520,7 @@ export class SassColor extends Value {
     } else {
       val = this.color.get(channel);
     }
-    if (space === 'rgb' && channel !== 'alpha') {
+    if (space === 'rgb') {
       val = coordToRgb(val);
     }
     return NaNtoZero(val);

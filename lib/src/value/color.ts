@@ -70,6 +70,16 @@ export type KnownColorSpace =
   | ColorSpaceRgb
   | ColorSpaceXyz;
 
+/**
+ * Methods by which two hues are adjusted when interpolating between polar
+ * colors.
+ */
+export type HueInterpolationMethod =
+  | 'decreasing'
+  | 'increasing'
+  | 'longer'
+  | 'shorter';
+
 type Channels = {
   [key in ChannelName]?: number | null;
 };
@@ -548,6 +558,26 @@ export class SassColor extends Value {
         return false;
     }
     return false;
+  }
+
+  // TODO(jgerigmeyer): Temp fns to pass type checks
+  change(
+    options: {
+      [key in ChannelName]?: number | null;
+    } & {
+      space?: KnownColorSpace;
+    }
+  ) {
+    return this;
+  }
+  interpolate(
+    color2: SassColor,
+    options: {
+      weight?: number;
+      method?: HueInterpolationMethod;
+    }
+  ) {
+    return this;
   }
 
   /**

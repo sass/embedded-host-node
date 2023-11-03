@@ -4,7 +4,13 @@
 
 import {Value} from './index';
 import {valueError} from '../utils';
-import {fuzzyAssertInRange, fuzzyEquals, fuzzyHashCode} from './utils';
+import {
+  fuzzyAssertInRange,
+  fuzzyEquals,
+  fuzzyHashCode,
+  fuzzyRound,
+  positiveMod,
+} from './utils';
 import {List} from 'immutable';
 import Color from 'colorjs.io';
 import type ColorType from 'colorjs.io';
@@ -98,7 +104,18 @@ function getColorSpace(options: Channels) {
 }
 
 function emitColor4ApiDeprecation(name: string) {
-  console.warn(`\`${name}\` is deprecated, use \`channel\` instead.`);
+  console.warn(
+    `Deprecation [color-4-api]: \`${name}\` is deprecated; use \`channel\` instead.`
+  );
+}
+
+function emitNullAlphaDeprecation() {
+  console.warn(
+    'Deprecation [null-alpha]: ' +
+      'Passing `alpha: null` without setting `space` is deprecated.' +
+      '\n' +
+      'More info: https://sass-lang.com/d/null-alpha'
+  );
 }
 
 function NaNtoNull(val: number) {
@@ -117,8 +134,36 @@ function coordToRgb(val: number) {
   return val * 255;
 }
 
-function normalizeRgb(space?: KnownColorSpace) {
-  return normalizeRgb(space);
+function normalizeHue(val: number) {
+  return positiveMod(val, 360);
+}
+
+function encodeSpaceForColorJs(space?: KnownColorSpace) {
+  switch (space) {
+    case 'rgb':
+      return 'srgb';
+    case 'a98-rgb':
+      return 'a98rgb';
+    case 'display-p3':
+      return 'p3';
+    case 'prophoto-rgb':
+      return 'prophoto';
+  }
+  return space;
+}
+
+function decodeSpaceFromColorJs(space: string, isRgb = false): KnownColorSpace {
+  switch (space) {
+    case 'srgb':
+      return isRgb ? 'rgb' : space;
+    case 'a98rgb':
+      return 'a98-rgb';
+    case 'p3':
+      return 'display-p3';
+    case 'prophoto':
+      return 'prophoto-rgb';
+  }
+  return space as KnownColorSpace;
 }
 
 /** A SassScript color. */
@@ -151,13 +196,15 @@ export class SassColor extends Value {
       );
     }
 
-    let space = options.space ?? getColorSpace(options);
+    const space = options.space ?? getColorSpace(options);
     if (space === 'rgb') {
-      space = 'srgb';
       this.isRgb = true;
     }
     let alpha;
     if (options.alpha === null) {
+      if (!options.space) {
+        emitNullAlphaDeprecation();
+      }
       alpha = NaN;
     } else if (options.alpha === undefined) {
       alpha = 1;
@@ -166,28 +213,24 @@ export class SassColor extends Value {
     }
 
     switch (space) {
+      case 'rgb':
       case 'srgb': {
         this.channel0Id = 'red';
         this.channel1Id = 'green';
         this.channel2Id = 'blue';
-        let red = options.red ?? NaN;
-        let green = options.green ?? NaN;
-        let blue = options.blue ?? NaN;
+        const red = options.red ?? NaN;
+        const green = options.green ?? NaN;
+        const blue = options.blue ?? NaN;
         if (this.isRgb) {
-          if (!options.space) {
-            red = assertClamped(red, 0, 255, 'red');
-            green = assertClamped(green, 0, 255, 'green');
-            blue = assertClamped(blue, 0, 255, 'blue');
-          }
           this.color = new Color({
-            spaceId: space,
+            spaceId: encodeSpaceForColorJs(space),
             // convert from 0-255 to 0-1
             coords: [red / 255, green / 255, blue / 255],
             alpha,
           });
         } else {
           this.color = new Color({
-            spaceId: space,
+            spaceId: encodeSpaceForColorJs(space),
             coords: [red, green, blue],
             alpha,
           });
@@ -204,7 +247,7 @@ export class SassColor extends Value {
         this.channel1Id = 'green';
         this.channel2Id = 'blue';
         this.color = new Color({
-          spaceId: space,
+          spaceId: encodeSpaceForColorJs(space),
           coords: [
             options.red ?? NaN,
             options.green ?? NaN,
@@ -218,15 +261,12 @@ export class SassColor extends Value {
         this.channel0Id = 'hue';
         this.channel1Id = 'saturation';
         this.channel2Id = 'lightness';
-        const hue = options.hue ?? NaN;
-        let saturation = options.saturation ?? NaN;
+        const hue = normalizeHue(options.hue ?? NaN);
+        const saturation = options.saturation ?? NaN;
         let lightness = options.lightness ?? NaN;
-        if (!options.space) {
-          saturation = assertClamped(saturation, 0, 100, 'saturation');
-        }
         lightness = assertClamped(lightness, 0, 100, 'lightness');
         this.color = new Color({
-          spaceId: space,
+          spaceId: encodeSpaceForColorJs(space),
           coords: [hue, saturation, lightness],
           alpha,
         });
@@ -237,15 +277,11 @@ export class SassColor extends Value {
         this.channel0Id = 'hue';
         this.channel1Id = 'whiteness';
         this.channel2Id = 'blackness';
-        const hue = options.hue ?? NaN;
-        let whiteness = options.whiteness ?? NaN;
-        let blackness = options.blackness ?? NaN;
-        if (!options.space) {
-          whiteness = assertClamped(whiteness, 0, 100, 'whiteness');
-          blackness = assertClamped(blackness, 0, 100, 'blackness');
-        }
+        const hue = normalizeHue(options.hue ?? NaN);
+        const whiteness = options.whiteness ?? NaN;
+        const blackness = options.blackness ?? NaN;
         this.color = new Color({
-          spaceId: space,
+          spaceId: encodeSpaceForColorJs(space),
           coords: [hue, whiteness, blackness],
           alpha,
         });
@@ -263,7 +299,7 @@ export class SassColor extends Value {
         const maxLightness = space === 'lab' ? 100 : 1;
         lightness = assertClamped(lightness, 0, maxLightness, 'lightness');
         this.color = new Color({
-          spaceId: space,
+          spaceId: encodeSpaceForColorJs(space),
           coords: [lightness, a, b],
           alpha,
         });
@@ -277,11 +313,11 @@ export class SassColor extends Value {
         this.channel2Id = 'hue';
         let lightness = options.lightness ?? NaN;
         const chroma = options.chroma ?? NaN;
-        const hue = options.hue ?? NaN;
+        const hue = normalizeHue(options.hue ?? NaN);
         const maxLightness = space === 'lch' ? 100 : 1;
         lightness = assertClamped(lightness, 0, maxLightness, 'lightness');
         this.color = new Color({
-          spaceId: space,
+          spaceId: encodeSpaceForColorJs(space),
           coords: [lightness, chroma, hue],
           alpha,
         });
@@ -295,7 +331,7 @@ export class SassColor extends Value {
         this.channel1Id = 'y';
         this.channel2Id = 'z';
         this.color = new Color({
-          spaceId: space,
+          spaceId: encodeSpaceForColorJs(space),
           coords: [options.x ?? NaN, options.y ?? NaN, options.z ?? NaN],
           alpha,
         });
@@ -310,11 +346,7 @@ export class SassColor extends Value {
 
   /** `this`'s color space. */
   get space(): KnownColorSpace {
-    const _space = this.color.spaceId as Exclude<KnownColorSpace, 'rgb'>;
-    if (_space === 'srgb' && this.isRgb) {
-      return 'rgb';
-    }
-    return _space;
+    return decodeSpaceFromColorJs(this.color.spaceId, this.isRgb);
   }
 
   /** Whether `this` is in a legacy color space. */
@@ -347,19 +379,31 @@ export class SassColor extends Value {
   /** `this`'s red channel. */
   get red(): number {
     emitColor4ApiDeprecation('red');
-    return NaNtoZero(this.color.srgb.red * 255);
+    let val = NaNtoZero(coordToRgb(this.color.srgb.red));
+    if (this.isLegacy && this.space !== 'rgb') {
+      val = fuzzyRound(val);
+    }
+    return val;
   }
 
   /** `this`'s blue channel. */
   get blue(): number {
     emitColor4ApiDeprecation('blue');
-    return NaNtoZero(this.color.srgb.blue * 255);
+    let val = NaNtoZero(coordToRgb(this.color.srgb.blue));
+    if (this.isLegacy && this.space !== 'rgb') {
+      val = fuzzyRound(val);
+    }
+    return val;
   }
 
   /** `this`'s green channel. */
   get green(): number {
     emitColor4ApiDeprecation('green');
-    return NaNtoZero(this.color.srgb.green * 255);
+    let val = NaNtoZero(coordToRgb(this.color.srgb.green));
+    if (this.isLegacy && this.space !== 'rgb') {
+      val = fuzzyRound(val);
+    }
+    return val;
   }
 
   /** `this`'s hue value. */
@@ -397,13 +441,8 @@ export class SassColor extends Value {
   }
 
   _toSpaceInternal(space: KnownColorSpace) {
-    if (space === 'rgb') {
-      this.isRgb = true;
-      this.color = this.color.to('srgb');
-    } else {
-      this.isRgb = false;
-      this.color = this.color.to(space);
-    }
+    this.isRgb = space === 'rgb';
+    this.color = this.color.to(encodeSpaceForColorJs(space) as string);
   }
 
   /**
@@ -422,11 +461,11 @@ export class SassColor extends Value {
    * `space`, or its current color space if `space` is not specified.
    */
   isInGamut(space?: KnownColorSpace): boolean {
-    return this.color.inGamut(normalizeRgb(space));
+    return this.color.inGamut(encodeSpaceForColorJs(space));
   }
 
   _toGamutInternal(space?: KnownColorSpace) {
-    this.color.toGamut({space: normalizeRgb(space)});
+    this.color.toGamut({space: encodeSpaceForColorJs(space)});
   }
 
   /**
@@ -462,12 +501,15 @@ export class SassColor extends Value {
     let val: number;
     const space = options?.space ?? this.space;
     if (options?.space) {
-      val = this.color[normalizeRgb(options.space)][channel];
+      val = this.color.get({
+        space: encodeSpaceForColorJs(options.space) as string,
+        coordId: channel,
+      });
     } else {
       val = this.color.get(channel);
     }
     if (space === 'rgb' && channel !== 'alpha') {
-      val = val * 255;
+      val = coordToRgb(val);
     }
     return NaNtoZero(val);
   }
@@ -640,16 +682,14 @@ export class SassColor extends Value {
       if (!other.isLegacy) return false;
       if (!fuzzyEquals(this.alpha, other.alpha)) return false;
       if (!(this.space === 'rgb' && other.space === 'rgb')) {
-        coords = this.color.to('srgb').coords.map(coordToRgb) as [
-          number,
-          number,
-          number,
-        ];
-        otherCoords = other.color.to('srgb').coords.map(coordToRgb) as [
-          number,
-          number,
-          number,
-        ];
+        coords = this.color
+          .to('srgb')
+          .coords.map(coordToRgb)
+          .map(fuzzyRound) as [number, number, number];
+        otherCoords = other.color
+          .to('srgb')
+          .coords.map(coordToRgb)
+          .map(fuzzyRound) as [number, number, number];
       }
       return (
         fuzzyEquals(coords[0], otherCoords[0]) &&
@@ -669,7 +709,7 @@ export class SassColor extends Value {
   hashCode(): number {
     let coords = this.color.coords;
     if (this.isLegacy) {
-      coords = this.color.to('srgb').coords.map(coordToRgb) as [
+      coords = this.color.to('srgb').coords.map(coordToRgb).map(fuzzyRound) as [
         number,
         number,
         number,

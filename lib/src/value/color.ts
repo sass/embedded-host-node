@@ -152,16 +152,12 @@ function encodeSpaceForColorJs(space?: KnownColorSpace) {
   return space;
 }
 
-function decodeSpaceFromColorJs(
-  space: string,
-  isRgb = false,
-  isXyz = false
-): KnownColorSpace {
+function decodeSpaceFromColorJs(space: string, isRgb = false): KnownColorSpace {
   switch (space) {
     case 'srgb':
       return isRgb ? 'rgb' : space;
     case 'xyz-d65':
-      return isXyz ? 'xyz' : space;
+      return 'xyz';
     case 'a98rgb':
       return 'a98-rgb';
     case 'p3':
@@ -172,11 +168,18 @@ function decodeSpaceFromColorJs(
   return space as KnownColorSpace;
 }
 
+// @TODO For some spaces (e.g. Lab and Oklab), ColorJS only accepts `l` and not
+// `lightness` as a channel name. Maybe a bug?
+function encodeChannelForColorJs(channel: ChannelName) {
+  if (channel === 'lightness') return 'l';
+  return channel;
+}
+
 /** A SassScript color. */
 export class SassColor extends Value {
   private color: ColorType;
   private isRgb = false;
-  private isXyz = false;
+  private alphaMissing = false;
   private channel0Id: string;
   private channel1Id: string;
   private channel2Id: string;
@@ -207,15 +210,13 @@ export class SassColor extends Value {
     if (space === 'rgb') {
       this.isRgb = true;
     }
-    if (space === 'xyz') {
-      this.isXyz = true;
-    }
     let alpha;
     if (options.alpha === null) {
       if (!options.space) {
         emitNullAlphaDeprecation();
       }
       alpha = NaN;
+      this.alphaMissing = true;
     } else if (options.alpha === undefined) {
       alpha = 1;
     } else {
@@ -347,6 +348,11 @@ export class SassColor extends Value {
         });
         break;
     }
+
+    // @TODO ColorJS doesn't seem to allow initial `alpha` to be missing?
+    if (this.alphaMissing) {
+      this.color.alpha = NaN;
+    }
   }
 
   /** `this`'s alpha channel. */
@@ -356,7 +362,7 @@ export class SassColor extends Value {
 
   /** `this`'s color space. */
   get space(): KnownColorSpace {
-    return decodeSpaceFromColorJs(this.color.spaceId, this.isRgb, this.isXyz);
+    return decodeSpaceFromColorJs(this.color.spaceId, this.isRgb);
   }
 
   /** Whether `this` is in a legacy color space. */
@@ -452,7 +458,6 @@ export class SassColor extends Value {
 
   _toSpaceInternal(space: KnownColorSpace) {
     this.isRgb = space === 'rgb';
-    this.isXyz = space === 'xyz';
     this.color = this.color.to(encodeSpaceForColorJs(space) as string);
   }
 
@@ -510,15 +515,20 @@ export class SassColor extends Value {
   channel(channel: ChannelNameXyz, options: {space: ColorSpaceXyz}): number;
   channel(channel: ChannelName, options?: {space: KnownColorSpace}): number {
     if (channel === 'alpha') return this.alpha;
+    // @TODO check that channel exists in space, or throw
+    // checkChannelValid();
     let val: number;
     const space = options?.space ?? this.space;
     if (options?.space) {
       val = this.color.get({
         space: encodeSpaceForColorJs(options.space) as string,
-        coordId: channel,
+        coordId: encodeChannelForColorJs(channel),
       });
     } else {
-      val = this.color.get(channel);
+      val = this.color.get({
+        space: this.color.spaceId,
+        coordId: encodeChannelForColorJs(channel),
+      });
     }
     if (space === 'rgb') {
       val = coordToRgb(val);
@@ -533,7 +543,15 @@ export class SassColor extends Value {
    * [missing channel]: https://developer.mozilla.org/en-US/docs/Web/CSS/color_value#missing_color_components
    */
   isChannelMissing(channel: ChannelName): boolean {
-    return Number.isNaN(this.color.get(channel));
+    if (channel === 'alpha') return Number.isNaN(this.color.alpha);
+    // @TODO check that channel exists in space, or throw
+    // checkChannelValid();
+    return Number.isNaN(
+      this.color.get({
+        space: this.color.spaceId,
+        coordId: encodeChannelForColorJs(channel),
+      })
+    );
   }
 
   /**
@@ -574,6 +592,8 @@ export class SassColor extends Value {
     options?: {space: KnownColorSpace}
   ): boolean {
     if (channel === 'alpha') return false;
+    // @TODO check that channel exists in space, or throw
+    // checkChannelValid();
     const color = options?.space ? this.toSpace(options.space) : this;
     const channels = color.channels.toArray();
     switch (channel) {

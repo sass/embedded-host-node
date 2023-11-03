@@ -107,10 +107,29 @@ function coordToRgb(val: number) {
   return val * 255;
 }
 
+function normalizeRgb(space?: KnownColorSpace) {
+  return normalizeRgb(space);
+}
+
 /** A SassScript color. */
 export class SassColor extends Value {
   private color: ColorType;
   private isRgb = false;
+  private channel0Id: string;
+  private channel1Id: string;
+  private channel2Id: string;
+  private clone() {
+    let coords = this.color.coords;
+    if (this.space === 'rgb') {
+      coords = coords.map(coordToRgb) as [number, number, number];
+    }
+    return new SassColor({
+      space: this.space,
+      [this.channel0Id]: coords[0],
+      [this.channel1Id]: coords[1],
+      [this.channel2Id]: coords[2],
+    });
+  }
 
   constructor(options: Channels & {space?: KnownColorSpace}) {
     super();
@@ -138,6 +157,9 @@ export class SassColor extends Value {
 
     switch (space) {
       case 'srgb': {
+        this.channel0Id = 'red';
+        this.channel1Id = 'green';
+        this.channel2Id = 'blue';
         let red = options.red ?? NaN;
         let green = options.green ?? NaN;
         let blue = options.blue ?? NaN;
@@ -162,11 +184,15 @@ export class SassColor extends Value {
         }
         break;
       }
+
       case 'srgb-linear':
       case 'display-p3':
       case 'a98-rgb':
       case 'prophoto-rgb':
       case 'rec2020':
+        this.channel0Id = 'red';
+        this.channel1Id = 'green';
+        this.channel2Id = 'blue';
         this.color = new Color({
           spaceId: space,
           coords: [
@@ -179,6 +205,9 @@ export class SassColor extends Value {
         break;
 
       case 'hsl': {
+        this.channel0Id = 'hue';
+        this.channel1Id = 'saturation';
+        this.channel2Id = 'lightness';
         const hue = options.hue ?? NaN;
         let saturation = options.saturation ?? NaN;
         let lightness = options.lightness ?? NaN;
@@ -195,6 +224,9 @@ export class SassColor extends Value {
       }
 
       case 'hwb': {
+        this.channel0Id = 'hue';
+        this.channel1Id = 'whiteness';
+        this.channel2Id = 'blackness';
         const hue = options.hue ?? NaN;
         let whiteness = options.whiteness ?? NaN;
         let blackness = options.blackness ?? NaN;
@@ -212,6 +244,9 @@ export class SassColor extends Value {
 
       case 'lab':
       case 'oklab': {
+        this.channel0Id = 'lightness';
+        this.channel1Id = 'a';
+        this.channel2Id = 'b';
         let lightness = options.lightness ?? NaN;
         const a = options.a ?? NaN;
         const b = options.b ?? NaN;
@@ -227,6 +262,9 @@ export class SassColor extends Value {
 
       case 'lch':
       case 'oklch': {
+        this.channel0Id = 'lightness';
+        this.channel1Id = 'chroma';
+        this.channel2Id = 'hue';
         let lightness = options.lightness ?? NaN;
         const chroma = options.chroma ?? NaN;
         const hue = options.hue ?? NaN;
@@ -243,6 +281,9 @@ export class SassColor extends Value {
       case 'xyz':
       case 'xyz-d65':
       case 'xyz-d50':
+        this.channel0Id = 'x';
+        this.channel1Id = 'y';
+        this.channel2Id = 'z';
         this.color = new Color({
           spaceId: space,
           coords: [options.x ?? NaN, options.y ?? NaN, options.z ?? NaN],
@@ -250,6 +291,47 @@ export class SassColor extends Value {
         });
         break;
     }
+  }
+
+  /** `this`'s alpha channel. */
+  get alpha(): number {
+    return NaNtoZero(this.color.alpha);
+  }
+
+  /** `this`'s color space. */
+  get space(): KnownColorSpace {
+    const _space = this.color.spaceId as Exclude<KnownColorSpace, 'rgb'>;
+    if (_space === 'srgb' && this.isRgb) {
+      return 'rgb';
+    }
+    return _space;
+  }
+
+  /** Whether `this` is in a legacy color space. */
+  get isLegacy(): boolean {
+    return ['rgb', 'hsl', 'hwb'].includes(this.space);
+  }
+
+  /** The values of this color's channels (excluding the alpha channel), or
+   * `null` for [missing] channels.
+   *
+   * [missing]: https://www.w3.org/TR/css-color-4/#missing
+   */
+  get channelsOrNull(): List<number | null> {
+    let coords = this.color.coords;
+    if (this.space === 'rgb') {
+      coords = coords.map(coordToRgb) as [number, number, number];
+    }
+    return List(coords.map(NaNtoNull));
+  }
+
+  /** The values of this color's channels (excluding the alpha channel). */
+  get channels(): List<number> {
+    let coords = this.color.coords;
+    if (this.space === 'rgb') {
+      coords = coords.map(coordToRgb) as [number, number, number];
+    }
+    return List(coords.map(NaNtoZero));
   }
 
   /** `this`'s red channel. */
@@ -300,49 +382,172 @@ export class SassColor extends Value {
     return NaNtoZero(this.color.hwb.blackness);
   }
 
-  /** `this`'s alpha channel. */
-  get alpha(): number {
-    return NaNtoZero(this.color.alpha);
-  }
-
-  /** `this`'s color space. */
-  get space(): string {
-    const _space = this.color.space.id;
-    if (_space === 'srgb' && this.isRgb) {
-      return 'rgb';
-    }
-    return _space;
-  }
-
-  /** Whether `this` is in a legacy color space. */
-  get isLegacy(): boolean {
-    return ['rgb', 'hsl', 'hwb'].includes(this.space);
-  }
-
-  /** The values of this color's channels (excluding the alpha channel), or
-   * `null` for [missing] channels.
-   *
-   * [missing]: https://www.w3.org/TR/css-color-4/#missing
-   */
-  get channelsOrNull(): List<number | null> {
-    let coords = this.color.coords;
-    if (this.space === 'rgb') {
-      coords = coords.map(coordToRgb) as [number, number, number];
-    }
-    return List(coords.map(NaNtoNull));
-  }
-
-  /** The values of this color's channels (excluding the alpha channel). */
-  get channels(): List<number> {
-    let coords = this.color.coords;
-    if (this.space === 'rgb') {
-      coords = coords.map(coordToRgb) as [number, number, number];
-    }
-    return List(coords.map(NaNtoZero));
-  }
-
   assertColor(): SassColor {
     return this;
+  }
+
+  _toSpaceInternal(space: KnownColorSpace) {
+    if (space === 'rgb') {
+      this.isRgb = true;
+      this.color = this.color.to('srgb');
+    } else {
+      this.isRgb = false;
+      this.color = this.color.to(space);
+    }
+  }
+
+  /**
+   * Returns this color converted to the specified `space`.
+   */
+  toSpace(space: KnownColorSpace): SassColor {
+    if (space === this.space) return this;
+    const color = this.clone();
+    color._toSpaceInternal(space);
+    return color;
+  }
+
+  /**
+   * Returns a boolean indicating whether this color is in-gamut (as opposed to
+   * having one or more of its channels out of bounds) for the specified
+   * `space`, or its current color space if `space` is not specified.
+   */
+  isInGamut(space?: KnownColorSpace): boolean {
+    return this.color.inGamut(normalizeRgb(space));
+  }
+
+  _toGamutInternal(space?: KnownColorSpace) {
+    this.color.toGamut({space: normalizeRgb(space)});
+  }
+
+  /**
+   * Returns this color, modified so it is in-gamut for the specified `space`—or
+   * the current color space if `space` is not specified—using the recommended
+   * [CSS Gamut Mapping Algorithm][css-mapping] to map out-of-gamut colors into
+   * the desired gamut with as little perceptual change as possible.
+   *
+   * [css-mapping]: https://www.w3.org/TR/css-color-4/#css-gamut-mapping-algorithm
+   */
+  toGamut(space?: KnownColorSpace): SassColor {
+    if (this.isInGamut(space)) return this;
+    const color = this.clone();
+    color._toGamutInternal(space);
+    return color;
+  }
+
+  /**
+   * Returns the value of a single specified `channel` of this color (optionally
+   * after converting this color to the specified `space`), with [missing
+   * channels] converted to `0`.
+   *
+   * [missing channels]: https://developer.mozilla.org/en-US/docs/Web/CSS/color_value#missing_color_components
+   */
+  channel(channel: ChannelName): number;
+  channel(channel: ChannelNameHsl, options: {space: ColorSpaceHsl}): number;
+  channel(channel: ChannelNameHwb, options: {space: ColorSpaceHwb}): number;
+  channel(channel: ChannelNameLab, options: {space: ColorSpaceLab}): number;
+  channel(channel: ChannelNameLch, options: {space: ColorSpaceLch}): number;
+  channel(channel: ChannelNameRgb, options: {space: ColorSpaceRgb}): number;
+  channel(channel: ChannelNameXyz, options: {space: ColorSpaceXyz}): number;
+  channel(channel: ChannelName, options?: {space: KnownColorSpace}): number {
+    let val: number;
+    const space = options?.space ?? this.space;
+    if (options?.space) {
+      val = this.color[normalizeRgb(options.space)][channel];
+    } else {
+      val = this.color.get(channel);
+    }
+    if (space === 'rgb' && channel !== 'alpha') {
+      val = val * 255;
+    }
+    return NaNtoZero(val);
+  }
+
+  /**
+   * Returns a boolean indicating whether a given channel value is a [missing
+   * channel].
+   *
+   * [missing channel]: https://developer.mozilla.org/en-US/docs/Web/CSS/color_value#missing_color_components
+   */
+  isChannelMissing(channel: ChannelName): boolean {
+    return Number.isNaN(this.color.get(channel));
+  }
+
+  /**
+   * Returns a boolean indicating whether a given `channel` is [powerless] in
+   * this color. This is a special state that's defined for individual color
+   * spaces, which indicates that a channel's value won't affect how a color is
+   * displayed.
+   *
+   * [powerless]: https://www.w3.org/TR/css-color-4/#powerless
+   */
+  isChannelPowerless(channel: ChannelName): boolean;
+  isChannelPowerless(
+    channel: ChannelNameHsl,
+    options?: {space: ColorSpaceHsl}
+  ): boolean;
+  isChannelPowerless(
+    channel: ChannelNameHwb,
+    options?: {space: ColorSpaceHwb}
+  ): boolean;
+  isChannelPowerless(
+    channel: ChannelNameLab,
+    options?: {space: ColorSpaceLab}
+  ): boolean;
+  isChannelPowerless(
+    channel: ChannelNameLch,
+    options?: {space: ColorSpaceLch}
+  ): boolean;
+  isChannelPowerless(
+    channel: ChannelNameRgb,
+    options?: {space: ColorSpaceRgb}
+  ): boolean;
+  isChannelPowerless(
+    channel: ChannelNameXyz,
+    options?: {space: ColorSpaceXyz}
+  ): boolean;
+  isChannelPowerless(
+    channel: ChannelName,
+    options?: {space: KnownColorSpace}
+  ): boolean {
+    if (channel === 'alpha') return false;
+    const color = options?.space ? this.toSpace(options.space) : this;
+    const channels = color.channels.toArray();
+    switch (channel) {
+      case color.channel0Id:
+        if (color.space === 'hsl') {
+          return fuzzyEquals(channels[1], 0) || fuzzyEquals(channels[2], 0);
+        }
+        if (color.space === 'hwb') {
+          return fuzzyEquals(channels[1] + channels[2], 100);
+        }
+        return false;
+      case color.channel1Id:
+        switch (color.space) {
+          case 'hsl':
+            return fuzzyEquals(channels[2], 0);
+          case 'lab':
+          case 'oklab':
+          case 'lch':
+          case 'oklch':
+            return fuzzyEquals(channels[0], 0) || fuzzyEquals(channels[0], 100);
+        }
+        return false;
+      case color.channel2Id:
+        switch (color.space) {
+          case 'lab':
+          case 'oklab':
+            return fuzzyEquals(channels[0], 0) || fuzzyEquals(channels[0], 100);
+          case 'lch':
+          case 'oklch':
+            return (
+              fuzzyEquals(channels[0], 0) ||
+              fuzzyEquals(channels[0], 100) ||
+              fuzzyEquals(channels[1], 0)
+            );
+        }
+        return false;
+    }
+    return false;
   }
 
   /**

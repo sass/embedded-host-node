@@ -395,31 +395,22 @@ export class SassColor extends Value {
   /** `this`'s red channel. */
   get red(): number {
     emitColor4ApiDeprecation('red');
-    let val = NaNtoZero(coordToRgb(this.color.srgb.red));
-    if (this.isLegacy && this.space !== 'rgb') {
-      val = fuzzyRound(val);
-    }
-    return val;
+    const val = NaNtoZero(coordToRgb(this.color.srgb.red));
+    return fuzzyRound(val);
   }
 
   /** `this`'s blue channel. */
   get blue(): number {
     emitColor4ApiDeprecation('blue');
-    let val = NaNtoZero(coordToRgb(this.color.srgb.blue));
-    if (this.isLegacy && this.space !== 'rgb') {
-      val = fuzzyRound(val);
-    }
-    return val;
+    const val = NaNtoZero(coordToRgb(this.color.srgb.blue));
+    return fuzzyRound(val);
   }
 
   /** `this`'s green channel. */
   get green(): number {
     emitColor4ApiDeprecation('green');
-    let val = NaNtoZero(coordToRgb(this.color.srgb.green));
-    if (this.isLegacy && this.space !== 'rgb') {
-      val = fuzzyRound(val);
-    }
-    return val;
+    const val = NaNtoZero(coordToRgb(this.color.srgb.green));
+    return fuzzyRound(val);
   }
 
   /** `this`'s hue value. */

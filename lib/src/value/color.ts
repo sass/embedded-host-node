@@ -11,7 +11,7 @@ import {
   fuzzyRound,
   positiveMod,
 } from './utils';
-import {List} from 'immutable';
+import {List, hash} from 'immutable';
 import Color from 'colorjs.io';
 import type ColorType from 'colorjs.io';
 
@@ -754,6 +754,7 @@ export class SassColor extends Value {
       );
     }
     return (
+      hash(this.space) ^
       fuzzyHashCode(coords[0]) ^
       fuzzyHashCode(coords[1]) ^
       fuzzyHashCode(coords[2]) ^

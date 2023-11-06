@@ -175,6 +175,49 @@ function encodeChannelForColorJs(channel: ChannelName) {
   return channel;
 }
 
+// Implement our own check of channel name validity for a given space, because
+// ColorJS allows e.g. `b` for either `blue` or `blackness` or `b` channels.
+function checkChannelValid(channel: ChannelName, space: KnownColorSpace) {
+  let valid = false;
+  switch (space) {
+    case 'rgb':
+    case 'srgb':
+    case 'srgb-linear':
+    case 'display-p3':
+    case 'a98-rgb':
+    case 'prophoto-rgb':
+    case 'rec2020':
+      valid = ['red', 'green', 'blue'].includes(channel);
+      break;
+    case 'hsl':
+      valid = ['hue', 'saturation', 'lightness'].includes(channel);
+      break;
+    case 'hwb':
+      valid = ['hue', 'whiteness', 'blackness'].includes(channel);
+      break;
+    case 'lab':
+    case 'oklab':
+      valid = ['lightness', 'a', 'b'].includes(channel);
+      break;
+    case 'lch':
+    case 'oklch':
+      valid = ['lightness', 'chroma', 'hue'].includes(channel);
+      break;
+    case 'xyz':
+    case 'xyz-d65':
+    case 'xyz-d50':
+      valid = ['x', 'y', 'z'].includes(channel);
+      break;
+  }
+  if (!valid) {
+    throw valueError(
+      `Unknown channel name "${channel}" for color space "${space}".`
+    );
+  }
+}
+
+Color.defaults.precision = 15;
+
 /** A SassScript color. */
 export class SassColor extends Value {
   private color: ColorType;
@@ -506,10 +549,9 @@ export class SassColor extends Value {
   channel(channel: ChannelNameXyz, options: {space: ColorSpaceXyz}): number;
   channel(channel: ChannelName, options?: {space: KnownColorSpace}): number {
     if (channel === 'alpha') return this.alpha;
-    // @TODO check that channel exists in space, or throw
-    // checkChannelValid();
     let val: number;
     const space = options?.space ?? this.space;
+    checkChannelValid(channel, space);
     if (options?.space) {
       val = this.color.get({
         space: encodeSpaceForColorJs(options.space) as string,
@@ -535,8 +577,7 @@ export class SassColor extends Value {
    */
   isChannelMissing(channel: ChannelName): boolean {
     if (channel === 'alpha') return Number.isNaN(this.color.alpha);
-    // @TODO check that channel exists in space, or throw
-    // checkChannelValid();
+    checkChannelValid(channel, this.space);
     return Number.isNaN(
       this.color.get({
         space: this.color.spaceId,
@@ -583,42 +624,23 @@ export class SassColor extends Value {
     options?: {space: KnownColorSpace}
   ): boolean {
     if (channel === 'alpha') return false;
-    // @TODO check that channel exists in space, or throw
-    // checkChannelValid();
     const color = options?.space ? this.toSpace(options.space) : this;
+    checkChannelValid(channel, color.space);
     const channels = color.channels.toArray();
     switch (channel) {
       case color.channel0Id:
         if (color.space === 'hsl') {
-          return fuzzyEquals(channels[1], 0) || fuzzyEquals(channels[2], 0);
+          return fuzzyEquals(channels[1], 0);
         }
         if (color.space === 'hwb') {
           return fuzzyEquals(channels[1] + channels[2], 100);
         }
         return false;
-      case color.channel1Id:
-        switch (color.space) {
-          case 'hsl':
-            return fuzzyEquals(channels[2], 0);
-          case 'lab':
-          case 'oklab':
-          case 'lch':
-          case 'oklch':
-            return fuzzyEquals(channels[0], 0) || fuzzyEquals(channels[0], 100);
-        }
-        return false;
       case color.channel2Id:
         switch (color.space) {
-          case 'lab':
-          case 'oklab':
-            return fuzzyEquals(channels[0], 0) || fuzzyEquals(channels[0], 100);
           case 'lch':
           case 'oklch':
-            return (
-              fuzzyEquals(channels[0], 0) ||
-              fuzzyEquals(channels[0], 100) ||
-              fuzzyEquals(channels[1], 0)
-            );
+            return fuzzyEquals(channels[1], 0);
         }
         return false;
     }

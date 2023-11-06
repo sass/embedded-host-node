@@ -12,7 +12,7 @@ import {
   positiveMod,
 } from './utils';
 import {List, hash} from 'immutable';
-import Color from 'colorjs.io';
+import Color from 'colorjs.io/dist/color.legacy';
 import type ColorType from 'colorjs.io';
 
 /** The HSL color space name. */
@@ -648,7 +648,6 @@ export class SassColor extends Value {
    *
    * [missing channels]: https://developer.mozilla.org/en-US/docs/Web/CSS/color_value#missing_color_components
    */
-  channel(channel: ChannelName): number;
   channel(channel: ChannelNameHsl, options: {space: ColorSpaceHsl}): number;
   channel(channel: ChannelNameHwb, options: {space: ColorSpaceHwb}): number;
   channel(channel: ChannelNameLab, options: {space: ColorSpaceLab}): number;
@@ -702,7 +701,6 @@ export class SassColor extends Value {
    *
    * [powerless]: https://www.w3.org/TR/css-color-4/#powerless
    */
-  isChannelPowerless(channel: ChannelName): boolean;
   isChannelPowerless(
     channel: ChannelNameHsl,
     options?: {space: ColorSpaceHsl}
@@ -761,10 +759,8 @@ export class SassColor extends Value {
    *
    * [color interpolation]: https://www.w3.org/TR/css-color-4/#interpolation
    *
-   * If `method` is missing and this color is in a rectangular color space (Lab,
-   * Oklab, RGB, and XYZ spaces), `method` defaults to the color space of this
-   * color. Otherwise, `method` defaults to a space separated list containing
-   * the color space of this color and the string "shorter".
+   * If `method` is missing and this color is in a polar color space (HSL, HWB,
+   * LCH, and Oklch spaces), `method` defaults to "shorter".
    *
    * The `weight` is a number between 0 and 1 that indicates how much of this
    * color should be in the resulting color. If omitted, it defaults to 0.5.

@@ -12,7 +12,7 @@ import {
   positiveMod,
 } from './utils';
 import {List, hash} from 'immutable';
-import Color from 'colorjs.io/dist/color.legacy';
+import Color from 'colorjs.io/dist/color.legacy.cjs';
 import type ColorType from 'colorjs.io';
 
 /** The HSL color space name. */

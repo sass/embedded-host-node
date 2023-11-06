@@ -648,6 +648,7 @@ export class SassColor extends Value {
    *
    * [missing channels]: https://developer.mozilla.org/en-US/docs/Web/CSS/color_value#missing_color_components
    */
+  channel(channel: ChannelName): number;
   channel(channel: ChannelNameHsl, options: {space: ColorSpaceHsl}): number;
   channel(channel: ChannelNameHwb, options: {space: ColorSpaceHwb}): number;
   channel(channel: ChannelNameLab, options: {space: ColorSpaceLab}): number;

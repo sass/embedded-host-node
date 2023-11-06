@@ -76,21 +76,25 @@ export type KnownColorSpace =
   | ColorSpaceRgb
   | ColorSpaceXyz;
 
+/** Polar color space names (HSL, HWB, LCH, and Oklch spaces). */
+type PolarColorSpace = ColorSpaceHsl | ColorSpaceHwb | ColorSpaceLch;
+
 /**
  * Methods by which two hues are adjusted when interpolating between polar
  * colors.
  */
-export type HueInterpolationMethod =
+type HueInterpolationMethod =
   | 'decreasing'
   | 'increasing'
   | 'longer'
   | 'shorter';
 
-type Channels = {
+type ChannelOptions = {
   [key in ChannelName]?: number | null;
 };
 
-function getColorSpace(options: Channels) {
+/** Legacy determination of color space by channel name. */
+function getColorSpace(options: ChannelOptions): KnownColorSpace {
   if (typeof options.red === 'number') {
     return 'rgb';
   }
@@ -103,42 +107,36 @@ function getColorSpace(options: Channels) {
   throw valueError('No color space found');
 }
 
-function emitColor4ApiDeprecation(name: string) {
-  console.warn(
-    `Deprecation [color-4-api]: \`${name}\` is deprecated; use \`channel\` instead.`
-  );
-}
-
-function emitNullAlphaDeprecation() {
-  console.warn(
-    'Deprecation [null-alpha]: ' +
-      'Passing `alpha: null` without setting `space` is deprecated.' +
-      '\n' +
-      'More info: https://sass-lang.com/d/null-alpha'
-  );
-}
-
-function NaNtoNull(val: number) {
+function NaNtoNull(val: number): number | null {
   return Number.isNaN(val) ? null : val;
 }
 
-function NaNtoZero(val: number) {
+function NaNtoZero(val: number): number {
   return Number.isNaN(val) ? 0 : val;
 }
 
-function assertClamped(val: number, min: number, max: number, name: string) {
+function assertClamped(
+  val: number,
+  min: number,
+  max: number,
+  name: string
+): number {
   return Number.isNaN(val) ? val : fuzzyAssertInRange(val, min, max, name);
 }
 
-function coordToRgb(val: number) {
+function coordToRgb(val: number): number {
   return val * 255;
 }
 
-function normalizeHue(val: number) {
+function normalizeHue(val: number): number {
   return positiveMod(val, 360);
 }
 
-function encodeSpaceForColorJs(space?: KnownColorSpace) {
+/**
+ * Normalize discrepancies between Sass color spaces and ColorJS color space
+ * ids.
+ */
+function encodeSpaceForColorJs(space?: KnownColorSpace): string | undefined {
   switch (space) {
     case 'rgb':
       return 'srgb';
@@ -152,6 +150,10 @@ function encodeSpaceForColorJs(space?: KnownColorSpace) {
   return space;
 }
 
+/**
+ * Normalize discrepancies between Sass color spaces and ColorJS color space
+ * ids.
+ */
 function decodeSpaceFromColorJs(space: string, isRgb = false): KnownColorSpace {
   switch (space) {
     case 'srgb':
@@ -170,14 +172,22 @@ function decodeSpaceFromColorJs(space: string, isRgb = false): KnownColorSpace {
 
 // @TODO For some spaces (e.g. Lab and Oklab), ColorJS only accepts `l` and not
 // `lightness` as a channel name. Maybe a bug?
-function encodeChannelForColorJs(channel: ChannelName) {
+/**
+ * Normalize discrepancies between Sass channel names and ColorJS channel ids.
+ */
+function encodeChannelForColorJs(channel: ChannelName): string {
   if (channel === 'lightness') return 'l';
   return channel;
 }
 
-// Implement our own check of channel name validity for a given space, because
-// ColorJS allows e.g. `b` for either `blue` or `blackness` or `b` channels.
-function checkChannelValid(channel: ChannelName, space: KnownColorSpace) {
+/**
+ * Implement our own check of channel name validity for a given space, because
+ * ColorJS allows e.g. `b` for either `blue` or `blackness` or `b` channels.
+ */
+function validateChannelInSpace(
+  channel: ChannelName,
+  space: KnownColorSpace
+): void {
   let valid = false;
   switch (space) {
     case 'rgb':
@@ -216,30 +226,85 @@ function checkChannelValid(channel: ChannelName, space: KnownColorSpace) {
   }
 }
 
+/** Determine whether the given space is a polar color space. */
+function isPolarColorSpace(space: KnownColorSpace): space is PolarColorSpace {
+  switch (space) {
+    case 'hsl':
+    case 'hwb':
+    case 'lch':
+    case 'oklch':
+      return true;
+    default:
+      return false;
+  }
+}
+
+/**
+ * Normalize between ColorJS coordinates (which use `NaN`) and Sass Color
+ * coordinates (which use `null`).
+ */
+function getCoordsFromColor(
+  coords: [number, number, number],
+  isRgb = false
+): [number | null, number | null, number | null] {
+  let newCoords: [number | null, number | null, number | null] = coords;
+  if (isRgb) {
+    newCoords = (newCoords as [number, number, number]).map(coordToRgb) as [
+      number,
+      number,
+      number,
+    ];
+  }
+  return (newCoords as [number, number, number]).map(NaNtoNull) as [
+    number | null,
+    number | null,
+    number | null,
+  ];
+}
+
+function emitColor4ApiDeprecation(name: string) {
+  console.warn(
+    `Deprecation [color-4-api]: \`${name}\` is deprecated; use \`channel\` instead.`
+  );
+}
+
+function emitNullAlphaDeprecation() {
+  console.warn(
+    'Deprecation [null-alpha]: ' +
+      'Passing `alpha: null` without setting `space` is deprecated.' +
+      '\n' +
+      'More info: https://sass-lang.com/d/null-alpha'
+  );
+}
+
+// @TODO remove this
 Color.defaults.precision = 15;
 
 /** A SassScript color. */
 export class SassColor extends Value {
+  // ColorJS color object
   private color: ColorType;
+  // Boolean indicating whether this color is in RGB format
   private isRgb = false;
+  // Boolean indicating whether this color has a missing `alpha` channel
   private alphaMissing = false;
-  private channel0Id: string;
-  private channel1Id: string;
-  private channel2Id: string;
-  private clone() {
-    let coords = this.color.coords;
-    if (this.space === 'rgb') {
-      coords = coords.map(coordToRgb) as [number, number, number];
-    }
+  // Names for the channels of this color
+  private channel0Id: ChannelName;
+  private channel1Id: ChannelName;
+  private channel2Id: ChannelName;
+  // Private method for cloning this as a new SassColor
+  private clone(): SassColor {
+    const coords = getCoordsFromColor(this.color.coords, this.space === 'rgb');
     return new SassColor({
       space: this.space,
       [this.channel0Id]: coords[0],
       [this.channel1Id]: coords[1],
       [this.channel2Id]: coords[2],
+      alpha: NaNtoNull(this.color.alpha),
     });
   }
 
-  constructor(options: Channels & {space?: KnownColorSpace}) {
+  constructor(options: ChannelOptions & {space?: KnownColorSpace}) {
     super();
 
     if (options.alpha === null && !options.space) {
@@ -398,25 +463,29 @@ export class SassColor extends Value {
     }
   }
 
-  /** `this`'s alpha channel. */
+  /** This color's alpha channel, between `0` and `1`. */
   get alpha(): number {
     return NaNtoZero(this.color.alpha);
   }
 
-  /** `this`'s color space. */
+  /** The name of this color's color space. */
   get space(): KnownColorSpace {
     return decodeSpaceFromColorJs(this.color.spaceId, this.isRgb);
   }
 
-  /** Whether `this` is in a legacy color space. */
+  /**
+   * A boolean indicating whether this color is in a legacy color space (`rgb`,
+   * `hsl`, or `hwb`).
+   */
   get isLegacy(): boolean {
     return ['rgb', 'hsl', 'hwb'].includes(this.space);
   }
 
-  /** The values of this color's channels (excluding the alpha channel), or
-   * `null` for [missing] channels.
+  /**
+   * A list of this color's channel values (excluding alpha), with [missing
+   * channels] converted to `null`.
    *
-   * [missing]: https://www.w3.org/TR/css-color-4/#missing
+   * [missing channels]: https://developer.mozilla.org/en-US/docs/Web/CSS/color_value#missing_color_components
    */
   get channelsOrNull(): List<number | null> {
     let coords = this.color.coords;
@@ -426,7 +495,12 @@ export class SassColor extends Value {
     return List(coords.map(NaNtoNull));
   }
 
-  /** The values of this color's channels (excluding the alpha channel). */
+  /**
+   * A list of this color's channel values (excluding alpha), with [missing
+   * channels] converted to `0`.
+   *
+   * [missing channels]: https://developer.mozilla.org/en-US/docs/Web/CSS/color_value#missing_color_components
+   */
   get channels(): List<number> {
     let coords = this.color.coords;
     if (this.space === 'rgb') {
@@ -435,52 +509,84 @@ export class SassColor extends Value {
     return List(coords.map(NaNtoZero));
   }
 
-  /** `this`'s red channel. */
+  /**
+   * This color's red channel in the RGB color space, between `0` and `255`.
+   *
+   * @deprecated Use {@link channel} instead.
+   */
   get red(): number {
     emitColor4ApiDeprecation('red');
     const val = NaNtoZero(coordToRgb(this.color.srgb.red));
     return fuzzyRound(val);
   }
 
-  /** `this`'s blue channel. */
-  get blue(): number {
-    emitColor4ApiDeprecation('blue');
-    const val = NaNtoZero(coordToRgb(this.color.srgb.blue));
-    return fuzzyRound(val);
-  }
-
-  /** `this`'s green channel. */
+  /**
+   * This color's green channel in the RGB color space, between `0` and `255`.
+   *
+   * @deprecated Use {@link channel} instead.
+   */
   get green(): number {
     emitColor4ApiDeprecation('green');
     const val = NaNtoZero(coordToRgb(this.color.srgb.green));
     return fuzzyRound(val);
   }
 
-  /** `this`'s hue value. */
+  /**
+   * This color's blue channel in the RGB color space, between `0` and `255`.
+   *
+   * @deprecated Use {@link channel} instead.
+   */
+  get blue(): number {
+    emitColor4ApiDeprecation('blue');
+    const val = NaNtoZero(coordToRgb(this.color.srgb.blue));
+    return fuzzyRound(val);
+  }
+
+  /**
+   * This color's hue in the HSL color space, between `0` and `360`.
+   *
+   * @deprecated Use {@link channel} instead.
+   */
   get hue(): number {
     emitColor4ApiDeprecation('hue');
     return NaNtoZero(this.color.hsl.hue);
   }
 
-  /** `this`'s saturation value. */
+  /**
+   * This color's saturation in the HSL color space, between `0` and `100`.
+   *
+   * @deprecated Use {@link channel} instead.
+   */
   get saturation(): number {
     emitColor4ApiDeprecation('saturation');
     return NaNtoZero(this.color.hsl.saturation);
   }
 
-  /** `this`'s lightness value. */
+  /**
+   * This color's lightness in the HSL color space, between `0` and `100`.
+   *
+   * @deprecated Use {@link channel} instead.
+   */
   get lightness(): number {
     emitColor4ApiDeprecation('lightness');
     return NaNtoZero(this.color.hsl.lightness);
   }
 
-  /** `this`'s whiteness value. */
+  /**
+   * This color's whiteness in the HWB color space, between `0` and `100`.
+   *
+   * @deprecated Use {@link channel} instead.
+   */
   get whiteness(): number {
     emitColor4ApiDeprecation('whiteness');
     return NaNtoZero(this.color.hwb.whiteness);
   }
 
-  /** `this`'s blackness value. */
+  /**
+   * This color's blackness in the HWB color space, between `0` and `100`.
+   *
+   * @deprecated Use {@link channel} instead.
+   */
   get blackness(): number {
     emitColor4ApiDeprecation('blackness');
     return NaNtoZero(this.color.hwb.blackness);
@@ -490,7 +596,8 @@ export class SassColor extends Value {
     return this;
   }
 
-  _toSpaceInternal(space: KnownColorSpace) {
+  // Internal helper which mutates the current color object.
+  _toSpaceInternal(space: KnownColorSpace): void {
     this.isRgb = space === 'rgb';
     this.color = this.color.to(encodeSpaceForColorJs(space) as string);
   }
@@ -514,7 +621,8 @@ export class SassColor extends Value {
     return this.color.inGamut(encodeSpaceForColorJs(space));
   }
 
-  _toGamutInternal(space?: KnownColorSpace) {
+  // Internal helper which mutates the current color object.
+  _toGamutInternal(space?: KnownColorSpace): void {
     this.color.toGamut({space: encodeSpaceForColorJs(space)});
   }
 
@@ -551,7 +659,7 @@ export class SassColor extends Value {
     if (channel === 'alpha') return this.alpha;
     let val: number;
     const space = options?.space ?? this.space;
-    checkChannelValid(channel, space);
+    validateChannelInSpace(channel, space);
     if (options?.space) {
       val = this.color.get({
         space: encodeSpaceForColorJs(options.space) as string,
@@ -577,7 +685,7 @@ export class SassColor extends Value {
    */
   isChannelMissing(channel: ChannelName): boolean {
     if (channel === 'alpha') return Number.isNaN(this.color.alpha);
-    checkChannelValid(channel, this.space);
+    validateChannelInSpace(channel, this.space);
     return Number.isNaN(
       this.color.get({
         space: this.color.spaceId,
@@ -625,7 +733,7 @@ export class SassColor extends Value {
   ): boolean {
     if (channel === 'alpha') return false;
     const color = options?.space ? this.toSpace(options.space) : this;
-    checkChannelValid(channel, color.space);
+    validateChannelInSpace(channel, color.space);
     const channels = color.channels.toArray();
     switch (channel) {
       case color.channel0Id:
@@ -647,21 +755,63 @@ export class SassColor extends Value {
     return false;
   }
 
-  // TODO(jgerigmeyer): Temp fns to pass type checks
+  /**
+   * Returns a color partway between this color and `color2` according to
+   * `method`, as defined by the CSS Color 4 [color interpolation] procedure.
+   *
+   * [color interpolation]: https://www.w3.org/TR/css-color-4/#interpolation
+   *
+   * If `method` is missing and this color is in a rectangular color space (Lab,
+   * Oklab, RGB, and XYZ spaces), `method` defaults to the color space of this
+   * color. Otherwise, `method` defaults to a space separated list containing
+   * the color space of this color and the string "shorter".
+   *
+   * The `weight` is a number between 0 and 1 that indicates how much of this
+   * color should be in the resulting color. If omitted, it defaults to 0.5.
+   */
+  interpolate(
+    color2: SassColor,
+    options?: {
+      weight?: number;
+      method?: HueInterpolationMethod;
+    }
+  ): SassColor {
+    const hueInterpolationMethod =
+      options?.method ??
+      (isPolarColorSpace(this.space) ? 'shorter' : undefined);
+    const weight = options?.weight ?? 0.5;
+
+    if (fuzzyEquals(weight, 0)) return color2;
+    if (fuzzyEquals(weight, 1)) return this;
+
+    if (weight < 0 || weight > 1) {
+      throw valueError(
+        `Expected \`weight\` between \`0\` and \`1\`; received \`${weight}\`.`
+      );
+    }
+
+    // ColorJS inverses the `weight` argument, where `0` is `this` and `1` is
+    // `color2`.
+    const color = this.color.mix(color2.color, 1 - weight, {
+      space: encodeSpaceForColorJs(this.space),
+      hue: hueInterpolationMethod,
+    } as any); // @TODO Waiting on new ColorJS release to fix type defs
+    const coords = getCoordsFromColor(color.coords, this.space === 'rgb');
+    return new SassColor({
+      space: this.space,
+      [this.channel0Id]: coords[0],
+      [this.channel1Id]: coords[1],
+      [this.channel2Id]: coords[2],
+      alpha: NaNtoNull(this.color.alpha),
+    });
+  }
+
+  // TODO(jgerigmeyer): Temp fn to pass type checks
   change(
     options: {
       [key in ChannelName]?: number | null;
     } & {
       space?: KnownColorSpace;
-    }
-  ) {
-    return this;
-  }
-  interpolate(
-    color2: SassColor,
-    options: {
-      weight?: number;
-      method?: HueInterpolationMethod;
     }
   ) {
     return this;

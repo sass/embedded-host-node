@@ -188,6 +188,7 @@ function validateChannelInSpace(
   channel: ChannelName,
   space: KnownColorSpace
 ): void {
+  if (channel === 'alpha') return;
   let valid = false;
   switch (space) {
     case 'rgb':
@@ -262,9 +263,44 @@ function getCoordsFromColor(
   ];
 }
 
-function emitColor4ApiDeprecation(name: string) {
+function propertyIsSet(val: undefined | null | number): val is number | null {
+  return val === null || typeof val === 'number';
+}
+
+function checkChangeDeprecations(
+  options: {
+    [key in ChannelName]?: number | null;
+  },
+  channels: ChannelName[]
+) {
+  if (options.alpha === null) {
+    emitNullAlphaDeprecation();
+  }
+  for (const channel of channels) {
+    if (options[channel] === null) {
+      emitColor4ApiChangeNullDeprecation(channel);
+    }
+  }
+}
+
+function emitColor4ApiGetterDeprecation(name: string) {
   console.warn(
     `Deprecation [color-4-api]: \`${name}\` is deprecated; use \`channel\` instead.`
+  );
+}
+
+function emitColor4ApiChangeSpaceDeprecation() {
+  console.warn(
+    'Deprecation [color-4-api]: ' +
+      "Changing a channel not in this color's space without explicitly " +
+      'specifying the `space` option is deprecated.'
+  );
+}
+
+function emitColor4ApiChangeNullDeprecation(channel: string) {
+  console.warn(
+    'Deprecation [color-4-api]: ' +
+      `Passing \`${channel}: null\` without setting \`space\` is deprecated.`
   );
 }
 
@@ -306,13 +342,6 @@ export class SassColor extends Value {
 
   constructor(options: ChannelOptions & {space?: KnownColorSpace}) {
     super();
-
-    if (options.alpha === null && !options.space) {
-      console.warn(
-        'Passing `alpha: null` without setting `space` is deprecated.\n\n' +
-          'More info: https://sass-lang.com/d/null-alpha'
-      );
-    }
 
     const space = options.space ?? getColorSpace(options);
     if (space === 'rgb') {
@@ -515,7 +544,7 @@ export class SassColor extends Value {
    * @deprecated Use {@link channel} instead.
    */
   get red(): number {
-    emitColor4ApiDeprecation('red');
+    emitColor4ApiGetterDeprecation('red');
     const val = NaNtoZero(coordToRgb(this.color.srgb.red));
     return fuzzyRound(val);
   }
@@ -526,7 +555,7 @@ export class SassColor extends Value {
    * @deprecated Use {@link channel} instead.
    */
   get green(): number {
-    emitColor4ApiDeprecation('green');
+    emitColor4ApiGetterDeprecation('green');
     const val = NaNtoZero(coordToRgb(this.color.srgb.green));
     return fuzzyRound(val);
   }
@@ -537,7 +566,7 @@ export class SassColor extends Value {
    * @deprecated Use {@link channel} instead.
    */
   get blue(): number {
-    emitColor4ApiDeprecation('blue');
+    emitColor4ApiGetterDeprecation('blue');
     const val = NaNtoZero(coordToRgb(this.color.srgb.blue));
     return fuzzyRound(val);
   }
@@ -548,7 +577,7 @@ export class SassColor extends Value {
    * @deprecated Use {@link channel} instead.
    */
   get hue(): number {
-    emitColor4ApiDeprecation('hue');
+    emitColor4ApiGetterDeprecation('hue');
     return NaNtoZero(this.color.hsl.hue);
   }
 
@@ -558,7 +587,7 @@ export class SassColor extends Value {
    * @deprecated Use {@link channel} instead.
    */
   get saturation(): number {
-    emitColor4ApiDeprecation('saturation');
+    emitColor4ApiGetterDeprecation('saturation');
     return NaNtoZero(this.color.hsl.saturation);
   }
 
@@ -568,7 +597,7 @@ export class SassColor extends Value {
    * @deprecated Use {@link channel} instead.
    */
   get lightness(): number {
-    emitColor4ApiDeprecation('lightness');
+    emitColor4ApiGetterDeprecation('lightness');
     return NaNtoZero(this.color.hsl.lightness);
   }
 
@@ -578,7 +607,7 @@ export class SassColor extends Value {
    * @deprecated Use {@link channel} instead.
    */
   get whiteness(): number {
-    emitColor4ApiDeprecation('whiteness');
+    emitColor4ApiGetterDeprecation('whiteness');
     return NaNtoZero(this.color.hwb.whiteness);
   }
 
@@ -588,7 +617,7 @@ export class SassColor extends Value {
    * @deprecated Use {@link channel} instead.
    */
   get blackness(): number {
-    emitColor4ApiDeprecation('blackness');
+    emitColor4ApiGetterDeprecation('blackness');
     return NaNtoZero(this.color.hwb.blackness);
   }
 
@@ -603,7 +632,8 @@ export class SassColor extends Value {
   }
 
   /**
-   * Returns this color converted to the specified `space`.
+   * Returns a new color that's the result of converting this color to the
+   * specified `space`.
    */
   toSpace(space: KnownColorSpace): SassColor {
     if (space === this.space) return this;
@@ -627,12 +657,13 @@ export class SassColor extends Value {
   }
 
   /**
-   * Returns this color, modified so it is in-gamut for the specified `space`—or
-   * the current color space if `space` is not specified—using the recommended
-   * [CSS Gamut Mapping Algorithm][css-mapping] to map out-of-gamut colors into
-   * the desired gamut with as little perceptual change as possible.
+   * Returns a copy of this color, modified so it is in-gamut for the specified
+   * `space`—or the current color space if `space` is not specified—using the
+   * recommended [CSS Gamut Mapping Algorithm][css-mapping] to map out-of-gamut
+   * colors into the desired gamut with as little perceptual change as possible.
    *
-   * [css-mapping]: https://www.w3.org/TR/css-color-4/#css-gamut-mapping-algorithm
+   * [css-mapping]:
+   * https://www.w3.org/TR/css-color-4/#css-gamut-mapping-algorithm
    */
   toGamut(space?: KnownColorSpace): SassColor {
     if (this.isInGamut(space)) return this;
@@ -803,7 +834,52 @@ export class SassColor extends Value {
     });
   }
 
-  // TODO(jgerigmeyer): Temp fn to pass type checks
+  /**
+   * Returns a new color that's the result of changing one or more of this
+   * color's channels.
+   */
+  change(
+    options: {
+      [key in ChannelNameHsl]?: number | null;
+    } & {
+      space?: ColorSpaceHsl;
+    }
+  ): SassColor;
+  change(
+    options: {
+      [key in ChannelNameHwb]?: number | null;
+    } & {
+      space?: ColorSpaceHwb;
+    }
+  ): SassColor;
+  change(
+    options: {
+      [key in ChannelNameLab]?: number | null;
+    } & {
+      space?: ColorSpaceLab;
+    }
+  ): SassColor;
+  change(
+    options: {
+      [key in ChannelNameLch]?: number | null;
+    } & {
+      space?: ColorSpaceLch;
+    }
+  ): SassColor;
+  change(
+    options: {
+      [key in ChannelNameRgb]?: number | null;
+    } & {
+      space?: ColorSpaceRgb;
+    }
+  ): SassColor;
+  change(
+    options: {
+      [key in ChannelNameXyz]?: number | null;
+    } & {
+      space?: ColorSpaceXyz;
+    }
+  ): SassColor;
   change(
     options: {
       [key in ChannelName]?: number | null;
@@ -811,60 +887,173 @@ export class SassColor extends Value {
       space?: KnownColorSpace;
     }
   ) {
-    return this;
-  }
+    const spaceSetExplicitly = !!options.space;
+    let space = options.space ?? this.space;
+    if (this.isLegacy && !spaceSetExplicitly) {
+      if (
+        propertyIsSet(options.whiteness) ||
+        propertyIsSet(options.blackness) ||
+        (this.space === 'hwb' && propertyIsSet(options.hue))
+      ) {
+        space = 'hwb';
+      } else if (
+        propertyIsSet(options.hue) ||
+        propertyIsSet(options.saturation) ||
+        propertyIsSet(options.lightness)
+      ) {
+        space = 'hsl';
+      } else if (
+        propertyIsSet(options.red) ||
+        propertyIsSet(options.green) ||
+        propertyIsSet(options.blue)
+      ) {
+        space = 'rgb';
+      }
+      if (space !== this.space) {
+        emitColor4ApiChangeSpaceDeprecation();
+      }
+    }
 
-  /**
-   * Returns a copy of `this` with its channels changed to match `color`.
-   */
-  // change(color: Partial<RgbColor>): SassColor;
-  // change(color: Partial<HslColor>): SassColor;
-  // change(color: Partial<HwbColor>): SassColor;
-  // change(
-  //   color: Partial<RgbColor> | Partial<HslColor> | Partial<HwbColor>
-  // ): SassColor {
-  //   if ('whiteness' in color || 'blackness' in color) {
-  //     return new SassColor({
-  //       hue: color.hue ?? this.hue,
-  //       whiteness: color.whiteness ?? this.whiteness,
-  //       blackness: color.blackness ?? this.blackness,
-  //       alpha: color.alpha ?? this.alpha,
-  //     });
-  //   } else if (
-  //     'hue' in color ||
-  //     'saturation' in color ||
-  //     'lightness' in color
-  //   ) {
-  //     // Tell TypeScript this isn't a Partial<HwbColor>.
-  //     const hsl = color as Partial<HslColor>;
-  //     return new SassColor({
-  //       hue: hsl.hue ?? this.hue,
-  //       saturation: hsl.saturation ?? this.saturation,
-  //       lightness: hsl.lightness ?? this.lightness,
-  //       alpha: hsl.alpha ?? this.alpha,
-  //     });
-  //   } else if (
-  //     'red' in color ||
-  //     'green' in color ||
-  //     'blue' in color ||
-  //     this.redInternal
-  //   ) {
-  //     const rgb = color as Partial<RgbColor>;
-  //     return new SassColor({
-  //       red: rgb.red ?? this.red,
-  //       green: rgb.green ?? this.green,
-  //       blue: rgb.blue ?? this.blue,
-  //       alpha: rgb.alpha ?? this.alpha,
-  //     });
-  //   } else {
-  //     return new SassColor({
-  //       hue: this.hue,
-  //       saturation: this.saturation,
-  //       lightness: this.lightness,
-  //       alpha: color.alpha ?? this.alpha,
-  //     });
-  //   }
-  // }
+    // Validate channel values
+    const keys = Object.keys(options).filter(
+      key => key !== 'space'
+    ) as ChannelName[];
+    for (const channel of keys) {
+      validateChannelInSpace(channel, space);
+    }
+    if (propertyIsSet(options.alpha) && options.alpha !== null) {
+      fuzzyAssertInRange(options.alpha, 0, 1, 'alpha');
+    }
+    if (propertyIsSet(options.lightness) && options.lightness !== null) {
+      const maxLightness = space === 'oklab' || space === 'oklch' ? 1 : 100;
+      assertClamped(options.lightness, 0, maxLightness, 'lightness');
+    }
+
+    const color = this.toSpace(space);
+    const getChangedValue = (channel: ChannelName) => {
+      if (propertyIsSet(options[channel])) {
+        return options[channel];
+      }
+      return color.channel(channel);
+    };
+    let changedColor: SassColor;
+
+    switch (space) {
+      case 'hsl':
+        if (spaceSetExplicitly) {
+          changedColor = new SassColor({
+            hue: getChangedValue('hue'),
+            saturation: getChangedValue('saturation'),
+            lightness: getChangedValue('lightness'),
+            alpha: getChangedValue('alpha'),
+            space,
+          });
+        } else {
+          checkChangeDeprecations(options, ['hue', 'saturation', 'lightness']);
+          changedColor = new SassColor({
+            hue: options.hue ?? color.channel('hue'),
+            saturation: options.saturation ?? color.channel('saturation'),
+            lightness: options.lightness ?? color.channel('lightness'),
+            alpha: options.alpha ?? color.channel('alpha'),
+            space,
+          });
+        }
+        break;
+
+      case 'hwb':
+        if (spaceSetExplicitly) {
+          changedColor = new SassColor({
+            hue: getChangedValue('hue'),
+            whiteness: getChangedValue('whiteness'),
+            blackness: getChangedValue('blackness'),
+            alpha: getChangedValue('alpha'),
+            space,
+          });
+        } else {
+          checkChangeDeprecations(options, ['hue', 'whiteness', 'blackness']);
+          changedColor = new SassColor({
+            hue: options.hue ?? color.channel('hue'),
+            whiteness: options.whiteness ?? color.channel('whiteness'),
+            blackness: options.blackness ?? color.channel('blackness'),
+            alpha: options.alpha ?? color.channel('alpha'),
+            space,
+          });
+        }
+        break;
+
+      case 'rgb':
+        if (spaceSetExplicitly) {
+          changedColor = new SassColor({
+            red: getChangedValue('red'),
+            green: getChangedValue('green'),
+            blue: getChangedValue('blue'),
+            alpha: getChangedValue('alpha'),
+            space,
+          });
+        } else {
+          checkChangeDeprecations(options, ['red', 'green', 'blue']);
+          changedColor = new SassColor({
+            red: options.red ?? color.channel('red'),
+            green: options.green ?? color.channel('green'),
+            blue: options.blue ?? color.channel('blue'),
+            alpha: options.alpha ?? color.channel('alpha'),
+            space,
+          });
+        }
+        break;
+
+      case 'lab':
+      case 'oklab':
+        changedColor = new SassColor({
+          lightness: getChangedValue('lightness'),
+          a: getChangedValue('a'),
+          b: getChangedValue('b'),
+          alpha: getChangedValue('alpha'),
+          space,
+        });
+        break;
+
+      case 'lch':
+      case 'oklch':
+        changedColor = new SassColor({
+          lightness: getChangedValue('lightness'),
+          chroma: getChangedValue('chroma'),
+          hue: getChangedValue('hue'),
+          alpha: getChangedValue('alpha'),
+          space,
+        });
+        break;
+
+      case 'a98-rgb':
+      case 'display-p3':
+      case 'prophoto-rgb':
+      case 'rec2020':
+      case 'srgb':
+      case 'srgb-linear':
+        changedColor = new SassColor({
+          red: getChangedValue('red'),
+          green: getChangedValue('green'),
+          blue: getChangedValue('blue'),
+          alpha: getChangedValue('alpha'),
+          space,
+        });
+        break;
+
+      case 'xyz':
+      case 'xyz-d50':
+      case 'xyz-d65':
+        changedColor = new SassColor({
+          y: getChangedValue('y'),
+          x: getChangedValue('x'),
+          z: getChangedValue('z'),
+          alpha: getChangedValue('alpha'),
+          space,
+        });
+        break;
+    }
+
+    return changedColor.toSpace(this.space);
+  }
 
   equals(other: Value): boolean {
     if (!(other instanceof SassColor)) return false;

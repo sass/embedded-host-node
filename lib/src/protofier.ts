@@ -72,6 +72,7 @@ export class Protofier {
       color.channel2 = channels.get(1) as number;
       color.channel3 = channels.get(2) as number;
       color.alpha = value.alpha;
+      color.space = value.space;
       result.value = {case: 'color', value: color};
     } else if (value instanceof SassList) {
       const list = new proto.Value_List();

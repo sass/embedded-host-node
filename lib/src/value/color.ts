@@ -313,9 +313,6 @@ function emitNullAlphaDeprecation() {
   );
 }
 
-// @TODO remove this
-Color.defaults.precision = 15;
-
 /** A SassScript color. */
 export class SassColor extends Value {
   // ColorJS color object

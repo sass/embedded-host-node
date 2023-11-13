@@ -39,7 +39,7 @@ export class Compiler {
   private readonly stderr$ = new Subject<Buffer>();
 
   /** Whether the underlying compiler has already exited. */
-  private exited = false;
+  private disposed = false;
 
   /** Writes `buffer` to the child process's stdin. */
   private writeStdin(buffer: Buffer): void {
@@ -58,14 +58,14 @@ export class Compiler {
         return true;
 
       case 'exit':
-        this.exited = true;
+        this.disposed = true;
         return false;
     }
   }
 
   /** Blocks until the underlying process exits. */
   private yieldUntilExit(): void {
-    while (!this.exited) {
+    while (!this.disposed) {
       this.yield();
     }
   }
@@ -121,14 +121,14 @@ export class Compiler {
     }
   }
 
-  private throwIfClosed(): void {
-    if (this.exited) {
+  private throwIfDisposed(): void {
+    if (this.disposed) {
       throw utils.compilerError('Sync compiler has already exited.');
     }
   }
 
   compile(path: string, options?: Options<'sync'>): CompileResult {
-    this.throwIfClosed();
+    this.throwIfDisposed();
     const importers = new ImporterRegistry(options);
     return this.compileRequestSync(
       newCompilePathRequest(path, importers, options),
@@ -138,7 +138,7 @@ export class Compiler {
   }
 
   compileString(source: string, options?: Options<'sync'>): CompileResult {
-    this.throwIfClosed();
+    this.throwIfDisposed();
     const importers = new ImporterRegistry(options);
     return this.compileRequestSync(
       newCompileStringRequest(source, importers, options),

@@ -6,27 +6,24 @@ import * as p from 'path';
 import {Observable} from 'rxjs';
 import * as supportsColor from 'supports-color';
 
-import * as proto from './vendor/embedded_sass_pb';
-import * as utils from './utils';
 import {AsyncEmbeddedCompiler} from './async-compiler';
-import {CompileResult, Options, SourceSpan, StringOptions} from './vendor/sass';
+import {OptionsWithLegacy, StringOptionsWithLegacy} from './compiler';
+import {deprotofySourceSpan} from './deprotofy-span';
 import {Dispatcher, DispatcherHandlers} from './dispatcher';
 import {Exception} from './exception';
 import {FunctionRegistry} from './function-registry';
 import {ImporterRegistry} from './importer-registry';
-import {MessageTransformer} from './message-transformer';
-import {PacketTransformer} from './packet-transformer';
 import {
-  initCompiler,
-  OptionsWithLegacy,
-  StringOptionsWithLegacy,
-} from './sync-compiler';
-import {deprotofySourceSpan} from './deprotofy-span';
-import {
+  legacyImporterProtocol,
   removeLegacyImporter,
   removeLegacyImporterFromSpan,
-  legacyImporterProtocol,
 } from './legacy/utils';
+import {MessageTransformer} from './message-transformer';
+import {PacketTransformer} from './packet-transformer';
+import {initCompiler} from './sync-compiler';
+import * as utils from './utils';
+import * as proto from './vendor/embedded_sass_pb';
+import {CompileResult, Options, SourceSpan, StringOptions} from './vendor/sass';
 
 export function compile(
   path: string,

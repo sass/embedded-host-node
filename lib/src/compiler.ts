@@ -2,22 +2,22 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-import { Observable } from 'rxjs';
+import {Observable} from 'rxjs';
 
 import * as p from 'path';
 import * as supportsColor from 'supports-color';
-import { deprotofySourceSpan } from './deprotofy-span';
-import { Dispatcher, DispatcherHandlers } from './dispatcher';
-import { Exception } from './exception';
-import { ImporterRegistry } from './importer-registry';
-import { legacyImporterProtocol } from './legacy/utils';
-import { MessageTransformer } from './message-transformer';
-import { PacketTransformer } from './packet-transformer';
+import {deprotofySourceSpan} from './deprotofy-span';
+import {Dispatcher, DispatcherHandlers} from './dispatcher';
+import {Exception} from './exception';
+import {ImporterRegistry} from './importer-registry';
+import {legacyImporterProtocol} from './legacy/utils';
+import {MessageTransformer} from './message-transformer';
+import {PacketTransformer} from './packet-transformer';
 import * as utils from './utils';
 import * as proto from './vendor/embedded_sass_pb';
-import { SourceSpan } from './vendor/sass';
-import { CompileResult } from './vendor/sass/compile';
-import { Options, StringOptions } from './vendor/sass/options';
+import {SourceSpan} from './vendor/sass';
+import {CompileResult} from './vendor/sass/compile';
+import {Options, StringOptions} from './vendor/sass/options';
 
 /// Allow the legacy API to pass in an option signaling to the modern API that
 /// it's being run in legacy mode.
@@ -145,9 +145,9 @@ export function handleLogEvent(
   options: OptionsWithLegacy<'sync' | 'async'> | undefined,
   event: proto.OutboundMessage_LogEvent
 ): void {
-  let span = event.span ? deprotofySourceSpan(event.span) : null;
-  let message = event.message;
-  let formatted = event.formatted;
+  const span = event.span ? deprotofySourceSpan(event.span) : null;
+  const message = event.message;
+  const formatted = event.formatted;
 
   if (event.type === proto.LogEventType.DEBUG) {
     if (options?.logger?.debug) {

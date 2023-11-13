@@ -16,7 +16,11 @@ import {FunctionRegistry} from './function-registry';
 import {ImporterRegistry} from './importer-registry';
 import {MessageTransformer} from './message-transformer';
 import {PacketTransformer} from './packet-transformer';
-import {SyncEmbeddedCompiler} from './sync-compiler';
+import {
+  initCompiler,
+  OptionsWithLegacy,
+  StringOptionsWithLegacy,
+} from './sync-compiler';
 import {deprotofySourceSpan} from './deprotofy-span';
 import {
   removeLegacyImporter,
@@ -24,45 +28,24 @@ import {
   legacyImporterProtocol,
 } from './legacy/utils';
 
-/// Allow the legacy API to pass in an option signaling to the modern API that
-/// it's being run in legacy mode.
-///
-/// This is not intended for API users to pass in, and may be broken without
-/// warning in the future.
-type OptionsWithLegacy<sync extends 'sync' | 'async'> = Options<sync> & {
-  legacy?: boolean;
-};
-
-/// Allow the legacy API to pass in an option signaling to the modern API that
-/// it's being run in legacy mode.
-///
-/// This is not intended for API users to pass in, and may be broken without
-/// warning in the future.
-type StringOptionsWithLegacy<sync extends 'sync' | 'async'> =
-  StringOptions<sync> & {legacy?: boolean};
-
 export function compile(
   path: string,
   options?: OptionsWithLegacy<'sync'>
 ): CompileResult {
-  const importers = new ImporterRegistry(options);
-  return compileRequestSync(
-    newCompilePathRequest(path, importers, options),
-    importers,
-    options
-  );
+  const compiler = initCompiler();
+  const result = compiler.compile(path, options);
+  compiler.dispose();
+  return result;
 }
 
 export function compileString(
   source: string,
   options?: StringOptionsWithLegacy<'sync'>
 ): CompileResult {
-  const importers = new ImporterRegistry(options);
-  return compileRequestSync(
-    newCompileStringRequest(source, importers, options),
-    importers,
-    options
-  );
+  const compiler = initCompiler();
+  const result = compiler.compileString(source, options);
+  compiler.dispose();
+  return result;
 }
 
 export function compileAsync(
@@ -209,58 +192,6 @@ async function compileRequestAsync(
   } finally {
     embeddedCompiler.close();
     await embeddedCompiler.exit$;
-  }
-}
-
-// Spins up a compiler, then sends it a compile request. Returns a promise that
-// resolves with the CompileResult. Throws if there were any protocol or
-// compilation errors. Shuts down the compiler after compilation.
-function compileRequestSync(
-  request: proto.InboundMessage_CompileRequest,
-  importers: ImporterRegistry<'sync'>,
-  options?: OptionsWithLegacy<'sync'>
-): CompileResult {
-  const functions = new FunctionRegistry(options?.functions);
-  const embeddedCompiler = new SyncEmbeddedCompiler();
-  embeddedCompiler.stderr$.subscribe(data => process.stderr.write(data));
-
-  try {
-    const dispatcher = createDispatcher<'sync'>(
-      embeddedCompiler.stdout$,
-      buffer => {
-        embeddedCompiler.writeStdin(buffer);
-      },
-      {
-        handleImportRequest: request => importers.import(request),
-        handleFileImportRequest: request => importers.fileImport(request),
-        handleCanonicalizeRequest: request => importers.canonicalize(request),
-        handleFunctionCallRequest: request => functions.call(request),
-      }
-    );
-
-    dispatcher.logEvents$.subscribe(event => handleLogEvent(options, event));
-
-    let error: unknown;
-    let response: proto.OutboundMessage_CompileResponse | undefined;
-    dispatcher.sendCompileRequest(request, (error_, response_) => {
-      if (error_) {
-        error = error_;
-      } else {
-        response = response_;
-      }
-    });
-
-    for (;;) {
-      if (!embeddedCompiler.yield()) {
-        throw utils.compilerError('Embedded compiler exited unexpectedly.');
-      }
-
-      if (error) throw error;
-      if (response) return handleCompileResponse(response);
-    }
-  } finally {
-    embeddedCompiler.close();
-    embeddedCompiler.yieldUntilExit();
   }
 }
 

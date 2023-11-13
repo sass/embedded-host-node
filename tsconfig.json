@@ -6,7 +6,6 @@
     "resolveJsonModule": true,
     "rootDir": ".",
     "useUnknownInCatchVariables": false,
-    "resolveJsonModule": true,
     "declaration": false,
     "lib": ["DOM"]
   },

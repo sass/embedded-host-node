@@ -12,8 +12,7 @@ import {
   positiveMod,
 } from './utils';
 import {List, hash} from 'immutable';
-import Color from 'colorjs.io/dist/color.legacy.cjs';
-import type ColorType from 'colorjs.io';
+import Color from 'colorjs.io';
 
 /** The HSL color space name. */
 type ColorSpaceHsl = 'hsl';
@@ -316,7 +315,7 @@ function emitNullAlphaDeprecation() {
 /** A SassScript color. */
 export class SassColor extends Value {
   // ColorJS color object
-  private color: ColorType;
+  private color: Color;
   // Boolean indicating whether this color is in RGB format
   private isRgb = false;
   // Boolean indicating whether this color has a missing `alpha` channel

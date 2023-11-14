@@ -10,7 +10,11 @@ import {deprotofySourceSpan} from './deprotofy-span';
 import {Dispatcher, DispatcherHandlers} from './dispatcher';
 import {Exception} from './exception';
 import {ImporterRegistry} from './importer-registry';
-import {legacyImporterProtocol} from './legacy/utils';
+import {
+  legacyImporterProtocol,
+  removeLegacyImporter,
+  removeLegacyImporterFromSpan,
+} from './legacy/utils';
 import {MessageTransformer} from './message-transformer';
 import {PacketTransformer} from './packet-transformer';
 import * as utils from './utils';
@@ -145,9 +149,12 @@ export function handleLogEvent(
   options: OptionsWithLegacy<'sync' | 'async'> | undefined,
   event: proto.OutboundMessage_LogEvent
 ): void {
-  const span = event.span ? deprotofySourceSpan(event.span) : null;
-  const message = event.message;
-  const formatted = event.formatted;
+  let span = event.span ? deprotofySourceSpan(event.span) : null;
+  if (span && options?.legacy) span = removeLegacyImporterFromSpan(span);
+  let message = event.message;
+  if (options?.legacy) message = removeLegacyImporter(message);
+  let formatted = event.formatted;
+  if (options?.legacy) formatted = removeLegacyImporter(formatted);
 
   if (event.type === proto.LogEventType.DEBUG) {
     if (options?.logger?.debug) {
@@ -159,18 +166,15 @@ export function handleLogEvent(
     }
   } else {
     if (options?.logger?.warn) {
-      const params: {
-        deprecation: boolean;
-        span?: SourceSpan;
-        stack?: string;
-      } = {
-        deprecation: event.type === proto.LogEventType.DEPRECATION_WARNING,
-      };
+      const params: {deprecation: boolean; span?: SourceSpan; stack?: string} =
+        {
+          deprecation: event.type === proto.LogEventType.DEPRECATION_WARNING,
+        };
       if (span) params.span = span;
 
       const stack = event.stackTrace;
       if (stack) {
-        params.stack = stack;
+        params.stack = options?.legacy ? removeLegacyImporter(stack) : stack;
       }
 
       options.logger.warn(message, params);

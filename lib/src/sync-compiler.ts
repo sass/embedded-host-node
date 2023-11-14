@@ -81,49 +81,44 @@ export class Compiler {
     const functions = new FunctionRegistry(options?.functions);
     this.stderr$.subscribe(data => process.stderr.write(data));
 
-    try {
-      const dispatcher = createDispatcher<'sync'>(
-        this.stdout$,
-        buffer => {
-          this.writeStdin(buffer);
-        },
-        {
-          handleImportRequest: request => importers.import(request),
-          handleFileImportRequest: request => importers.fileImport(request),
-          handleCanonicalizeRequest: request => importers.canonicalize(request),
-          handleFunctionCallRequest: request => functions.call(request),
-        }
-      );
-
-      dispatcher.logEvents$.subscribe(event => handleLogEvent(options, event));
-
-      let error: unknown;
-      let response: proto.OutboundMessage_CompileResponse | undefined;
-      dispatcher.sendCompileRequest(request, (error_, response_) => {
-        if (error_) {
-          error = error_;
-        } else {
-          response = response_;
-        }
-      });
-
-      for (;;) {
-        if (!this.yield()) {
-          throw utils.compilerError('Embedded compiler exited unexpectedly.');
-        }
-
-        if (error) throw error;
-        if (response) return handleCompileResponse(response);
+    const dispatcher = createDispatcher<'sync'>(
+      this.stdout$,
+      buffer => {
+        this.writeStdin(buffer);
+      },
+      {
+        handleImportRequest: request => importers.import(request),
+        handleFileImportRequest: request => importers.fileImport(request),
+        handleCanonicalizeRequest: request => importers.canonicalize(request),
+        handleFunctionCallRequest: request => functions.call(request),
       }
-    } finally {
-      this.dispose();
-      this.yieldUntilExit();
+    );
+
+    dispatcher.logEvents$.subscribe(event => handleLogEvent(options, event));
+
+    let error: unknown;
+    let response: proto.OutboundMessage_CompileResponse | undefined;
+    dispatcher.sendCompileRequest(request, (error_, response_) => {
+      if (error_) {
+        error = error_;
+      } else {
+        response = response_;
+      }
+    });
+
+    for (;;) {
+      if (!this.yield()) {
+        throw utils.compilerError('Embedded compiler exited unexpectedly.');
+      }
+
+      if (error) throw error;
+      if (response) return handleCompileResponse(response);
     }
   }
 
   private throwIfDisposed(): void {
     if (this.disposed) {
-      throw utils.compilerError('Sync compiler has already exited.');
+      throw utils.compilerError('Sync compiler has already been disposed.');
     }
   }
 
@@ -150,6 +145,7 @@ export class Compiler {
   /** Kills the child process, cleaning up all associated Observables. */
   dispose() {
     this.process.stdin.end();
+    this.yieldUntilExit();
   }
 }
 

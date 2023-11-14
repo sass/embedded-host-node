@@ -58,7 +58,7 @@ export class AsyncCompiler {
 
   private throwIfDisposed(): void {
     if (this.disposed) {
-      throw utils.compilerError('Sync compiler has already exited.');
+      throw utils.compilerError('Async compiler has already been disposed.');
     }
   }
 

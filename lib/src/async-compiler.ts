@@ -36,6 +36,9 @@ export class AsyncCompiler {
   /** Whether the underlying compiler has already exited. */
   private disposed = false;
 
+  /** A record of all compilations */
+  private compilations: Promise<CompileResult>[] = [];
+
   /** The child process's exit event. */
   private readonly exit$ = new Promise<number | null>(resolve => {
     this.process.on('exit', code => resolve(code));
@@ -108,11 +111,13 @@ export class AsyncCompiler {
   ): Promise<CompileResult> {
     this.throwIfDisposed();
     const importers = new ImporterRegistry(options);
-    return this.compileRequestAsync(
+    const compilation = this.compileRequestAsync(
       newCompilePathRequest(path, importers, options),
       importers,
       options
     );
+    this.compilations.push(compilation);
+    return compilation;
   }
 
   compileStringAsync(
@@ -121,16 +126,19 @@ export class AsyncCompiler {
   ): Promise<CompileResult> {
     this.throwIfDisposed();
     const importers = new ImporterRegistry(options);
-    return this.compileRequestAsync(
+    const compilation = this.compileRequestAsync(
       newCompileStringRequest(source, importers, options),
       importers,
       options
     );
+    this.compilations.push(compilation);
+    return compilation;
   }
 
   /** Kills the child process, cleaning up all associated Observables. */
   async dispose() {
     this.disposed = true;
+    await Promise.all(this.compilations);
     this.process.stdin.end();
     await this.exit$;
   }

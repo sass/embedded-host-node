@@ -188,9 +188,9 @@ function decodeSpaceFromColorJs(space: string, isRgb = false): KnownColorSpace {
  * Normalize discrepancies between Sass channel names and ColorJS channel ids,
  * converting Sass values to ColorJS values.
  *
- * For some spaces (e.g. Lab and Oklab), ColorJS only accepts `l` and not
- * `lightness` as a channel name. This might be a bug:
- * https://github.com/LeaVerou/color.js/issues/345.
+ * @TODO Waiting on a new release of ColorJS that allows Lab spaces to accept
+ * `lightness` instead of only `l` and not as a channel name.
+ * Fixed in: https://github.com/LeaVerou/color.js/pull/348
  */
 function encodeChannelForColorJs(channel: ChannelName): string {
   if (channel === 'lightness') return 'l';
@@ -882,7 +882,9 @@ export class SassColor extends Value {
     const color = this.color.mix(color2.color, 1 - weight, {
       space: encodeSpaceForColorJs(this.space),
       hue: hueInterpolationMethod,
-    } as any); // @TODO https://github.com/LeaVerou/color.js/issues/346
+      // @TODO Waiting on new release of ColorJS to fix option types.
+      // Fixed in: https://github.com/LeaVerou/color.js/pull/347
+    } as any);
     const coords = decodeCoordsFromColorJs(color.coords, this.space === 'rgb');
     return new SassColor({
       space: this.space,

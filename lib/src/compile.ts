@@ -12,9 +12,11 @@ export function compile(
   options?: OptionsWithLegacy<'sync'>
 ): CompileResult {
   const compiler = initCompiler();
-  const result = compiler.compile(path, options);
-  compiler.dispose();
-  return result;
+  try {
+    return compiler.compile(path, options);
+  } finally {
+    compiler.dispose();
+  }
 }
 
 export function compileString(
@@ -22,9 +24,11 @@ export function compileString(
   options?: StringOptionsWithLegacy<'sync'>
 ): CompileResult {
   const compiler = initCompiler();
-  const result = compiler.compileString(source, options);
-  compiler.dispose();
-  return result;
+  try {
+    return compiler.compileString(source, options);
+  } finally {
+    compiler.dispose();
+  }
 }
 
 export async function compileAsync(

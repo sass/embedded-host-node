@@ -36,8 +36,8 @@ export class AsyncCompiler {
   /** Whether the underlying compiler has already exited. */
   private disposed = false;
 
-  /** A record of all compilations */
-  private compilations: Promise<CompileResult>[] = [];
+  /** A list of pending compilations */
+  private compilations = new Set<Promise<CompileResult>>();
 
   /** The child process's exit event. */
   private readonly exit$ = new Promise<number | null>(resolve => {
@@ -57,6 +57,14 @@ export class AsyncCompiler {
   /** Writes `buffer` to the child process's stdin. */
   private writeStdin(buffer: Buffer): void {
     this.process.stdin.write(buffer);
+  }
+
+  /** Adds a compilation to the pending set and removes it up when it's done. */
+  private addCompilation(compilation: Promise<CompileResult>): void {
+    this.compilations.add(compilation);
+    compilation
+      .catch(() => {})
+      .finally(() => this.compilations.delete(compilation));
   }
 
   private throwIfDisposed(): void {
@@ -116,7 +124,7 @@ export class AsyncCompiler {
       importers,
       options
     );
-    this.compilations.push(compilation);
+    this.addCompilation(compilation);
     return compilation;
   }
 
@@ -131,7 +139,7 @@ export class AsyncCompiler {
       importers,
       options
     );
-    this.compilations.push(compilation);
+    this.addCompilation(compilation);
     return compilation;
   }
 

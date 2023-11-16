@@ -31,8 +31,7 @@ export function fetchRepo(options: {
       `git clone \
       --depth=1 \
       https://github.com/sass/${options.repo} \
-      ${path}`,
-      {silent: true}
+      ${path}`
     );
   }
 
@@ -41,10 +40,7 @@ export function fetchRepo(options: {
   console.log(`Fetching ${version} for ${options.repo}.`);
   shell.exec(
     `git fetch --depth=1 origin ${options.ref} && git reset --hard FETCH_HEAD`,
-    {
-      silent: true,
-      cwd: path,
-    }
+    {cwd: path}
   );
 }
 

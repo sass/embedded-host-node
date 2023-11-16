@@ -23,6 +23,9 @@ import {SourceSpan} from './vendor/sass';
 import {CompileResult} from './vendor/sass/compile';
 import {Options, StringOptions} from './vendor/sass/options';
 
+// A module-level ID for each compilation.
+let compilationId = 0;
+
 /// Allow the legacy API to pass in an option signaling to the modern API that
 /// it's being run in legacy mode.
 ///
@@ -56,11 +59,7 @@ export function createDispatcher<sync extends 'sync' | 'async'>(
   );
 
   return new Dispatcher<sync>(
-    // Since we only use one compilation per process, we can get away with
-    // hardcoding a compilation ID. Once we support multiple concurrent
-    // compilations with the same process, we'll need to ensure each one uses a
-    // unique ID.
-    1,
+    compilationId += 1,
     messageTransformer.outboundMessages$,
     message => messageTransformer.writeInboundMessage(message),
     handlers

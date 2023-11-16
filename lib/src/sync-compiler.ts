@@ -46,6 +46,7 @@ export class Compiler {
     this.process.stdin.write(buffer);
   }
 
+  /** Yields the next event from the underlying process. */
   private yield(): boolean {
     const event = this.process.yield();
     switch (event.type) {
@@ -70,9 +71,10 @@ export class Compiler {
     }
   }
 
-  // Spins up a compiler, then sends it a compile request. Returns a promise that
-  // resolves with the CompileResult. Throws if there were any protocol or
-  // compilation errors. Shuts down the compiler after compilation.
+  /**
+   * Sends a compile request to the child process and returns the CompileResult.
+   * Throws if there were any protocol or compilation errors.
+   */
   private compileRequestSync(
     request: proto.InboundMessage_CompileRequest,
     importers: ImporterRegistry<'sync'>,
@@ -116,6 +118,7 @@ export class Compiler {
     }
   }
 
+  /** Guards against using a disposed compiler. */
   private throwIfDisposed(): void {
     if (this.disposed) {
       throw utils.compilerError('Sync compiler has already been disposed.');
@@ -142,7 +145,6 @@ export class Compiler {
     );
   }
 
-  /** Kills the child process, cleaning up all associated Observables. */
   dispose() {
     this.process.stdin.end();
     this.yieldUntilExit();

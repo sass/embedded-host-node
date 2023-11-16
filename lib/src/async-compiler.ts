@@ -59,7 +59,7 @@ export class AsyncCompiler {
     this.process.stdin.write(buffer);
   }
 
-  /** Adds a compilation to the pending set and removes it up when it's done. */
+  /** Adds a compilation to the pending set and removes it when it's done. */
   private addCompilation(compilation: Promise<CompileResult>): void {
     this.compilations.add(compilation);
     compilation
@@ -67,15 +67,18 @@ export class AsyncCompiler {
       .finally(() => this.compilations.delete(compilation));
   }
 
+  /** Guards against using a disposed compiler. */
   private throwIfDisposed(): void {
     if (this.disposed) {
       throw utils.compilerError('Async compiler has already been disposed.');
     }
   }
 
-  // Spins up a compiler, then sends it a compile request. Returns a promise that
-  // resolves with the CompileResult. Throws if there were any protocol or
-  // compilation errors. Shuts down the compiler after compilation.
+  /**
+   * Sends a compile request to the child process and returns a Promise that
+   * resolves with the CompileResult. Rejects the promise if there were any
+   * protocol or compilation errors.
+   */
   private async compileRequestAsync(
     request: proto.InboundMessage_CompileRequest,
     importers: ImporterRegistry<'async'>,
@@ -143,7 +146,6 @@ export class AsyncCompiler {
     return compilation;
   }
 
-  /** Kills the child process, cleaning up all associated Observables. */
   async dispose() {
     this.disposed = true;
     await Promise.all(this.compilations);

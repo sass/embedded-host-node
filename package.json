@@ -1,18 +1,18 @@
 {
   "name": "sass-embedded",
-  "version": "1.68.0",
+  "version": "1.69.5",
   "protocol-version": "2.3.0",
-  "compiler-version": "1.68.0",
+  "compiler-version": "1.69.5",
   "description": "Node.js library that communicates with Embedded Dart Sass using the Embedded Sass protocol",
   "repository": "sass/embedded-host-node",
   "author": "Google Inc.",
   "license": "MIT",
   "exports": {
     "import": {
-      "types": "./dist/lib/index.m.d.ts",
+      "types": "./dist/types/index.m.d.ts",
       "default": "./dist/lib/index.mjs"
     },
-    "types": "./dist/lib/index.d.ts",
+    "types": "./dist/types/index.d.ts",
     "default": "./dist/lib/index.js"
   },
   "main": "dist/lib/index.js",
@@ -35,14 +35,14 @@
     "test": "jest"
   },
   "optionalDependencies": {
-    "sass-embedded-darwin-arm64": "1.68.0",
-    "sass-embedded-darwin-x64": "1.68.0",
-    "sass-embedded-linux-arm": "1.68.0",
-    "sass-embedded-linux-arm64": "1.68.0",
-    "sass-embedded-linux-ia32": "1.68.0",
-    "sass-embedded-linux-x64": "1.68.0",
-    "sass-embedded-win32-ia32": "1.68.0",
-    "sass-embedded-win32-x64": "1.68.0"
+    "sass-embedded-darwin-arm64": "1.69.5",
+    "sass-embedded-darwin-x64": "1.69.5",
+    "sass-embedded-linux-arm": "1.69.5",
+    "sass-embedded-linux-arm64": "1.69.5",
+    "sass-embedded-linux-ia32": "1.69.5",
+    "sass-embedded-linux-x64": "1.69.5",
+    "sass-embedded-win32-ia32": "1.69.5",
+    "sass-embedded-win32-x64": "1.69.5"
   },
   "dependencies": {
     "@bufbuild/protobuf": "^1.0.0",

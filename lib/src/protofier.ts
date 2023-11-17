@@ -8,7 +8,7 @@ import * as proto from './vendor/embedded_sass_pb';
 import * as utils from './utils';
 import {FunctionRegistry} from './function-registry';
 import {SassArgumentList} from './value/argument-list';
-import {SassColor} from './value/color';
+import {SassColor, KnownColorSpace} from './value/color';
 import {SassFunction} from './value/function';
 import {SassList, ListSeparator} from './value/list';
 import {SassMap} from './value/map';
@@ -66,21 +66,14 @@ export class Protofier {
     } else if (value instanceof SassNumber) {
       result.value = {case: 'number', value: this.protofyNumber(value)};
     } else if (value instanceof SassColor) {
-      if (value.hasCalculatedHsl) {
-        const color = new proto.Value_HslColor();
-        color.hue = value.hue;
-        color.saturation = value.saturation;
-        color.lightness = value.lightness;
-        color.alpha = value.alpha;
-        result.value = {case: 'hslColor', value: color};
-      } else {
-        const color = new proto.Value_RgbColor();
-        color.red = value.red;
-        color.green = value.green;
-        color.blue = value.blue;
-        color.alpha = value.alpha;
-        result.value = {case: 'rgbColor', value: color};
-      }
+      const color = new proto.Value_Color();
+      const channels = value.channels;
+      color.channel1 = channels.get(0) as number;
+      color.channel2 = channels.get(1) as number;
+      color.channel3 = channels.get(2) as number;
+      color.alpha = value.alpha;
+      color.space = value.space;
+      result.value = {case: 'color', value: color};
     } else if (value instanceof SassList) {
       const list = new proto.Value_List();
       list.separator = this.protofySeparator(value.separator);
@@ -242,24 +235,76 @@ export class Protofier {
         return this.deprotofyNumber(value.value.value);
       }
 
-      case 'rgbColor': {
+      case 'color': {
         const color = value.value.value;
-        return new SassColor({
-          red: color.red,
-          green: color.green,
-          blue: color.blue,
-          alpha: color.alpha,
-        });
-      }
+        switch (color.space.toLowerCase()) {
+          case 'rgb':
+          case 'srgb':
+          case 'srgb-linear':
+          case 'display-p3':
+          case 'a98-rgb':
+          case 'prophoto-rgb':
+          case 'rec2020':
+            return new SassColor({
+              red: color.channel1,
+              green: color.channel2,
+              blue: color.channel3,
+              alpha: color.alpha,
+              space: color.space as KnownColorSpace,
+            });
 
-      case 'hslColor': {
-        const color = value.value.value;
-        return new SassColor({
-          hue: color.hue,
-          saturation: color.saturation,
-          lightness: color.lightness,
-          alpha: color.alpha,
-        });
+          case 'hsl':
+            return new SassColor({
+              hue: color.channel1,
+              saturation: color.channel2,
+              lightness: color.channel3,
+              alpha: color.alpha,
+              space: 'hsl',
+            });
+
+          case 'hwb':
+            return new SassColor({
+              hue: color.channel1,
+              whiteness: color.channel2,
+              blackness: color.channel3,
+              alpha: color.alpha,
+              space: 'hwb',
+            });
+
+          case 'lab':
+          case 'oklab':
+            return new SassColor({
+              lightness: color.channel1,
+              a: color.channel2,
+              b: color.channel3,
+              alpha: color.alpha,
+              space: color.space as KnownColorSpace,
+            });
+
+          case 'lch':
+          case 'oklch':
+            return new SassColor({
+              lightness: color.channel1,
+              chroma: color.channel2,
+              hue: color.channel3,
+              alpha: color.alpha,
+              space: color.space as KnownColorSpace,
+            });
+
+          case 'xyz':
+          case 'xyz-d65':
+          case 'xyz-d50':
+            return new SassColor({
+              x: color.channel1,
+              y: color.channel2,
+              z: color.channel3,
+              alpha: color.alpha,
+              space: color.space as KnownColorSpace,
+            });
+
+          default:
+            throw utils.compilerError(`Unknown color space "${color.space}".`);
+        }
       }
 
       case 'list': {

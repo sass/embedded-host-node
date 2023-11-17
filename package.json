@@ -1,7 +1,7 @@
 {
   "name": "sass-embedded",
   "version": "1.69.5",
-  "protocol-version": "2.3.0",
+  "protocol-version": "3.0.0-dev",
   "compiler-version": "1.69.5",
   "description": "Node.js library that communicates with Embedded Dart Sass using the Embedded Sass protocol",
   "repository": "sass/embedded-host-node",
@@ -21,7 +21,7 @@
     "dist/**/*"
   ],
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=16.0.0"
   },
   "scripts": {
     "init": "ts-node ./tool/init.ts",
@@ -47,6 +47,7 @@
   "dependencies": {
     "@bufbuild/protobuf": "^1.0.0",
     "buffer-builder": "^0.2.0",
+    "colorjs.io": "^0.4.5",
     "immutable": "^4.0.0",
     "rxjs": "^7.4.0",
     "supports-color": "^8.1.1",

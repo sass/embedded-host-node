@@ -43,7 +43,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu, macos, windows]
-        node-version: [18.x, 16.x, 14.x] # If changing this, also change env.DEFAULT_NODE_VERSION
+        node-version: [18.x, 16.x] # If changing this, also change env.DEFAULT_NODE_VERSION
       fail-fast: false
 
     steps:
@@ -89,8 +89,6 @@ jobs:
           # Include LTS versions on Ubuntu
           - os: ubuntu
             node_version: 16
-          - os: ubuntu
-            node_version: 14
 
     steps:
       - uses: actions/checkout@v2

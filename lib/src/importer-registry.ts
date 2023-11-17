@@ -16,9 +16,7 @@ import {
 import * as proto from './vendor/embedded_sass_pb';
 import {catchOr, thenOr, PromiseOr} from './utils';
 
-export const nodePackageImporter: NodePackageImporter = {
-  _NodePackageImporterBrand: '',
-};
+export const nodePackageImporter: NodePackageImporter = Symbol();
 
 /**
  * A registry of importers defined in the host that can be invoked by the
@@ -54,9 +52,7 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
   isNodePackageImporter(
     importer: Importer<sync> | FileImporter<sync> | NodePackageImporter
   ): importer is NodePackageImporter {
-    return (
-      (importer as NodePackageImporter)._NodePackageImporterBrand !== undefined
-    );
+    return typeof importer === 'symbol';
   }
 
   /** Converts an importer to a proto without adding it to `this.importers`. */

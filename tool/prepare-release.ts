@@ -15,11 +15,12 @@ void (async () => {
     await getLanguageRepo('lib/src/vendor');
 
     console.log('Transpiling TS into dist.');
-    shell.exec('tsc');
+    shell.exec('tsc -p tsconfig.build.json');
     shell.cp('lib/index.mjs', 'dist/lib/index.mjs');
 
     console.log('Copying JS API types to dist.');
     shell.cp('-R', 'lib/src/vendor/sass', 'dist/types');
+    shell.cp('dist/types/index.d.ts', 'dist/types/index.m.d.ts');
     await fs.unlink('dist/types/README.md');
 
     console.log('Ready for publishing to npm.');

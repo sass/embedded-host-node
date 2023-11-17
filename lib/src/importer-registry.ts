@@ -48,19 +48,12 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
       );
   }
 
-  // Type predicate for NodePackageImporter
-  isNodePackageImporter(
-    importer: Importer<sync> | FileImporter<sync> | NodePackageImporter
-  ): importer is NodePackageImporter {
-    return typeof importer === 'symbol';
-  }
-
   /** Converts an importer to a proto without adding it to `this.importers`. */
   register(
     importer: Importer<sync> | FileImporter<sync> | NodePackageImporter
   ): proto.InboundMessage_CompileRequest_Importer {
     const message = new proto.InboundMessage_CompileRequest_Importer();
-    if (this.isNodePackageImporter(importer)) {
+    if (typeof importer === 'symbol') {
       if (importer !== nodePackageImporter) {
         throw 'Incorrect Node Package Importer used';
       }

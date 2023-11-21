@@ -160,15 +160,9 @@ function convertOptions<sync extends 'sync' | 'async'>(
       ),
     ];
   }
-  if (options.pkgImporter === 'node') {
-    importers = importers
-      ? [nodePackageImporter, ...importers]
-      : [nodePackageImporter];
-  }
 
-  return {
+  const convertedOptions = {
     functions,
-    importers,
     sourceMap: wasSourceMapRequested(options),
     sourceMapIncludeSources: options.sourceMapContents,
     loadPaths: importers ? undefined : options.includePaths,
@@ -177,8 +171,23 @@ function convertOptions<sync extends 'sync' | 'async'>(
     verbose: options.verbose,
     charset: options.charset,
     logger: options.logger,
-    legacy: true,
+    legacy: true as const,
   };
+
+  // Use separate return statements, as applying logic directly to the inclusion
+  // of `nodePackageImporter` causes the symbol to use its unique flag.
+  if (options.pkgImporter === 'node') {
+    importers = importers || [];
+    return {
+      ...convertedOptions,
+      importers: [nodePackageImporter, ...importers],
+    };
+  } else {
+    return {
+      ...convertedOptions,
+      importers,
+    };
+  }
 }
 
 // Converts `LegacyStringOptions` into new API `StringOptions`.

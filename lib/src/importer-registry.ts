@@ -16,7 +16,8 @@ import {
 import * as proto from './vendor/embedded_sass_pb';
 import {catchOr, thenOr, PromiseOr} from './utils';
 
-export const nodePackageImporter: NodePackageImporter = Symbol();
+export const nodePackageImporter: NodePackageImporter =
+  Symbol() as NodePackageImporter;
 
 /**
  * A registry of importers defined in the host that can be invoked by the

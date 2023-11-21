@@ -21,6 +21,8 @@ import {ImporterRegistry} from './importer-registry';
 import * as utils from './utils';
 import * as proto from './vendor/embedded_sass_pb';
 import {CompileResult} from './vendor/sass';
+import {PacketTransformer} from './packet-transformer';
+import {MessageTransformer} from './message-transformer';
 
 /**
  * An asynchronous wrapper for the embedded Sass compiler
@@ -35,6 +37,9 @@ export class AsyncCompiler {
 
   /** Whether the underlying compiler has already exited. */
   private disposed = false;
+
+  /** Reusable message transformer for all compilations.  */
+  private messageTransformer: MessageTransformer;
 
   /** A list of pending compilations */
   private compilations = new Set<Promise<CompileResult>>();
@@ -85,20 +90,13 @@ export class AsyncCompiler {
     options?: OptionsWithLegacy<'async'> & {legacy?: boolean}
   ): Promise<CompileResult> {
     const functions = new FunctionRegistry(options?.functions);
-    this.stderr$.subscribe(data => process.stderr.write(data));
 
-    const dispatcher = createDispatcher<'async'>(
-      this.stdout$,
-      buffer => {
-        this.writeStdin(buffer);
-      },
-      {
-        handleImportRequest: request => importers.import(request),
-        handleFileImportRequest: request => importers.fileImport(request),
-        handleCanonicalizeRequest: request => importers.canonicalize(request),
-        handleFunctionCallRequest: request => functions.call(request),
-      }
-    );
+    const dispatcher = createDispatcher<'async'>(this.messageTransformer, {
+      handleImportRequest: request => importers.import(request),
+      handleFileImportRequest: request => importers.fileImport(request),
+      handleCanonicalizeRequest: request => importers.canonicalize(request),
+      handleFunctionCallRequest: request => functions.call(request),
+    });
 
     dispatcher.logEvents$.subscribe(event => handleLogEvent(options, event));
 
@@ -113,6 +111,18 @@ export class AsyncCompiler {
             }
           })
       )
+    );
+  }
+
+  /** Initialize resources shared across compilations. */
+  constructor() {
+    this.stderr$.subscribe(data => process.stderr.write(data));
+    const packetTransformer = new PacketTransformer(this.stdout$, buffer => {
+      this.writeStdin(buffer);
+    });
+    this.messageTransformer = new MessageTransformer(
+      packetTransformer.outboundProtobufs$,
+      packet => packetTransformer.writeInboundProtobuf(packet)
     );
   }
 

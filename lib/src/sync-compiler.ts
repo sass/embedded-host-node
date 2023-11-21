@@ -20,6 +20,8 @@ import * as utils from './utils';
 import * as proto from './vendor/embedded_sass_pb';
 import {CompileResult} from './vendor/sass/compile';
 import {Options} from './vendor/sass/options';
+import {PacketTransformer} from './packet-transformer';
+import {MessageTransformer} from './message-transformer';
 
 /**
  * A synchronous wrapper for the embedded Sass compiler
@@ -40,6 +42,9 @@ export class Compiler {
 
   /** Whether the underlying compiler has already exited. */
   private disposed = false;
+
+  /** Reusable message transformer for all compilations.  */
+  private messageTransformer: MessageTransformer;
 
   /** Writes `buffer` to the child process's stdin. */
   private writeStdin(buffer: Buffer): void {
@@ -81,20 +86,13 @@ export class Compiler {
     options?: OptionsWithLegacy<'sync'>
   ): CompileResult {
     const functions = new FunctionRegistry(options?.functions);
-    this.stderr$.subscribe(data => process.stderr.write(data));
 
-    const dispatcher = createDispatcher<'sync'>(
-      this.stdout$,
-      buffer => {
-        this.writeStdin(buffer);
-      },
-      {
-        handleImportRequest: request => importers.import(request),
-        handleFileImportRequest: request => importers.fileImport(request),
-        handleCanonicalizeRequest: request => importers.canonicalize(request),
-        handleFunctionCallRequest: request => functions.call(request),
-      }
-    );
+    const dispatcher = createDispatcher<'sync'>(this.messageTransformer, {
+      handleImportRequest: request => importers.import(request),
+      handleFileImportRequest: request => importers.fileImport(request),
+      handleCanonicalizeRequest: request => importers.canonicalize(request),
+      handleFunctionCallRequest: request => functions.call(request),
+    });
 
     dispatcher.logEvents$.subscribe(event => handleLogEvent(options, event));
 
@@ -123,6 +121,18 @@ export class Compiler {
     if (this.disposed) {
       throw utils.compilerError('Sync compiler has already been disposed.');
     }
+  }
+
+  /** Initialize resources shared across compilations. */
+  constructor() {
+    this.stderr$.subscribe(data => process.stderr.write(data));
+    const packetTransformer = new PacketTransformer(this.stdout$, buffer => {
+      this.writeStdin(buffer);
+    });
+    this.messageTransformer = new MessageTransformer(
+      packetTransformer.outboundProtobufs$,
+      packet => packetTransformer.writeInboundProtobuf(packet)
+    );
   }
 
   compile(path: string, options?: Options<'sync'>): CompileResult {

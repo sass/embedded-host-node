@@ -2,8 +2,6 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-import {Observable} from 'rxjs';
-
 import * as p from 'path';
 import * as supportsColor from 'supports-color';
 import {deprotofySourceSpan} from './deprotofy-span';
@@ -16,7 +14,6 @@ import {
   removeLegacyImporterFromSpan,
 } from './legacy/utils';
 import {MessageTransformer} from './message-transformer';
-import {PacketTransformer} from './packet-transformer';
 import * as utils from './utils';
 import * as proto from './vendor/embedded_sass_pb';
 import {SourceSpan} from './vendor/sass';
@@ -47,17 +44,9 @@ export type StringOptionsWithLegacy<sync extends 'sync' | 'async'> =
  * Creates a dispatcher that dispatches messages from the given `stdout` stream.
  */
 export function createDispatcher<sync extends 'sync' | 'async'>(
-  stdout: Observable<Buffer>,
-  writeStdin: (buffer: Buffer) => void,
+  messageTransformer: MessageTransformer,
   handlers: DispatcherHandlers<sync>
 ): Dispatcher<sync> {
-  const packetTransformer = new PacketTransformer(stdout, writeStdin);
-
-  const messageTransformer = new MessageTransformer(
-    packetTransformer.outboundProtobufs$,
-    packet => packetTransformer.writeInboundProtobuf(packet)
-  );
-
   return new Dispatcher<sync>(
     (compilationId += 1),
     messageTransformer.outboundMessages$,

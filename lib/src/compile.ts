@@ -47,7 +47,7 @@ export function compile(
   path: string,
   options?: OptionsWithLegacy<'sync'>
 ): CompileResult {
-  const importers = new ImporterRegistry(options);
+  const importers = new ImporterRegistry(options, path);
   return compileRequestSync(
     newCompilePathRequest(path, importers, options),
     importers,
@@ -59,7 +59,7 @@ export function compileString(
   source: string,
   options?: StringOptionsWithLegacy<'sync'>
 ): CompileResult {
-  const importers = new ImporterRegistry(options);
+  const importers = new ImporterRegistry(options, options?.url);
   return compileRequestSync(
     newCompileStringRequest(source, importers, options),
     importers,
@@ -71,7 +71,7 @@ export function compileAsync(
   path: string,
   options?: OptionsWithLegacy<'async'>
 ): Promise<CompileResult> {
-  const importers = new ImporterRegistry(options);
+  const importers = new ImporterRegistry(options, path);
   return compileRequestAsync(
     newCompilePathRequest(path, importers, options),
     importers,
@@ -83,7 +83,7 @@ export function compileStringAsync(
   source: string,
   options?: StringOptionsWithLegacy<'async'>
 ): Promise<CompileResult> {
-  const importers = new ImporterRegistry(options);
+  const importers = new ImporterRegistry(options, options?.url);
   return compileRequestAsync(
     newCompileStringRequest(source, importers, options),
     importers,

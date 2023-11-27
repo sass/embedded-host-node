@@ -7,6 +7,8 @@ import {URL} from 'url';
 import {inspect} from 'util';
 
 import * as utils from './utils';
+import {legacyImporterProtocol} from './legacy/utils';
+
 import {
   FileImporter,
   Importer,
@@ -36,9 +38,9 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
   /** The next ID to use for an importer. */
   private id = 0;
 
-  constructor(options?: Options<sync>) {
+  constructor(options?: Options<sync>, entryPointURL?: string | URL) {
     this.importers = (options?.importers ?? [])
-      .map(importer => this.register(importer))
+      .map(importer => this.register(importer, entryPointURL))
       .concat(
         (options?.loadPaths ?? []).map(
           path =>
@@ -51,7 +53,8 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
 
   /** Converts an importer to a proto without adding it to `this.importers`. */
   register(
-    importer: Importer<sync> | FileImporter<sync> | NodePackageImporter
+    importer: Importer<sync> | FileImporter<sync> | NodePackageImporter,
+    _entryPointURL?: string | URL
   ): proto.InboundMessage_CompileRequest_Importer {
     const message = new proto.InboundMessage_CompileRequest_Importer();
     if (typeof importer === 'symbol') {
@@ -59,7 +62,11 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
         throw 'Incorrect Node Package Importer used';
       }
       const importerMessage = new proto.NodePackageImporter();
-      const entryPointURL = require.main?.filename;
+      let entryPointURL = _entryPointURL ?? require.main?.filename;
+      entryPointURL = entryPointURL?.toString();
+      if (entryPointURL === legacyImporterProtocol)
+        entryPointURL = require.main?.filename;
+
       if (!entryPointURL) {
         throw new Error(
           'Node Package Importer requires access to a filesystem.'

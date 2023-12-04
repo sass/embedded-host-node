@@ -54,18 +54,19 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
   /** Converts an importer to a proto without adding it to `this.importers`. */
   register(
     importer: Importer<sync> | FileImporter<sync> | NodePackageImporter,
-    _entryPointURL?: string | URL
+    providedEntryPointURL?: string | URL
   ): proto.InboundMessage_CompileRequest_Importer {
     const message = new proto.InboundMessage_CompileRequest_Importer();
     if (typeof importer === 'symbol') {
       if (importer !== nodePackageImporter) {
-        throw 'Incorrect Node Package Importer used';
+        throw 'Unknown importer ${importer}';
       }
       const importerMessage = new proto.NodePackageImporter();
-      let entryPointURL = _entryPointURL ?? require.main?.filename;
+      let entryPointURL = providedEntryPointURL ?? require.main?.filename;
       entryPointURL = entryPointURL?.toString();
-      if (entryPointURL === legacyImporterProtocol)
+      if (entryPointURL === legacyImporterProtocol){
         entryPointURL = require.main?.filename;
+      }
 
       if (!entryPointURL) {
         throw new Error(

@@ -175,7 +175,7 @@ function convertOptions<sync extends 'sync' | 'async'>(
   };
 
   // Use separate return statements, as applying logic directly to the inclusion
-  // of `nodePackageImporter` causes the symbol to use its unique flag.
+  // of `nodePackageImporter` causes the symbol to lose its unique flag.
   // See https://github.com/microsoft/TypeScript/issues/55901
   if (options.pkgImporter === 'node') {
     importers = importers || [];

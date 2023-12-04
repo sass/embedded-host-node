@@ -64,7 +64,7 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
       const importerMessage = new proto.NodePackageImporter();
       let entryPointURL = providedEntryPointURL ?? require.main?.filename;
       entryPointURL = entryPointURL?.toString();
-      if (entryPointURL === legacyImporterProtocol){
+      if (entryPointURL === legacyImporterProtocol) {
         entryPointURL = require.main?.filename;
       }
 

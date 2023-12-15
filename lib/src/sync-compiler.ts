@@ -24,6 +24,13 @@ import {PacketTransformer} from './packet-transformer';
 import {MessageTransformer} from './message-transformer';
 
 /**
+ * Flag allowing the constructor passed by `initCompiler` so we can
+ * differentiate and throw an error if the `Compiler` is constructed via `new
+ * Compiler`.
+ */
+const initFlag = Symbol();
+
+/**
  * A synchronous wrapper for the embedded Sass compiler
  */
 export class Compiler {
@@ -124,7 +131,12 @@ export class Compiler {
   }
 
   /** Initialize resources shared across compilations. */
-  constructor() {
+  constructor(flag: Symbol | undefined) {
+    if (flag !== initFlag) {
+      throw utils.compilerError(
+        'Compiler can not be directly constructed. Please use `sass.initAsyncCompiler()` instead.'
+      );
+    }
     this.stderr$.subscribe(data => process.stderr.write(data));
     const packetTransformer = new PacketTransformer(this.stdout$, buffer => {
       this.writeStdin(buffer);
@@ -162,5 +174,5 @@ export class Compiler {
 }
 
 export function initCompiler(): Compiler {
-  return new Compiler();
+  return new Compiler(initFlag);
 }

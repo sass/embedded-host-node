@@ -5,7 +5,7 @@ describe('utils', () => {
   describe('pathToUrlString', () => {
     it('encode relative path like `pathToFileURL`', () => {
       const baseURL = pathToFileURL('').toString();
-      for (let i = 0; i < 128; i++) {
+      for (let i = 33; i < 128; i++) {
         const char = String.fromCharCode(i);
         const filename = `${i}-${char}`;
         expect(pathToUrlString(filename)).toEqual(

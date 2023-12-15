@@ -6,14 +6,34 @@ import * as fs from 'fs';
 import * as p from 'path';
 import {isErrnoException} from './utils';
 
+const isLinuxMusl = function () {
+  return fs.readFileSync(process.execPath).includes('/ld-musl-');
+};
+
 /** The full command for the embedded compiler executable. */
 export const compilerCommand = (() => {
+  let platform = process.platform as string;
+  let arch = process.arch;
+
+  if (platform === 'linux' && isLinuxMusl()) {
+    platform = 'linux-musl';
+  }
+
+  // https://github.com/sass/embedded-host-node/issues/263
+  // Use windows-x64 emulation on windows-arm64
+  //
+  // TODO: Make sure to remove "arm64" from "npm/win32-x64/package.json" when
+  // this logic is removed once we have true windows-arm64 support.
+  if (platform === 'win32' && arch === 'arm64') {
+    arch = 'x64';
+  }
+
   // find for development
   for (const path of ['vendor', '../../../lib/src/vendor']) {
     const executable = p.resolve(
       __dirname,
       path,
-      `dart-sass/sass${process.platform === 'win32' ? '.bat' : ''}`
+      `dart-sass/sass${platform === 'win32' ? '.bat' : ''}`
     );
 
     if (fs.existsSync(executable)) return [executable];
@@ -22,13 +42,11 @@ export const compilerCommand = (() => {
   try {
     return [
       require.resolve(
-        `sass-embedded-${process.platform}-${process.arch}/` +
-          'dart-sass/src/dart' +
-          (process.platform === 'win32' ? '.exe' : '')
+        `sass-embedded-${platform}-${arch}/dart-sass/src/dart` +
+          (platform === 'win32' ? '.exe' : '')
       ),
       require.resolve(
-        `sass-embedded-${process.platform}-${process.arch}/` +
-          'dart-sass/src/sass.snapshot'
+        `sass-embedded-${platform}-${arch}/dart-sass/src/sass.snapshot`
       ),
     ];
   } catch (ignored) {
@@ -38,9 +56,8 @@ export const compilerCommand = (() => {
   try {
     return [
       require.resolve(
-        `sass-embedded-${process.platform}-${process.arch}/` +
-          'dart-sass/sass' +
-          (process.platform === 'win32' ? '.bat' : '')
+        `sass-embedded-${platform}-${arch}/dart-sass/sass` +
+          (platform === 'win32' ? '.bat' : '')
       ),
     ];
   } catch (e: unknown) {
@@ -52,7 +69,7 @@ export const compilerCommand = (() => {
   throw new Error(
     "Embedded Dart Sass couldn't find the embedded compiler executable. " +
       'Please make sure the optional dependency ' +
-      `sass-embedded-${process.platform}-${process.arch} is installed in ` +
+      `sass-embedded-${platform}-${arch} is installed in ` +
       'node_modules.'
   );
 })();

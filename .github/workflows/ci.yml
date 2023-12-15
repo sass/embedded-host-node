@@ -5,7 +5,6 @@ defaults:
 
 env:
   PROTOC_VERSION: 3.x
-  DEFAULT_NODE_VERSION: 18.x # If changing this, also change jobs.tests.strategy.matrix.node_version
 
 on:
   push:
@@ -19,10 +18,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
-          node-version: ${{ env.DEFAULT_NODE_VERSION }}
+          node-version: 'lts/*'
           check-latest: true
 
       - name: Check out the language repo
@@ -43,12 +42,12 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu, macos, windows]
-        node-version: [18.x, 16.x, 14.x] # If changing this, also change env.DEFAULT_NODE_VERSION
+        node-version: ['lts/*', 'lts/-1', 'lts/-2']
       fail-fast: false
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
           check-latest: true
@@ -73,9 +72,6 @@ jobs:
       - run: npm run compile
       - run: node test/after-compile-test.mjs
 
-  # The versions should be kept up-to-date with the latest LTS Node releases.
-  # They next need to be rotated October 2021. See
-  # https://github.com/nodejs/Release.
   sass_spec:
     name: 'JS API Tests | Node ${{ matrix.node_version }} | ${{ matrix.os }}'
     runs-on: ${{ matrix.os }}-latest
@@ -84,19 +80,19 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu, windows, macos]
-        node_version: [18]
+        node_version: ['lts/*']
         include:
           # Include LTS versions on Ubuntu
           - os: ubuntu
-            node_version: 16
+            node_version: lts/-1
           - os: ubuntu
-            node_version: 14
+            node_version: lts/-2
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: dart-lang/setup-dart@v1
         with: {sdk: stable}
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3
         with: {node-version: "${{ matrix.node_version }}"}
 
       - name: Check out Dart Sass
@@ -144,10 +140,10 @@ jobs:
     needs: [static_analysis, tests, sass_spec]
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
-          node-version: ${{ env.DEFAULT_NODE_VERSION }}
+          node-version: 'lts/*'
           check-latest: true
           registry-url: 'https://registry.npmjs.org'
       - run: npm install

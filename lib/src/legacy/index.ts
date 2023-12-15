@@ -161,8 +161,12 @@ function convertOptions<sync extends 'sync' | 'async'>(
     ];
   }
 
-  const convertedOptions = {
+  return {
     functions,
+    importers:
+      options.pkgImporter === 'node'
+        ? [nodePackageImporter, ...(importers ?? [])]
+        : importers,
     sourceMap: wasSourceMapRequested(options),
     sourceMapIncludeSources: options.sourceMapContents,
     loadPaths: importers ? undefined : options.includePaths,
@@ -173,22 +177,6 @@ function convertOptions<sync extends 'sync' | 'async'>(
     logger: options.logger,
     legacy: true as const,
   };
-
-  // Use separate return statements, as applying logic directly to the inclusion
-  // of `nodePackageImporter` causes the symbol to lose its unique flag.
-  // See https://github.com/microsoft/TypeScript/issues/55901
-  if (options.pkgImporter === 'node') {
-    importers = importers || [];
-    return {
-      ...convertedOptions,
-      importers: [nodePackageImporter, ...importers],
-    };
-  } else {
-    return {
-      ...convertedOptions,
-      importers,
-    };
-  }
 }
 
 // Converts `LegacyStringOptions` into new API `StringOptions`.

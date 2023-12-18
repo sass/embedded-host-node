@@ -1,7 +1,7 @@
 {
-  "name": "sass-embedded-win32-x64",
+  "name": "sass-embedded-android-arm",
   "version": "1.69.5",
-  "description": "The win32-x64 binary for sass-embedded",
+  "description": "The android-arm binary for sass-embedded",
   "repository": "sass/embedded-host-node",
   "author": "Google Inc.",
   "license": "MIT",
@@ -12,13 +12,12 @@
     "node": ">=14.0.0"
   },
   "bin": {
-    "sass": "./dart-sass/sass.bat"
+    "sass": "./dart-sass/sass"
   },
   "os": [
-    "win32"
+    "android"
   ],
   "cpu": [
-    "arm64",
-    "x64"
+    "arm"
   ]
 }

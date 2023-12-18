@@ -115,19 +115,17 @@ async function downloadRelease(options: {
 
 // Patch the launcher script if needed.
 //
-// For linux both -linux- and -linux-musl- packages will be installed,
-// but only linux package has "bin" script defined in package.json in order
-// to avoid conflict.
-// Therefore, we patch the -linux- script to detect linux variants and launch
-// the correct binary.
+// For linux both `-linux-` and `-linux-musl-` packages will be installed
+// because npm doesn't know how to select packages based on LibC. To avoid
+// conflicts, only the `-linux-` packages have "bin" scripts defined in
+// package.json, which we patch to detect which LibC is available and launch the
+// correct binary.
 async function patchLauncherScript(
   path: string,
   dartPlatform: DartPlatform,
   dartArch: DartArch
 ) {
-  if (dartPlatform !== 'linux') {
-    return;
-  }
+  if (dartPlatform !== 'linux') return;
 
   const scriptPath = p.join(path, 'dart-sass', 'sass');
   console.log(`Patching ${scriptPath} script.`);
@@ -144,13 +142,14 @@ async function patchLauncherScript(
     throw new Error(`The format of ${scriptPath} has changed!`);
   }
 
-  const patch = [
+  lines.splice(
+    index + 1,
+    0,
     '# Detect linux-musl',
     'if grep -qm 1 /ld-musl- /proc/self/exe; then',
     `  path="$path/../../sass-embedded-linux-musl-${dartArch}/dart-sass"`,
-    'fi',
-  ];
-  lines.splice(index + 1, 0, ...patch);
+    'fi'
+  );
 
   await fs.writeFile(scriptPath, lines.join('\n'));
 }

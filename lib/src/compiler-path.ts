@@ -12,21 +12,18 @@ const isLinuxMusl = function () {
 
 /** The full command for the embedded compiler executable. */
 export const compilerCommand = (() => {
-  let platform = process.platform as string;
-  let arch = process.arch;
-
-  if (platform === 'linux' && isLinuxMusl()) {
-    platform = 'linux-musl';
-  }
+  const platform =
+    process.platform === 'linux' && isLinuxMusl()
+      ? 'linux-musl'
+      : (process.platform as string);
 
   // https://github.com/sass/embedded-host-node/issues/263
   // Use windows-x64 emulation on windows-arm64
   //
   // TODO: Make sure to remove "arm64" from "npm/win32-x64/package.json" when
   // this logic is removed once we have true windows-arm64 support.
-  if (platform === 'win32' && arch === 'arm64') {
-    arch = 'x64';
-  }
+  const arch =
+    platform === 'win32' && process.arch === 'arm64' ? 'x86' : process.arch;
 
   // find for development
   for (const path of ['vendor', '../../../lib/src/vendor']) {

@@ -6,6 +6,10 @@ import * as fs from 'fs';
 import * as p from 'path';
 import {isErrnoException} from './utils';
 
+/**
+ * Detect if the current running node binary is linked with musl libc by
+ * checking if the binary contains a string like "/.../ld-musl-$ARCH.so"
+ */
 const isLinuxMusl = function () {
   return fs.readFileSync(process.execPath).includes('/ld-musl-');
 };

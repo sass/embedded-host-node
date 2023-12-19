@@ -24,7 +24,7 @@ import {
   legacyImporterProtocol,
 } from './legacy/utils';
 
-export {nodePackageImporter} from './importer-registry';
+export {NodePackageImporter} from './importer-registry';
 
 /// Allow the legacy API to pass in an option signaling to the modern API that
 /// it's being run in legacy mode.
@@ -47,7 +47,7 @@ export function compile(
   path: string,
   options?: OptionsWithLegacy<'sync'>
 ): CompileResult {
-  const importers = new ImporterRegistry(options, path);
+  const importers = new ImporterRegistry(options);
   return compileRequestSync(
     newCompilePathRequest(path, importers, options),
     importers,
@@ -59,7 +59,7 @@ export function compileString(
   source: string,
   options?: StringOptionsWithLegacy<'sync'>
 ): CompileResult {
-  const importers = new ImporterRegistry(options, options?.url);
+  const importers = new ImporterRegistry(options);
   return compileRequestSync(
     newCompileStringRequest(source, importers, options),
     importers,
@@ -71,7 +71,7 @@ export function compileAsync(
   path: string,
   options?: OptionsWithLegacy<'async'>
 ): Promise<CompileResult> {
-  const importers = new ImporterRegistry(options, path);
+  const importers = new ImporterRegistry(options);
   return compileRequestAsync(
     newCompilePathRequest(path, importers, options),
     importers,
@@ -83,7 +83,7 @@ export function compileStringAsync(
   source: string,
   options?: StringOptionsWithLegacy<'async'>
 ): Promise<CompileResult> {
-  const importers = new ImporterRegistry(options, options?.url);
+  const importers = new ImporterRegistry(options);
   return compileRequestAsync(
     newCompileStringRequest(source, importers, options),
     importers,

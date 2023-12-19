@@ -5,7 +5,7 @@
 import * as fs from 'fs';
 import * as p from 'path';
 import {pathToFileURL, URL} from 'url';
-import {nodePackageImporter} from '../importer-registry';
+import {NodePackageImporter} from '../importer-registry';
 
 import {Exception} from '../exception';
 import {
@@ -164,8 +164,11 @@ function convertOptions<sync extends 'sync' | 'async'>(
   return {
     functions,
     importers:
-      options.pkgImporter === 'node'
-        ? [nodePackageImporter, ...(importers ?? [])]
+      options.pkgImporter?.type === 'node'
+        ? [
+            new NodePackageImporter(options.pkgImporter?.entryPointPath),
+            ...(importers ?? []),
+          ]
         : importers,
     sourceMap: wasSourceMapRequested(options),
     sourceMapIncludeSources: options.sourceMapContents,
@@ -186,10 +189,10 @@ function convertStringOptions<sync extends 'sync' | 'async'>(
 ): StringOptions<sync> & {legacy: true} {
   const modernOptions = convertOptions(options, sync);
 
-  // Find the first non-nodePackageImporter to pass as legacy `importer` option.
-  // nodePackageImporter will be passed in `modernOptions.importers`.
+  // Find the first non-NodePackageImporter to pass as legacy `importer` option.
+  // NodePackageImporter will be passed in `modernOptions.importers`.
   const importer = modernOptions.importers?.find(
-    _importer => _importer !== nodePackageImporter
+    _importer => _importer instanceof NodePackageImporter
   ) as Importer<sync> | FileImporter<sync>;
 
   return {

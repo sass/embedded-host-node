@@ -31,7 +31,7 @@ export {
   compileString,
   compileAsync,
   compileStringAsync,
-  nodePackageImporter,
+  NodePackageImporter,
 } from './src/compile';
 export {render, renderSync} from './src/legacy';
 

@@ -7,19 +7,18 @@ import {URL} from 'url';
 import {inspect} from 'util';
 
 import * as utils from './utils';
-import {legacyImporterProtocol} from './legacy/utils';
 
-import {
-  FileImporter,
-  Importer,
-  NodePackageImporter,
-  Options,
-} from './vendor/sass';
+import {FileImporter, Importer, Options} from './vendor/sass';
 import * as proto from './vendor/embedded_sass_pb';
 import {catchOr, thenOr, PromiseOr} from './utils';
+import path = require('path');
 
-export const nodePackageImporter: NodePackageImporter =
-  Symbol() as NodePackageImporter;
+export class NodePackageImporter {
+  entryPointPath?: string;
+  constructor(entryPointPath?: string) {
+    this.entryPointPath = entryPointPath;
+  }
+}
 
 /**
  * A registry of importers defined in the host that can be invoked by the
@@ -38,9 +37,9 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
   /** The next ID to use for an importer. */
   private id = 0;
 
-  constructor(options?: Options<sync>, entryPointURL?: string | URL) {
+  constructor(options?: Options<sync>) {
     this.importers = (options?.importers ?? [])
-      .map(importer => this.register(importer, entryPointURL))
+      .map(importer => this.register(importer))
       .concat(
         (options?.loadPaths ?? []).map(
           path =>
@@ -53,27 +52,21 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
 
   /** Converts an importer to a proto without adding it to `this.importers`. */
   register(
-    importer: Importer<sync> | FileImporter<sync> | NodePackageImporter,
-    providedEntryPointURL?: string | URL
+    importer: Importer<sync> | FileImporter<sync> | NodePackageImporter
   ): proto.InboundMessage_CompileRequest_Importer {
     const message = new proto.InboundMessage_CompileRequest_Importer();
-    if (typeof importer === 'symbol') {
-      if (importer !== nodePackageImporter) {
-        throw 'Unknown importer ${importer}';
-      }
+    if (importer instanceof NodePackageImporter) {
       const importerMessage = new proto.NodePackageImporter();
-      let entryPointURL = providedEntryPointURL ?? require.main?.filename;
-      entryPointURL = entryPointURL?.toString();
-      if (entryPointURL === legacyImporterProtocol) {
-        entryPointURL = require.main?.filename;
-      }
+      const entryPointPath = importer.entryPointPath
+        ? path.resolve(process.cwd(), importer.entryPointPath)
+        : require.main?.filename;
 
-      if (!entryPointURL) {
+      if (!entryPointPath) {
         throw new Error(
           'Node Package Importer requires access to a filesystem.'
         );
       }
-      importerMessage.entryPointUrl = entryPointURL;
+      importerMessage.entryPointPath = entryPointPath;
       message.importer = {
         case: 'nodePackageImporter',
         value: importerMessage,

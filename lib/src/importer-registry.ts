@@ -12,7 +12,6 @@ import {legacyImporterProtocol} from './legacy/utils';
 import {FileImporter, Importer, Options} from './vendor/sass';
 import * as proto from './vendor/embedded_sass_pb';
 import {catchOr, thenOr, PromiseOr} from './utils';
-import path = require('path');
 
 export class NodePackageImporter {
   entryPointPath?: string;
@@ -58,13 +57,9 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
     const message = new proto.InboundMessage_CompileRequest_Importer();
     if (importer instanceof NodePackageImporter) {
       const importerMessage = new proto.NodePackageImporter();
-      let entryPointPath = importer.entryPointPath
-        ? path.resolve(process.cwd(), importer.entryPointPath)
+      const entryPointPath = importer.entryPointPath
+        ? p.resolve(process.cwd(), importer.entryPointPath)
         : require.main?.filename;
-
-      if (entryPointPath === legacyImporterProtocol) {
-        entryPointPath = require.main?.filename;
-      }
 
       if (!entryPointPath) {
         throw new Error(

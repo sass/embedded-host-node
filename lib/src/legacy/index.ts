@@ -192,7 +192,7 @@ function convertStringOptions<sync extends 'sync' | 'async'>(
   // Find the first non-NodePackageImporter to pass as legacy `importer` option.
   // NodePackageImporter will be passed in `modernOptions.importers`.
   const importer = modernOptions.importers?.find(
-    _importer => _importer instanceof NodePackageImporter
+    _importer => !(_importer instanceof NodePackageImporter)
   ) as Importer<sync> | FileImporter<sync>;
 
   return {

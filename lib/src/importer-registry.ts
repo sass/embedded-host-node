@@ -7,6 +7,7 @@ import {URL} from 'url';
 import {inspect} from 'util';
 
 import * as utils from './utils';
+import {legacyImporterProtocol} from './legacy/utils';
 
 import {FileImporter, Importer, Options} from './vendor/sass';
 import * as proto from './vendor/embedded_sass_pb';
@@ -57,9 +58,13 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
     const message = new proto.InboundMessage_CompileRequest_Importer();
     if (importer instanceof NodePackageImporter) {
       const importerMessage = new proto.NodePackageImporter();
-      const entryPointPath = importer.entryPointPath
+      let entryPointPath = importer.entryPointPath
         ? path.resolve(process.cwd(), importer.entryPointPath)
         : require.main?.filename;
+
+      if (entryPointPath === legacyImporterProtocol) {
+        entryPointPath = require.main?.filename;
+      }
 
       if (!entryPointPath) {
         throw new Error(

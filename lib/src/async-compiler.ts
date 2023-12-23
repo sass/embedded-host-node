@@ -98,12 +98,16 @@ export class AsyncCompiler {
   ): Promise<CompileResult> {
     const functions = new FunctionRegistry(options?.functions);
 
-    const dispatcher = createDispatcher<'async'>(this.messageTransformer, {
-      handleImportRequest: request => importers.import(request),
-      handleFileImportRequest: request => importers.fileImport(request),
-      handleCanonicalizeRequest: request => importers.canonicalize(request),
-      handleFunctionCallRequest: request => functions.call(request),
-    });
+    const dispatcher = createDispatcher<'async'>(
+      this.compilations.size + 1,
+      this.messageTransformer,
+      {
+        handleImportRequest: request => importers.import(request),
+        handleFileImportRequest: request => importers.fileImport(request),
+        handleCanonicalizeRequest: request => importers.canonicalize(request),
+        handleFunctionCallRequest: request => functions.call(request),
+      }
+    );
 
     dispatcher.logEvents$.subscribe(event => handleLogEvent(options, event));
 

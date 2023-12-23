@@ -22,6 +22,7 @@ import {CompileResult} from './vendor/sass/compile';
 import {Options} from './vendor/sass/options';
 import {PacketTransformer} from './packet-transformer';
 import {MessageTransformer} from './message-transformer';
+import {Dispatcher} from './dispatcher';
 
 /**
  * Flag allowing the constructor passed by `initCompiler` so we can
@@ -40,6 +41,9 @@ export class Compiler {
     [...compilerCommand.slice(1), '--embedded'],
     {windowsHide: true}
   );
+
+  /** A list of active dispatchers */
+  private dispatchers: Set<Dispatcher<'sync'>> = new Set();
 
   /** The buffers emitted by the child process's stdout. */
   private readonly stdout$ = new Subject<Buffer>();
@@ -94,18 +98,24 @@ export class Compiler {
   ): CompileResult {
     const functions = new FunctionRegistry(options?.functions);
 
-    const dispatcher = createDispatcher<'sync'>(this.messageTransformer, {
-      handleImportRequest: request => importers.import(request),
-      handleFileImportRequest: request => importers.fileImport(request),
-      handleCanonicalizeRequest: request => importers.canonicalize(request),
-      handleFunctionCallRequest: request => functions.call(request),
-    });
+    const dispatcher = createDispatcher<'sync'>(
+      this.dispatchers.size + 1,
+      this.messageTransformer,
+      {
+        handleImportRequest: request => importers.import(request),
+        handleFileImportRequest: request => importers.fileImport(request),
+        handleCanonicalizeRequest: request => importers.canonicalize(request),
+        handleFunctionCallRequest: request => functions.call(request),
+      }
+    );
+    this.dispatchers.add(dispatcher);
 
     dispatcher.logEvents$.subscribe(event => handleLogEvent(options, event));
 
     let error: unknown;
     let response: proto.OutboundMessage_CompileResponse | undefined;
     dispatcher.sendCompileRequest(request, (error_, response_) => {
+      this.dispatchers.delete(dispatcher);
       if (error_) {
         error = error_;
       } else {

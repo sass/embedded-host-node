@@ -20,9 +20,6 @@ import {SourceSpan} from './vendor/sass';
 import {CompileResult} from './vendor/sass/compile';
 import {Options, StringOptions} from './vendor/sass/options';
 
-// A module-level ID for each compilation.
-let compilationId = 0;
-
 /// Allow the legacy API to pass in an option signaling to the modern API that
 /// it's being run in legacy mode.
 ///
@@ -44,11 +41,12 @@ export type StringOptionsWithLegacy<sync extends 'sync' | 'async'> =
  * Creates a dispatcher that dispatches messages from the given `stdout` stream.
  */
 export function createDispatcher<sync extends 'sync' | 'async'>(
+  compilationId: number,
   messageTransformer: MessageTransformer,
   handlers: DispatcherHandlers<sync>
 ): Dispatcher<sync> {
   return new Dispatcher<sync>(
-    (compilationId += 1),
+    compilationId,
     messageTransformer.outboundMessages$,
     message => messageTransformer.writeInboundMessage(message),
     handlers

@@ -2,7 +2,6 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-// import {jest} from '@jest/globals';
 import * as compilerModule from './compiler';
 import {Compiler, initCompiler} from './sync-compiler';
 import {AsyncCompiler, initAsyncCompiler} from './async-compiler';

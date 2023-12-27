@@ -42,6 +42,9 @@ export class AsyncCompiler {
     {windowsHide: true}
   );
 
+  /** The next compilation ID */
+  private compilationId = 1;
+
   /** Whether the underlying compiler has already exited. */
   private disposed = false;
 
@@ -76,7 +79,10 @@ export class AsyncCompiler {
     this.compilations.add(compilation);
     compilation
       .catch(() => {})
-      .finally(() => this.compilations.delete(compilation));
+      .finally(() => {
+        this.compilations.delete(compilation);
+        if (this.compilations.size === 0) this.compilationId = 1;
+      });
   }
 
   /** Guards against using a disposed compiler. */
@@ -99,7 +105,7 @@ export class AsyncCompiler {
     const functions = new FunctionRegistry(options?.functions);
 
     const dispatcher = createDispatcher<'async'>(
-      this.compilations.size + 1,
+      this.compilationId++,
       this.messageTransformer,
       {
         handleImportRequest: request => importers.import(request),

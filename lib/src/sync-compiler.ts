@@ -42,6 +42,9 @@ export class Compiler {
     {windowsHide: true}
   );
 
+  /** The next compilation ID */
+  private compilationId = 1;
+
   /** A list of active dispatchers */
   private dispatchers: Set<Dispatcher<'sync'>> = new Set();
 
@@ -99,7 +102,7 @@ export class Compiler {
     const functions = new FunctionRegistry(options?.functions);
 
     const dispatcher = createDispatcher<'sync'>(
-      this.dispatchers.size + 1,
+      this.compilationId++,
       this.messageTransformer,
       {
         handleImportRequest: request => importers.import(request),
@@ -116,6 +119,7 @@ export class Compiler {
     let response: proto.OutboundMessage_CompileResponse | undefined;
     dispatcher.sendCompileRequest(request, (error_, response_) => {
       this.dispatchers.delete(dispatcher);
+      if (this.dispatchers.size === 0) this.compilationId = 1;
       if (error_) {
         error = error_;
       } else {

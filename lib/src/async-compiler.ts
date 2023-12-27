@@ -45,14 +45,15 @@ export class AsyncCompiler {
   /** The next compilation ID */
   private compilationId = 1;
 
+  /** A list of active compilations */
+  private compilations: Set<Promise<proto.OutboundMessage_CompileResponse>> =
+    new Set();
+
   /** Whether the underlying compiler has already exited. */
   private disposed = false;
 
   /** Reusable message transformer for all compilations.  */
   private messageTransformer: MessageTransformer;
-
-  /** A list of pending compilations */
-  private compilations = new Set<Promise<CompileResult>>();
 
   /** The child process's exit event. */
   private readonly exit$ = new Promise<number | null>(resolve => {
@@ -72,17 +73,6 @@ export class AsyncCompiler {
   /** Writes `buffer` to the child process's stdin. */
   private writeStdin(buffer: Buffer): void {
     this.process.stdin.write(buffer);
-  }
-
-  /** Adds a compilation to the pending set and removes it when it's done. */
-  private addCompilation(compilation: Promise<CompileResult>): void {
-    this.compilations.add(compilation);
-    compilation
-      .catch(() => {})
-      .finally(() => {
-        this.compilations.delete(compilation);
-        if (this.compilations.size === 0) this.compilationId = 1;
-      });
   }
 
   /** Guards against using a disposed compiler. */
@@ -114,21 +104,23 @@ export class AsyncCompiler {
         handleFunctionCallRequest: request => functions.call(request),
       }
     );
-
     dispatcher.logEvents$.subscribe(event => handleLogEvent(options, event));
 
-    return handleCompileResponse(
-      await new Promise<proto.OutboundMessage_CompileResponse>(
-        (resolve, reject) =>
-          dispatcher.sendCompileRequest(request, (err, response) => {
-            if (err) {
-              reject(err);
-            } else {
-              resolve(response!);
-            }
-          })
-      )
+    const compilation = new Promise<proto.OutboundMessage_CompileResponse>(
+      (resolve, reject) =>
+        dispatcher.sendCompileRequest(request, (err, response) => {
+          this.compilations.delete(compilation);
+          if (this.compilations.size === 0) this.compilationId = 1;
+          if (err) {
+            reject(err);
+          } else {
+            resolve(response!);
+          }
+        })
     );
+    this.compilations.add(compilation);
+
+    return handleCompileResponse(await compilation);
   }
 
   /** Initialize resources shared across compilations. */
@@ -154,13 +146,11 @@ export class AsyncCompiler {
   ): Promise<CompileResult> {
     this.throwIfDisposed();
     const importers = new ImporterRegistry(options);
-    const compilation = this.compileRequestAsync(
+    return this.compileRequestAsync(
       newCompilePathRequest(path, importers, options),
       importers,
       options
     );
-    this.addCompilation(compilation);
-    return compilation;
   }
 
   compileStringAsync(
@@ -169,13 +159,11 @@ export class AsyncCompiler {
   ): Promise<CompileResult> {
     this.throwIfDisposed();
     const importers = new ImporterRegistry(options);
-    const compilation = this.compileRequestAsync(
+    return this.compileRequestAsync(
       newCompileStringRequest(source, importers, options),
       importers,
       options
     );
-    this.addCompilation(compilation);
-    return compilation;
   }
 
   async dispose() {

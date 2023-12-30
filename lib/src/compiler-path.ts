@@ -27,7 +27,7 @@ export const compilerCommand = (() => {
   // TODO: Make sure to remove "arm64" from "npm/win32-x64/package.json" when
   // this logic is removed once we have true windows-arm64 support.
   const arch =
-    platform === 'win32' && process.arch === 'arm64' ? 'x86' : process.arch;
+    platform === 'win32' && process.arch === 'arm64' ? 'x64' : process.arch;
 
   // find for development
   for (const path of ['vendor', '../../../lib/src/vendor']) {

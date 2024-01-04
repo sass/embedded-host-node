@@ -1,8 +1,8 @@
 // Copyright 2023 Google Inc. Use of this source code is governed by an
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
+
 import * as fs from 'fs';
-import * as path from 'path';
 import {chdir} from 'process';
 import {AsyncCompiler, initAsyncCompiler} from './async-compiler';
 import * as compilerModule from './compiler';
@@ -45,14 +45,14 @@ describe('compiler', () => {
     expect(logger2).toHaveBeenCalledTimes(1);
   });
 
-  it('survives the removal of the working directory', () => {
+  it('handles the removal of the working directory', () => {
     const oldDir = fs.mkdtempSync('sass-spec-');
     chdir(oldDir);
     const tmpCompiler = initCompiler();
     chdir('..');
     fs.rmSync(oldDir, {recursive: true});
     fs.writeFileSync('foo.scss', 'a {b: c}');
-    expect(() => tmpCompiler.compile(path.resolve('foo.scss'))).not.toThrow();
+    expect(() => tmpCompiler.compile('foo.scss')).not.toThrow();
     tmpCompiler.dispose();
     fs.rmSync('foo.scss');
   });
@@ -83,7 +83,7 @@ describe('asyncCompiler', () => {
     await asyncCompiler.dispose();
   });
 
-  it('survives the removal of the working directory', async () => {
+  it('handles the removal of the working directory', async () => {
     const oldDir = fs.mkdtempSync('sass-spec-');
     chdir(oldDir);
     const tmpCompiler = await initAsyncCompiler();
@@ -91,7 +91,7 @@ describe('asyncCompiler', () => {
     fs.rmSync(oldDir, {recursive: true});
     fs.writeFileSync('foo.scss', 'a {b: c}');
     expect(
-      tmpCompiler.compileAsync(path.resolve('foo.scss'))
+      tmpCompiler.compileAsync('foo.scss')
     ).resolves.not.toThrow();
     await tmpCompiler.dispose();
     fs.rmSync('foo.scss');

@@ -93,8 +93,9 @@ export function newCompilePathRequest(
   importers: ImporterRegistry<'sync' | 'async'>,
   options?: Options<'sync' | 'async'>
 ): proto.InboundMessage_CompileRequest {
+  const absPath = p.resolve(path);
   const request = newCompileRequest(importers, options);
-  request.input = {case: 'path', value: path};
+  request.input = {case: 'path', value: absPath};
   return request;
 }
 

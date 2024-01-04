@@ -45,6 +45,11 @@ export class Dispatcher<sync extends 'sync' | 'async'> {
   // dispatching messages, this completes.
   private readonly messages$ = new Subject<proto.OutboundMessage>();
 
+  // Subject to unsubscribe from all outbound messages to prevent dispatchers
+  // that happen to share a compilation ID from receiving messages intended for
+  // past dispatchers.
+  private readonly unsubscribe$ = new Subject<void>();
+
   // If the dispatcher encounters an error, this errors out. It is publicly
   // exposed as a readonly Observable.
   private readonly errorInternal$ = new Subject<void>();
@@ -55,11 +60,6 @@ export class Dispatcher<sync extends 'sync' | 'async'> {
    * closes all subscriptions to outbound events.
    */
   readonly error$ = this.errorInternal$.pipe();
-
-  // Subject to unsubscribe from all outbound messages to prevent dispatchers
-  // that happen to share a compilation ID from receiving messages intended for
-  // past dispatchers.
-  private readonly unsubscribe$ = new Subject();
 
   /**
    * Outbound log events. If an error occurs, the dispatcher closes this
@@ -104,12 +104,6 @@ export class Dispatcher<sync extends 'sync' | 'async'> {
           this.errorInternal$.complete();
         },
       });
-  }
-
-  /** Stop the outbound message subscription. */
-  unsubscribe(): void {
-    this.unsubscribe$.next(undefined);
-    this.unsubscribe$.complete();
   }
 
   /**
@@ -157,6 +151,12 @@ export class Dispatcher<sync extends 'sync' | 'async'> {
     } catch (error) {
       this.throwAndClose(error);
     }
+  }
+
+  // Stop the outbound message subscription.
+  private unsubscribe(): void {
+    this.unsubscribe$.next(undefined);
+    this.unsubscribe$.complete();
   }
 
   // Rejects with `error` all promises awaiting an outbound response, and

@@ -31,9 +31,7 @@ import {Dispatcher} from './dispatcher';
  */
 const initFlag = Symbol();
 
-/**
- * A synchronous wrapper for the embedded Sass compiler
- */
+/** A synchronous wrapper for the embedded Sass compiler */
 export class Compiler {
   /** The underlying process that's being wrapped. */
   private readonly process = new SyncProcess(
@@ -42,11 +40,11 @@ export class Compiler {
     {windowsHide: true}
   );
 
-  /** The next compilation ID */
+  /** The next compilation ID. */
   private compilationId = 1;
 
-  /** A list of active dispatchers */
-  private dispatchers: Set<Dispatcher<'sync'>> = new Set();
+  /** A list of active dispatchers. */
+  private readonly dispatchers: Set<Dispatcher<'sync'>> = new Set();
 
   /** The buffers emitted by the child process's stdout. */
   private readonly stdout$ = new Subject<Buffer>();
@@ -58,7 +56,7 @@ export class Compiler {
   private disposed = false;
 
   /** Reusable message transformer for all compilations.  */
-  private messageTransformer: MessageTransformer;
+  private readonly messageTransformer: MessageTransformer;
 
   /** Writes `buffer` to the child process's stdin. */
   private writeStdin(buffer: Buffer): void {
@@ -181,7 +179,7 @@ export class Compiler {
     );
   }
 
-  dispose() {
+  dispose(): void {
     this.process.stdin.end();
     this.yieldUntilExit();
   }

@@ -31,9 +31,7 @@ import {MessageTransformer} from './message-transformer';
  */
 const initFlag = Symbol();
 
-/**
- * An asynchronous wrapper for the embedded Sass compiler
- */
+/** An asynchronous wrapper for the embedded Sass compiler */
 export class AsyncCompiler {
   /** The underlying process that's being wrapped. */
   private readonly process = spawn(
@@ -42,18 +40,19 @@ export class AsyncCompiler {
     {windowsHide: true}
   );
 
-  /** The next compilation ID */
+  /** The next compilation ID. */
   private compilationId = 1;
 
-  /** A list of active compilations */
-  private compilations: Set<Promise<proto.OutboundMessage_CompileResponse>> =
-    new Set();
+  /** A list of active compilations. */
+  private readonly compilations: Set<
+    Promise<proto.OutboundMessage_CompileResponse>
+  > = new Set();
 
   /** Whether the underlying compiler has already exited. */
   private disposed = false;
 
   /** Reusable message transformer for all compilations.  */
-  private messageTransformer: MessageTransformer;
+  private readonly messageTransformer: MessageTransformer;
 
   /** The child process's exit event. */
   private readonly exit$ = new Promise<number | null>(resolve => {
@@ -166,7 +165,7 @@ export class AsyncCompiler {
     );
   }
 
-  async dispose() {
+  async dispose(): Promise<void> {
     this.disposed = true;
     await Promise.all(this.compilations);
     this.process.stdin.end();

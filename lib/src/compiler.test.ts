@@ -90,9 +90,7 @@ describe('asyncCompiler', () => {
     chdir('..');
     fs.rmSync(oldDir, {recursive: true});
     fs.writeFileSync('foo.scss', 'a {b: c}');
-    expect(
-      tmpCompiler.compileAsync('foo.scss')
-    ).resolves.not.toThrow();
+    expect(tmpCompiler.compileAsync('foo.scss')).resolves.not.toThrow();
     await tmpCompiler.dispose();
     fs.rmSync('foo.scss');
   });

@@ -1,10 +1,12 @@
 // Copyright 2023 Google Inc. Use of this source code is governed by an
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
-
+import * as fs from 'fs';
+import * as path from 'path';
+import {chdir} from 'process';
+import {AsyncCompiler, initAsyncCompiler} from './async-compiler';
 import * as compilerModule from './compiler';
 import {Compiler, initCompiler} from './sync-compiler';
-import {AsyncCompiler, initAsyncCompiler} from './async-compiler';
 
 const createDispatcher = jest.spyOn(compilerModule, 'createDispatcher');
 function getIdHistory() {
@@ -43,6 +45,18 @@ describe('compiler', () => {
     expect(logger2).toHaveBeenCalledTimes(1);
   });
 
+  it('survives the removal of the working directory', () => {
+    const oldDir = fs.mkdtempSync('sass-spec-');
+    chdir(oldDir);
+    const tmpCompiler = initCompiler();
+    chdir('..');
+    fs.rmSync(oldDir, {recursive: true});
+    fs.writeFileSync('foo.scss', 'a {b: c}');
+    expect(() => tmpCompiler.compile(path.resolve('foo.scss'))).not.toThrow();
+    tmpCompiler.dispose();
+    fs.rmSync('foo.scss');
+  });
+
   describe('compilation ID', () => {
     it('resets after callback compilations complete', () => {
       compiler.compileString('@import "foo"', {importers});
@@ -67,6 +81,20 @@ describe('asyncCompiler', () => {
 
   afterEach(async () => {
     await asyncCompiler.dispose();
+  });
+
+  it('survives the removal of the working directory', async () => {
+    const oldDir = fs.mkdtempSync('sass-spec-');
+    chdir(oldDir);
+    const tmpCompiler = await initAsyncCompiler();
+    chdir('..');
+    fs.rmSync(oldDir, {recursive: true});
+    fs.writeFileSync('foo.scss', 'a {b: c}');
+    expect(
+      tmpCompiler.compileAsync(path.resolve('foo.scss'))
+    ).resolves.not.toThrow();
+    await tmpCompiler.dispose();
+    fs.rmSync('foo.scss');
   });
 
   it('calls functions independently', async () => {

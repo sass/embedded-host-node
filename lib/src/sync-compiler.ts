@@ -4,6 +4,7 @@
 
 import {Subject} from 'rxjs';
 
+import * as path from 'path';
 import {
   OptionsWithLegacy,
   createDispatcher,
@@ -13,16 +14,16 @@ import {
   newCompileStringRequest,
 } from './compiler';
 import {compilerCommand} from './compiler-path';
+import {Dispatcher} from './dispatcher';
 import {FunctionRegistry} from './function-registry';
 import {ImporterRegistry} from './importer-registry';
+import {MessageTransformer} from './message-transformer';
+import {PacketTransformer} from './packet-transformer';
 import {SyncProcess} from './sync-process';
 import * as utils from './utils';
 import * as proto from './vendor/embedded_sass_pb';
 import {CompileResult} from './vendor/sass/compile';
 import {Options} from './vendor/sass/options';
-import {PacketTransformer} from './packet-transformer';
-import {MessageTransformer} from './message-transformer';
-import {Dispatcher} from './dispatcher';
 
 /**
  * Flag allowing the constructor passed by `initCompiler` so we can
@@ -37,7 +38,7 @@ export class Compiler {
   private readonly process = new SyncProcess(
     compilerCommand[0],
     [...compilerCommand.slice(1), '--embedded'],
-    {windowsHide: true}
+    {cwd: path.dirname(compilerCommand[0]), windowsHide: true}
   );
 
   /** The next compilation ID. */

@@ -6,6 +6,7 @@ import {spawn} from 'child_process';
 import {Observable} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
 
+import * as path from 'path';
 import {
   OptionsWithLegacy,
   StringOptionsWithLegacy,
@@ -18,11 +19,11 @@ import {
 import {compilerCommand} from './compiler-path';
 import {FunctionRegistry} from './function-registry';
 import {ImporterRegistry} from './importer-registry';
+import {MessageTransformer} from './message-transformer';
+import {PacketTransformer} from './packet-transformer';
 import * as utils from './utils';
 import * as proto from './vendor/embedded_sass_pb';
 import {CompileResult} from './vendor/sass';
-import {PacketTransformer} from './packet-transformer';
-import {MessageTransformer} from './message-transformer';
 
 /**
  * Flag allowing the constructor passed by `initAsyncCompiler` so we can
@@ -37,7 +38,7 @@ export class AsyncCompiler {
   private readonly process = spawn(
     compilerCommand[0],
     [...compilerCommand.slice(1), '--embedded'],
-    {windowsHide: true}
+    {cwd: path.dirname(compilerCommand[0]), windowsHide: true}
   );
 
   /** The next compilation ID. */

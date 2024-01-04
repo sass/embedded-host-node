@@ -35,6 +35,14 @@ describe('compiler', () => {
     compiler.dispose();
   });
 
+  it('calls functions independently', () => {
+    const [logger1, logger2] = [jest.fn(), jest.fn()];
+    compiler.compileString('@debug ""', {logger: {debug: logger1}});
+    compiler.compileString('@debug ""', {logger: {debug: logger2}});
+    expect(logger1).toHaveBeenCalledTimes(1);
+    expect(logger2).toHaveBeenCalledTimes(1);
+  });
+
   describe('compilation ID', () => {
     it('resets after callback compilations complete', () => {
       compiler.compileString('@import "foo"', {importers});
@@ -59,6 +67,18 @@ describe('asyncCompiler', () => {
 
   afterEach(async () => {
     await asyncCompiler.dispose();
+  });
+
+  it('calls functions independently', async () => {
+    const [logger1, logger2] = [jest.fn(), jest.fn()];
+    await asyncCompiler.compileStringAsync('@debug ""', {
+      logger: {debug: logger1},
+    });
+    await asyncCompiler.compileStringAsync('@debug ""', {
+      logger: {debug: logger2},
+    });
+    expect(logger1).toHaveBeenCalledTimes(1);
+    expect(logger2).toHaveBeenCalledTimes(1);
   });
 
   describe('compilation ID', () => {

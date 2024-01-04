@@ -3,12 +3,18 @@
 // https://opensource.org/licenses/MIT.
 
 import {Observable, Subject} from 'rxjs';
-import {filter, map, mergeMap} from 'rxjs/operators';
+import {filter, map, mergeMap, takeUntil} from 'rxjs/operators';
 
 import {OutboundResponse} from './messages';
 import * as proto from './vendor/embedded_sass_pb';
 import {RequestTracker} from './request-tracker';
 import {PromiseOr, compilerError, thenOr, hostError} from './utils';
+
+// A callback that accepts a response or error.
+type ResponseCallback = (
+  err: unknown,
+  response: proto.OutboundMessage_CompileResponse | undefined
+) => void;
 
 /**
  * Dispatches requests, responses, and events for a single compilation.
@@ -50,6 +56,11 @@ export class Dispatcher<sync extends 'sync' | 'async'> {
    */
   readonly error$ = this.errorInternal$.pipe();
 
+  // Subject to unsubscribe from all outbound messages to prevent dispatchers
+  // that happen to share a compilation ID from receiving messages intended for
+  // past dispatchers.
+  private readonly unsubscribe$ = new Subject();
+
   /**
    * Outbound log events. If an error occurs, the dispatcher closes this
    * silently.
@@ -82,7 +93,8 @@ export class Dispatcher<sync extends 'sync' | 'async'> {
           return result instanceof Promise
             ? result.then(() => message)
             : [message];
-        })
+        }),
+        takeUntil(this.unsubscribe$)
       )
       .subscribe({
         next: message => this.messages$.next(message),
@@ -94,9 +106,16 @@ export class Dispatcher<sync extends 'sync' | 'async'> {
       });
   }
 
+  /** Stop the outbound message subscription. */
+  unsubscribe(): void {
+    this.unsubscribe$.next(undefined);
+    this.unsubscribe$.complete();
+  }
+
   /**
    * Sends a CompileRequest inbound. Passes the corresponding outbound
-   * CompileResponse or an error to `callback`.
+   * CompileResponse or an error to `callback` and unsubscribes from all
+   * outbound events.
    *
    * This uses an old-style callback argument so that it can work either
    * synchronously or asynchronously. If the underlying stdout stream emits
@@ -104,13 +123,16 @@ export class Dispatcher<sync extends 'sync' | 'async'> {
    */
   sendCompileRequest(
     request: proto.InboundMessage_CompileRequest,
-    callback: (
-      err: unknown,
-      response: proto.OutboundMessage_CompileResponse | undefined
-    ) => void
+    callback: ResponseCallback
   ): void {
+    // Call the callback but unsubscribe first
+    const callback_: ResponseCallback = (err, response) => {
+      this.unsubscribe();
+      return callback(err, response);
+    };
+
     if (this.messages$.isStopped) {
-      callback(new Error('Tried writing to closed dispatcher'), undefined);
+      callback_(new Error('Tried writing to closed dispatcher'), undefined);
       return;
     }
 
@@ -119,9 +141,11 @@ export class Dispatcher<sync extends 'sync' | 'async'> {
         filter(message => message.message.case === 'compileResponse'),
         map(message => message.message.value as OutboundResponse)
       )
-      .subscribe({next: response => callback(null, response)});
+      .subscribe({next: response => callback_(null, response)});
 
-    this.error$.subscribe({error: error => callback(error, undefined)});
+    this.error$.subscribe({
+      error: error => callback_(error, undefined),
+    });
 
     try {
       this.writeInboundMessage([
@@ -140,6 +164,7 @@ export class Dispatcher<sync extends 'sync' | 'async'> {
   private throwAndClose(error: unknown): void {
     this.messages$.complete();
     this.errorInternal$.error(error);
+    this.unsubscribe();
   }
 
   // Keeps track of all outbound messages. If the outbound `message` contains a

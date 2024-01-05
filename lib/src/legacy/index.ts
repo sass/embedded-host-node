@@ -161,7 +161,10 @@ function convertOptions<sync extends 'sync' | 'async'>(
 
   return {
     functions,
-    importers,
+    importers:
+      options.pkgImporter instanceof NodePackageImporter
+        ? [options.pkgImporter, ...(importers ?? [])]
+        : importers,
     sourceMap: wasSourceMapRequested(options),
     sourceMapIncludeSources: options.sourceMapContents,
     loadPaths: importers ? undefined : options.includePaths,

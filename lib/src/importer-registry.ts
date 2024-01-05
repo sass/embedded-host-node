@@ -7,8 +7,6 @@ import {URL} from 'url';
 import {inspect} from 'util';
 
 import * as utils from './utils';
-import {legacyImporterProtocol} from './legacy/utils';
-
 import {FileImporter, Importer, Options} from './vendor/sass';
 import * as proto from './vendor/embedded_sass_pb';
 import {catchOr, thenOr, PromiseOr} from './utils';

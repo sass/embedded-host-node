@@ -143,33 +143,25 @@ function convertOptions<sync extends 'sync' | 'async'>(
     functions[signature.trimLeft()] = wrapFunction(self, callback, sync);
   }
 
-  let importers;
-  if (
+  const importers =
     options.importer &&
     (!(options.importer instanceof Array) || options.importer.length > 0)
-  ) {
-    importers = [
-      new LegacyImporterWrapper(
-        self,
-        options.importer instanceof Array
-          ? options.importer
-          : [options.importer],
-        options.includePaths ?? [],
-        options.file ?? 'stdin',
-        sync
-      ),
-    ];
-  }
+      ? [
+          new LegacyImporterWrapper(
+            self,
+            options.importer instanceof Array
+              ? options.importer
+              : [options.importer],
+            options.includePaths ?? [],
+            options.file ?? 'stdin',
+            sync
+          ),
+        ]
+      : undefined;
 
   return {
     functions,
-    importers:
-      options.pkgImporter?.type === 'node'
-        ? [
-            new NodePackageImporter(options.pkgImporter?.entryPointPath),
-            ...(importers ?? []),
-          ]
-        : importers,
+    importers,
     sourceMap: wasSourceMapRequested(options),
     sourceMapIncludeSources: options.sourceMapContents,
     loadPaths: importers ? undefined : options.includePaths,
@@ -178,7 +170,7 @@ function convertOptions<sync extends 'sync' | 'async'>(
     verbose: options.verbose,
     charset: options.charset,
     logger: options.logger,
-    legacy: true as const,
+    legacy: true,
   };
 }
 

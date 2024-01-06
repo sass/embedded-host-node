@@ -38,7 +38,13 @@ export class Compiler {
   private readonly process = new SyncProcess(
     compilerCommand[0],
     [...compilerCommand.slice(1), '--embedded'],
-    {cwd: path.dirname(compilerCommand[0]), windowsHide: true}
+    {
+      // Use the command's cwd so the compiler survives the removal of the
+      // current working directory.
+      // https://github.com/sass/embedded-host-node/pull/261#discussion_r1438712923
+      cwd: path.dirname(compilerCommand[0]),
+      windowsHide: true,
+    }
   );
 
   /** The next compilation ID. */
@@ -118,6 +124,9 @@ export class Compiler {
     let response: proto.OutboundMessage_CompileResponse | undefined;
     dispatcher.sendCompileRequest(request, (error_, response_) => {
       this.dispatchers.delete(dispatcher);
+      // Reset the compilation ID when the compiler goes idle (no active
+      // dispatchers) to avoid overflowing it.
+      // https://github.com/sass/embedded-host-node/pull/261#discussion_r1429266794
       if (this.dispatchers.size === 0) this.compilationId = 1;
       if (error_) {
         error = error_;
@@ -147,7 +156,8 @@ export class Compiler {
   constructor(flag: Symbol | undefined) {
     if (flag !== initFlag) {
       throw utils.compilerError(
-        'Compiler can not be directly constructed. Please use `sass.initAsyncCompiler()` instead.'
+        'Compiler can not be directly constructed. ' +
+          'Please use `sass.initAsyncCompiler()` instead.'
       );
     }
     this.stderr$.subscribe(data => process.stderr.write(data));

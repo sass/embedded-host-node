@@ -126,7 +126,37 @@ export class SassString extends Value {
   }
 
   toString(): string {
-    return this.hasQuotes ? `"${this.text}"` : this.text;
+    if (!this.hasQuotes)
+      return this.text.replace(/\0/g, '\uFFFD').replace(/\n */g, ' ');
+
+    // https://drafts.csswg.org/cssom/#serialize-a-string
+    let buffer = '"';
+    for (const character of this.text) {
+      if (character === '\0') {
+        // If the character is NULL (U+0000), then the REPLACEMENT CHARACTER
+        // (U+FFFD).
+        buffer += '\uFFFD';
+      } else if (character === '\x22' || character === '\x5C') {
+        // If the character is '"' (U+0022) or "\" (U+005C), then the escaped
+        // character.
+        buffer += '\x5C' + character;
+      } else if (character < '\x20' || character === '\x7F') {
+        // If the character is in the range [\1-\1f] (U+0001 to U+001F) or is
+        // U+007F, then the character escaped as code point.
+        //
+        // To escape a character as code point means to create a string of "\"
+        // (U+005C), followed by the Unicode code point as the smallest possible
+        // number of hexadecimal digits in the range 0-9 a-f (U+0030 to U+0039
+        // and U+0061 to U+0066) to represent the code point in base 16,
+        // followed by a single SPACE (U+0020).
+        buffer += '\x5C' + character.codePointAt(0)!.toString(16) + '\x20';
+      } else {
+        // Otherwise, the character itself.
+        buffer += character;
+      }
+    }
+    buffer += '"';
+    return buffer;
   }
 }
 

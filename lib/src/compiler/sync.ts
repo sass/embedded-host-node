@@ -12,18 +12,18 @@ import {
   handleLogEvent,
   newCompilePathRequest,
   newCompileStringRequest,
-} from './compiler';
-import {compilerCommand} from './compiler-path';
-import {Dispatcher} from './dispatcher';
-import {FunctionRegistry} from './function-registry';
-import {ImporterRegistry} from './importer-registry';
-import {MessageTransformer} from './message-transformer';
-import {PacketTransformer} from './packet-transformer';
-import {SyncProcess} from './sync-process';
-import * as utils from './utils';
-import * as proto from './vendor/embedded_sass_pb';
-import {CompileResult} from './vendor/sass/compile';
-import {Options} from './vendor/sass/options';
+} from './utils';
+import {compilerCommand} from '../compiler-path';
+import {Dispatcher} from '../dispatcher';
+import {FunctionRegistry} from '../function-registry';
+import {ImporterRegistry} from '../importer-registry';
+import {MessageTransformer} from '../message-transformer';
+import {PacketTransformer} from '../packet-transformer';
+import {SyncProcess} from '../sync-process';
+import * as utils from '../utils';
+import * as proto from '../vendor/embedded_sass_pb';
+import {CompileResult} from '../vendor/sass/compile';
+import {Options} from '../vendor/sass/options';
 
 /**
  * Flag allowing the constructor passed by `initCompiler` so we can

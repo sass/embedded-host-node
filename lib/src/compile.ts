@@ -2,9 +2,9 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-import {initAsyncCompiler} from './async-compiler';
-import {OptionsWithLegacy, StringOptionsWithLegacy} from './compiler';
-import {initCompiler} from './sync-compiler';
+import {initAsyncCompiler} from './compiler/async';
+import {OptionsWithLegacy, StringOptionsWithLegacy} from './compiler/utils';
+import {initCompiler} from './compiler/sync';
 import {CompileResult} from './vendor/sass';
 
 export function compile(

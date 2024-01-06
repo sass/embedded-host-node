@@ -4,21 +4,21 @@
 
 import * as p from 'path';
 import * as supportsColor from 'supports-color';
-import {deprotofySourceSpan} from './deprotofy-span';
-import {Dispatcher, DispatcherHandlers} from './dispatcher';
-import {Exception} from './exception';
-import {ImporterRegistry} from './importer-registry';
+import {deprotofySourceSpan} from '../deprotofy-span';
+import {Dispatcher, DispatcherHandlers} from '../dispatcher';
+import {Exception} from '../exception';
+import {ImporterRegistry} from '../importer-registry';
 import {
   legacyImporterProtocol,
   removeLegacyImporter,
   removeLegacyImporterFromSpan,
-} from './legacy/utils';
-import {MessageTransformer} from './message-transformer';
-import * as utils from './utils';
-import * as proto from './vendor/embedded_sass_pb';
-import {SourceSpan} from './vendor/sass';
-import {CompileResult} from './vendor/sass/compile';
-import {Options, StringOptions} from './vendor/sass/options';
+} from '../legacy/utils';
+import {MessageTransformer} from '../message-transformer';
+import * as utils from '../utils';
+import * as proto from '../vendor/embedded_sass_pb';
+import {SourceSpan} from '../vendor/sass';
+import {CompileResult} from '../vendor/sass/compile';
+import {Options, StringOptions} from '../vendor/sass/options';
 
 /// Allow the legacy API to pass in an option signaling to the modern API that
 /// it's being run in legacy mode.

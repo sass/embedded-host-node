@@ -4,9 +4,9 @@
 
 import * as fs from 'fs';
 import {chdir} from 'process';
-import {AsyncCompiler, initAsyncCompiler} from './async-compiler';
-import * as compilerModule from './compiler';
-import {Compiler, initCompiler} from './sync-compiler';
+import {AsyncCompiler, initAsyncCompiler} from './compiler/async';
+import * as compilerModule from './compiler/utils';
+import {Compiler, initCompiler} from './compiler/sync';
 
 const createDispatcher = jest.spyOn(compilerModule, 'createDispatcher');
 function getIdHistory() {

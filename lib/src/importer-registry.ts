@@ -11,10 +11,13 @@ import {FileImporter, Importer, Options} from './vendor/sass';
 import * as proto from './vendor/embedded_sass_pb';
 import {catchOr, thenOr, PromiseOr} from './utils';
 
+const entryPointPathKey = Symbol();
+
 export class NodePackageImporter {
-  entryPointPath?: string;
+  [entryPointPathKey]?: string;
+
   constructor(entryPointPath?: string) {
-    this.entryPointPath = entryPointPath;
+    this[entryPointPathKey] = entryPointPath;
   }
 }
 
@@ -55,13 +58,15 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
     const message = new proto.InboundMessage_CompileRequest_Importer();
     if (importer instanceof NodePackageImporter) {
       const importerMessage = new proto.NodePackageImporter();
-      const entryPointPath = importer.entryPointPath
-        ? p.resolve(process.cwd(), importer.entryPointPath)
+      const entryPointPath = importer[entryPointPathKey]
+        ? p.resolve(process.cwd(), importer[entryPointPathKey])
         : require.main?.filename;
 
       if (!entryPointPath) {
         throw new Error(
-          'Node Package Importer requires access to a filesystem.'
+          'The Node package importer cannot determine an entry point ' +
+            'because `require.main.filename` is not defined. ' +
+            'Please provide an `entryPointPath` to the `NodePackageImporter`.'
         );
       }
       importerMessage.entryPointPath = entryPointPath;

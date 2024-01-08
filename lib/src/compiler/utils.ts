@@ -20,20 +20,24 @@ import {SourceSpan} from '../vendor/sass';
 import {CompileResult} from '../vendor/sass/compile';
 import {Options, StringOptions} from '../vendor/sass/options';
 
-/// Allow the legacy API to pass in an option signaling to the modern API that
-/// it's being run in legacy mode.
-///
-/// This is not intended for API users to pass in, and may be broken without
-/// warning in the future.
+/**
+ * Allow the legacy API to pass in an option signaling to the modern API that
+ * it's being run in legacy mode.
+ *
+ * This is not intended for API users to pass in, and may be broken without
+ * warning in the future.
+ */
 export type OptionsWithLegacy<sync extends 'sync' | 'async'> = Options<sync> & {
   legacy?: boolean;
 };
 
-/// Allow the legacy API to pass in an option signaling to the modern API that
-/// it's being run in legacy mode.
-///
-/// This is not intended for API users to pass in, and may be broken without
-/// warning in the future.
+/**
+ * Allow the legacy API to pass in an option signaling to the modern API that
+ * it's being run in legacy mode.
+ *
+ * This is not intended for API users to pass in, and may be broken without
+ * warning in the future.
+ */
 export type StringOptionsWithLegacy<sync extends 'sync' | 'async'> =
   StringOptions<sync> & {legacy?: boolean};
 

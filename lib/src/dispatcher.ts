@@ -45,9 +45,9 @@ export class Dispatcher<sync extends 'sync' | 'async'> {
   // dispatching messages, this completes.
   private readonly messages$ = new Subject<proto.OutboundMessage>();
 
-  // Subject to unsubscribe from all outbound messages to prevent dispatchers
-  // that happen to reuse a compilation ID from receiving messages intended for
-  // past dispatchers.
+  // Subject to unsubscribe from all outbound messages to prevent past
+  // dispatchers with compilation IDs reused by future dispatchers from
+  // receiving messages intended for future dispatchers.
   private readonly unsubscribe$ = new Subject<void>();
 
   // If the dispatcher encounters an error, this errors out. It is publicly

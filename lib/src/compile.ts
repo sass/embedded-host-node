@@ -14,6 +14,7 @@ import {Dispatcher, DispatcherHandlers} from './dispatcher';
 import {Exception} from './exception';
 import {FunctionRegistry} from './function-registry';
 import {ImporterRegistry} from './importer-registry';
+import {Logger} from './logger';
 import {MessageTransformer} from './message-transformer';
 import {PacketTransformer} from './packet-transformer';
 import {SyncEmbeddedCompiler} from './sync-compiler';
@@ -148,6 +149,7 @@ function newCompileRequest(
     quietDeps: !!options?.quietDeps,
     verbose: !!options?.verbose,
     charset: !!(options?.charset ?? true),
+    silent: options?.logger === Logger.silent,
   });
 
   switch (options?.style ?? 'expanded') {

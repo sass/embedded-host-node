@@ -126,8 +126,9 @@ export class SassString extends Value {
   }
 
   toString(): string {
-    if (!this.hasQuotes)
+    if (!this.hasQuotes) {
       return this.text.replace(/\0/g, '\uFFFD').replace(/\n */g, ' ');
+    }
 
     // https://drafts.csswg.org/cssom/#serialize-a-string
     let buffer = '"';

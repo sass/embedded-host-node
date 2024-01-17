@@ -38,9 +38,7 @@ export {render, renderSync} from './src/legacy';
 
 export const info = `sass-embedded\t${pkg.version}`;
 
-export const Logger = {
-  silent: {warn() {}, debug() {}},
-};
+export {Logger} from './src/logger';
 
 // Legacy JS API
 

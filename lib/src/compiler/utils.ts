@@ -13,6 +13,7 @@ import {
   removeLegacyImporter,
   removeLegacyImporterFromSpan,
 } from '../legacy/utils';
+import {Logger} from '../logger';
 import {MessageTransformer} from '../message-transformer';
 import * as utils from '../utils';
 import * as proto from '../vendor/embedded_sass_pb';
@@ -73,6 +74,7 @@ function newCompileRequest(
     quietDeps: !!options?.quietDeps,
     verbose: !!options?.verbose,
     charset: !!(options?.charset ?? true),
+    silent: options?.logger === Logger.silent,
   });
 
   switch (options?.style ?? 'expanded') {

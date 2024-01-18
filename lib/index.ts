@@ -32,6 +32,8 @@ export {
   compileAsync,
   compileStringAsync,
 } from './src/compile';
+export {initAsyncCompiler, AsyncCompiler} from './src/compiler/async';
+export {initCompiler, Compiler} from './src/compiler/sync';
 export {render, renderSync} from './src/legacy';
 
 export const info = `sass-embedded\t${pkg.version}`;

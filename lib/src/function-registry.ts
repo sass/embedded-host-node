@@ -13,12 +13,6 @@ import {Protofier} from './protofier';
 import {Value} from './value';
 
 /**
- * The next ID to use for a function. The embedded protocol requires that
- * function IDs be globally unique.
- */
-let nextFunctionID = 0;
-
-/**
  * Tracks functions that are defined on the host so that the compiler can
  * execute them.
  */
@@ -26,6 +20,9 @@ export class FunctionRegistry<sync extends 'sync' | 'async'> {
   private readonly functionsByName = new Map<string, CustomFunction<sync>>();
   private readonly functionsById = new Map<number, CustomFunction<sync>>();
   private readonly idsByFunction = new Map<CustomFunction<sync>, number>();
+
+  /** The next ID to use for a function. */
+  private id = 0;
 
   constructor(functionsBySignature?: Record<string, CustomFunction<sync>>) {
     for (const [signature, fn] of Object.entries(functionsBySignature ?? {})) {
@@ -41,8 +38,8 @@ export class FunctionRegistry<sync extends 'sync' | 'async'> {
   /** Registers `fn` as a function that can be called using the returned ID. */
   register(fn: CustomFunction<sync>): number {
     return utils.putIfAbsent(this.idsByFunction, fn, () => {
-      const id = nextFunctionID;
-      nextFunctionID += 1;
+      const id = this.id;
+      this.id += 1;
       this.functionsById.set(id, fn);
       return id;
     });

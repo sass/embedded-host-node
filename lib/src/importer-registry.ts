@@ -17,6 +17,16 @@ export class NodePackageImporter {
   [entryPointPathKey]?: string;
 
   constructor(entryPointPath?: string) {
+    entryPointPath = entryPointPath
+      ? p.resolve(process.cwd(), entryPointPath)
+      : require.main?.filename;
+    if (!entryPointPath) {
+      throw new Error(
+        'The Node package importer cannot determine an entry point ' +
+          'because `require.main.filename` is not defined. ' +
+          'Please provide an `entryPointPath` to the `NodePackageImporter`.'
+      );
+    }
     this[entryPointPathKey] = entryPointPath;
   }
 }
@@ -58,18 +68,7 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
     const message = new proto.InboundMessage_CompileRequest_Importer();
     if (importer instanceof NodePackageImporter) {
       const importerMessage = new proto.NodePackageImporter();
-      const entryPointPath = importer[entryPointPathKey]
-        ? p.resolve(process.cwd(), importer[entryPointPathKey])
-        : require.main?.filename;
-
-      if (!entryPointPath) {
-        throw new Error(
-          'The Node package importer cannot determine an entry point ' +
-            'because `require.main.filename` is not defined. ' +
-            'Please provide an `entryPointPath` to the `NodePackageImporter`.'
-        );
-      }
-      importerMessage.entryPointPath = entryPointPath;
+      importerMessage.entryPointPath = importer[entryPointPathKey]!;
       message.importer = {
         case: 'nodePackageImporter',
         value: importerMessage,

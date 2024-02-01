@@ -19,7 +19,9 @@ export class NodePackageImporter {
   constructor(entryPointDirectory?: string) {
     entryPointDirectory = entryPointDirectory
       ? p.resolve(process.cwd(), entryPointDirectory)
-      : require.main?.filename;
+      : require.main?.filename
+      ? p.dirname(require.main?.filename)
+      : undefined;
     if (!entryPointDirectory) {
       throw new Error(
         'The Node package importer cannot determine an entry point ' +

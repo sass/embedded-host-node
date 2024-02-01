@@ -11,23 +11,23 @@ import {FileImporter, Importer, Options} from './vendor/sass';
 import * as proto from './vendor/embedded_sass_pb';
 import {catchOr, thenOr, PromiseOr} from './utils';
 
-const entryPointPathKey = Symbol();
+const entryPointDirectoryKey = Symbol();
 
 export class NodePackageImporter {
-  [entryPointPathKey]?: string;
+  [entryPointDirectoryKey]?: string;
 
-  constructor(entryPointPath?: string) {
-    entryPointPath = entryPointPath
-      ? p.resolve(process.cwd(), entryPointPath)
+  constructor(entryPointDirectory?: string) {
+    entryPointDirectory = entryPointDirectory
+      ? p.resolve(process.cwd(), entryPointDirectory)
       : require.main?.filename;
-    if (!entryPointPath) {
+    if (!entryPointDirectory) {
       throw new Error(
         'The Node package importer cannot determine an entry point ' +
           'because `require.main.filename` is not defined. ' +
-          'Please provide an `entryPointPath` to the `NodePackageImporter`.'
+          'Please provide an `entryPointDirectory` to the `NodePackageImporter`.'
       );
     }
-    this[entryPointPathKey] = entryPointPath;
+    this[entryPointDirectoryKey] = entryPointDirectory;
   }
 }
 
@@ -68,7 +68,7 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
     const message = new proto.InboundMessage_CompileRequest_Importer();
     if (importer instanceof NodePackageImporter) {
       const importerMessage = new proto.NodePackageImporter();
-      importerMessage.entryPointPath = importer[entryPointPathKey]!;
+      importerMessage.entryPointDirectory = importer[entryPointDirectoryKey]!;
       message.importer = {
         case: 'nodePackageImporter',
         value: importerMessage,

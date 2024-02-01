@@ -18,7 +18,7 @@ export class NodePackageImporter {
 
   constructor(entryPointDirectory?: string) {
     entryPointDirectory = entryPointDirectory
-      ? p.resolve(process.cwd(), entryPointDirectory)
+      ? p.resolve(entryPointDirectory)
       : require.main?.filename
       ? p.dirname(require.main?.filename)
       : undefined;

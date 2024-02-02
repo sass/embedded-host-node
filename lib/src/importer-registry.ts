@@ -20,7 +20,7 @@ export class NodePackageImporter {
     entryPointDirectory = entryPointDirectory
       ? p.resolve(entryPointDirectory)
       : require.main?.filename
-      ? p.dirname(require.main?.filename)
+      ? p.dirname(require.main.filename)
       : undefined;
     if (!entryPointDirectory) {
       throw new Error(

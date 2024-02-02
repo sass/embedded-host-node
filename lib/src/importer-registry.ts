@@ -14,7 +14,7 @@ import {catchOr, thenOr, PromiseOr} from './utils';
 const entryPointDirectoryKey = Symbol();
 
 export class NodePackageImporter {
-  [entryPointDirectoryKey]?: string;
+  readonly [entryPointDirectoryKey]: string;
 
   constructor(entryPointDirectory?: string) {
     entryPointDirectory = entryPointDirectory
@@ -52,7 +52,11 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
 
   constructor(options?: Options<sync>) {
     this.importers = (options?.importers ?? [])
-      .map(importer => this.register(importer))
+      .map(importer =>
+        this.register(
+          importer as Importer<sync> | FileImporter<sync> | NodePackageImporter
+        )
+      )
       .concat(
         (options?.loadPaths ?? []).map(
           path =>
@@ -70,7 +74,7 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
     const message = new proto.InboundMessage_CompileRequest_Importer();
     if (importer instanceof NodePackageImporter) {
       const importerMessage = new proto.NodePackageImporter();
-      importerMessage.entryPointDirectory = importer[entryPointDirectoryKey]!;
+      importerMessage.entryPointDirectory = importer[entryPointDirectoryKey];
       message.importer = {
         case: 'nodePackageImporter',
         value: importerMessage,

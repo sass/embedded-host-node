@@ -7,6 +7,8 @@ import {OptionsWithLegacy, StringOptionsWithLegacy} from './compiler/utils';
 import {initCompiler} from './compiler/sync';
 import {CompileResult} from './vendor/sass';
 
+export {NodePackageImporter} from './importer-registry';
+
 export function compile(
   path: string,
   options?: OptionsWithLegacy<'sync'>

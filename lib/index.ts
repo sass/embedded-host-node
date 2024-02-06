@@ -31,6 +31,7 @@ export {
   compileString,
   compileAsync,
   compileStringAsync,
+  NodePackageImporter,
 } from './src/compile';
 export {initAsyncCompiler, AsyncCompiler} from './src/compiler/async';
 export {initCompiler, Compiler} from './src/compiler/sync';

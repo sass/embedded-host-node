@@ -1,3 +1,36 @@
+## 1.71.0
+
+For more information about `pkg:` importers, see [the
+announcement][pkg-importers] on the Sass blog.
+
+[pkg-importers]: https://sass-lang.com/blog/announcing-pkg-importers
+
+### Command-Line Interface
+
+* Add a `--pkg-importer` flag to enable built-in `pkg:` importers. Currently
+  this only supports the Node.js package resolution algorithm, via
+  `--pkg-importer=node`. For example, `@use "pkg:bootstrap"` will load
+  `node_modules/bootstrap/scss/bootstrap.scss`.
+
+### JavaScript API
+
+* Add a `NodePackageImporter` importer that can be passed to the `importers`
+  option. This loads files using the `pkg:` URL scheme according to the Node.js
+  package resolution algorithm. For example, `@use "pkg:bootstrap"` will load
+  `node_modules/bootstrap/scss/bootstrap.scss`. The constructor takes a single
+  optional argument, which indicates the base directory to use when locating
+  `node_modules` directories. It defaults to
+  `path.dirname(require.main.filename)`.
+
+### Dart API
+
+* Add a `NodePackageImporter` importer that can be passed to the `importers`
+  option. This loads files using the `pkg:` URL scheme according to the Node.js
+  package resolution algorithm. For example, `@use "pkg:bootstrap"` will load
+  `node_modules/bootstrap/scss/bootstrap.scss`. The constructor takes a single
+  argument, which indicates the base directory to use when locating
+  `node_modules` directories.
+
 ## 1.70.0
 
 ### JavaScript API

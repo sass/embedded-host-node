@@ -35,9 +35,8 @@ export function nodePlatformToDartPlatform(platform: string): DartPlatform {
     case 'android':
       return 'android';
     case 'linux':
-      return 'linux';
     case 'linux-musl':
-      return 'linux-musl';
+      return 'linux';
     case 'darwin':
       return 'macos';
     case 'win32':
@@ -168,13 +167,15 @@ void (async () => {
     const nodeArch = argv.package.substring(index + 1);
     const dartPlatform = nodePlatformToDartPlatform(nodePlatform);
     const dartArch = nodeArchToDartArch(nodeArch);
+    const isMusl = nodePlatform === 'linux-musl';
     const outPath = p.join('npm', argv.package);
     await downloadRelease({
       repo: 'dart-sass',
       assetUrl:
         'https://github.com/sass/dart-sass/releases/download/' +
         `${version}/dart-sass-${version}-` +
-        `${dartPlatform}-${dartArch}${getArchiveExtension(dartPlatform)}`,
+        `${dartPlatform}-${dartArch}${isMusl ? '-musl' : ''}` +
+        `${getArchiveExtension(dartPlatform)}`,
       outPath,
     });
     await patchLauncherScript(outPath, dartPlatform, dartArch);

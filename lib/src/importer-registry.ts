@@ -2,6 +2,7 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
+import {createRequire} from 'module';
 import * as p from 'path';
 import {URL} from 'url';
 import {inspect} from 'util';
@@ -21,6 +22,10 @@ export class NodePackageImporter {
       ? p.resolve(entryPointDirectory)
       : require.main?.filename
       ? p.dirname(require.main.filename)
+      : // TODO: Find a way to use `import.meta.main` once
+      // https://github.com/nodejs/node/issues/49440 is done.
+      process.argv[1]
+      ? createRequire(process.argv[1]).resolve(process.argv[1])
       : undefined;
     if (!entryPointDirectory) {
       throw new Error(

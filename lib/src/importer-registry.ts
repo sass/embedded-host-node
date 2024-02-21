@@ -22,9 +22,9 @@ export class NodePackageImporter {
       ? p.resolve(entryPointDirectory)
       : require.main?.filename
       ? p.dirname(require.main.filename)
-      // TODO: Find a way to use `import.meta.main` once
+      : // TODO: Find a way to use `import.meta.main` once
       // https://github.com/nodejs/node/issues/49440 is done.
-      : process.argv[1]
+      process.argv[1]
       ? createRequire(process.argv[1]).resolve(process.argv[1])
       : undefined;
     if (!entryPointDirectory) {

@@ -1,3 +1,26 @@
+## 1.71.1
+
+### Command-Line Interface
+
+* Ship the musl Linux release with the proper Dart executable.
+
+### JavaScript API
+
+* Export the `NodePackageImporter` class in ESM mode.
+
+* Allow `NodePackageImporter` to locate a default directory even when the
+  entrypoint is an ESM module.
+
+### Dart API
+
+* Make passing a null argument to `NodePackageImporter()` a static error rather
+  than just a runtime error.
+
+### Embedded Sass
+
+* In the JS Embedded Host, properly install the musl Linux embedded compiler
+  when running on musl Linux.
+
 ## 1.71.0
 
 For more information about `pkg:` importers, see [the

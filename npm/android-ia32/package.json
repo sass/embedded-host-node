@@ -1,6 +1,6 @@
 {
   "name": "sass-embedded-android-ia32",
-  "version": "1.71.0",
+  "version": "1.71.1",
   "description": "The android-ia32 binary for sass-embedded",
   "repository": "sass/embedded-host-node",
   "author": "Google Inc.",

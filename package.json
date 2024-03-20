@@ -49,6 +49,7 @@
     "sass-embedded-linux-musl-arm64": "1.72.0",
     "sass-embedded-linux-musl-ia32": "1.72.0",
     "sass-embedded-linux-musl-x64": "1.72.0",
+    "sass-embedded-win32-arm64": "1.72.0",
     "sass-embedded-win32-ia32": "1.72.0",
     "sass-embedded-win32-x64": "1.72.0"
   },

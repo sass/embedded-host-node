@@ -21,13 +21,7 @@ export const compilerCommand = (() => {
       ? 'linux-musl'
       : (process.platform as string);
 
-  // https://github.com/sass/embedded-host-node/issues/263
-  // Use windows-x64 emulation on windows-arm64
-  //
-  // TODO: Make sure to remove "arm64" from "npm/win32-x64/package.json" when
-  // this logic is removed once we have true windows-arm64 support.
-  const arch =
-    platform === 'win32' && process.arch === 'arm64' ? 'x64' : process.arch;
+  const arch = process.arch;
 
   // find for development
   for (const path of ['vendor', '../../../lib/src/vendor']) {

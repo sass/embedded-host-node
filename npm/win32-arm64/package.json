@@ -1,7 +1,7 @@
 {
-  "name": "sass-embedded-win32-x64",
+  "name": "sass-embedded-win32-arm64",
   "version": "1.72.0",
-  "description": "The win32-x64 binary for sass-embedded",
+  "description": "The win32-arm64 binary for sass-embedded",
   "repository": "sass/embedded-host-node",
   "author": "Google Inc.",
   "license": "MIT",
@@ -18,6 +18,6 @@
     "win32"
   ],
   "cpu": [
-    "x64"
+    "arm64"
   ]
 }

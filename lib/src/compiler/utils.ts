@@ -4,6 +4,7 @@
 
 import * as p from 'path';
 import * as supportsColor from 'supports-color';
+import {getDeprecationIds} from '../deprecations';
 import {deprotofySourceSpan} from '../deprotofy-span';
 import {Dispatcher, DispatcherHandlers} from '../dispatcher';
 import {Exception} from '../exception';
@@ -75,6 +76,9 @@ function newCompileRequest(
     verbose: !!options?.verbose,
     charset: !!(options?.charset ?? true),
     silent: options?.logger === Logger.silent,
+    fatalDeprecation: getDeprecationIds(options?.fatalDeprecations ?? []),
+    silenceDeprecation: getDeprecationIds(options?.silenceDeprecations ?? []),
+    futureDeprecation: getDeprecationIds(options?.futureDeprecations ?? []),
   });
 
   switch (options?.style ?? 'expanded') {

@@ -1,6 +1,6 @@
 {
   "name": "sass-embedded-linux-ia32",
-  "version": "1.69.5",
+  "version": "1.72.0",
   "description": "The linux-ia32 binary for sass-embedded",
   "repository": "sass/embedded-host-node",
   "author": "Google Inc.",

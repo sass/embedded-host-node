@@ -1,7 +1,7 @@
 {
-  "name": "sass-embedded-linux-arm64",
+  "name": "sass-embedded-android-x64",
   "version": "1.72.0",
-  "description": "The linux-arm64 binary for sass-embedded",
+  "description": "The android-x64 binary for sass-embedded",
   "repository": "sass/embedded-host-node",
   "author": "Google Inc.",
   "license": "MIT",
@@ -15,9 +15,9 @@
     "sass": "./dart-sass/sass"
   },
   "os": [
-    "linux"
+    "android"
   ],
   "cpu": [
-    "arm64"
+    "x64"
   ]
 }

@@ -1,7 +1,7 @@
 {
-  "name": "sass-embedded-linux-arm64",
+  "name": "sass-embedded-win32-arm64",
   "version": "1.72.0",
-  "description": "The linux-arm64 binary for sass-embedded",
+  "description": "The win32-arm64 binary for sass-embedded",
   "repository": "sass/embedded-host-node",
   "author": "Google Inc.",
   "license": "MIT",
@@ -12,10 +12,10 @@
     "node": ">=14.0.0"
   },
   "bin": {
-    "sass": "./dart-sass/sass"
+    "sass": "./dart-sass/sass.bat"
   },
   "os": [
-    "linux"
+    "win32"
   ],
   "cpu": [
     "arm64"

@@ -5,7 +5,9 @@ describe('utils', () => {
   describe('pathToUrlString', () => {
     it('encode relative path like `pathToFileURL`', () => {
       const baseURL = pathToFileURL('').toString();
-      for (let i = 0; i < 128; i++) {
+      // Skip charcodes 0-32 to work around Node trailing whitespace regression:
+      // https://github.com/nodejs/node/issues/51167
+      for (let i = 33; i < 128; i++) {
         const char = String.fromCharCode(i);
         const filename = `${i}-${char}`;
         expect(pathToUrlString(filename)).toEqual(

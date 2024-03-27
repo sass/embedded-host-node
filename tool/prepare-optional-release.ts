@@ -7,7 +7,12 @@ import yargs from 'yargs';
 import * as pkg from '../package.json';
 import * as utils from './utils';
 
-export type DartPlatform = 'linux' | 'macos' | 'windows';
+export type DartPlatform =
+  | 'android'
+  | 'linux'
+  | 'linux-musl'
+  | 'macos'
+  | 'windows';
 export type DartArch = 'ia32' | 'x64' | 'arm' | 'arm64';
 
 const argv = yargs(process.argv.slice(2))
@@ -27,7 +32,10 @@ const argv = yargs(process.argv.slice(2))
 // Dart Sass Embedded.
 export function nodePlatformToDartPlatform(platform: string): DartPlatform {
   switch (platform) {
+    case 'android':
+      return 'android';
     case 'linux':
+    case 'linux-musl':
       return 'linux';
     case 'darwin':
       return 'macos';
@@ -104,6 +112,47 @@ async function downloadRelease(options: {
   await fs.unlink(zippedAssetPath);
 }
 
+// Patch the launcher script if needed.
+//
+// For linux both `-linux-` and `-linux-musl-` packages will be installed
+// because npm doesn't know how to select packages based on LibC. To avoid
+// conflicts, only the `-linux-` packages have "bin" scripts defined in
+// package.json, which we patch to detect which LibC is available and launch the
+// correct binary.
+async function patchLauncherScript(
+  path: string,
+  dartPlatform: DartPlatform,
+  dartArch: DartArch
+) {
+  if (dartPlatform !== 'linux') return;
+
+  const scriptPath = p.join(path, 'dart-sass', 'sass');
+  console.log(`Patching ${scriptPath} script.`);
+
+  const shebang = Buffer.from('#!/bin/sh\n');
+  const buffer = await fs.readFile(scriptPath);
+  if (!buffer.subarray(0, shebang.length).equals(shebang)) {
+    throw new Error(`${scriptPath} is not a shell script!`);
+  }
+
+  const lines = buffer.toString('utf-8').split('\n');
+  const index = lines.findIndex(line => line.startsWith('path='));
+  if (index < 0) {
+    throw new Error(`The format of ${scriptPath} has changed!`);
+  }
+
+  lines.splice(
+    index + 1,
+    0,
+    '# Detect linux-musl',
+    'if grep -qm 1 /ld-musl- /proc/self/exe; then',
+    `  path="$path/../../sass-embedded-linux-musl-${dartArch}/dart-sass"`,
+    'fi'
+  );
+
+  await fs.writeFile(scriptPath, lines.join('\n'));
+}
+
 void (async () => {
   try {
     const version = pkg['compiler-version'] as string;
@@ -113,18 +162,23 @@ void (async () => {
       );
     }
 
-    const [nodePlatform, nodeArch] = argv.package.split('-');
+    const index = argv.package.lastIndexOf('-');
+    const nodePlatform = argv.package.substring(0, index);
+    const nodeArch = argv.package.substring(index + 1);
     const dartPlatform = nodePlatformToDartPlatform(nodePlatform);
     const dartArch = nodeArchToDartArch(nodeArch);
+    const isMusl = nodePlatform === 'linux-musl';
     const outPath = p.join('npm', argv.package);
     await downloadRelease({
       repo: 'dart-sass',
       assetUrl:
         'https://github.com/sass/dart-sass/releases/download/' +
         `${version}/dart-sass-${version}-` +
-        `${dartPlatform}-${dartArch}${getArchiveExtension(dartPlatform)}`,
+        `${dartPlatform}-${dartArch}${isMusl ? '-musl' : ''}` +
+        `${getArchiveExtension(dartPlatform)}`,
       outPath,
     });
+    await patchLauncherScript(outPath, dartPlatform, dartArch);
   } catch (error) {
     console.error(error);
     process.exitCode = 1;

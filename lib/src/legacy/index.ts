@@ -5,6 +5,7 @@
 import * as fs from 'fs';
 import * as p from 'path';
 import {pathToFileURL, URL} from 'url';
+import {NodePackageImporter} from '../importer-registry';
 
 import {Exception} from '../exception';
 import {
@@ -31,6 +32,8 @@ import {
   LegacyStringOptions,
   Options,
   StringOptions,
+  Importer,
+  FileImporter,
 } from '../vendor/sass';
 import {wrapFunction} from './value/wrap';
 import {endOfLoadProtocol, LegacyImporterWrapper} from './importer';
@@ -158,7 +161,10 @@ function convertOptions<sync extends 'sync' | 'async'>(
 
   return {
     functions,
-    importers,
+    importers:
+      options.pkgImporter instanceof NodePackageImporter
+        ? [options.pkgImporter, ...(importers ?? [])]
+        : importers,
     sourceMap: wasSourceMapRequested(options),
     sourceMapIncludeSources: options.sourceMapContents,
     loadPaths: importers ? undefined : options.includePaths,
@@ -178,6 +184,12 @@ function convertStringOptions<sync extends 'sync' | 'async'>(
 ): StringOptions<sync> & {legacy: true} {
   const modernOptions = convertOptions(options, sync);
 
+  // Find the first non-NodePackageImporter to pass as legacy `importer` option.
+  // NodePackageImporter will be passed in `modernOptions.importers`.
+  const importer = modernOptions.importers?.find(
+    _importer => !(_importer instanceof NodePackageImporter)
+  ) as Importer<sync> | FileImporter<sync>;
+
   return {
     ...modernOptions,
     url: options.file
@@ -185,7 +197,7 @@ function convertStringOptions<sync extends 'sync' | 'async'>(
         ? pathToLegacyFileUrl(options.file)
         : pathToFileURL(options.file)
       : new URL(legacyImporterProtocol),
-    importer: modernOptions.importers ? modernOptions.importers[0] : undefined,
+    importer,
     syntax: options.indentedSyntax ? 'indented' : 'scss',
   };
 }

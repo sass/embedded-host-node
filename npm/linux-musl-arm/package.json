@@ -1,7 +1,7 @@
 {
-  "name": "sass-embedded-linux-arm64",
+  "name": "sass-embedded-linux-musl-arm",
   "version": "1.72.0",
-  "description": "The linux-arm64 binary for sass-embedded",
+  "description": "The linux-musl-arm binary for sass-embedded",
   "repository": "sass/embedded-host-node",
   "author": "Google Inc.",
   "license": "MIT",
@@ -11,13 +11,10 @@
   "engines": {
     "node": ">=14.0.0"
   },
-  "bin": {
-    "sass": "./dart-sass/sass"
-  },
   "os": [
     "linux"
   ],
   "cpu": [
-    "arm64"
+    "arm"
   ]
 }

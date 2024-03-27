@@ -1,3 +1,126 @@
+## 1.72.0
+
+* Support adjacent `/`s without whitespace in between when parsing plain CSS
+  expressions.
+
+* Allow the Node.js `pkg:` importer to load Sass stylesheets for `package.json`
+  `exports` field entries without extensions.
+
+* When printing suggestions for variables, use underscores in variable names
+  when the original usage used underscores.
+
+### JavaScript API
+
+* Properly resolve `pkg:` imports with the Node.js package importer when
+  arguments are passed to the JavaScript process.
+
+## 1.71.1
+
+### Command-Line Interface
+
+* Ship the musl Linux release with the proper Dart executable.
+
+### JavaScript API
+
+* Export the `NodePackageImporter` class in ESM mode.
+
+* Allow `NodePackageImporter` to locate a default directory even when the
+  entrypoint is an ESM module.
+
+### Dart API
+
+* Make passing a null argument to `NodePackageImporter()` a static error rather
+  than just a runtime error.
+
+### Embedded Sass
+
+* In the JS Embedded Host, properly install the musl Linux embedded compiler
+  when running on musl Linux.
+
+## 1.71.0
+
+For more information about `pkg:` importers, see [the
+announcement][pkg-importers] on the Sass blog.
+
+[pkg-importers]: https://sass-lang.com/blog/announcing-pkg-importers
+
+### Command-Line Interface
+
+* Add a `--pkg-importer` flag to enable built-in `pkg:` importers. Currently
+  this only supports the Node.js package resolution algorithm, via
+  `--pkg-importer=node`. For example, `@use "pkg:bootstrap"` will load
+  `node_modules/bootstrap/scss/bootstrap.scss`.
+
+### JavaScript API
+
+* Add a `NodePackageImporter` importer that can be passed to the `importers`
+  option. This loads files using the `pkg:` URL scheme according to the Node.js
+  package resolution algorithm. For example, `@use "pkg:bootstrap"` will load
+  `node_modules/bootstrap/scss/bootstrap.scss`. The constructor takes a single
+  optional argument, which indicates the base directory to use when locating
+  `node_modules` directories. It defaults to
+  `path.dirname(require.main.filename)`.
+
+### Dart API
+
+* Add a `NodePackageImporter` importer that can be passed to the `importers`
+  option. This loads files using the `pkg:` URL scheme according to the Node.js
+  package resolution algorithm. For example, `@use "pkg:bootstrap"` will load
+  `node_modules/bootstrap/scss/bootstrap.scss`. The constructor takes a single
+  argument, which indicates the base directory to use when locating
+  `node_modules` directories.
+
+## 1.70.0
+
+### JavaScript API
+
+* Add a `sass.initCompiler()` function that returns a `sass.Compiler` object
+  which supports `compile()` and `compileString()` methods with the same API as
+  the global Sass object. On the Node.js embedded host, each `sass.Compiler`
+  object uses a single long-lived subprocess, making compiling multiple
+  stylesheets much more efficient.
+
+* Add a `sass.initAsyncCompiler()` function that returns a `sass.AsyncCompiler`
+  object which supports `compileAsync()` and `compileStringAsync()` methods with
+  the same API as the global Sass object. On the Node.js embedded host, each
+  `sass.AsynCompiler` object uses a single long-lived subprocess, making
+  compiling multiple stylesheets much more efficient.
+
+### Embedded Sass
+
+* Support the `CompileRequest.silent` field. This allows compilations with no
+  logging to avoid unnecessary request/response cycles.
+
+* The Dart Sass embedded compiler now reports its name as "dart-sass" rather
+  than "Dart Sass", to match the JS API's `info` field.
+
+## 1.69.7
+
+### Embedded Sass
+
+* In the JS Embedded Host, properly install the x64 Dart Sass executable on
+  ARM64 Windows.
+
+## 1.69.6
+
+* Produce better output for numbers with complex units in `meta.inspect()` and
+  debugging messages.
+
+* Escape U+007F DELETE when serializing strings.
+
+* When generating CSS error messages to display in-browser, escape all code
+  points that aren't in the US-ASCII region. Previously only code points U+0100
+  LATIN CAPITAL LETTER A WITH MACRON were escaped.
+
+* Provide official releases for musl LibC and for Android.
+
+* Don't crash when running `meta.apply()` in asynchronous mode.
+
+### JS API
+
+* Fix a bug where certain exceptions could produce `SourceSpan`s that didn't
+  follow the documented `SourceSpan` API.
+
 ## 1.69.5
 
 ### JS API

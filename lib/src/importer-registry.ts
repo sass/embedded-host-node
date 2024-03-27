@@ -2,6 +2,7 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
+import {createRequire} from 'module';
 import * as p from 'path';
 import {URL} from 'url';
 import {inspect} from 'util';
@@ -10,6 +11,32 @@ import * as utils from './utils';
 import {FileImporter, Importer, Options} from './vendor/sass';
 import * as proto from './vendor/embedded_sass_pb';
 import {catchOr, thenOr, PromiseOr} from './utils';
+
+const entryPointDirectoryKey = Symbol();
+
+export class NodePackageImporter {
+  readonly [entryPointDirectoryKey]: string;
+
+  constructor(entryPointDirectory?: string) {
+    entryPointDirectory = entryPointDirectory
+      ? p.resolve(entryPointDirectory)
+      : require.main?.filename
+      ? p.dirname(require.main.filename)
+      : // TODO: Find a way to use `import.meta.main` once
+      // https://github.com/nodejs/node/issues/49440 is done.
+      process.argv[1]
+      ? createRequire(process.argv[1]).resolve(process.argv[1])
+      : undefined;
+    if (!entryPointDirectory) {
+      throw new Error(
+        'The Node package importer cannot determine an entry point ' +
+          'because `require.main.filename` is not defined. ' +
+          'Please provide an `entryPointDirectory` to the `NodePackageImporter`.'
+      );
+    }
+    this[entryPointDirectoryKey] = entryPointDirectory;
+  }
+}
 
 /**
  * A registry of importers defined in the host that can be invoked by the
@@ -30,7 +57,11 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
 
   constructor(options?: Options<sync>) {
     this.importers = (options?.importers ?? [])
-      .map(importer => this.register(importer))
+      .map(importer =>
+        this.register(
+          importer as Importer<sync> | FileImporter<sync> | NodePackageImporter
+        )
+      )
       .concat(
         (options?.loadPaths ?? []).map(
           path =>
@@ -43,10 +74,17 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
 
   /** Converts an importer to a proto without adding it to `this.importers`. */
   register(
-    importer: Importer<sync> | FileImporter<sync>
+    importer: Importer<sync> | FileImporter<sync> | NodePackageImporter
   ): proto.InboundMessage_CompileRequest_Importer {
     const message = new proto.InboundMessage_CompileRequest_Importer();
-    if ('canonicalize' in importer) {
+    if (importer instanceof NodePackageImporter) {
+      const importerMessage = new proto.NodePackageImporter();
+      importerMessage.entryPointDirectory = importer[entryPointDirectoryKey];
+      message.importer = {
+        case: 'nodePackageImporter',
+        value: importerMessage,
+      };
+    } else if ('canonicalize' in importer) {
       if ('findFileUrl' in importer) {
         throw new Error(
           'Importer may not contain both canonicalize() and findFileUrl(): ' +

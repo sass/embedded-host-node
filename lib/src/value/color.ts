@@ -882,9 +882,7 @@ export class SassColor extends Value {
     const color = this.color.mix(color2.color, 1 - weight, {
       space: encodeSpaceForColorJs(this.space),
       hue: hueInterpolationMethod,
-      // @TODO Waiting on new release of ColorJS to fix option types.
-      // Fixed in: https://github.com/LeaVerou/color.js/pull/347
-    } as any);
+    });
     const coords = decodeCoordsFromColorJs(color.coords, this.space === 'rgb');
     return new SassColor({
       space: this.space,

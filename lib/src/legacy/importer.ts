@@ -216,8 +216,8 @@ export class LegacyImporterWrapper<sync extends 'sync' | 'async'>
       const syntax = canonicalUrl.pathname.endsWith('.sass')
         ? 'indented'
         : canonicalUrl.pathname.endsWith('.css')
-        ? 'css'
-        : 'scss';
+          ? 'css'
+          : 'scss';
 
       let contents =
         this.lastContents ??

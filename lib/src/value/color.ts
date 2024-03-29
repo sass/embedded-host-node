@@ -7,7 +7,9 @@ import {valueError} from '../utils';
 import {
   fuzzyAssertInRange,
   fuzzyEquals,
+  fuzzyGreaterThanOrEquals,
   fuzzyHashCode,
+  fuzzyLessThan,
   fuzzyRound,
   positiveMod,
 } from './utils';
@@ -121,19 +123,6 @@ function NaNtoNull(val: number): number | null {
  */
 function NaNtoZero(val: number): number {
   return Number.isNaN(val) ? 0 : val;
-}
-
-/**
- * Assert that `val` is either `NaN` or within `min` and `max`. Otherwise,
- * throw an error.
- */
-function assertClamped(
-  val: number,
-  min: number,
-  max: number,
-  name: string
-): number {
-  return Number.isNaN(val) ? val : fuzzyAssertInRange(val, min, max, name);
 }
 
 /** Convert from sRGB (0-1) to RGB (0-255) units. */
@@ -493,10 +482,14 @@ export class SassColor extends Value {
         break;
 
       case 'hsl': {
-        const hue = normalizeHue(options.hue ?? NaN);
-        const saturation = options.saturation ?? NaN;
-        let lightness = options.lightness ?? NaN;
-        lightness = assertClamped(lightness, 0, 100, 'lightness');
+        let hue = normalizeHue(options.hue ?? NaN);
+        let saturation = options.saturation ?? NaN;
+        const lightness = options.lightness ?? NaN;
+        if (!Number.isNaN(saturation) && fuzzyLessThan(saturation, 0)) {
+          saturation = Math.abs(saturation);
+          hue = (hue + 180) % 360;
+        }
+
         this.color = new Color({
           spaceId: encodeSpaceForColorJs(space),
           coords: [hue, saturation, lightness],
@@ -519,11 +512,9 @@ export class SassColor extends Value {
 
       case 'lab':
       case 'oklab': {
-        let lightness = options.lightness ?? NaN;
+        const lightness = options.lightness ?? NaN;
         const a = options.a ?? NaN;
         const b = options.b ?? NaN;
-        const maxLightness = space === 'lab' ? 100 : 1;
-        lightness = assertClamped(lightness, 0, maxLightness, 'lightness');
         this.color = new Color({
           spaceId: encodeSpaceForColorJs(space),
           coords: [lightness, a, b],
@@ -534,11 +525,14 @@ export class SassColor extends Value {
 
       case 'lch':
       case 'oklch': {
-        let lightness = options.lightness ?? NaN;
-        const chroma = options.chroma ?? NaN;
-        const hue = normalizeHue(options.hue ?? NaN);
-        const maxLightness = space === 'lch' ? 100 : 1;
-        lightness = assertClamped(lightness, 0, maxLightness, 'lightness');
+        const lightness = options.lightness ?? NaN;
+        let chroma = options.chroma ?? NaN;
+        let hue = normalizeHue(options.hue ?? NaN);
+        if (!Number.isNaN(chroma) && fuzzyLessThan(chroma, 0)) {
+          chroma = Math.abs(chroma);
+          hue = (hue + 180) % 360;
+        }
+
         this.color = new Color({
           spaceId: encodeSpaceForColorJs(space),
           coords: [lightness, chroma, hue],
@@ -830,7 +824,7 @@ export class SassColor extends Value {
       case color.channel0Id:
         if (color.space === 'hsl') return fuzzyEquals(channels[1], 0);
         if (color.space === 'hwb') {
-          return fuzzyEquals(channels[1] + channels[2], 100);
+          return fuzzyGreaterThanOrEquals(channels[1] + channels[2], 100);
         }
         return false;
       case color.channel2Id:
@@ -1104,10 +1098,6 @@ export class SassColor extends Value {
     }
     if (isNumberOrNull(options.alpha) && options.alpha !== null) {
       fuzzyAssertInRange(options.alpha, 0, 1, 'alpha');
-    }
-    if (isNumberOrNull(options.lightness) && options.lightness !== null) {
-      const maxLightness = space === 'oklab' || space === 'oklch' ? 1 : 100;
-      assertClamped(options.lightness, 0, maxLightness, 'lightness');
     }
 
     return this.getChangedColor(options, space, spaceSetExplicitly).toSpace(

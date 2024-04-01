@@ -42,18 +42,22 @@ function isActiveIn(deprecation: api.Deprecation, version: Version) {
  * Converts a mixed array of deprecations, IDs, and versions to an array of IDs
  * that's ready to include in a CompileRequest.
  */
-export function getDeprecationIds(arr: (api.DeprecationOrId|Version)[]): string[] {
-  return arr.flatMap((item) => {
+export function getDeprecationIds(
+  arr: (api.DeprecationOrId | Version)[]
+): string[] {
+  return arr.flatMap(item => {
     if (item instanceof Version) {
-      return Object.values(deprecations).filter((deprecation) => isActiveIn(deprecation, item)).map((deprecation) => deprecation.id);
-    } else if (typeof item === "string") {
+      return Object.values(deprecations)
+        .filter(deprecation => isActiveIn(deprecation, item))
+        .map(deprecation => deprecation.id);
+    } else if (typeof item === 'string') {
       return item;
     }
     return item.id;
   });
 }
 
-export const deprecations : typeof api.deprecations = {
+export const deprecations: typeof api.deprecations = {
   'call-string': {
     id: 'call-string',
     status: 'active',
@@ -144,6 +148,14 @@ export const deprecations : typeof api.deprecations = {
     deprecatedIn: new Version(1, 65, 0),
     obsoleteIn: null,
     description: 'Passing percentages to the Sass abs() function.',
+  },
+  'fs-importer-cwd': {
+    id: 'fs-importer-cwd',
+    status: 'active',
+    deprecatedIn: new Version(1, 73, 0),
+    obsoleteIn: null,
+    description:
+      'Using the current working directory as an implicit load path.',
   },
   import: {
     id: 'import',

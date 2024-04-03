@@ -132,7 +132,7 @@ export class LegacyImporterWrapper<sync extends 'sync' | 'async'>
         }
       }
 
-      return null;
+      url = urlWithoutPrefix;
     }
 
     const prev = this.prev[this.prev.length - 1];

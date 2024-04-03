@@ -32,8 +32,6 @@ import {
   LegacyStringOptions,
   Options,
   StringOptions,
-  Importer,
-  FileImporter,
 } from '../vendor/sass';
 import {wrapFunction} from './value/wrap';
 import {endOfLoadProtocol, LegacyImporterWrapper} from './importer';
@@ -184,12 +182,6 @@ function convertStringOptions<sync extends 'sync' | 'async'>(
 ): StringOptions<sync> & {legacy: true} {
   const modernOptions = convertOptions(options, sync);
 
-  // Find the first non-NodePackageImporter to pass as legacy `importer` option.
-  // NodePackageImporter will be passed in `modernOptions.importers`.
-  const importer = modernOptions.importers?.find(
-    _importer => !(_importer instanceof NodePackageImporter)
-  ) as Importer<sync> | FileImporter<sync>;
-
   return {
     ...modernOptions,
     url: options.file
@@ -197,7 +189,6 @@ function convertStringOptions<sync extends 'sync' | 'async'>(
         ? pathToLegacyFileUrl(options.file)
         : pathToFileURL(options.file)
       : new URL(legacyImporterProtocol),
-    importer,
     syntax: options.indentedSyntax ? 'indented' : 'scss',
   };
 }

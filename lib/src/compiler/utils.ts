@@ -4,6 +4,7 @@
 
 import * as p from 'path';
 import * as supportsColor from 'supports-color';
+import {deprecations, getDeprecationIds, Deprecation} from '../deprecations';
 import {deprotofySourceSpan} from '../deprotofy-span';
 import {Dispatcher, DispatcherHandlers} from '../dispatcher';
 import {Exception} from '../exception';
@@ -75,6 +76,9 @@ function newCompileRequest(
     verbose: !!options?.verbose,
     charset: !!(options?.charset ?? true),
     silent: options?.logger === Logger.silent,
+    fatalDeprecation: getDeprecationIds(options?.fatalDeprecations ?? []),
+    silenceDeprecation: getDeprecationIds(options?.silenceDeprecations ?? []),
+    futureDeprecation: getDeprecationIds(options?.futureDeprecations ?? []),
   });
 
   switch (options?.style ?? 'expanded') {
@@ -137,6 +141,13 @@ export function newCompileStringRequest(
   return request;
 }
 
+/** Type guard to check that `id` is a valid deprecation ID. */
+function validDeprecationId(
+  id: string | number | symbol | undefined
+): id is keyof typeof deprecations {
+  return !!id && id in deprecations;
+}
+
 /** Handles a log event according to `options`. */
 export function handleLogEvent(
   options: OptionsWithLegacy<'sync' | 'async'> | undefined,
@@ -148,6 +159,9 @@ export function handleLogEvent(
   if (options?.legacy) message = removeLegacyImporter(message);
   let formatted = event.formatted;
   if (options?.legacy) formatted = removeLegacyImporter(formatted);
+  const deprecationType = validDeprecationId(event.deprecationType)
+    ? deprecations[event.deprecationType]
+    : null;
 
   if (event.type === proto.LogEventType.DEBUG) {
     if (options?.logger?.debug) {
@@ -159,10 +173,18 @@ export function handleLogEvent(
     }
   } else {
     if (options?.logger?.warn) {
-      const params: {deprecation: boolean; span?: SourceSpan; stack?: string} =
-        {
-          deprecation: event.type === proto.LogEventType.DEPRECATION_WARNING,
-        };
+      const params: (
+        | {
+            deprecation: true;
+            deprecationType: Deprecation;
+          }
+        | {deprecation: false}
+      ) & {
+        span?: SourceSpan;
+        stack?: string;
+      } = deprecationType
+        ? {deprecation: true, deprecationType: deprecationType}
+        : {deprecation: false};
       if (span) params.span = span;
 
       const stack = event.stackTrace;

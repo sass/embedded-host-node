@@ -35,6 +35,13 @@ export {
 } from './src/compile';
 export {initAsyncCompiler, AsyncCompiler} from './src/compiler/async';
 export {initCompiler, Compiler} from './src/compiler/sync';
+export {
+  deprecations,
+  Deprecation,
+  DeprecationOrId,
+  DeprecationStatus,
+  Version,
+} from './src/deprecations';
 export {render, renderSync} from './src/legacy';
 
 export const info = `sass-embedded\t${pkg.version}`;

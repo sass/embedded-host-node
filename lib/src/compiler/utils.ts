@@ -141,6 +141,7 @@ export function newCompileStringRequest(
   return request;
 }
 
+/** Type guard to check that `id` is a valid deprecation ID. */
 function validDeprecationId(
   id: string | number | symbol | undefined
 ): id is keyof typeof deprecations {
@@ -172,15 +173,18 @@ export function handleLogEvent(
     }
   } else {
     if (options?.logger?.warn) {
-      const params: {
-        deprecation: boolean;
-        deprecationType?: Deprecation;
+      const params: (
+        | {
+            deprecation: true;
+            deprecationType: Deprecation;
+          }
+        | {deprecation: false}
+      ) & {
         span?: SourceSpan;
         stack?: string;
-      } = {
-        deprecation: event.type === proto.LogEventType.DEPRECATION_WARNING,
-      };
-      if (deprecationType) params.deprecationType = deprecationType;
+      } = deprecationType
+        ? {deprecation: true, deprecationType: deprecationType}
+        : {deprecation: false};
       if (span) params.span = span;
 
       const stack = event.stackTrace;

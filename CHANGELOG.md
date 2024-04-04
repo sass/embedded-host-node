@@ -1,3 +1,82 @@
+## 1.74.1
+
+* No user-visible changes.
+
+## 1.74.0
+
+### JS API
+
+* Add a new top-level `deprecations` object, which contains various
+  `Deprecation` objects that define the different types of deprecation used by
+  the Sass compiler and can be passed to the options below.
+
+* Add a new `fatalDeprecations` compiler option that causes the compiler to
+  error if any deprecation warnings of the provided types are encountered. You
+  can also pass in a `Version` object to treat all deprecations that were active
+  in that Dart Sass version as fatal.
+
+* Add a new `futureDeprecations` compiler option that allows you to opt-in to
+  certain deprecations early (currently just `import`).
+
+* Add a new `silenceDeprecations` compiler option to ignore any deprecation
+  warnings of the provided types.
+
+### Command-Line Interface
+
+* Add a new `--silence-deprecation` flag, which causes the compiler to ignore
+  any deprecation warnings of the provided types.
+
+* Previously, if a future deprecation was passed to `--fatal-deprecation` but
+  not `--future-deprecation`, it would be treated as fatal despite not being
+  enabled. Both flags are now required to treat a future deprecation as fatal
+  with a warning emitted if `--fatal-deprecation` is passed without
+  `--future-deprecation`, matching the JS API's behavior.
+
+### Dart API
+
+* The `compile` methods now take in a `silenceDeprecations` parameter, which
+  causes the compiler to ignore any deprecation warnings of the provided types.
+
+* Add `Deprecation.obsoleteIn` to match the JS API. This is currently null for
+  all deprecations, but will be used once some deprecations become obsolete in
+  Dart Sass 2.0.0.
+
+* **Potentially breaking bug fix:** Fix a bug where `compileStringToResultAsync`
+  ignored `fatalDeprecations` and `futureDeprecations`.
+
+* The behavior around making future deprecations fatal mentioned in the CLI
+  section above has also been changed in the Dart API.
+
+## 1.73.0
+
+* Add support for nesting in plain CSS files. This is not processed by Sass at
+  all; it's emitted exactly as-is in the CSS.
+
+* In certain circumstances, the current working directory was unintentionally
+  being made available as a load path. This is now deprecated. Anyone relying on
+  this should explicitly pass in `.` as a load path or `FilesystemImporter('.')`
+  as the current importer.
+
+* Add linux-riscv64 and windows-arm64 releases.
+
+### Command-Line Interface
+
+* Fix a bug where absolute `file:` URLs weren't loaded for files compiled via
+  the command line unless an unrelated load path was also passed.
+
+* Fix a bug where `--update` would always update files that were specified via
+  absolute path unless an unrelated load path was also passed.
+
+### Dart API
+
+* Add `FilesystemImporter.noLoadPath`, which is a `FilesystemImporter` that can
+  load absolute `file:` URLs and resolve URLs relative to the base file but
+  doesn't load relative URLs from a load path.
+
+* `FilesystemImporter.cwd` is now deprecated. Either use
+  `FilesystemImporter.noLoadPath` if you weren't intending to rely on the load
+  path, or `FilesystemImporter('.')` if you were.
+
 ## 1.72.0
 
 * Support adjacent `/`s without whitespace in between when parsing plain CSS

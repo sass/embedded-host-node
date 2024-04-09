@@ -157,6 +157,14 @@ export const deprecations: typeof api.deprecations = {
     description:
       'Using the current working directory as an implicit load path.',
   },
+  'importer-without-url': {
+    id: 'importer-without-url',
+    status: 'active',
+    deprecatedIn: new Version(1, 75, 0),
+    obsoleteIn: null,
+    description:
+      'Passing a base importer without a base URL to compileString*.',
+  },
   import: {
     id: 'import',
     status: 'future',

@@ -157,6 +157,20 @@ export const deprecations: typeof api.deprecations = {
     description:
       'Using the current working directory as an implicit load path.',
   },
+  'color-4-api': {
+    id: 'color-4-api',
+    status: 'active',
+    deprecatedIn: new Version(1, 76, 0),
+    obsoleteIn: null,
+    description: 'Methods of interacting with legacy SassColors.',
+  },
+  'color-functions': {
+    id: 'color-functions',
+    status: 'active',
+    deprecatedIn: new Version(1, 76, 0),
+    obsoleteIn: null,
+    description: 'Using global Sass color functions.',
+  },
   import: {
     id: 'import',
     status: 'future',

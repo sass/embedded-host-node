@@ -7,6 +7,7 @@ import * as p from 'path';
 import {URL} from 'url';
 import {inspect} from 'util';
 
+import {CanonicalizeContext} from './canonicalize-context';
 import * as utils from './utils';
 import {FileImporter, Importer, Options} from './vendor/sass';
 import * as proto from './vendor/embedded_sass_pb';
@@ -115,21 +116,22 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
       throw utils.compilerError('Unknown CanonicalizeRequest.importer_id');
     }
 
+    const canonicalizeContext = new CanonicalizeContext(
+      request.containingUrl ? new URL(request.containingUrl) : null,
+      request.fromImport
+    );
+
     return catchOr(
       () => {
         return thenOr(
-          importer.canonicalize(request.url, {
-            fromImport: request.fromImport,
-            containingUrl: request.containingUrl
-              ? new URL(request.containingUrl)
-              : null,
-          }),
+          importer.canonicalize(request.url, canonicalizeContext),
           url =>
             new proto.InboundMessage_CanonicalizeResponse({
               result:
                 url === null
                   ? {case: undefined}
                   : {case: 'url', value: url.toString()},
+              containingUrlUnused: !canonicalizeContext.containingUrlAccessed,
             })
         );
       },
@@ -197,15 +199,15 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
       throw utils.compilerError('Unknown FileImportRequest.importer_id');
     }
 
+    const canonicalizeContext = new CanonicalizeContext(
+      request.containingUrl ? new URL(request.containingUrl) : null,
+      request.fromImport
+    );
+
     return catchOr(
       () => {
         return thenOr(
-          importer.findFileUrl(request.url, {
-            fromImport: request.fromImport,
-            containingUrl: request.containingUrl
-              ? new URL(request.containingUrl)
-              : null,
-          }),
+          importer.findFileUrl(request.url, canonicalizeContext),
           url => {
             if (!url) return new proto.InboundMessage_FileImportResponse();
             if (url.protocol !== 'file:') {
@@ -216,6 +218,7 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
             }
             return new proto.InboundMessage_FileImportResponse({
               result: {case: 'fileUrl', value: url.toString()},
+              containingUrlUnused: !canonicalizeContext.containingUrlAccessed,
             });
           }
         );

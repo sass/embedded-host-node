@@ -43,6 +43,10 @@ export class Compiler {
       // current working directory.
       // https://github.com/sass/embedded-host-node/pull/261#discussion_r1438712923
       cwd: path.dirname(compilerCommand[0]),
+      // Node blocks launching .bat and .cmd without a shell due to CVE-2024-27980
+      shell: ['.bat', '.cmd'].includes(
+        path.extname(compilerCommand[0]).toLowerCase()
+      ),
       windowsHide: true,
     }
   );

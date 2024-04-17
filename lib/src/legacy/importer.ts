@@ -86,9 +86,33 @@ export class LegacyImporterWrapper<sync extends 'sync' | 'async'>
 
   canonicalize(
     url: string,
-    options: {fromImport: boolean}
+    options: {fromImport: boolean; containingUrl: URL | null}
   ): PromiseOr<URL | null, sync> {
     if (url.startsWith(endOfLoadProtocol)) return new URL(url);
+
+    // Emulate a base importer instead of using a real base importer,
+    // because we want to mark containingUrl as used, which is impossible
+    // in a real base importer.
+    if (options.containingUrl !== null) {
+      try {
+        const absoluteUrl = new URL(url, options.containingUrl).toString();
+        const resolved = this.canonicalize(absoluteUrl, {
+          fromImport: options.fromImport,
+          containingUrl: null,
+        });
+        if (resolved !== null) return resolved;
+      } catch (error: unknown) {
+        if (
+          error instanceof TypeError &&
+          isErrnoException(error) &&
+          error.code === 'ERR_INVALID_URL'
+        ) {
+          // ignore
+        } else {
+          throw error;
+        }
+      }
+    }
 
     if (
       url.startsWith(legacyImporterProtocolPrefix) ||

@@ -31,6 +31,8 @@ export class SassArgumentList extends SassList {
    */
   readonly keywordsInternal: OrderedMap<string, Value>;
 
+  private _keywordsAccessed = false;
+
   /**
    * Whether the `keywords` getter has been accessed.
    *
@@ -38,10 +40,12 @@ export class SassArgumentList extends SassList {
    * part of the package's public API and should not be accessed by user code.
    * It may be renamed or removed without warning in the future.
    */
-  keywordsAccessed = false;
+  get keywordsAccessed(): boolean {
+    return this._keywordsAccessed;
+  }
 
   get keywords(): OrderedMap<string, Value> {
-    this.keywordsAccessed = true;
+    this._keywordsAccessed = true;
     return this.keywordsInternal;
   }
 

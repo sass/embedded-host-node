@@ -90,6 +90,12 @@ type HueInterpolationMethod =
   | 'longer'
   | 'shorter';
 
+/**
+ * Methods by which colors in bounded spaces can be mapped to within their
+ * gamut.
+ */
+type GamutMapMethod = 'clip' | 'local-minde';
+
 /** Options for specifying any channel value. */
 type ChannelOptions = {
   [key in ChannelName]?: number | null;
@@ -151,6 +157,14 @@ function encodeSpaceForColorJs(space?: KnownColorSpace): string | undefined {
       return 'prophoto';
   }
   return space;
+}
+
+/**
+ * Normalize discrepancies between Sass's [GamutMapMethod] and Color.js's
+ * `method` option.
+ */
+function encodeGamutMapMethodForColorJs(method: GamutMapMethod): string {
+  return method === 'local-minde' ? 'css' : method;
 }
 
 /**
@@ -714,18 +728,21 @@ export class SassColor extends Value {
 
   /**
    * Returns a copy of this color, modified so it is in-gamut for the specified
-   * `space`—or the current color space if `space` is not specified—using the
-   * recommended [CSS Gamut Mapping Algorithm][css-mapping] to map out-of-gamut
-   * colors into the desired gamut with as little perceptual change as possible.
-   *
-   * [css-mapping]:
-   * https://www.w3.org/TR/css-color-4/#css-gamut-mapping-algorithm
+   * `space`—or the current color space if `space` is not specified—using
+   * `method` to map out-of-gamut colors into the desired gamut.
    */
-  toGamut(space?: KnownColorSpace): SassColor {
+  toGamut({
+    space,
+    method,
+  }: {
+    space?: KnownColorSpace;
+    method: GamutMapMethod;
+  }): SassColor {
     if (this.isInGamut(space)) return this;
-    const color = this.color
-      .clone()
-      .toGamut({space: encodeSpaceForColorJs(space)});
+    const color = this.color.clone().toGamut({
+      space: encodeSpaceForColorJs(space),
+      method: encodeGamutMapMethodForColorJs(method),
+    });
     return new SassColor({color, space: space ?? this.space});
   }
 

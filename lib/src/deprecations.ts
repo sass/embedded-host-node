@@ -157,6 +157,13 @@ export const deprecations: typeof api.deprecations = {
     description:
       'Using the current working directory as an implicit load path.',
   },
+  'css-function-mixin': {
+    id: 'css-function-mixin',
+    status: 'active',
+    deprecatedIn: new Version(1, 76, 0),
+    obsoleteIn: null,
+    description: 'Function and mixin names beginning with --.',
+  },
   import: {
     id: 'import',
     status: 'future',

@@ -209,7 +209,11 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
         return thenOr(
           importer.findFileUrl(request.url, canonicalizeContext),
           url => {
-            if (!url) return new proto.InboundMessage_FileImportResponse();
+            if (!url) {
+              return new proto.InboundMessage_FileImportResponse({
+                containingUrlUnused: !canonicalizeContext.containingUrlAccessed,
+              });
+            }
             if (url.protocol !== 'file:') {
               throw (
                 `FileImporter ${inspect(importer)} returned non-file: URL ` +

@@ -164,6 +164,13 @@ export const deprecations: typeof api.deprecations = {
     obsoleteIn: null,
     description: 'Function and mixin names beginning with --.',
   },
+  'feature-exists': {
+    id: 'feature-exists',
+    status: 'active',
+    deprecatedIn: new Version(1, 78, 0),
+    obsoleteIn: null,
+    description: 'Using the meta.feature-exists() function.',
+  },
   import: {
     id: 'import',
     status: 'future',

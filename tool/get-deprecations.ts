@@ -48,7 +48,7 @@ export async function getDeprecations(outDirectory: string) {
     tsText +=
       `  ${key}: {\n` +
       `    id: '${id}',\n` +
-      `    description: '${deprecation.description}'\n` +
+      `    description: '${deprecation.description}',\n` +
       `    status: '${dartSass.status}',\n` +
       `    deprecatedIn: ${toVersionCode(dartSass.deprecated)},\n` +
       `    obsoleteIn: ${toVersionCode(dartSass.obsolete)},\n` +

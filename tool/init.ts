@@ -4,6 +4,7 @@
 
 import yargs from 'yargs';
 
+import {getDeprecations} from './get-deprecations';
 import {getEmbeddedCompiler} from './get-embedded-compiler';
 import {getLanguageRepo} from './get-language-repo';
 
@@ -65,6 +66,8 @@ void (async () => {
         await getEmbeddedCompiler(outPath);
       }
     }
+
+    await getDeprecations(outPath);
   } catch (error) {
     console.error(error);
     process.exitCode = 1;

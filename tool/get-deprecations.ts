@@ -21,8 +21,8 @@ const yamlFile = 'build/sass/spec/deprecations.yaml';
  * Converts a version string in the form X.Y.Z to be code calling the Version
  * constructor, or null if the string is undefined.
  */
-function toVersionCode(version: string | undefined): string | null {
-  if (!version) return null;
+function toVersionCode(version: string | undefined): string {
+  if (!version) return 'null';
   const match = version.match(/^(\d+)\.(\d+)\.(\d+)$/);
   if (match === null) {
     throw new Error(`Invalid version ${version}`);

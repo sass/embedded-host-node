@@ -31,9 +31,7 @@ export function getDeprecationIds(
 ): string[] {
   return arr.flatMap(item => {
     if (item instanceof Version) {
-      return Object.values(deprecations)
-        .filter(deprecation => isActiveIn(deprecation, item))
-        .map(deprecation => deprecation.id);
+      return arr.map(item => item.toString());
     } else if (typeof item === 'string') {
       return item;
     }

@@ -40,8 +40,8 @@ export {
   Deprecation,
   DeprecationOrId,
   DeprecationStatus,
-  Version,
 } from './src/deprecations';
+export {Version} from './src/version';
 export {render, renderSync} from './src/legacy';
 
 export const info = `sass-embedded\t${pkg.version}`;

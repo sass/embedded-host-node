@@ -184,11 +184,20 @@ function convertStringOptions<sync extends 'sync' | 'async'>(
 ): StringOptions<sync> & {legacy: true} {
   const modernOptions = convertOptions(options, sync);
 
-  // Find the first non-NodePackageImporter to pass as legacy `importer` option.
-  // NodePackageImporter will be passed in `modernOptions.importers`.
-  const importer = modernOptions.importers?.find(
-    _importer => !(_importer instanceof NodePackageImporter)
-  ) as Importer<sync> | FileImporter<sync>;
+  // Use a no-op base importer, because the LegacyImporterWrapper will emulate
+  // the base importer by itself in order to mark containingUrl as accessed.
+  const importer = modernOptions.importers?.some(
+    importer => importer instanceof LegacyImporterWrapper
+  )
+    ? {
+        canonicalize() {
+          return null;
+        },
+        load() {
+          return null;
+        },
+      }
+    : undefined;
 
   return {
     ...modernOptions,

@@ -32,8 +32,6 @@ import {
   LegacyStringOptions,
   Options,
   StringOptions,
-  Importer,
-  FileImporter,
 } from '../vendor/sass';
 import {wrapFunction} from './value/wrap';
 import {endOfLoadProtocol, LegacyImporterWrapper} from './importer';

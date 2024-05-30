@@ -1,6 +1,6 @@
 {
   "name": "sass-embedded-linux-musl-arm64",
-  "version": "1.74.1",
+  "version": "1.77.3",
   "description": "The linux-musl-arm64 binary for sass-embedded",
   "repository": "sass/embedded-host-node",
   "author": "Google Inc.",

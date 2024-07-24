@@ -8,7 +8,7 @@ import {filter, map, mergeMap, takeUntil} from 'rxjs/operators';
 import {OutboundResponse} from './messages';
 import * as proto from './vendor/embedded_sass_pb';
 import {RequestTracker} from './request-tracker';
-import {PromiseOr, compilerError, thenOr, hostError} from './utils';
+import {PromiseOr, compilerError, hostError, thenOr} from './utils';
 
 // A callback that accepts a response or error.
 type ResponseCallback = (

@@ -4,7 +4,7 @@
 
 import * as p from 'path';
 import * as supportsColor from 'supports-color';
-import {deprecations, getDeprecationIds, Deprecation} from '../deprecations';
+import {Deprecation, deprecations, getDeprecationIds} from '../deprecations';
 import {deprotofySourceSpan} from '../deprotofy-span';
 import {Dispatcher, DispatcherHandlers} from '../dispatcher';
 import {Exception} from '../exception';

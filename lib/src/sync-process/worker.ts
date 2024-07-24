@@ -3,12 +3,12 @@
 // https://opensource.org/licenses/MIT.
 
 import {
-  parentPort,
-  workerData,
   MessagePort,
   TransferListItem,
+  parentPort,
+  workerData,
 } from 'worker_threads';
-import {spawn, SpawnOptionsWithoutStdio} from 'child_process';
+import {SpawnOptionsWithoutStdio, spawn} from 'child_process';
 import {strict as assert} from 'assert';
 
 import {SyncMessagePort} from './sync-message-port';

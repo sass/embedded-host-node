@@ -2,7 +2,7 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-import {hash, List, ValueObject} from 'immutable';
+import {List, ValueObject, hash} from 'immutable';
 
 import {Value} from './index';
 import {SassNumber} from './number';

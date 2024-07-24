@@ -4,7 +4,7 @@
 
 import * as fs from 'fs';
 import * as p from 'path';
-import {pathToFileURL, URL} from 'url';
+import {URL, pathToFileURL} from 'url';
 import {NodePackageImporter} from '../importer-registry';
 
 import {Exception} from '../exception';
@@ -15,11 +15,11 @@ import {
   compileStringAsync,
 } from '../compile';
 import {
+  SyncBoolean,
   fileUrlToPathCrossPlatform,
   isNullOrUndefined,
   pathToUrlString,
   withoutExtension,
-  SyncBoolean,
 } from '../utils';
 import {
   CompileResult,
@@ -34,7 +34,7 @@ import {
   StringOptions,
 } from '../vendor/sass';
 import {wrapFunction} from './value/wrap';
-import {endOfLoadProtocol, LegacyImporterWrapper} from './importer';
+import {LegacyImporterWrapper, endOfLoadProtocol} from './importer';
 import {
   legacyImporterProtocol,
   pathToLegacyFileUrl,

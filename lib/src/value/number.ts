@@ -2,7 +2,7 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-import {hash, List} from 'immutable';
+import {List, hash} from 'immutable';
 
 import {asImmutableList, valueError} from '../utils';
 import {Value} from './index';

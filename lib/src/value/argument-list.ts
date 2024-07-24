@@ -2,7 +2,7 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-import {isOrderedMap, List, OrderedMap} from 'immutable';
+import {List, OrderedMap, isOrderedMap} from 'immutable';
 
 import {ListSeparator, SassList} from './list';
 import {Value} from './index';

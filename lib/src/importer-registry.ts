@@ -11,7 +11,7 @@ import {CanonicalizeContext} from './canonicalize-context';
 import * as utils from './utils';
 import {FileImporter, Importer, Options} from './vendor/sass';
 import * as proto from './vendor/embedded_sass_pb';
-import {catchOr, thenOr, PromiseOr} from './utils';
+import {PromiseOr, catchOr, thenOr} from './utils';
 
 const entryPointDirectoryKey = Symbol();
 

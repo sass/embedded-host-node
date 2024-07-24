@@ -9,11 +9,11 @@ import * as util from 'util';
 
 import {resolvePath} from './resolve-path';
 import {
+  PromiseOr,
+  SyncBoolean,
   fileUrlToPathCrossPlatform,
   isErrnoException,
   thenOr,
-  PromiseOr,
-  SyncBoolean,
 } from '../utils';
 import {
   Importer,
@@ -26,10 +26,10 @@ import {
   LegacySyncImporter,
 } from '../vendor/sass';
 import {
-  pathToLegacyFileUrl,
   legacyFileUrlToPath,
   legacyImporterProtocol,
   legacyImporterProtocolPrefix,
+  pathToLegacyFileUrl,
 } from './utils';
 
 /**

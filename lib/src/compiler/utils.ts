@@ -10,7 +10,6 @@ import {Dispatcher, DispatcherHandlers} from '../dispatcher';
 import {Exception} from '../exception';
 import {ImporterRegistry} from '../importer-registry';
 import {
-  legacyImporterProtocol,
   removeLegacyImporter,
   removeLegacyImporterFromSpan,
 } from '../legacy/utils';
@@ -121,19 +120,12 @@ export function newCompileStringRequest(
   });
 
   const url = options?.url?.toString();
-  if (url && url !== legacyImporterProtocol) {
+  if (url) {
     input.url = url;
   }
 
   if (options && 'importer' in options && options.importer) {
     input.importer = importers.register(options.importer);
-  } else if (url === legacyImporterProtocol) {
-    input.importer = new proto.InboundMessage_CompileRequest_Importer({
-      importer: {case: 'path', value: p.resolve('.')},
-    });
-  } else {
-    // When importer is not set on the host, the compiler will set a
-    // FileSystemImporter if `url` is set to a file: url or a NoOpImporter.
   }
 
   const request = newCompileRequest(importers, options);

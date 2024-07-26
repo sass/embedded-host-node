@@ -57,7 +57,7 @@ export class SyncProcess {
     this.worker.on('error', console.error);
 
     this.stdin = new stream.Writable({
-      write: (chunk: Buffer, encoding, callback) => {
+      write: (chunk: Buffer, _encoding, callback) => {
         this.port.postMessage(
           {
             type: 'stdin',

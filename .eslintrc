@@ -5,5 +5,19 @@
     // It would be nice to sort import declaration order as well, but that's not
     // autofixable and it's not worth the effort of handling manually.
     "sort-imports": ["error", {"ignoreDeclarationSort": true}],
+    // Match TypeScript style of exempting names starting with `_`.
+    // See: https://typescript-eslint.io/rules/no-unused-vars/
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      {
+        "args": "all",
+        "argsIgnorePattern": "^_",
+        "caughtErrors": "all",
+        "caughtErrorsIgnorePattern": "^_",
+        "destructuredArrayIgnorePattern": "^_",
+        "varsIgnorePattern": "^_",
+        "ignoreRestSiblings": true
+      }
+    ]
   }
 }

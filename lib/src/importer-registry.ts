@@ -12,6 +12,8 @@ import * as utils from './utils';
 import {FileImporter, Importer, Options} from './vendor/sass';
 import * as proto from './vendor/embedded_sass_pb';
 import {PromiseOr, catchOr, thenOr} from './utils';
+import {LegacyImporterWrapper} from './legacy/importer';
+import {legacyImporterScheme} from './legacy/utils';
 
 const entryPointDirectoryKey = Symbol();
 
@@ -94,10 +96,15 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
       }
 
       message.importer = {case: 'importerId', value: this.id};
-      message.nonCanonicalScheme =
-        typeof importer.nonCanonicalScheme === 'string'
-          ? [importer.nonCanonicalScheme]
-          : importer.nonCanonicalScheme ?? [];
+      if (importer instanceof LegacyImporterWrapper) {
+        message.nonCanonicalScheme = [legacyImporterScheme];
+        message.invertNonCanonicalScheme = true;
+      } else {
+        message.nonCanonicalScheme =
+          typeof importer.nonCanonicalScheme === 'string'
+            ? [importer.nonCanonicalScheme]
+            : importer.nonCanonicalScheme ?? [];
+      }
       this.importersById.set(this.id, importer);
     } else {
       message.importer = {case: 'fileImporterId', value: this.id};

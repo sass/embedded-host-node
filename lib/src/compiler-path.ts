@@ -53,7 +53,7 @@ export const compilerCommand = (() => {
         `sass-embedded-${platform}-${arch}/dart-sass/src/sass.snapshot`
       ),
     ];
-  } catch (ignored) {
+  } catch (_ignored) {
     // ignored
   }
 

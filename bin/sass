@@ -1,62 +1,24 @@
-#!/bin/bash -e
+#!/usr/bin/env node
 
-dir="$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"
-if [ "$(basename "$dir")" == bin ]; then
-    # Global executables are installed in .../bin/, and global libraries
-    # (including their dependencies) in .../lib/node_modules.
-    node_modules="$(dirname "$dir")/lib/node_modules"
-elif [ "$(basename "$dir")" == .bin ]; then
-    # Local dependency executables are installed in ./node_modules/.bin, and
-    # and their libraries in ./node_modules.
-    node_modules="$(dirname "$dir")"
-else
-    # If all else fails, try to find node_modules in a parent directory. We
-    # might execute this, for example, if someone runs the script from source.
-    while [ "$dir" != "/" ]; do
-        dir="$(dirname "$dir")"
-        if [ -d "$dir/node_modules" ]; then
-            node_modules="$dir/node_modules"
-            break
-        fi
-    done
-    echo "Could not find node_modules above ${BASH_SOURCE[0]}!" >&2
-    exit 1
-fi
+const child_process = require("child_process");
+const {compilerCommand} = require("../dist/lib/src/compiler-path");
 
-case "$(uname -s)" in
-    Linux*)
-        if [ ! -z "$ANDROID_ROOT" -a ! -z "$ANDROID_DATA" ]; then
-            os=android
-        else
-            os=linux
-        fi;;
-    Darwin*)
-        os=darwin;;
-    CYGWIN*|MINGW*|MSYS_NT*)
-        os=win32;;
-    *)
-        echo "Unknown operating system $(uname -s)!" >&2
-        exit 1
-esac
+// TODO npm/cmd-shim#152 and yarnpkg/berry#6422 - If and when the package
+// managers support it, we should make this a proper shell script rather than a
+// JS wrapper.
 
-musl=
-if [ "$os" == linux ] && grep -q /ld-musl- /bin/bash; then musl=-musl; fi
+try {
+child_process.execFileSync(
+  compilerCommand[0], [...compilerCommand.slice(1), ...process.argv.slice(2)], {
+    stdio: 'inherit',
+    windowsHide: true
+});
+} catch (error) {
+  if (error.code) {
+    throw error;
+  } else {
+    process.exitCode = error.status;
+  }
+}
 
-case "$(uname -m)" in
-    aarch64*) arch=arm64;;
-    arm*) arch=arm;;
-    x86_64) arch=x64;;
-    i386|i486|i586|i686) arch=ia32;;
-    *)
-        echo "Unknown architecture $(uname -m)!" >&2
-        exit 1
-esac
-
-shared="$node_modules/sass-embedded-$os$musl-$arch"
-specific="$node_modules/sass-embedded/node_modules/sass-embedded-$os$musl-$arch"
-if [ -d "$specific" ]; then
-    exec "$specific/dart-sass/sass" "$@"
-else
-    exec "$shared/dart-sass/sass" "$@"
-fi
 

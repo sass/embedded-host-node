@@ -47,7 +47,7 @@ export function getElfInterpreter(path: string): string {
     if (elfIdentificationClass !== 1 && elfIdentificationClass !== 2) {
       throw new Error(`${path} has an invalid ELF class.`);
     }
-    const class32 = elfIdentificationClass === 1;
+    const elfClass32 = elfIdentificationClass === 1;
 
     const elfIdentificationData = elfIdentification.getUint8(5);
     if (elfIdentificationData !== 1 && elfIdentificationData !== 2) {
@@ -58,37 +58,41 @@ export function getElfInterpreter(path: string): string {
     // Converting BigUint64 to Number because node Buffer length has to be
     // number type, and we don't expect any elf we check with this method to
     // be larger than 9007199254740991 bytes.
-    const ePhoff = class32
+    const programHeadersOffset = elfClass32
       ? elfIdentification.getUint32(28, littleEndian)
       : Number(elfIdentification.getBigUint64(32, littleEndian));
-    const ePhentsize = class32
+    const programHeadersEntrySize = elfClass32
       ? elfIdentification.getUint16(42, littleEndian)
       : elfIdentification.getUint16(54, littleEndian);
-    const ePhnum = class32
+    const programHeadersEntryCount = elfClass32
       ? elfIdentification.getUint16(44, littleEndian)
       : elfIdentification.getUint16(56, littleEndian);
 
     const programHeaders = new DataView(
-      readFileDescriptor(fd, ePhoff, ePhentsize * ePhnum).buffer
+      readFileDescriptor(
+        fd,
+        programHeadersOffset,
+        programHeadersEntrySize * programHeadersEntryCount
+      ).buffer
     );
-    for (let i = 0; i < ePhnum; i++) {
-      const byteOffset = i * ePhentsize;
-      const pType = programHeaders.getUint32(byteOffset, littleEndian);
-      if (pType !== 3) continue; // 3 is PT_INTERP, the interpreter
+    for (let i = 0; i < programHeadersEntryCount; i++) {
+      const byteOffset = i * programHeadersEntrySize;
+      const segmentType = programHeaders.getUint32(byteOffset, littleEndian);
+      if (segmentType !== 3) continue; // 3 is PT_INTERP, the interpreter
 
-      const pOffset = class32
+      const segmentOffset = elfClass32
         ? programHeaders.getUint32(byteOffset + 4, littleEndian)
         : Number(programHeaders.getBigUint64(byteOffset + 8, littleEndian));
-      const pFilesz = class32
+      const segmentFileSize = elfClass32
         ? programHeaders.getUint32(byteOffset + 16, littleEndian)
         : Number(programHeaders.getBigUint64(byteOffset + 32, littleEndian));
 
-      const buffer = readFileDescriptor(fd, pOffset, pFilesz);
-      if (buffer[pFilesz - 1] !== 0) {
+      const buffer = readFileDescriptor(fd, segmentOffset, segmentFileSize);
+      if (buffer[segmentFileSize - 1] !== 0) {
         throw new Error(`${path} is corrupted.`);
       }
 
-      return buffer.toString('utf8', 0, pFilesz - 1);
+      return buffer.toString('utf8', 0, segmentFileSize - 1);
     }
 
     throw new Error(`${path} does not contain an interpreter entry.`);

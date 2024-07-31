@@ -54,7 +54,7 @@
     "sass-embedded-win32-x64": "1.77.8"
   },
   "dependencies": {
-    "@bufbuild/protobuf": "^1.0.0",
+    "@bufbuild/protobuf": "^2.0.0",
     "buffer-builder": "^0.2.0",
     "immutable": "^4.0.0",
     "rxjs": "^7.4.0",

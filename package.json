@@ -63,7 +63,7 @@
   },
   "devDependencies": {
     "@bufbuild/buf": "^1.13.1-4",
-    "@bufbuild/protoc-gen-es": "^1.0.0",
+    "@bufbuild/protoc-gen-es": "^2.0.0",
     "@types/buffer-builder": "^0.2.0",
     "@types/google-protobuf": "^3.7.2",
     "@types/jest": "^29.4.0",

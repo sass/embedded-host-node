@@ -4,10 +4,8 @@
 
 import * as fs from 'fs';
 
-/**
- * Read chunk of data from a file descriptor into a new Buffer.
- */
-const readFileDescriptor = function (
+/** Read a chunk of data from a file descriptor into a new Buffer. */
+function readFileDescriptor(
   fd: number,
   position: number,
   length: number
@@ -26,74 +24,75 @@ const readFileDescriptor = function (
     offset += bytesRead;
   }
   return buffer;
-};
+}
 
-/**
- * Parse an ELF file and return its interpreter.
- */
-export const getELFInterpreter = function (path: string): string {
+/** Parse an ELF file and return its interpreter. */
+export function getElfInterpreter(path: string): string {
   const fd = fs.openSync(path, 'r');
   try {
-    const eIdent = new DataView(readFileDescriptor(fd, 0, 64).buffer);
+    const elfIdentification = new DataView(
+      readFileDescriptor(fd, 0, 64).buffer
+    );
 
     if (
-      eIdent.getUint8(0) !== 0x7f ||
-      eIdent.getUint8(1) !== 0x45 ||
-      eIdent.getUint8(2) !== 0x4c ||
-      eIdent.getUint8(3) !== 0x46
+      elfIdentification.getUint8(0) !== 0x7f ||
+      elfIdentification.getUint8(1) !== 0x45 ||
+      elfIdentification.getUint8(2) !== 0x4c ||
+      elfIdentification.getUint8(3) !== 0x46
     ) {
-      throw new Error(`${path} is not an elf file.`);
+      throw new Error(`${path} is not an ELF file.`);
     }
 
-    const eIdentClass = eIdent.getUint8(4);
-    if (eIdentClass !== 1 && eIdentClass !== 2) {
-      throw new Error(`${path} has an invalid elf class.`);
+    const elfIdentificationClass = elfIdentification.getUint8(4);
+    if (elfIdentificationClass !== 1 && elfIdentificationClass !== 2) {
+      throw new Error(`${path} has an invalid ELF class.`);
     }
-    const class32 = eIdentClass === 1;
+    const class32 = elfIdentificationClass === 1;
 
-    const eIdentData = eIdent.getUint8(5);
-    if (eIdentData !== 1 && eIdentData !== 2) {
+    const elfIdentificationData = elfIdentification.getUint8(5);
+    if (elfIdentificationData !== 1 && elfIdentificationData !== 2) {
       throw new Error(`${path} has an invalid endianness.`);
     }
-    const littleEndian = eIdentData === 1;
+    const littleEndian = elfIdentificationData === 1;
 
-    const e_phoff = class32
-      ? eIdent.getUint32(28, littleEndian)
-      : Number(eIdent.getBigUint64(32, littleEndian));
-    const e_phentsize = class32
-      ? eIdent.getUint16(42, littleEndian)
-      : eIdent.getUint16(54, littleEndian);
-    const e_phnum = class32
-      ? eIdent.getUint16(44, littleEndian)
-      : eIdent.getUint16(56, littleEndian);
+    // Converting BigUint64 to Number because node Buffer length has to be
+    // number type, and we don't expect any elf we check with this method to
+    // be larger than 9007199254740991 bytes.
+    const ePhoff = class32
+      ? elfIdentification.getUint32(28, littleEndian)
+      : Number(elfIdentification.getBigUint64(32, littleEndian));
+    const ePhentsize = class32
+      ? elfIdentification.getUint16(42, littleEndian)
+      : elfIdentification.getUint16(54, littleEndian);
+    const ePhnum = class32
+      ? elfIdentification.getUint16(44, littleEndian)
+      : elfIdentification.getUint16(56, littleEndian);
 
-    const proghdrs = new DataView(
-      readFileDescriptor(fd, e_phoff, e_phentsize * e_phnum).buffer
+    const programHeaders = new DataView(
+      readFileDescriptor(fd, ePhoff, ePhentsize * ePhnum).buffer
     );
-    for (let i = 0; i < e_phnum; i++) {
-      const byteOffset = i * e_phentsize;
-      const p_type = proghdrs.getUint32(byteOffset, littleEndian);
-      if (p_type !== 3) {
-        continue;
-      }
+    for (let i = 0; i < ePhnum; i++) {
+      const byteOffset = i * ePhentsize;
+      const pType = programHeaders.getUint32(byteOffset, littleEndian);
+      if (pType !== 3) continue; // 3 is PT_INTERP, the interpreter
 
-      const p_offset = class32
-        ? proghdrs.getUint32(byteOffset + 4, littleEndian)
-        : Number(proghdrs.getBigUint64(byteOffset + 8, littleEndian));
-      const p_filesz = class32
-        ? proghdrs.getUint32(byteOffset + 16, littleEndian)
-        : Number(proghdrs.getBigUint64(byteOffset + 32, littleEndian));
+      const pOffset = class32
+        ? programHeaders.getUint32(byteOffset + 4, littleEndian)
+        : Number(programHeaders.getBigUint64(byteOffset + 8, littleEndian));
+      const pFilesz = class32
+        ? programHeaders.getUint32(byteOffset + 16, littleEndian)
+        : Number(programHeaders.getBigUint64(byteOffset + 32, littleEndian));
 
-      const buffer = readFileDescriptor(fd, p_offset, p_filesz);
-      if (buffer[p_filesz - 1] !== 0) {
+      const buffer = readFileDescriptor(fd, pOffset, pFilesz);
+      if (buffer[pFilesz - 1] !== 0) {
         throw new Error(`${path} is corrupted.`);
       }
 
-      return buffer.toString('utf8', 0, p_filesz - 1);
+      return buffer.toString('utf8', 0, pFilesz - 1);
     }
 
     throw new Error(`${path} does not contain an interpreter entry.`);
   } finally {
     fs.closeSync(fd);
   }
-};
+}

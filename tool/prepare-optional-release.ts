@@ -123,7 +123,7 @@ async function patchLauncherScript(
   path: string,
   dartPlatform: DartPlatform,
   dartArch: DartArch
-) {
+): Promise<void> {
   if (dartPlatform !== 'linux') return;
 
   const scriptPath = p.join(path, 'dart-sass', 'sass');

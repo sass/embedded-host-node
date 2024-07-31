@@ -23,9 +23,12 @@ function assertCalculationValue(value: CalculationValue): void {
   }
 }
 
-const isValidClampArg = (value: CalculationValue): boolean =>
-  value instanceof CalculationInterpolation ||
-  (value instanceof SassString && !value.hasQuotes);
+function isValidClampArg(value: CalculationValue): boolean {
+  return (
+    value instanceof CalculationInterpolation ||
+    (value instanceof SassString && !value.hasQuotes)
+  );
+}
 
 /* A SassScript calculation */
 export class SassCalculation extends Value {

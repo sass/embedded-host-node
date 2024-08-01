@@ -4,20 +4,29 @@
 
 import * as fs from 'fs';
 import * as p from 'path';
+import {getElfInterpreter} from './elf';
 import {isErrnoException} from './utils';
 
 /**
- * Detect if the current running node binary is linked with musl libc by
- * checking if the binary contains a string like "/.../ld-musl-$ARCH.so"
+ * Detect if the given binary is linked with musl libc by checking if
+ * the interpreter basename starts with "ld-musl-"
  */
-const isLinuxMusl = function () {
-  return fs.readFileSync(process.execPath).includes('/ld-musl-');
-};
+function isLinuxMusl(path: string): boolean {
+  try {
+    const interpreter = getElfInterpreter(path);
+    return p.basename(interpreter).startsWith('ld-musl-');
+  } catch (error) {
+    console.warn(
+      `Warning: Failed to detect linux-musl, fallback to linux-gnu: ${error.message}`
+    );
+    return false;
+  }
+}
 
 /** The full command for the embedded compiler executable. */
 export const compilerCommand = (() => {
   const platform =
-    process.platform === 'linux' && isLinuxMusl()
+    process.platform === 'linux' && isLinuxMusl(process.execPath)
       ? 'linux-musl'
       : (process.platform as string);
 

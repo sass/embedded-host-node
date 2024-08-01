@@ -11,9 +11,6 @@
   "engines": {
     "node": ">=14.0.0"
   },
-  "bin": {
-    "sass": "./dart-sass/sass.bat"
-  },
   "os": [
     "win32"
   ],

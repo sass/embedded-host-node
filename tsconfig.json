@@ -11,6 +11,7 @@
   },
   "include": [
     "*.ts",
+    "bin/*.ts",
     "lib/**/*.ts",
     "tool/**/*.ts",
     "test/**/*.ts"

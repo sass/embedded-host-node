@@ -1,6 +1,7 @@
 {
   "extends": "./tsconfig.json",
   "exclude": [
+    "jest.config.js",
     "lib/src/vendor/dart-sass/**",
     "**/*.test.ts"
   ]

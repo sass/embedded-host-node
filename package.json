@@ -23,7 +23,7 @@
   "engines": {
     "node": ">=16.0.0"
   },
-  "bin": {"sass": "bin/sass"},
+  "bin": {"sass": "dist/bin/sass.js"},
   "scripts": {
     "init": "ts-node ./tool/init.ts",
     "check": "npm-run-all check:gts check:tsc",

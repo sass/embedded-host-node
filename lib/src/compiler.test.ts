@@ -9,7 +9,7 @@ import * as compilerModule from './compiler/utils';
 import {Compiler, initCompiler} from './compiler/sync';
 
 const createDispatcher = jest.spyOn(compilerModule, 'createDispatcher');
-function getIdHistory() {
+function getIdHistory(): number[] {
   return createDispatcher.mock.calls.map(([id]) => id);
 }
 

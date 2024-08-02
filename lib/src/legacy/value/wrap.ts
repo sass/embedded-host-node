@@ -42,7 +42,7 @@ export function wrapFunction<sync extends 'sync' | 'async'>(
   } else {
     return args =>
       new Promise((resolve, reject) => {
-        const done = (result: unknown) => {
+        function done(result: unknown): void {
           try {
             if (result instanceof Error) {
               reject(result);
@@ -52,7 +52,7 @@ export function wrapFunction<sync extends 'sync' | 'async'>(
           } catch (error: unknown) {
             reject(error);
           }
-        };
+        }
 
         // The cast here is necesary to work around microsoft/TypeScript#33815.
         const syncResult = (callback as (...args: unknown[]) => unknown).apply(

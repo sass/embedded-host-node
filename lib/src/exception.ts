@@ -19,7 +19,7 @@ export class Exception extends Error implements SassException {
     this.span = deprotofySourceSpan(failure.span!);
   }
 
-  toString() {
+  toString(): string {
     return this.message;
   }
 }

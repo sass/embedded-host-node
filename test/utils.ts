@@ -48,7 +48,7 @@ export function expectEqualIgnoringWhitespace(
   string1: string,
   string2: string
 ): void {
-  function strip(str: string) {
+  function strip(str: string): string {
     return str.replace(/\s+/g, '');
   }
   expect(strip(string1)).toBe(strip(string2));

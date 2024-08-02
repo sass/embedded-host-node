@@ -55,7 +55,7 @@ describe('packet transformer', () => {
   describe('decode', () => {
     let rawBuffers$: Subject<Buffer>;
 
-    function expectDecoding(expected: Buffer[], done: () => void) {
+    function expectDecoding(expected: Buffer[], done: () => void): void {
       const actual: Buffer[] = [];
       packets.outboundProtobufs$.subscribe({
         next: protobuf => actual.push(protobuf),

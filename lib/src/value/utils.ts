@@ -116,7 +116,7 @@ export function fuzzyAssertInRange(
 }
 
 /** Returns `dividend % modulus`, but always in the range `[0, modulus)`. */
-export function positiveMod(dividend: number, modulus: number) {
+export function positiveMod(dividend: number, modulus: number): number {
   const result = dividend % modulus;
   return result < 0 ? result + modulus : result;
 }

@@ -35,7 +35,7 @@ void (async () => {
 
 // Quick sanity checks to make sure the release we are preparing is a suitable
 // candidate for release.
-async function sanityCheckBeforeRelease() {
+async function sanityCheckBeforeRelease(): Promise<void> {
   console.log('Running sanity checks before releasing.');
   const releaseVersion = pkg.version;
 

@@ -350,7 +350,7 @@ function hwbToRgb(
   hue: number,
   scaledWhiteness: number,
   scaledBlackness: number
-) {
+): number {
   const factor = 1 - scaledWhiteness - scaledBlackness;
   const channel = hueToRgb(0, 1, hue) * factor + scaledWhiteness;
   return fuzzyRound(channel * 255);

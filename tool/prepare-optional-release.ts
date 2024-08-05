@@ -13,7 +13,7 @@ export type DartPlatform =
   | 'linux-musl'
   | 'macos'
   | 'windows';
-export type DartArch = 'ia32' | 'x64' | 'arm' | 'arm64';
+export type DartArch = 'ia32' | 'x64' | 'arm' | 'arm64' | 'riscv64';
 
 const argv = yargs(process.argv.slice(2))
   .option('package', {
@@ -61,6 +61,8 @@ export function nodeArchToDartArch(arch: string): DartArch {
       return 'arm';
     case 'arm64':
       return 'arm64';
+    case 'riscv64':
+      return 'riscv64';
     default:
       throw Error(`Architecture ${arch} is not supported.`);
   }

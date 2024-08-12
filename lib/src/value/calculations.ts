@@ -2,7 +2,7 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-import {hash, List, ValueObject} from 'immutable';
+import {List, ValueObject, hash} from 'immutable';
 
 import {Value} from './index';
 import {SassNumber} from './number';
@@ -23,9 +23,12 @@ function assertCalculationValue(value: CalculationValue): void {
   }
 }
 
-const isValidClampArg = (value: CalculationValue): boolean =>
-  value instanceof CalculationInterpolation ||
-  (value instanceof SassString && !value.hasQuotes);
+function isValidClampArg(value: CalculationValue): boolean {
+  return (
+    value instanceof CalculationInterpolation ||
+    (value instanceof SassString && !value.hasQuotes)
+  );
+}
 
 /* A SassScript calculation */
 export class SassCalculation extends Value {

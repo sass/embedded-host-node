@@ -34,7 +34,7 @@ function toVersionCode(version: string | undefined): string {
  * Generates the list of deprecations based on the YAML file in the language
  * repo.
  */
-export async function getDeprecations(outDirectory: string) {
+export async function getDeprecations(outDirectory: string): Promise<void> {
   const yamlText = fs.readFileSync(yamlFile, 'utf8');
 
   const deprecations = parse(yamlText) as YamlData;

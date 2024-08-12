@@ -21,4 +21,7 @@ export class Version implements api.Version {
       parseInt(match[3])
     );
   }
+  toString(): string {
+    return `${this.major}.${this.minor}.${this.patch}`;
+  }
 }

@@ -5,10 +5,10 @@
 import {strict as assert} from 'assert';
 import {EventEmitter} from 'events';
 import {
-  receiveMessageOnPort,
   MessageChannel,
   MessagePort,
   TransferListItem,
+  receiveMessageOnPort,
 } from 'worker_threads';
 
 // TODO(nex3): Make this its own package.

@@ -6,6 +6,7 @@ import {promises as fs} from 'fs';
 import * as shell from 'shelljs';
 
 import * as pkg from '../package.json';
+import {getDeprecations} from './get-deprecations';
 import {getLanguageRepo} from './get-language-repo';
 
 void (async () => {
@@ -13,6 +14,8 @@ void (async () => {
     await sanityCheckBeforeRelease();
 
     await getLanguageRepo('lib/src/vendor');
+
+    await getDeprecations('lib/src/vendor');
 
     console.log('Transpiling TS into dist.');
     shell.exec('tsc -p tsconfig.build.json');
@@ -32,7 +35,7 @@ void (async () => {
 
 // Quick sanity checks to make sure the release we are preparing is a suitable
 // candidate for release.
-async function sanityCheckBeforeRelease() {
+async function sanityCheckBeforeRelease(): Promise<void> {
   console.log('Running sanity checks before releasing.');
   const releaseVersion = pkg.version;
 

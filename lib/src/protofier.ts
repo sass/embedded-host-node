@@ -8,7 +8,7 @@ import * as proto from './vendor/embedded_sass_pb';
 import * as utils from './utils';
 import {FunctionRegistry} from './function-registry';
 import {SassArgumentList} from './value/argument-list';
-import {SassColor, KnownColorSpace} from './value/color';
+import {KnownColorSpace, SassColor} from './value/color';
 import {SassFunction} from './value/function';
 import {ListSeparator, SassList} from './value/list';
 import {SassMap} from './value/map';

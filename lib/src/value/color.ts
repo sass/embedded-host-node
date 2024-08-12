@@ -295,7 +295,7 @@ function checkChangeDeprecations(
     [key in ChannelName]?: number | null;
   },
   channels: ChannelName[]
-) {
+): void {
   if (options.alpha === null) emitNullAlphaDeprecation();
   for (const channel of channels) {
     if (options[channel] === null) emitColor4ApiChangeNullDeprecation(channel);
@@ -303,7 +303,7 @@ function checkChangeDeprecations(
 }
 
 /** Warn users about legacy color channel getters. */
-function emitColor4ApiGetterDeprecation(name: string) {
+function emitColor4ApiGetterDeprecation(name: string): void {
   console.warn(
     'Deprecation [color-4-api]: ' +
       `\`${name}\` is deprecated, use \`channel\` instead.` +
@@ -316,7 +316,7 @@ function emitColor4ApiGetterDeprecation(name: string) {
  * Warn users about changing channels not in the current color space without
  * explicitly setting `space`.
  */
-function emitColor4ApiChangeSpaceDeprecation() {
+function emitColor4ApiChangeSpaceDeprecation(): void {
   console.warn(
     'Deprecation [color-4-api]: ' +
       "Changing a channel not in this color's space without explicitly " +
@@ -327,7 +327,7 @@ function emitColor4ApiChangeSpaceDeprecation() {
 }
 
 /** Warn users about `null` channel values without setting `space`. */
-function emitColor4ApiChangeNullDeprecation(channel: string) {
+function emitColor4ApiChangeNullDeprecation(channel: string): void {
   console.warn(
     'Deprecation [color-4-api]: ' +
       `Passing \`${channel}: null\` without setting \`space\` is deprecated.` +
@@ -337,7 +337,7 @@ function emitColor4ApiChangeNullDeprecation(channel: string) {
 }
 
 /** Warn users about null-alpha deprecation. */
-function emitNullAlphaDeprecation() {
+function emitNullAlphaDeprecation(): void {
   console.warn(
     'Deprecation [null-alpha]: ' +
       'Passing `alpha: null` without setting `space` is deprecated.' +
@@ -375,7 +375,7 @@ export class SassColor extends Value {
   private channel2Id!: ChannelName;
 
   // Sets channel names based on this color's color space
-  private setChannelIds(space: KnownColorSpace) {
+  private setChannelIds(space: KnownColorSpace): void {
     switch (space) {
       case 'rgb':
       case 'srgb':
@@ -940,10 +940,10 @@ export class SassColor extends Value {
     spaceSetExplicitly: boolean
   ): SassColor {
     const color = this.toSpace(space);
-    const getChangedValue = (channel: ChannelName) => {
+    function getChangedValue(channel: ChannelName): number | null {
       if (isNumberOrNull(options[channel])) return options[channel];
       return color.channel(channel);
-    };
+    }
 
     switch (space) {
       case 'hsl':
@@ -1099,7 +1099,7 @@ export class SassColor extends Value {
       space?: ColorSpaceXyz;
     }
   ): SassColor;
-  change(options: ConstructorOptions) {
+  change(options: ConstructorOptions): SassColor {
     const spaceSetExplicitly = !!options.space;
     let space = options.space ?? this.space;
     if (this.isLegacy && !spaceSetExplicitly) {

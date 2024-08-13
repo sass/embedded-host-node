@@ -1,6 +1,6 @@
 {
   "name": "sass-embedded-linux-ia32",
-  "version": "1.77.3",
+  "version": "1.77.8",
   "description": "The linux-ia32 binary for sass-embedded",
   "repository": "sass/embedded-host-node",
   "author": "Google Inc.",
@@ -10,9 +10,6 @@
   ],
   "engines": {
     "node": ">=14.0.0"
-  },
-  "bin": {
-    "sass": "./dart-sass/sass"
   },
   "os": [
     "linux"

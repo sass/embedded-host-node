@@ -18,8 +18,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 'lts/*'
           check-latest: true
@@ -46,8 +46,8 @@ jobs:
       fail-fast: false
 
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
           check-latest: true
@@ -89,10 +89,10 @@ jobs:
             node_version: lts/-2
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: dart-lang/setup-dart@v1
         with: {sdk: stable}
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with: {node-version: "${{ matrix.node_version }}"}
 
       - name: Check out Dart Sass
@@ -140,8 +140,8 @@ jobs:
     needs: [static_analysis, tests, sass_spec]
 
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 'lts/*'
           check-latest: true

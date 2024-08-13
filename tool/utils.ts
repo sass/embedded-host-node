@@ -2,7 +2,7 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-import {promises as fs, existsSync, lstatSync} from 'fs';
+import {existsSync, promises as fs, lstatSync} from 'fs';
 import * as p from 'path';
 import * as shell from 'shelljs';
 

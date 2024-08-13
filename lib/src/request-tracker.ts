@@ -16,7 +16,7 @@ export class RequestTracker {
   > = [];
 
   /** The next available request ID. */
-  get nextId() {
+  get nextId(): number {
     for (let i = 0; i < this.requests.length; i++) {
       if (this.requests[i] === undefined || this.requests[i] === null) {
         return i;
@@ -32,7 +32,7 @@ export class RequestTracker {
   add(
     id: number,
     expectedResponseType: InboundResponseType | OutboundResponseType
-  ) {
+  ): void {
     if (id < 0) {
       throw Error(`Invalid request ID ${id}.`);
     } else if (this.requests[id]) {
@@ -47,7 +47,7 @@ export class RequestTracker {
    * Resolves a pending request with matching ID `id` and expected response type
    * `type`. Throws an error if the Protocol Error is violated.
    */
-  resolve(id: number, type: InboundResponseType | OutboundResponseType) {
+  resolve(id: number, type: InboundResponseType | OutboundResponseType): void {
     if (this.requests[id] === undefined || this.requests[id] === null) {
       throw Error(`Response ID ${id} does not match any pending requests.`);
     } else if (this.requests[id] !== type) {

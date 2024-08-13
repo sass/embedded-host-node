@@ -2,7 +2,7 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-import {hash, isList, List} from 'immutable';
+import {List, hash, isList} from 'immutable';
 
 import {Value} from './index';
 import {SassMap} from './map';

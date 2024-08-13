@@ -8,21 +8,21 @@ import * as proto from './vendor/embedded_sass_pb';
 import * as utils from './utils';
 import {FunctionRegistry} from './function-registry';
 import {SassArgumentList} from './value/argument-list';
-import {SassColor, KnownColorSpace} from './value/color';
+import {KnownColorSpace, SassColor} from './value/color';
 import {SassFunction} from './value/function';
-import {SassList, ListSeparator} from './value/list';
+import {ListSeparator, SassList} from './value/list';
 import {SassMap} from './value/map';
 import {SassNumber} from './value/number';
 import {SassString} from './value/string';
 import {Value} from './value';
 import {sassNull} from './value/null';
-import {sassTrue, sassFalse} from './value/boolean';
+import {sassFalse, sassTrue} from './value/boolean';
 import {
-  CalculationValue,
-  SassCalculation,
   CalculationInterpolation,
   CalculationOperation,
   CalculationOperator,
+  CalculationValue,
+  SassCalculation,
 } from './value/calculations';
 import {SassMixin} from './value/mixin';
 

@@ -156,6 +156,7 @@ function convertOptions<sync extends 'sync' | 'async'>(
           ),
         ]
       : undefined;
+
   return {
     functions,
     importers:

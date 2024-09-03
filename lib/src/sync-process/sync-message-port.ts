@@ -159,7 +159,9 @@ export class SyncMessagePort extends EventEmitter {
     message = receiveMessageOnPort(this.port);
     if (message) return message.message;
 
+    // Update the state to 0b10 after the last message is consumed.
     const oldState = Atomics.and(this.buffer, 0, BufferState.Closed);
+    // Assert the old state was either 0b10 or 0b11.
     assert.equal(oldState & BufferState.Closed, BufferState.Closed);
     throw new Error("The SyncMessagePort's channel is closed.");
   }

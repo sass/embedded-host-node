@@ -1,7 +1,7 @@
 const config = {
+  roots: ['<rootDir>/lib/', '<rootDir>/test/'],
   preset: 'ts-jest',
   testEnvironment: 'node',
-  modulePathIgnorePatterns: ['<rootDir>/dart-sass/'],
 };
 
 export default config;

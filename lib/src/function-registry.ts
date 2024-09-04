@@ -3,6 +3,7 @@
 // https://opensource.org/licenses/MIT.
 
 import {inspect} from 'util';
+import {create} from '@bufbuild/protobuf';
 
 import * as types from './vendor/sass';
 import * as utils from './utils';
@@ -74,7 +75,7 @@ export class FunctionRegistry<sync extends 'sync' | 'async'> {
               );
             }
 
-            return new proto.InboundMessage_FunctionCallResponse({
+            return create(proto.InboundMessage_FunctionCallResponseSchema, {
               result: {case: 'success', value: protofier.protofy(result)},
               accessedArgumentLists: protofier.accessedArgumentLists,
             });
@@ -82,7 +83,7 @@ export class FunctionRegistry<sync extends 'sync' | 'async'> {
         );
       },
       error =>
-        new proto.InboundMessage_FunctionCallResponse({
+        create(proto.InboundMessage_FunctionCallResponseSchema, {
           result: {case: 'error', value: `${error}`},
         })
     );

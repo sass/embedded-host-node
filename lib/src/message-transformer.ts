@@ -4,10 +4,16 @@
 
 import {Observable, Subject} from 'rxjs';
 import {map} from 'rxjs/operators';
+import {fromBinary, toBinary} from '@bufbuild/protobuf';
 import * as varint from 'varint';
 
 import {compilerError} from './utils';
-import {InboundMessage, OutboundMessage} from './vendor/embedded_sass_pb';
+import {
+  InboundMessage,
+  InboundMessageSchema,
+  OutboundMessage,
+  OutboundMessageSchema,
+} from './vendor/embedded_sass_pb';
 
 /**
  * Encodes InboundMessages into protocol buffers and decodes protocol buffers
@@ -43,7 +49,7 @@ export class MessageTransformer {
     InboundMessage,
   ]): void {
     const compilationIdLength = varint.encodingLength(compilationId);
-    const encodedMessage = message.toBinary();
+    const encodedMessage = toBinary(InboundMessageSchema, message);
     const buffer = new Uint8Array(compilationIdLength + encodedMessage.length);
     varint.encode(compilationId, buffer);
     buffer.set(encodedMessage, compilationIdLength);
@@ -71,7 +77,8 @@ function decode(buffer: Uint8Array): [number, OutboundMessage] {
   try {
     return [
       compilationId,
-      OutboundMessage.fromBinary(
+      fromBinary(
+        OutboundMessageSchema,
         new Uint8Array(buffer.buffer, varint.decode.bytes)
       ),
     ];

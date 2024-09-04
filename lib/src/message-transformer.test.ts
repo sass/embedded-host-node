@@ -4,6 +4,7 @@
 
 import {Observable, Subject} from 'rxjs';
 import * as varint from 'varint';
+import {create, toBinary} from '@bufbuild/protobuf';
 
 import {expectObservableToError} from '../../test/utils';
 import {MessageTransformer} from './message-transformer';
@@ -13,17 +14,17 @@ describe('message transformer', () => {
   let messages: MessageTransformer;
 
   function validInboundMessage(source: string): proto.InboundMessage {
-    return new proto.InboundMessage({
+    return create(proto.InboundMessageSchema, {
       message: {
         case: 'compileRequest',
-        value: new proto.InboundMessage_CompileRequest({
+        value: {
           input: {
             case: 'string',
-            value: new proto.InboundMessage_CompileRequest_StringInput({
+            value: {
               source,
-            }),
+            },
           },
-        }),
+        },
       },
     });
   }
@@ -42,7 +43,10 @@ describe('message transformer', () => {
       const message = validInboundMessage('a {b: c}');
       messages.writeInboundMessage([1234, message]);
       expect(encodedProtobufs).toEqual([
-        Uint8Array.from([...varint.encode(1234), ...message.toBinary()]),
+        Uint8Array.from([
+          ...varint.encode(1234),
+          ...toBinary(proto.InboundMessageSchema, message),
+        ]),
       ]);
     });
   });
@@ -81,7 +85,10 @@ describe('message transformer', () => {
       protobufs$.next(
         Uint8Array.from([
           ...varint.encode(1234),
-          ...validInboundMessage('a {b: c}').toBinary(),
+          ...toBinary(
+            proto.InboundMessageSchema,
+            validInboundMessage('a {b: c}')
+          ),
         ])
       );
       protobufs$.complete();

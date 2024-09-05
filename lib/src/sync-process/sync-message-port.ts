@@ -23,18 +23,19 @@ enum BufferState {
    * the buffer to this state so that it can use `Atomics.wait()` to be notified
    * when it switches to `MessageSent`.
    */
-  AwaitingMessage,
+  AwaitingMessage = 0b00,
   /**
    * The state indicating that a message has been sent. Whenever an endpoint
    * sends a message, it'll set the buffer to this state so that the other
    * endpoint's `Atomics.wait()` call terminates.
    */
-  MessageSent,
+  MessageSent = 0b01,
   /**
-   * The state indicating that the channel has been closed. This never
-   * transitions to any other states.
+   * The bitmask indicating that the channel has been closed. This is masked on
+   * top of AwaitingMessage and MessageSent state. It never transitions to any
+   * other states once closed.
    */
-  Closed,
+  Closed = 0b10,
 }
 
 /**
@@ -158,13 +159,16 @@ export class SyncMessagePort extends EventEmitter {
     message = receiveMessageOnPort(this.port);
     if (message) return message.message;
 
-    assert.equal(Atomics.load(this.buffer, 0), BufferState.Closed);
+    // Update the state to 0b10 after the last message is consumed.
+    const oldState = Atomics.and(this.buffer, 0, BufferState.Closed);
+    // Assert the old state was either 0b10 or 0b11.
+    assert.equal(oldState & BufferState.Closed, BufferState.Closed);
     throw new Error("The SyncMessagePort's channel is closed.");
   }
 
   /** See `MessagePort.close()`. */
   close(): void {
-    Atomics.store(this.buffer, 0, BufferState.Closed);
+    Atomics.or(this.buffer, 0, BufferState.Closed);
     this.port.close();
   }
 }

@@ -6,6 +6,7 @@ import {createRequire} from 'module';
 import * as p from 'path';
 import {URL} from 'url';
 import {inspect} from 'util';
+import {create} from '@bufbuild/protobuf';
 
 import {CanonicalizeContext} from './canonicalize-context';
 import * as utils from './utils';
@@ -64,11 +65,10 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
         )
       )
       .concat(
-        (options?.loadPaths ?? []).map(
-          path =>
-            new proto.InboundMessage_CompileRequest_Importer({
-              importer: {case: 'path', value: p.resolve(path)},
-            })
+        (options?.loadPaths ?? []).map(path =>
+          create(proto.InboundMessage_CompileRequest_ImporterSchema, {
+            importer: {case: 'path', value: p.resolve(path)},
+          })
         )
       );
   }
@@ -77,10 +77,14 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
   register(
     importer: Importer<sync> | FileImporter<sync> | NodePackageImporter
   ): proto.InboundMessage_CompileRequest_Importer {
-    const message = new proto.InboundMessage_CompileRequest_Importer();
+    const message = create(
+      proto.InboundMessage_CompileRequest_ImporterSchema,
+      {}
+    );
     if (importer instanceof NodePackageImporter) {
-      const importerMessage = new proto.NodePackageImporter();
-      importerMessage.entryPointDirectory = importer[entryPointDirectoryKey];
+      const importerMessage = create(proto.NodePackageImporterSchema, {
+        entryPointDirectory: importer[entryPointDirectoryKey],
+      });
       message.importer = {
         case: 'nodePackageImporter',
         value: importerMessage,
@@ -126,7 +130,7 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
         return thenOr(
           importer.canonicalize(request.url, canonicalizeContext),
           url =>
-            new proto.InboundMessage_CanonicalizeResponse({
+            create(proto.InboundMessage_CanonicalizeResponseSchema, {
               result:
                 url === null
                   ? {case: undefined}
@@ -136,7 +140,7 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
         );
       },
       error =>
-        new proto.InboundMessage_CanonicalizeResponse({
+        create(proto.InboundMessage_CanonicalizeResponseSchema, {
           result: {case: 'error', value: `${error}`},
         })
     );
@@ -154,7 +158,8 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
     return catchOr(
       () => {
         return thenOr(importer.load(new URL(request.url)), result => {
-          if (!result) return new proto.InboundMessage_ImportResponse();
+          if (!result)
+            return create(proto.InboundMessage_ImportResponseSchema, {});
 
           if (typeof result.contents !== 'string') {
             throw Error(
@@ -171,20 +176,20 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
             );
           }
 
-          return new proto.InboundMessage_ImportResponse({
+          return create(proto.InboundMessage_ImportResponseSchema, {
             result: {
               case: 'success',
-              value: new proto.InboundMessage_ImportResponse_ImportSuccess({
+              value: {
                 contents: result.contents,
                 syntax: utils.protofySyntax(result.syntax),
                 sourceMapUrl: result.sourceMapUrl?.toString() ?? '',
-              }),
+              },
             },
           });
         });
       },
       error =>
-        new proto.InboundMessage_ImportResponse({
+        create(proto.InboundMessage_ImportResponseSchema, {
           result: {case: 'error', value: `${error}`},
         })
     );
@@ -210,7 +215,7 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
           importer.findFileUrl(request.url, canonicalizeContext),
           url => {
             if (!url) {
-              return new proto.InboundMessage_FileImportResponse({
+              return create(proto.InboundMessage_FileImportResponseSchema, {
                 containingUrlUnused: !canonicalizeContext.containingUrlAccessed,
               });
             }
@@ -220,7 +225,7 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
                 +`"${url}" for URL "${request.url}".`
               );
             }
-            return new proto.InboundMessage_FileImportResponse({
+            return create(proto.InboundMessage_FileImportResponseSchema, {
               result: {case: 'fileUrl', value: url.toString()},
               containingUrlUnused: !canonicalizeContext.containingUrlAccessed,
             });
@@ -228,7 +233,7 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
         );
       },
       error =>
-        new proto.InboundMessage_FileImportResponse({
+        create(proto.InboundMessage_FileImportResponseSchema, {
           result: {case: 'error', value: `${error}`},
         })
     );

@@ -4,6 +4,7 @@
 
 import {Observable, Subject} from 'rxjs';
 import {filter, map, mergeMap, takeUntil} from 'rxjs/operators';
+import {create} from '@bufbuild/protobuf';
 
 import {OutboundResponse} from './messages';
 import * as proto from './vendor/embedded_sass_pb';
@@ -144,7 +145,7 @@ export class Dispatcher<sync extends 'sync' | 'async'> {
     try {
       this.writeInboundMessage([
         this.compilationId,
-        new proto.InboundMessage({
+        create(proto.InboundMessageSchema, {
           message: {value: request, case: 'compileRequest'},
         }),
       ]);
@@ -267,7 +268,7 @@ export class Dispatcher<sync extends 'sync' | 'async'> {
 
     this.writeInboundMessage([
       this.compilationId,
-      new proto.InboundMessage({message}),
+      create(proto.InboundMessageSchema, {message}),
     ]);
   }
 }

@@ -36,6 +36,7 @@ describe('SyncMessagePort', () => {
       );
 
       expect(port.receiveMessage()).toEqual('done!');
+      expect(port.receiveMessage).toThrow();
     });
 
     it('multiple times before the other endpoint starts reading', () => {
@@ -51,6 +52,24 @@ describe('SyncMessagePort', () => {
       expect(port2.receiveMessage()).toEqual('message2');
       expect(port2.receiveMessage()).toEqual('message3');
       expect(port2.receiveMessage()).toEqual('message4');
+    });
+
+    it('multiple times and close', () => {
+      const channel = SyncMessagePort.createChannel();
+      const port = new SyncMessagePort(channel.port1);
+
+      spawnWorker(
+        `
+        port.postMessage('message1');
+        port.postMessage('done!');
+        port.close();
+      `,
+        channel.port2
+      );
+
+      expect(port.receiveMessage()).toEqual('message1');
+      expect(port.receiveMessage()).toEqual('done!');
+      expect(port.receiveMessage).toThrow();
     });
   });
 

@@ -171,6 +171,9 @@ function convertOptions<sync extends 'sync' | 'async'>(
     verbose: options.verbose,
     charset: options.charset,
     logger: options.logger,
+    fatalDeprecations: options.fatalDeprecations,
+    futureDeprecations: options.futureDeprecations,
+    silenceDeprecations: options.silenceDeprecations,
     legacy: true,
   };
 }

@@ -4,6 +4,8 @@
 
 import * as p from 'path';
 import * as supportsColor from 'supports-color';
+import {create} from '@bufbuild/protobuf';
+
 import {Deprecation, deprecations, getDeprecationIds} from '../deprecations';
 import {deprotofySourceSpan} from '../deprotofy-span';
 import {Dispatcher, DispatcherHandlers} from '../dispatcher';
@@ -65,7 +67,7 @@ function newCompileRequest(
   importers: ImporterRegistry<'sync' | 'async'>,
   options?: Options<'sync' | 'async'>
 ): proto.InboundMessage_CompileRequest {
-  const request = new proto.InboundMessage_CompileRequest({
+  const request = create(proto.InboundMessage_CompileRequestSchema, {
     importers: importers.importers,
     globalFunctions: Object.keys(options?.functions ?? {}),
     sourceMap: !!options?.sourceMap,
@@ -115,7 +117,7 @@ export function newCompileStringRequest(
   importers: ImporterRegistry<'sync' | 'async'>,
   options?: StringOptions<'sync' | 'async'>
 ): proto.InboundMessage_CompileRequest {
-  const input = new proto.InboundMessage_CompileRequest_StringInput({
+  const input = create(proto.InboundMessage_CompileRequest_StringInputSchema, {
     source,
     syntax: utils.protofySyntax(options?.syntax ?? 'scss'),
   });
@@ -128,9 +130,12 @@ export function newCompileStringRequest(
   if (options && 'importer' in options && options.importer) {
     input.importer = importers.register(options.importer);
   } else if (url === legacyImporterProtocol) {
-    input.importer = new proto.InboundMessage_CompileRequest_Importer({
-      importer: {case: 'path', value: p.resolve('.')},
-    });
+    input.importer = create(
+      proto.InboundMessage_CompileRequest_ImporterSchema,
+      {
+        importer: {case: 'path', value: p.resolve('.')},
+      }
+    );
   } else {
     // When importer is not set on the host, the compiler will set a
     // FileSystemImporter if `url` is set to a file: url or a NoOpImporter.

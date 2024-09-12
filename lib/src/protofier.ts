@@ -3,6 +3,7 @@
 // https://opensource.org/licenses/MIT.
 
 import {OrderedMap} from 'immutable';
+import {create} from '@bufbuild/protobuf';
 
 import * as proto from './vendor/embedded_sass_pb';
 import * as utils from './utils';
@@ -57,65 +58,63 @@ export class Protofier {
 
   /** Converts `value` to its protocol buffer representation. */
   protofy(value: Value): proto.Value {
-    const result = new proto.Value();
+    const result = create(proto.ValueSchema, {});
     if (value instanceof SassString) {
-      const string = new proto.Value_String();
-      string.text = value.text;
-      string.quoted = value.hasQuotes;
+      const string = create(proto.Value_StringSchema, {
+        text: value.text,
+        quoted: value.hasQuotes,
+      });
       result.value = {case: 'string', value: string};
     } else if (value instanceof SassNumber) {
       result.value = {case: 'number', value: this.protofyNumber(value)};
     } else if (value instanceof SassColor) {
-      const color = new proto.Value_Color();
       const channels = value.channels;
-      color.channel1 = channels.get(0) as number;
-      color.channel2 = channels.get(1) as number;
-      color.channel3 = channels.get(2) as number;
-      color.alpha = value.alpha;
-      color.space = value.space;
+      const color = create(proto.Value_ColorSchema, {
+        channel1: channels.get(0) as number,
+        channel2: channels.get(1) as number,
+        channel3: channels.get(2) as number,
+        alpha: value.alpha,
+        space: value.space,
+      });
       result.value = {case: 'color', value: color};
     } else if (value instanceof SassList) {
-      const list = new proto.Value_List();
-      list.separator = this.protofySeparator(value.separator);
-      list.hasBrackets = value.hasBrackets;
-      for (const element of value.asList) {
-        list.contents.push(this.protofy(element));
-      }
+      const list = create(proto.Value_ListSchema, {
+        separator: this.protofySeparator(value.separator),
+        hasBrackets: value.hasBrackets,
+        contents: value.asList.map(element => this.protofy(element)).toArray(),
+      });
       result.value = {case: 'list', value: list};
     } else if (value instanceof SassArgumentList) {
-      const list = new proto.Value_ArgumentList();
-      list.id = value.id;
-      list.separator = this.protofySeparator(value.separator);
-      list.contents = value.asList
-        .map(element => this.protofy(element))
-        .toArray();
+      const list = create(proto.Value_ArgumentListSchema, {
+        id: value.id,
+        separator: this.protofySeparator(value.separator),
+        contents: value.asList.map(element => this.protofy(element)).toArray(),
+      });
       for (const [key, mapValue] of value.keywordsInternal) {
         list.keywords[key] = this.protofy(mapValue);
       }
       result.value = {case: 'argumentList', value: list};
     } else if (value instanceof SassMap) {
-      const map = new proto.Value_Map();
-      for (const [key, mapValue] of value.contents) {
-        const entry = new proto.Value_Map_Entry();
-        entry.key = this.protofy(key);
-        entry.value = this.protofy(mapValue);
-        map.entries.push(entry);
-      }
+      const map = create(proto.Value_MapSchema, {
+        entries: value.contents.toArray().map(([key, value]) => ({
+          key: this.protofy(key),
+          value: this.protofy(value),
+        })),
+      });
       result.value = {case: 'map', value: map};
     } else if (value instanceof SassFunction) {
       if (value.id !== undefined) {
-        const fn = new proto.Value_CompilerFunction();
-        fn.id = value.id;
+        const fn = create(proto.Value_CompilerFunctionSchema, value);
         result.value = {case: 'compilerFunction', value: fn};
       } else {
-        const fn = new proto.Value_HostFunction();
-        fn.id = this.functions.register(value.callback!);
-        fn.signature = value.signature!;
+        const fn = create(proto.Value_HostFunctionSchema, {
+          id: this.functions.register(value.callback!),
+          signature: value.signature!,
+        });
         result.value = {case: 'hostFunction', value: fn};
       }
     } else if (value instanceof SassMixin) {
-      const mixin = new proto.Value_CompilerMixin();
-      mixin.id = value.id;
+      const mixin = create(proto.Value_CompilerMixinSchema, value);
       result.value = {case: 'compilerMixin', value: mixin};
     } else if (value instanceof SassCalculation) {
       result.value = {
@@ -136,7 +135,7 @@ export class Protofier {
 
   /** Converts `number` to its protocol buffer representation. */
   private protofyNumber(number: SassNumber): proto.Value_Number {
-    return new proto.Value_Number({
+    return create(proto.Value_NumberSchema, {
       value: number.value,
       numerators: number.numeratorUnits.toArray(),
       denominators: number.denominatorUnits.toArray(),
@@ -163,7 +162,7 @@ export class Protofier {
   private protofyCalculation(
     calculation: SassCalculation
   ): proto.Value_Calculation {
-    return new proto.Value_Calculation({
+    return create(proto.Value_CalculationSchema, {
       name: calculation.name,
       arguments: calculation.arguments
         .map(this.protofyCalculationValue.bind(this))
@@ -176,7 +175,7 @@ export class Protofier {
   private protofyCalculationValue(
     value: Object
   ): proto.Value_Calculation_CalculationValue {
-    const result = new proto.Value_Calculation_CalculationValue();
+    const result = create(proto.Value_Calculation_CalculationValueSchema, {});
     if (value instanceof SassCalculation) {
       result.value = {
         case: 'calculation',
@@ -185,7 +184,7 @@ export class Protofier {
     } else if (value instanceof CalculationOperation) {
       result.value = {
         case: 'operation',
-        value: new proto.Value_Calculation_CalculationOperation({
+        value: create(proto.Value_Calculation_CalculationOperationSchema, {
           operator: this.protofyCalculationOperator(value.operator),
           left: this.protofyCalculationValue(value.left),
           right: this.protofyCalculationValue(value.right),

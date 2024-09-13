@@ -3,6 +3,7 @@
 // https://opensource.org/licenses/MIT.
 
 import {Value} from './index';
+import {deprecations, warnForHostSideDeprecation} from '../deprecations';
 import {valueError} from '../utils';
 import {
   fuzzyAssertInRange,
@@ -304,11 +305,11 @@ function checkChangeDeprecations(
 
 /** Warn users about legacy color channel getters. */
 function emitColor4ApiGetterDeprecation(name: string): void {
-  console.warn(
-    'Deprecation [color-4-api]: ' +
-      `\`${name}\` is deprecated, use \`channel\` instead.` +
+  warnForHostSideDeprecation(
+    `\`${name}\` is deprecated, use \`channel\` instead.` +
       '\n' +
-      'More info: https://sass-lang.com/d/color-4-api'
+      'More info: https://sass-lang.com/d/color-4-api',
+    deprecations['color-4-api']
   );
 }
 
@@ -317,32 +318,32 @@ function emitColor4ApiGetterDeprecation(name: string): void {
  * explicitly setting `space`.
  */
 function emitColor4ApiChangeSpaceDeprecation(): void {
-  console.warn(
-    'Deprecation [color-4-api]: ' +
-      "Changing a channel not in this color's space without explicitly " +
+  warnForHostSideDeprecation(
+    "Changing a channel not in this color's space without explicitly " +
       'specifying the `space` option is deprecated.' +
       '\n' +
-      'More info: https://sass-lang.com/d/color-4-api'
+      'More info: https://sass-lang.com/d/color-4-api',
+    deprecations['color-4-api']
   );
 }
 
 /** Warn users about `null` channel values without setting `space`. */
 function emitColor4ApiChangeNullDeprecation(channel: string): void {
-  console.warn(
-    'Deprecation [color-4-api]: ' +
-      `Passing \`${channel}: null\` without setting \`space\` is deprecated.` +
+  warnForHostSideDeprecation(
+    `Passing \`${channel}: null\` without setting \`space\` is deprecated.` +
       '\n' +
-      'More info: https://sass-lang.com/d/color-4-api'
+      'More info: https://sass-lang.com/d/color-4-api',
+    deprecations['color-4-api']
   );
 }
 
 /** Warn users about null-alpha deprecation. */
 function emitNullAlphaDeprecation(): void {
-  console.warn(
-    'Deprecation [null-alpha]: ' +
-      'Passing `alpha: null` without setting `space` is deprecated.' +
+  warnForHostSideDeprecation(
+    'Passing `alpha: null` without setting `space` is deprecated.' +
       '\n' +
-      'More info: https://sass-lang.com/d/null-alpha'
+      'More info: https://sass-lang.com/d/null-alpha',
+    deprecations['null-alpha']
   );
 }
 

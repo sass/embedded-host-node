@@ -54,7 +54,6 @@ export function warnForHostSideDeprecation(
   deprecation: Deprecation,
   options?: DeprecationOptions
 ): void {
-  if (options) throw Error(message);
   if (
     deprecation.status === 'future' &&
     !isEnabledFuture(deprecation, options)

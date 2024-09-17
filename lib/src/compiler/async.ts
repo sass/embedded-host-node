@@ -17,6 +17,7 @@ import {
   newCompileStringRequest,
 } from './utils';
 import {compilerCommand} from '../compiler-path';
+import {activeDeprecationOptions} from '../deprecations';
 import {FunctionRegistry} from '../function-registry';
 import {ImporterRegistry} from '../importer-registry';
 import {MessageTransformer} from '../message-transformer';
@@ -102,38 +103,44 @@ export class AsyncCompiler {
     importers: ImporterRegistry<'async'>,
     options?: OptionsWithLegacy<'async'> & {legacy?: boolean}
   ): Promise<CompileResult> {
-    const functions = new FunctionRegistry(options?.functions);
+    const optionsKey = Symbol();
+    activeDeprecationOptions.set(optionsKey, options ?? {});
+    try {
+      const functions = new FunctionRegistry(options?.functions);
 
-    const dispatcher = createDispatcher<'async'>(
-      this.compilationId++,
-      this.messageTransformer,
-      {
-        handleImportRequest: request => importers.import(request),
-        handleFileImportRequest: request => importers.fileImport(request),
-        handleCanonicalizeRequest: request => importers.canonicalize(request),
-        handleFunctionCallRequest: request => functions.call(request),
-      }
-    );
-    dispatcher.logEvents$.subscribe(event => handleLogEvent(options, event));
+      const dispatcher = createDispatcher<'async'>(
+        this.compilationId++,
+        this.messageTransformer,
+        {
+          handleImportRequest: request => importers.import(request),
+          handleFileImportRequest: request => importers.fileImport(request),
+          handleCanonicalizeRequest: request => importers.canonicalize(request),
+          handleFunctionCallRequest: request => functions.call(request),
+        }
+      );
+      dispatcher.logEvents$.subscribe(event => handleLogEvent(options, event));
 
-    const compilation = new Promise<proto.OutboundMessage_CompileResponse>(
-      (resolve, reject) =>
-        dispatcher.sendCompileRequest(request, (err, response) => {
-          this.compilations.delete(compilation);
-          // Reset the compilation ID when the compiler goes idle (no active
-          // compilations) to avoid overflowing it.
-          // https://github.com/sass/embedded-host-node/pull/261#discussion_r1429266794
-          if (this.compilations.size === 0) this.compilationId = 1;
-          if (err) {
-            reject(err);
-          } else {
-            resolve(response!);
-          }
-        })
-    );
-    this.compilations.add(compilation);
+      const compilation = new Promise<proto.OutboundMessage_CompileResponse>(
+        (resolve, reject) =>
+          dispatcher.sendCompileRequest(request, (err, response) => {
+            this.compilations.delete(compilation);
+            // Reset the compilation ID when the compiler goes idle (no active
+            // compilations) to avoid overflowing it.
+            // https://github.com/sass/embedded-host-node/pull/261#discussion_r1429266794
+            if (this.compilations.size === 0) this.compilationId = 1;
+            if (err) {
+              reject(err);
+            } else {
+              resolve(response!);
+            }
+          })
+      );
+      this.compilations.add(compilation);
 
-    return handleCompileResponse(await compilation);
+      return handleCompileResponse(await compilation);
+    } finally {
+      activeDeprecationOptions.delete(optionsKey);
+    }
   }
 
   /** Initialize resources shared across compilations. */

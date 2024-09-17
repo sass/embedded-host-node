@@ -14,6 +14,7 @@ import {
   compileString,
   compileStringAsync,
 } from '../compile';
+import {deprecations, warnForHostSideDeprecation} from '../deprecations';
 import {
   SyncBoolean,
   fileUrlToPathCrossPlatform,
@@ -50,6 +51,11 @@ export function render(
     options = adjustOptions(options);
 
     const start = Date.now();
+    warnForHostSideDeprecation(
+      'The legacy JS API is deprecated and will be removed in Dart Sass 2.0.0.',
+      deprecations['legacy-js-api'],
+      options
+    );
     const compileSass = isStringOptions(options)
       ? compileStringAsync(options.data, convertStringOptions(options, false))
       : compileAsync(options.file, convertOptions(options, false));
@@ -68,6 +74,11 @@ export function renderSync(options: LegacyOptions<'sync'>): LegacyResult {
   const start = Date.now();
   try {
     options = adjustOptions(options);
+    warnForHostSideDeprecation(
+      'The legacy JS API is deprecated and will be removed in Dart Sass 2.0.0.',
+      deprecations['legacy-js-api'],
+      options
+    );
     const result = isStringOptions(options)
       ? compileString(options.data, convertStringOptions(options, true))
       : compile(options.file, convertOptions(options, true));

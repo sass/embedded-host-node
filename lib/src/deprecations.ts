@@ -31,7 +31,7 @@ export function getDeprecationIds(
  * This is used to determine which options to use when handling host-side
  * deprecation warnings that aren't explicitly tied to a particular compilation.
  */
-export const activeDeprecationOptions: Map<Object, DeprecationOptions> =
+export const activeDeprecationOptions: Map<Symbol, DeprecationOptions> =
   new Map();
 
 /**
@@ -83,7 +83,7 @@ function isSilent(
     }
     return false;
   }
-  return getDeprecationIds(options?.silenceDeprecations ?? []).includes(
+  return getDeprecationIds(options.silenceDeprecations ?? []).includes(
     deprecation.id
   );
 }
@@ -102,7 +102,7 @@ function isEnabledFuture(
     }
     return activeDeprecationOptions.size > 0;
   }
-  return getDeprecationIds(options?.futureDeprecations ?? []).includes(
+  return getDeprecationIds(options.futureDeprecations ?? []).includes(
     deprecation.id
   );
 }
@@ -127,7 +127,7 @@ function isFatal(
       : deprecation.deprecatedIn.major * 1000000 +
         deprecation.deprecatedIn.minor * 1000 +
         deprecation.deprecatedIn.patch;
-  for (const fatal of options?.fatalDeprecations ?? []) {
+  for (const fatal of options.fatalDeprecations ?? []) {
     if (fatal instanceof Version) {
       if (versionNumber === null) continue;
       if (

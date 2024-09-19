@@ -52,7 +52,9 @@ export function render(
 
     const start = Date.now();
     warnForHostSideDeprecation(
-      'The legacy JS API is deprecated and will be removed in Dart Sass 2.0.0.',
+      'The legacy JS API is deprecated and will be removed in ' +
+        'Dart Sass 2.0.0.\n\n' +
+        'More info: https://sass-lang.com/d/legacy-js-api',
       deprecations['legacy-js-api'],
       options
     );
@@ -75,7 +77,9 @@ export function renderSync(options: LegacyOptions<'sync'>): LegacyResult {
   try {
     options = adjustOptions(options);
     warnForHostSideDeprecation(
-      'The legacy JS API is deprecated and will be removed in Dart Sass 2.0.0.',
+      'The legacy JS API is deprecated and will be removed in ' +
+        'Dart Sass 2.0.0.\n\n' +
+        'More info: https://sass-lang.com/d/legacy-js-api',
       deprecations['legacy-js-api'],
       options
     );

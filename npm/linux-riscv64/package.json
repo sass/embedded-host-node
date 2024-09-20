@@ -1,6 +1,6 @@
 {
   "name": "sass-embedded-linux-riscv64",
-  "version": "1.79.2",
+  "version": "1.79.3",
   "description": "The linux-riscv64 binary for sass-embedded",
   "repository": "sass/embedded-host-node",
   "author": "Google Inc.",

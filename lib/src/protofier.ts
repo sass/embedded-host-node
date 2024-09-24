@@ -68,12 +68,12 @@ export class Protofier {
     } else if (value instanceof SassNumber) {
       result.value = {case: 'number', value: this.protofyNumber(value)};
     } else if (value instanceof SassColor) {
-      const channels = value.channels;
+      const channels = value.channelsOrNull;
       const color = create(proto.Value_ColorSchema, {
         channel1: channels.get(0) as number,
         channel2: channels.get(1) as number,
         channel3: channels.get(2) as number,
-        alpha: value.alpha,
+        alpha: value.isChannelMissing('alpha') ? undefined : value.alpha,
         space: value.space,
       });
       result.value = {case: 'color', value: color};
@@ -236,6 +236,11 @@ export class Protofier {
 
       case 'color': {
         const color = value.value.value;
+        const channel1 = color.channel1 ?? null;
+        const channel2 = color.channel2 ?? null;
+        const channel3 = color.channel3 ?? null;
+        const alpha = color.alpha ?? null;
+        const space = color.space as KnownColorSpace;
         switch (color.space.toLowerCase()) {
           case 'rgb':
           case 'srgb':
@@ -245,60 +250,60 @@ export class Protofier {
           case 'prophoto-rgb':
           case 'rec2020':
             return new SassColor({
-              red: color.channel1,
-              green: color.channel2,
-              blue: color.channel3,
-              alpha: color.alpha,
-              space: color.space as KnownColorSpace,
+              red: channel1,
+              green: channel2,
+              blue: channel3,
+              alpha,
+              space,
             });
 
           case 'hsl':
             return new SassColor({
-              hue: color.channel1,
-              saturation: color.channel2,
-              lightness: color.channel3,
-              alpha: color.alpha,
-              space: 'hsl',
+              hue: channel1,
+              saturation: channel2,
+              lightness: channel3,
+              alpha,
+              space,
             });
 
           case 'hwb':
             return new SassColor({
-              hue: color.channel1,
-              whiteness: color.channel2,
-              blackness: color.channel3,
-              alpha: color.alpha,
-              space: 'hwb',
+              hue: channel1,
+              whiteness: channel2,
+              blackness: channel3,
+              alpha,
+              space,
             });
 
           case 'lab':
           case 'oklab':
             return new SassColor({
-              lightness: color.channel1,
-              a: color.channel2,
-              b: color.channel3,
-              alpha: color.alpha,
-              space: color.space as KnownColorSpace,
+              lightness: channel1,
+              a: channel2,
+              b: channel3,
+              alpha,
+              space,
             });
 
           case 'lch':
           case 'oklch':
             return new SassColor({
-              lightness: color.channel1,
-              chroma: color.channel2,
-              hue: color.channel3,
-              alpha: color.alpha,
-              space: color.space as KnownColorSpace,
+              lightness: channel1,
+              chroma: channel2,
+              hue: channel3,
+              alpha,
+              space,
             });
 
           case 'xyz':
           case 'xyz-d65':
           case 'xyz-d50':
             return new SassColor({
-              x: color.channel1,
-              y: color.channel2,
-              z: color.channel3,
-              alpha: color.alpha,
-              space: color.space as KnownColorSpace,
+              x: channel1,
+              y: channel2,
+              z: channel3,
+              alpha,
+              space,
             });
 
           default:

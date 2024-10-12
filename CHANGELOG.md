@@ -1,3 +1,40 @@
+## 1.79.5
+
+* Changes to how `selector.unify()` and `@extend` combine selectors:
+
+  * The relative order of pseudo-classes (like `:hover`) and pseudo-elements
+    (like `::before`) within each original selector is now preserved when
+    they're combined.
+
+  * Pseudo selectors are now consistently placed at the end of the combined
+    selector, regardless of which selector they came from. Previously, this
+    reordering only applied to pseudo-selectors in the second selector.
+
+* Tweak the color transformation matrices for OKLab and OKLCH to match the
+  newer, more accurate values in the CSS spec.
+
+* Fix a slight inaccuracy case when converting to `srgb-linear` and
+  `display-p3`.
+
+* **Potentially breaking bug fix:** `math.unit()` now wraps multiple denominator
+  units in parentheses. For example, `px/(em*em)` instead of `px/em*em`.
+
+### Command-Line Interface
+
+* Use `@parcel/watcher` to watch the filesystem when running from JavaScript and
+  not using `--poll`. This should mitigate more frequent failures users have
+  been seeing since version 4.0.0 of Chokidar, our previous watching tool, was
+  released.
+
+### JS API
+
+* Fix `SassColor.interpolate()` to allow an undefined `options` parameter, as
+  the types indicate.
+
+### Embedded Sass
+
+* Properly pass missing color channel values to and from custom functions.
+
 ## 1.79.4
 
 ### JS API

@@ -8,7 +8,7 @@ import {sassNull} from './src/value/null';
 
 export {ListSeparator, SassList} from './src/value/list';
 export {SassArgumentList} from './src/value/argument-list';
-export {sassFalse, sassTrue} from './src/value/boolean';
+export {SassBoolean, sassFalse, sassTrue} from './src/value/boolean';
 export {SassColor} from './src/value/color';
 export {SassFunction} from './src/value/function';
 export {SassMap} from './src/value/map';

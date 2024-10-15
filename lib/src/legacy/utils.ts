@@ -8,7 +8,6 @@ import {pathToFileURL} from 'url';
 import {fileUrlToPathCrossPlatform} from '../utils';
 import {SourceSpan} from '../vendor/sass';
 import {legacyImporterFileProtocol} from './importer';
-import { remove } from 'immutable';
 
 /**
  * The URL protocol to use for URLs canonicalized using `LegacyImporterWrapper`.

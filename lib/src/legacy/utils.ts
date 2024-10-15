@@ -38,13 +38,13 @@ export function removeLegacyImporter(string: string): string {
 // syntax.
 export function removeLegacyImporterFromSpan(span: SourceSpan): SourceSpan {
   if (!span.url) return span;
-  const url = removeLegacyImporter(span.url.toString());
-  try {
-    return {...span, url: new URL(url)};
-  } catch (_) {
-    // Relative URL
-    return {...span, url: new URL(url, `file://${process.cwd()}`)};
-  }
+  return {
+    ...span,
+    url: new URL(
+      removeLegacyImporter(span.url.toString()),
+      pathToFileURL(process.cwd())
+    ),
+  };
 }
 
 // Converts [path] to a `file:` URL and adds the [legacyImporterProtocolPrefix]

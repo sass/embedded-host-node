@@ -8,6 +8,7 @@ import {pathToFileURL} from 'url';
 import {fileUrlToPathCrossPlatform} from '../utils';
 import {SourceSpan} from '../vendor/sass';
 import {legacyImporterFileProtocol} from './importer';
+import { remove } from 'immutable';
 
 /**
  * The URL protocol to use for URLs canonicalized using `LegacyImporterWrapper`.
@@ -39,12 +40,12 @@ export function removeLegacyImporter(string: string): string {
 export function removeLegacyImporterFromSpan(span: SourceSpan): SourceSpan {
   if (!span.url) return span;
   const url = removeLegacyImporter(span.url.toString());
-  return {
-    ...span,
-    url: URL.canParse(url)
-      ? new URL(url)
-      : new URL(url, `file://${process.cwd()}/`),
-  };
+  try {
+    return {...span, url: new URL(url)};
+  } catch (_) {
+    // Relative URL
+    return {...span, url: new URL(url, `file://${process.cwd()}`)};
+  }
 }
 
 // Converts [path] to a `file:` URL and adds the [legacyImporterProtocolPrefix]

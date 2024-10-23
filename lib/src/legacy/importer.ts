@@ -46,7 +46,7 @@ export const endOfLoadProtocol = 'sass-embedded-legacy-load-done:';
 export const legacyImporterFileProtocol = 'legacy-importer-file:';
 
 /**
- * A random namespace for `sas:meta`, so we can use `meta.load-css()` at the end
+ * A random namespace for `sass:meta`, so we can use `meta.load-css()` at the end
  * of the file to signal that a load has finished without polluting a namespace
  * a user might actually use.
  */

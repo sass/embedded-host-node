@@ -38,6 +38,7 @@
     "test": "jest"
   },
   "optionalDependencies": {
+    "sass": "1.85.1",
     "sass-embedded-android-arm": "1.85.1",
     "sass-embedded-android-arm64": "1.85.1",
     "sass-embedded-android-ia32": "1.85.1",

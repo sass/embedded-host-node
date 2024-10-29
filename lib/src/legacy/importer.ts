@@ -45,6 +45,13 @@ export const endOfLoadProtocol = 'sass-embedded-legacy-load-done:';
  */
 export const legacyImporterFileProtocol = 'legacy-importer-file:';
 
+/**
+ * A random namespace for `sass:meta`, so we can use `meta.load-css()` at the end
+ * of the file to signal that a load has finished without polluting a namespace
+ * a user might actually use.
+ */
+export const metaNamespace = `---${Math.random().toString(36).substring(2)}`;
+
 // A count of `endOfLoadProtocol` imports that have been generated. Each one
 // must be a different URL to ensure that the importer results aren't cached.
 let endOfLoadCount = 0;
@@ -247,22 +254,20 @@ export class LegacyImporterWrapper<sync extends 'sync' | 'async'>
         this.lastContents ??
         fs.readFileSync(legacyFileUrlToPath(canonicalUrl), 'utf-8');
       this.lastContents = undefined;
-      if (syntax === 'scss') {
-        contents += this.endOfLoadImport;
-      } else if (syntax === 'indented') {
-        contents += `\n@import "${endOfLoadProtocol}${endOfLoadCount++}"`;
-      } else {
+      if (syntax === 'css') {
         this.prev.pop();
+      } else {
+        contents = this.wrapContents(contents, syntax);
       }
 
       return {contents, syntax, sourceMapUrl: canonicalUrl};
     }
 
-    const lastContents = this.lastContents;
+    const lastContents = this.lastContents!;
     assert.notEqual(lastContents, undefined);
     this.lastContents = undefined;
     return {
-      contents: lastContents + this.endOfLoadImport,
+      contents: this.wrapContents(lastContents, 'scss'),
       syntax: 'scss',
       sourceMapUrl: canonicalUrl,
     };
@@ -333,10 +338,22 @@ export class LegacyImporterWrapper<sync extends 'sync' | 'async'>
     }) as PromiseOr<LegacyImporterResult, sync>;
   }
 
-  // The `@import` statement to inject after the contents of files to ensure
-  // that we know when a load has completed so we can pass the correct `prev`
-  // argument to callbacks.
-  private get endOfLoadImport(): string {
-    return `\n;@import "${endOfLoadProtocol}${endOfLoadCount++}";`;
+  // Modifies {@link contents} to ensure that we know when a load has completed
+  // so we can pass the correct `prev` argument to callbacks.
+  private wrapContents(contents: string, syntax: 'scss' | 'indented'): string {
+    const url = `"${endOfLoadProtocol}${endOfLoadCount++}"`;
+    if (syntax === 'scss') {
+      return (
+        `@use "sass:meta" as ${metaNamespace};` +
+        contents +
+        `\n;@include ${metaNamespace}.load-css(${url});`
+      );
+    } else {
+      return (
+        `@use "sass:meta" as ${metaNamespace}\n` +
+        contents +
+        `\n@include ${metaNamespace}.load-css(${url})`
+      );
+    }
   }
 }

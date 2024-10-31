@@ -50,7 +50,7 @@ export class FunctionRegistry<sync extends 'sync' | 'async'> {
    * Returns the function to which `request` refers and returns its response.
    */
   call(
-    request: proto.OutboundMessage_FunctionCallRequest
+    request: proto.OutboundMessage_FunctionCallRequest,
   ): PromiseOr<proto.InboundMessage_FunctionCallResponse, sync> {
     const protofier = new Protofier(this);
     const fn = this.get(request);
@@ -60,8 +60,8 @@ export class FunctionRegistry<sync extends 'sync' | 'async'> {
         return thenOr(
           fn(
             request.arguments.map(
-              value => protofier.deprotofy(value) as types.Value
-            )
+              value => protofier.deprotofy(value) as types.Value,
+            ),
           ),
           result => {
             if (!(result instanceof Value)) {
@@ -79,19 +79,19 @@ export class FunctionRegistry<sync extends 'sync' | 'async'> {
               result: {case: 'success', value: protofier.protofy(result)},
               accessedArgumentLists: protofier.accessedArgumentLists,
             });
-          }
+          },
         );
       },
       error =>
         create(proto.InboundMessage_FunctionCallResponseSchema, {
           result: {case: 'error', value: `${error}`},
-        })
+        }),
     );
   }
 
   /** Returns the function to which `request` refers. */
   private get(
-    request: proto.OutboundMessage_FunctionCallRequest
+    request: proto.OutboundMessage_FunctionCallRequest,
   ): CustomFunction<sync> {
     if (request.identifier.case === 'name') {
       const fn = this.functionsByName.get(request.identifier.value);
@@ -99,7 +99,7 @@ export class FunctionRegistry<sync extends 'sync' | 'async'> {
 
       throw compilerError(
         'Invalid OutboundMessage_FunctionCallRequest: there is no function ' +
-          `named "${request.identifier.value}"`
+          `named "${request.identifier.value}"`,
       );
     } else if (request.identifier.case === 'functionId') {
       const fn = this.functionsById.get(request.identifier.value);
@@ -107,12 +107,12 @@ export class FunctionRegistry<sync extends 'sync' | 'async'> {
 
       throw compilerError(
         'Invalid OutboundMessage_FunctionCallRequest: there is no function ' +
-          `with ID "${request.identifier.value}"`
+          `with ID "${request.identifier.value}"`,
       );
     } else {
       throw compilerError(
         'Invalid OutboundMessage_FunctionCallRequest: function identifier is ' +
-          'unset'
+          'unset',
       );
     }
   }

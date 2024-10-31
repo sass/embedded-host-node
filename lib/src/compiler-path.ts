@@ -17,7 +17,7 @@ function isLinuxMusl(path: string): boolean {
     return p.basename(interpreter).startsWith('ld-musl-');
   } catch (error) {
     console.warn(
-      `Warning: Failed to detect linux-musl, fallback to linux-gnu: ${error.message}`
+      `Warning: Failed to detect linux-musl, fallback to linux-gnu: ${error.message}`,
     );
     return false;
   }
@@ -37,7 +37,7 @@ export const compilerCommand = (() => {
     const executable = p.resolve(
       __dirname,
       path,
-      `dart-sass/sass${platform === 'win32' ? '.bat' : ''}`
+      `dart-sass/sass${platform === 'win32' ? '.bat' : ''}`,
     );
 
     if (fs.existsSync(executable)) return [executable];
@@ -47,10 +47,10 @@ export const compilerCommand = (() => {
     return [
       require.resolve(
         `sass-embedded-${platform}-${arch}/dart-sass/src/dart` +
-          (platform === 'win32' ? '.exe' : '')
+          (platform === 'win32' ? '.exe' : ''),
       ),
       require.resolve(
-        `sass-embedded-${platform}-${arch}/dart-sass/src/sass.snapshot`
+        `sass-embedded-${platform}-${arch}/dart-sass/src/sass.snapshot`,
       ),
     ];
   } catch (ignored) {
@@ -61,7 +61,7 @@ export const compilerCommand = (() => {
     return [
       require.resolve(
         `sass-embedded-${platform}-${arch}/dart-sass/sass` +
-          (platform === 'win32' ? '.bat' : '')
+          (platform === 'win32' ? '.bat' : ''),
       ),
     ];
   } catch (e: unknown) {
@@ -74,6 +74,6 @@ export const compilerCommand = (() => {
     "Embedded Dart Sass couldn't find the embedded compiler executable. " +
       'Please make sure the optional dependency ' +
       `sass-embedded-${platform}-${arch} is installed in ` +
-      'node_modules.'
+      'node_modules.',
   );
 })();

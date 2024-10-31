@@ -31,7 +31,7 @@ export function fetchRepo(options: {
       `git clone \
       --depth=1 \
       https://github.com/sass/${options.repo} \
-      ${path}`
+      ${path}`,
     );
   }
 
@@ -40,7 +40,7 @@ export function fetchRepo(options: {
   console.log(`Fetching ${version} for ${options.repo}.`);
   shell.exec(
     `git fetch --depth=1 origin ${options.ref} && git reset --hard FETCH_HEAD`,
-    {cwd: path}
+    {cwd: path},
   );
 }
 
@@ -71,7 +71,7 @@ export async function cleanDir(dir: string): Promise<void> {
 // Returns whether [path1] and [path2] are symlinks that refer to the same file.
 export async function sameTarget(
   path1: string,
-  path2: string
+  path2: string,
 ): Promise<boolean> {
   const realpath1 = await tryRealpath(path1);
   if (realpath1 === null) return false;

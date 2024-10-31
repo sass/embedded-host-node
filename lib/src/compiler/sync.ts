@@ -46,10 +46,10 @@ export class Compiler {
       cwd: path.dirname(compilerCommand[0]),
       // Node blocks launching .bat and .cmd without a shell due to CVE-2024-27980
       shell: ['.bat', '.cmd'].includes(
-        path.extname(compilerCommand[0]).toLowerCase()
+        path.extname(compilerCommand[0]).toLowerCase(),
       ),
       windowsHide: true,
-    }
+    },
   );
 
   /** The next compilation ID. */
@@ -107,7 +107,7 @@ export class Compiler {
   private compileRequestSync(
     request: proto.InboundMessage_CompileRequest,
     importers: ImporterRegistry<'sync'>,
-    options?: OptionsWithLegacy<'sync'>
+    options?: OptionsWithLegacy<'sync'>,
   ): CompileResult {
     const optionsKey = Symbol();
     activeDeprecationOptions.set(optionsKey, options ?? {});
@@ -122,7 +122,7 @@ export class Compiler {
           handleFileImportRequest: request => importers.fileImport(request),
           handleCanonicalizeRequest: request => importers.canonicalize(request),
           handleFunctionCallRequest: request => functions.call(request),
-        }
+        },
       );
       this.dispatchers.add(dispatcher);
 
@@ -168,7 +168,7 @@ export class Compiler {
     if (flag !== initFlag) {
       throw utils.compilerError(
         'Compiler can not be directly constructed. ' +
-          'Please use `sass.initAsyncCompiler()` instead.'
+          'Please use `sass.initAsyncCompiler()` instead.',
       );
     }
     this.stderr$.subscribe(data => process.stderr.write(data));
@@ -177,7 +177,7 @@ export class Compiler {
     });
     this.messageTransformer = new MessageTransformer(
       packetTransformer.outboundProtobufs$,
-      packet => packetTransformer.writeInboundProtobuf(packet)
+      packet => packetTransformer.writeInboundProtobuf(packet),
     );
   }
 
@@ -187,7 +187,7 @@ export class Compiler {
     return this.compileRequestSync(
       newCompilePathRequest(path, importers, options),
       importers,
-      options
+      options,
     );
   }
 
@@ -197,7 +197,7 @@ export class Compiler {
     return this.compileRequestSync(
       newCompileStringRequest(source, importers, options),
       importers,
-      options
+      options,
     );
   }
 

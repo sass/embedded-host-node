@@ -32,7 +32,7 @@ describe('SyncMessagePort', () => {
           port.close();
         }, 100);
       `,
-        channel.port2
+        channel.port2,
       );
 
       expect(port.receiveMessage()).toEqual('done!');
@@ -64,7 +64,7 @@ describe('SyncMessagePort', () => {
         port.postMessage('done!');
         port.close();
       `,
-        channel.port2
+        channel.port2,
       );
 
       expect(port.receiveMessage()).toEqual('message1');
@@ -152,14 +152,14 @@ function spawnWorker(source: string, port: MessagePort): Worker {
     file,
     `
     const {SyncMessagePort} = require(${JSON.stringify(
-      p.join(p.dirname(__filename), 'sync-message-port')
+      p.join(p.dirname(__filename), 'sync-message-port'),
     )});
     const {workerData} = require('worker_threads');
 
     const port = new SyncMessagePort(workerData);
 
     ${source}
-  `
+  `,
   );
 
   const worker = new Worker(
@@ -167,7 +167,7 @@ function spawnWorker(source: string, port: MessagePort): Worker {
       require('ts-node').register();
       require(${JSON.stringify(p.resolve(file.substring(0, file.length - 3)))});
     `,
-    {eval: true, workerData: port, transferList: [port]}
+    {eval: true, workerData: port, transferList: [port]},
   );
 
   worker.on('error', error => {

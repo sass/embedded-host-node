@@ -15,7 +15,7 @@ describe('packet transformer', () => {
     beforeEach(() => {
       encodedBuffers = [];
       packets = new PacketTransformer(new Observable(), buffer =>
-        encodedBuffers.push(buffer)
+        encodedBuffers.push(buffer),
       );
     });
 
@@ -133,7 +133,7 @@ describe('packet transformer', () => {
       it('decodes a single chunk', done => {
         expectDecoding(
           [Buffer.from([1, 2, 3, 4]), Buffer.from([101, 102])],
-          done
+          done,
         );
 
         rawBuffers$.next(Buffer.from([4, 1, 2, 3, 4, 2, 101, 102]));

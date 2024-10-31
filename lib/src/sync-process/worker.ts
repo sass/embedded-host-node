@@ -24,7 +24,7 @@ function emit(event: InternalEvent, transferList?: TransferListItem[]): void {
 const process = spawn(
   workerData.command as string,
   workerData.args as string[],
-  workerData.options as SpawnOptionsWithoutStdio | undefined
+  workerData.options as SpawnOptionsWithoutStdio | undefined,
 );
 
 port.on('message', message => {

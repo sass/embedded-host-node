@@ -31,13 +31,13 @@ export class RequestTracker {
    */
   add(
     id: number,
-    expectedResponseType: InboundResponseType | OutboundResponseType
+    expectedResponseType: InboundResponseType | OutboundResponseType,
   ): void {
     if (id < 0) {
       throw Error(`Invalid request ID ${id}.`);
     } else if (this.requests[id]) {
       throw Error(
-        `Request ID ${id} is already in use by an in-flight request.`
+        `Request ID ${id} is already in use by an in-flight request.`,
       );
     }
     this.requests[id] = expectedResponseType;
@@ -52,7 +52,7 @@ export class RequestTracker {
       throw Error(`Response ID ${id} does not match any pending requests.`);
     } else if (this.requests[id] !== type) {
       throw Error(
-        `Response with ID ${id} does not match pending request's type. Expected ${this.requests[id]} but received ${type}.`
+        `Response with ID ${id} does not match pending request's type. Expected ${this.requests[id]} but received ${type}.`,
       );
     }
     this.requests[id] = null;

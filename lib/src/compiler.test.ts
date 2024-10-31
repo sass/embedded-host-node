@@ -110,7 +110,7 @@ describe('asyncCompiler', () => {
   describe('compilation ID', () => {
     it('resets after concurrent compilations complete', async () => {
       await Promise.all(
-        Array.from({length: 10}, () => asyncCompiler.compileStringAsync(''))
+        Array.from({length: 10}, () => asyncCompiler.compileStringAsync('')),
       );
       await asyncCompiler.compileStringAsync('');
       expect(getIdHistory()).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 1]);
@@ -118,7 +118,7 @@ describe('asyncCompiler', () => {
 
     it('keeps working after failed compilations', async () => {
       await expect(
-        asyncCompiler.compileStringAsync('invalid')
+        asyncCompiler.compileStringAsync('invalid'),
       ).rejects.toThrow();
       await Promise.all([
         asyncCompiler.compileStringAsync(''),

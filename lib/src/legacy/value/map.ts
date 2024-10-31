@@ -25,9 +25,9 @@ export class LegacyMap extends LegacyValueBase<SassMap> {
           Array.from({length: lengthOrInner}, (_, i) => [
             new SassNumber(i),
             sassNull,
-          ])
-        )
-      )
+          ]),
+        ),
+      ),
     );
   }
 
@@ -36,7 +36,7 @@ export class LegacyMap extends LegacyValueBase<SassMap> {
     if (index < 0 || !value) {
       throw new Error(
         `Invalid index ${index}, must be between 0 and ` +
-          this.inner.contents.size
+          this.inner.contents.size,
       );
     }
 
@@ -45,7 +45,7 @@ export class LegacyMap extends LegacyValueBase<SassMap> {
 
   setValue(index: number, value: LegacyValue): void {
     this.inner = new SassMap(
-      this.inner.contents.set(this.getUnwrappedKey(index), unwrapValue(value))
+      this.inner.contents.set(this.getUnwrappedKey(index), unwrapValue(value)),
     );
   }
 
@@ -59,7 +59,7 @@ export class LegacyMap extends LegacyValueBase<SassMap> {
     if (index >= 0 && key) return key;
     throw new Error(
       `Invalid index ${index}, must be between 0 and ` +
-        this.inner.contents.size
+        this.inner.contents.size,
     );
   }
 
@@ -67,7 +67,7 @@ export class LegacyMap extends LegacyValueBase<SassMap> {
     const oldMap = this.inner.contents;
     if (index < 0 || index >= oldMap.size) {
       throw new Error(
-        `Invalid index ${index}, must be between 0 and ${oldMap.size}`
+        `Invalid index ${index}, must be between 0 and ${oldMap.size}`,
       );
     }
 

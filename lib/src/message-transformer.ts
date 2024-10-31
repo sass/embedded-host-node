@@ -34,7 +34,7 @@ export class MessageTransformer {
 
   constructor(
     private readonly outboundProtobufs$: Observable<Uint8Array>,
-    private readonly writeInboundProtobuf: (buffer: Uint8Array) => void
+    private readonly writeInboundProtobuf: (buffer: Uint8Array) => void,
   ) {
     this.outboundProtobufs$
       .pipe(map(decode))
@@ -79,7 +79,7 @@ function decode(buffer: Uint8Array): [number, OutboundMessage] {
       compilationId,
       fromBinary(
         OutboundMessageSchema,
-        new Uint8Array(buffer.buffer, varint.decode.bytes)
+        new Uint8Array(buffer.buffer, varint.decode.bytes),
       ),
     ];
   } catch (error) {

@@ -45,7 +45,7 @@ import {
 
 export function render(
   options: LegacyOptions<'async'>,
-  callback: (error?: LegacyException, result?: LegacyResult) => void
+  callback: (error?: LegacyException, result?: LegacyResult) => void,
 ): void {
   try {
     options = adjustOptions(options);
@@ -56,7 +56,7 @@ export function render(
         'Dart Sass 2.0.0.\n\n' +
         'More info: https://sass-lang.com/d/legacy-js-api',
       deprecations['legacy-js-api'],
-      options
+      options,
     );
     const compileSass = isStringOptions(options)
       ? compileStringAsync(options.data, convertStringOptions(options, false))
@@ -64,7 +64,7 @@ export function render(
 
     compileSass.then(
       result => callback(undefined, newLegacyResult(options, start, result)),
-      error => callback(newLegacyException(error))
+      error => callback(newLegacyException(error)),
     );
   } catch (error) {
     if (error instanceof Error) callback(newLegacyException(error));
@@ -81,7 +81,7 @@ export function renderSync(options: LegacyOptions<'sync'>): LegacyResult {
         'Dart Sass 2.0.0.\n\n' +
         'More info: https://sass-lang.com/d/legacy-js-api',
       deprecations['legacy-js-api'],
-      options
+      options,
     );
     const result = isStringOptions(options)
       ? compileString(options.data, convertStringOptions(options, true))
@@ -95,7 +95,7 @@ export function renderSync(options: LegacyOptions<'sync'>): LegacyResult {
 // Does some initial adjustments of `options` to make it easier to pass to the
 // new API.
 function adjustOptions<sync extends 'sync' | 'async'>(
-  options: LegacyOptions<sync>
+  options: LegacyOptions<sync>,
 ): LegacyOptions<sync> {
   if (!('file' in options && options.file) && !('data' in options)) {
     throw new Error('Either options.data or options.file must be set.');
@@ -128,7 +128,7 @@ function adjustOptions<sync extends 'sync' | 'async'>(
 
 // Returns whether `options` is a `LegacyStringOptions`.
 function isStringOptions<sync extends 'sync' | 'async'>(
-  options: LegacyOptions<sync>
+  options: LegacyOptions<sync>,
 ): options is LegacyStringOptions<sync> {
   return 'data' in options;
 }
@@ -136,7 +136,7 @@ function isStringOptions<sync extends 'sync' | 'async'>(
 // Converts `LegacyOptions` into new API `Options`.
 function convertOptions<sync extends 'sync' | 'async'>(
   options: LegacyOptions<sync>,
-  sync: SyncBoolean<sync>
+  sync: SyncBoolean<sync>,
 ): Options<sync> & {legacy: true} {
   if (
     'outputStyle' in options &&
@@ -167,7 +167,7 @@ function convertOptions<sync extends 'sync' | 'async'>(
               : [options.importer],
             options.includePaths ?? [],
             options.file ?? 'stdin',
-            sync
+            sync,
           ),
         ]
       : undefined;
@@ -196,14 +196,14 @@ function convertOptions<sync extends 'sync' | 'async'>(
 // Converts `LegacyStringOptions` into new API `StringOptions`.
 function convertStringOptions<sync extends 'sync' | 'async'>(
   options: LegacyStringOptions<sync>,
-  sync: SyncBoolean<sync>
+  sync: SyncBoolean<sync>,
 ): StringOptions<sync> & {legacy: true} {
   const modernOptions = convertOptions(options, sync);
 
   // Use a no-op base importer, because the LegacyImporterWrapper will emulate
   // the base importer by itself in order to mark containingUrl as accessed.
   const importer = modernOptions.importers?.some(
-    importer => importer instanceof LegacyImporterWrapper
+    importer => importer instanceof LegacyImporterWrapper,
   )
     ? {
         canonicalize() {
@@ -229,7 +229,7 @@ function convertStringOptions<sync extends 'sync' | 'async'>(
 
 // Determines whether a sourceMap was requested by the call to `render()`.
 function wasSourceMapRequested(
-  options: LegacySharedOptions<'sync' | 'async'>
+  options: LegacySharedOptions<'sync' | 'async'>,
 ): boolean {
   return (
     typeof options.sourceMap === 'string' ||
@@ -239,7 +239,7 @@ function wasSourceMapRequested(
 
 // Creates the `this` value that's used for callbacks.
 function pluginThis(
-  options: LegacyOptions<'sync' | 'async'>
+  options: LegacyOptions<'sync' | 'async'>,
 ): LegacyPluginThis {
   const pluginThis: LegacyPluginThis = {
     options: {
@@ -269,7 +269,7 @@ function pluginThis(
 function newLegacyResult(
   options: LegacyOptions<'sync' | 'async'>,
   start: number,
-  result: CompileResult
+  result: CompileResult,
 ): LegacyResult {
   const end = Date.now();
 
@@ -287,7 +287,7 @@ function newLegacyResult(
 
     if (options.outFile) {
       sourceMap.file = pathToUrlString(
-        p.relative(sourceMapDir, options.outFile)
+        p.relative(sourceMapDir, options.outFile),
       );
     } else if (options.file) {
       sourceMap.file = pathToUrlString(withoutExtension(options.file) + '.css');
@@ -301,7 +301,7 @@ function newLegacyResult(
         source = removeLegacyImporter(source);
         if (source.startsWith('file://')) {
           return pathToUrlString(
-            p.relative(sourceMapDir, fileUrlToPathCrossPlatform(source))
+            p.relative(sourceMapDir, fileUrlToPathCrossPlatform(source)),
           );
         } else if (source.startsWith('data:')) {
           return 'stdin';
@@ -316,11 +316,11 @@ function newLegacyResult(
       let url;
       if (options.sourceMapEmbed) {
         url = `data:application/json;base64,${sourceMapBytes.toString(
-          'base64'
+          'base64',
         )}`;
       } else if (options.outFile) {
         url = pathToUrlString(
-          p.relative(p.dirname(options.outFile), sourceMapPath)
+          p.relative(p.dirname(options.outFile), sourceMapPath),
         );
       } else {
         url = pathToUrlString(sourceMapPath);

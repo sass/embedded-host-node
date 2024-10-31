@@ -10,7 +10,7 @@ export class LegacyNumber extends LegacyValueBase<SassNumber> {
     super(
       valueOrInner instanceof SassNumber
         ? valueOrInner
-        : parseNumber(valueOrInner, unit)
+        : parseNumber(valueOrInner, unit),
     );
   }
 

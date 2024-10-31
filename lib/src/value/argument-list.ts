@@ -53,7 +53,7 @@ export class SassArgumentList extends SassList {
     contents: Value[] | List<Value>,
     keywords: Record<string, Value> | OrderedMap<string, Value>,
     separator?: ListSeparator,
-    id?: number
+    id?: number,
   ) {
     super(contents, {separator});
     this.keywordsInternal = isOrderedMap(keywords)

@@ -43,7 +43,7 @@ export class SassFunction extends Value {
   constructor(signature: string, callback: CustomFunction<'sync'>);
   constructor(
     idOrSignature: number | string,
-    callback?: CustomFunction<'sync'>
+    callback?: CustomFunction<'sync'>,
   ) {
     super();
 

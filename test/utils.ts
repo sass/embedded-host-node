@@ -12,7 +12,7 @@ import {Value} from '../lib/src/value';
 export function expectObservableToError<T>(
   observable: Observable<T>,
   errorMessage: string,
-  done: () => void
+  done: () => void,
 ): void {
   observable.subscribe({
     next: () => {
@@ -46,7 +46,7 @@ export function expectEqualPaths(actual: string, expected: string): void {
  */
 export function expectEqualIgnoringWhitespace(
   string1: string,
-  string2: string
+  string2: string,
 ): void {
   function strip(str: string): string {
     return str.replace(/\s+/g, '');

@@ -36,12 +36,12 @@ export class SassList extends Value {
     options?: {
       separator?: ListSeparator;
       brackets?: boolean;
-    }
+    },
   );
   constructor(options?: ConstructorOptions);
   constructor(
     contentsOrOptions?: Value[] | List<Value> | ConstructorOptions,
-    options?: ConstructorOptions
+    options?: ConstructorOptions,
   ) {
     super();
 
@@ -54,7 +54,7 @@ export class SassList extends Value {
 
     if (this.contentsInternal.size > 1 && options?.separator === null) {
       throw Error(
-        'Non-null separator required for SassList with more than one element.'
+        'Non-null separator required for SassList with more than one element.',
       );
     }
     this.separatorInternal =
@@ -136,7 +136,7 @@ export class SassList extends Value {
     string += `${this.contentsInternal.join(
       this.separator === ' ' || this.separator === null
         ? ' '
-        : `${this.separator} `
+        : `${this.separator} `,
     )}`;
     if (this.hasBrackets) string += ']';
     return string;

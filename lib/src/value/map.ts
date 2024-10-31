@@ -97,7 +97,7 @@ export class SassMap extends Value {
         this.contents.reduce(
           (accumulator, value, key) =>
             accumulator ^ value.hashCode() ^ key.hashCode(),
-          0
+          0,
         );
   }
 
@@ -105,7 +105,7 @@ export class SassMap extends Value {
     let string = '(';
     string += Array.from(
       this.contents.entries(),
-      ([key, value]) => `${key}: ${value}`
+      ([key, value]) => `${key}: ${value}`,
     ).join(', ');
     string += ')';
     return string;

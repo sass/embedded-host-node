@@ -21,7 +21,7 @@ export class LegacyList extends LegacyValueBase<SassList> {
     super(
       new SassList(new Array(lengthOrInner).fill(sassNull), {
         separator: commaSeparator === false ? ' ' : ',',
-      })
+      }),
     );
   }
 
@@ -29,7 +29,7 @@ export class LegacyList extends LegacyValueBase<SassList> {
     const length = this.inner.asList.size;
     if (index < 0 || index >= length) {
       throw new Error(
-        `Invalid index ${index}, must be between 0 and ${length}`
+        `Invalid index ${index}, must be between 0 and ${length}`,
       );
     }
     const value = this.inner.get(index);
@@ -42,7 +42,7 @@ export class LegacyList extends LegacyValueBase<SassList> {
       {
         separator: this.inner.separator,
         brackets: this.inner.hasBrackets,
-      }
+      },
     );
   }
 

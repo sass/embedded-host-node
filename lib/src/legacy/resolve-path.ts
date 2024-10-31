@@ -64,7 +64,7 @@ function exactlyOne(paths: string[]): string | null {
 
   throw new Error(
     "It's not clear which file to import. Found:\n" +
-      paths.map(path => '  ' + path).join('\n')
+      paths.map(path => '  ' + path).join('\n'),
   );
 }
 

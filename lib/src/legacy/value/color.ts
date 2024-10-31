@@ -14,7 +14,7 @@ export class LegacyColor extends LegacyValueBase<SassColor> {
     redOrArgb: number | SassColor,
     green?: number,
     blue?: number,
-    alpha?: number
+    alpha?: number,
   ) {
     if (redOrArgb instanceof SassColor) {
       super(redOrArgb);
@@ -38,7 +38,7 @@ export class LegacyColor extends LegacyValueBase<SassColor> {
         green: clamp(green as number, 0, 255),
         blue: clamp(blue as number, 0, 255),
         alpha: alpha ? clamp(alpha, 0, 1) : 1,
-      })
+      }),
     );
   }
 

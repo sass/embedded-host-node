@@ -51,13 +51,13 @@ export type StringOptionsWithLegacy<sync extends 'sync' | 'async'> =
 export function createDispatcher<sync extends 'sync' | 'async'>(
   compilationId: number,
   messageTransformer: MessageTransformer,
-  handlers: DispatcherHandlers<sync>
+  handlers: DispatcherHandlers<sync>,
 ): Dispatcher<sync> {
   return new Dispatcher<sync>(
     compilationId,
     messageTransformer.outboundMessages$,
     message => messageTransformer.writeInboundMessage(message),
-    handlers
+    handlers,
   );
 }
 
@@ -65,7 +65,7 @@ export function createDispatcher<sync extends 'sync' | 'async'>(
 // input-specific options.
 function newCompileRequest(
   importers: ImporterRegistry<'sync' | 'async'>,
-  options?: Options<'sync' | 'async'>
+  options?: Options<'sync' | 'async'>,
 ): proto.InboundMessage_CompileRequest {
   const request = create(proto.InboundMessage_CompileRequestSchema, {
     importers: importers.importers,
@@ -103,7 +103,7 @@ function newCompileRequest(
 export function newCompilePathRequest(
   path: string,
   importers: ImporterRegistry<'sync' | 'async'>,
-  options?: Options<'sync' | 'async'>
+  options?: Options<'sync' | 'async'>,
 ): proto.InboundMessage_CompileRequest {
   const absPath = p.resolve(path);
   const request = newCompileRequest(importers, options);
@@ -115,7 +115,7 @@ export function newCompilePathRequest(
 export function newCompileStringRequest(
   source: string,
   importers: ImporterRegistry<'sync' | 'async'>,
-  options?: StringOptions<'sync' | 'async'>
+  options?: StringOptions<'sync' | 'async'>,
 ): proto.InboundMessage_CompileRequest {
   const input = create(proto.InboundMessage_CompileRequest_StringInputSchema, {
     source,
@@ -134,7 +134,7 @@ export function newCompileStringRequest(
       proto.InboundMessage_CompileRequest_ImporterSchema,
       {
         importer: {case: 'path', value: p.resolve('.')},
-      }
+      },
     );
   } else {
     // When importer is not set on the host, the compiler will set a
@@ -148,7 +148,7 @@ export function newCompileStringRequest(
 
 /** Type guard to check that `id` is a valid deprecation ID. */
 function validDeprecationId(
-  id: string | number | symbol | undefined
+  id: string | number | symbol | undefined,
 ): id is keyof typeof deprecations {
   return !!id && id in deprecations;
 }
@@ -156,7 +156,7 @@ function validDeprecationId(
 /** Handles a log event according to `options`. */
 export function handleLogEvent(
   options: OptionsWithLegacy<'sync' | 'async'> | undefined,
-  event: proto.OutboundMessage_LogEvent
+  event: proto.OutboundMessage_LogEvent,
 ): void {
   let span = event.span ? deprotofySourceSpan(event.span) : null;
   if (span && options?.legacy) span = removeLegacyImporterFromSpan(span);
@@ -210,7 +210,7 @@ export function handleLogEvent(
  * Throws a `SassException` if the compilation failed.
  */
 export function handleCompileResponse(
-  response: proto.OutboundMessage_CompileResponse
+  response: proto.OutboundMessage_CompileResponse,
 ): CompileResult {
   if (response.result.case === 'success') {
     const success = response.result.value;

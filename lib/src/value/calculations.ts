@@ -36,7 +36,7 @@ export class SassCalculation extends Value {
 
   private constructor(
     readonly name: string,
-    args: CalculationValueIterable
+    args: CalculationValueIterable,
   ) {
     super();
     this.arguments = List(args);
@@ -60,14 +60,14 @@ export class SassCalculation extends Value {
   static clamp(
     min: CalculationValue,
     value?: CalculationValue,
-    max?: CalculationValue
+    max?: CalculationValue,
   ): SassCalculation {
     if (
       (value === undefined && !isValidClampArg(min)) ||
       (max === undefined && ![min, value].some(x => x && isValidClampArg(x)))
     ) {
       throw new Error(
-        'Argument must be an unquoted SassString or CalculationInterpolation.'
+        'Argument must be an unquoted SassString or CalculationInterpolation.',
       );
     }
     const args = [min];
@@ -105,7 +105,7 @@ export class CalculationOperation implements ValueObject {
   constructor(
     readonly operator: CalculationOperator,
     readonly left: CalculationValue,
-    readonly right: CalculationValue
+    readonly right: CalculationValue,
   ) {
     if (!operators.includes(operator)) {
       throw new Error(`Invalid operator: ${operator}`);

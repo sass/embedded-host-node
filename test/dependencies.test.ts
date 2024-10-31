@@ -17,8 +17,8 @@ it('declares a compatible dependency on the embedded protocol', () => {
     fs
       .readFileSync(
         p.join(__dirname, '../build/sass/spec/EMBEDDED_PROTOCOL_VERSION'),
-        'utf-8'
+        'utf-8',
       )
-      .trim()
+      .trim(),
   ).toBe(pkg['protocol-version']);
 });

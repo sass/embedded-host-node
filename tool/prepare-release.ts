@@ -42,14 +42,14 @@ async function sanityCheckBeforeRelease(): Promise<void> {
   const ref = process.env['GITHUB_REF'];
   if (ref !== `refs/tags/${releaseVersion}`) {
     throw Error(
-      `GITHUB_REF ${ref} is different than the package.json version ${releaseVersion}.`
+      `GITHUB_REF ${ref} is different than the package.json version ${releaseVersion}.`,
     );
   }
 
   for (const [dep, version] of Object.entries(pkg.optionalDependencies)) {
     if (version !== releaseVersion) {
       throw Error(
-        `optional dependency ${dep}'s version doesn't match ${releaseVersion}.`
+        `optional dependency ${dep}'s version doesn't match ${releaseVersion}.`,
       );
     }
   }

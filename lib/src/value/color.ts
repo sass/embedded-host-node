@@ -207,7 +207,7 @@ function encodeChannelForColorJs(channel: ChannelName): string {
  */
 function validateChannelInSpace(
   channel: ChannelName,
-  space: KnownColorSpace
+  space: KnownColorSpace,
 ): void {
   if (channel === 'alpha') return;
   let valid = false;
@@ -243,7 +243,7 @@ function validateChannelInSpace(
   }
   if (!valid) {
     throw valueError(
-      `Unknown channel name "${channel}" for color space "${space}".`
+      `Unknown channel name "${channel}" for color space "${space}".`,
     );
   }
 }
@@ -269,7 +269,7 @@ function isPolarColorSpace(space: KnownColorSpace): space is PolarColorSpace {
  */
 function decodeCoordsFromColorJs(
   coords: [number, number, number], // ColorJS coordinates
-  isRgb = false // Whether this color is in the `rgb` color space
+  isRgb = false, // Whether this color is in the `rgb` color space
 ): [number | null, number | null, number | null] {
   let newCoords = coords;
   // If this color is in the `rgb` space, convert channel values to `0-255`
@@ -295,7 +295,7 @@ function checkChangeDeprecations(
   options: {
     [key in ChannelName]?: number | null;
   },
-  channels: ChannelName[]
+  channels: ChannelName[],
 ): void {
   if (options.alpha === null) emitNullAlphaDeprecation();
   for (const channel of channels) {
@@ -309,7 +309,7 @@ function emitColor4ApiGetterDeprecation(name: string): void {
     `\`${name}\` is deprecated, use \`channel\` instead.` +
       '\n' +
       'More info: https://sass-lang.com/d/color-4-api',
-    deprecations['color-4-api']
+    deprecations['color-4-api'],
   );
 }
 
@@ -323,7 +323,7 @@ function emitColor4ApiChangeSpaceDeprecation(): void {
       'specifying the `space` option is deprecated.' +
       '\n' +
       'More info: https://sass-lang.com/d/color-4-api',
-    deprecations['color-4-api']
+    deprecations['color-4-api'],
   );
 }
 
@@ -333,7 +333,7 @@ function emitColor4ApiChangeNullDeprecation(channel: string): void {
     `Passing \`${channel}: null\` without setting \`space\` is deprecated.` +
       '\n' +
       'More info: https://sass-lang.com/d/color-4-api',
-    deprecations['color-4-api']
+    deprecations['color-4-api'],
   );
 }
 
@@ -343,7 +343,7 @@ function emitNullAlphaDeprecation(): void {
     'Passing `alpha: null` without setting `space` is deprecated.' +
       '\n' +
       'More info: https://sass-lang.com/d/null-alpha',
-    deprecations['null-alpha']
+    deprecations['null-alpha'],
   );
 }
 
@@ -352,7 +352,7 @@ function emitNullAlphaDeprecation(): void {
  * ColorJS color object.
  */
 function optionsHaveColor(
-  opts: OptionsWithColor | ConstructorOptions
+  opts: OptionsWithColor | ConstructorOptions,
 ): opts is OptionsWithColor {
   return (opts as OptionsWithColor).color instanceof Color;
 }
@@ -794,7 +794,7 @@ export class SassColor extends Value {
       this.color.get({
         space: this.color.spaceId,
         coordId: encodeChannelForColorJs(channel),
-      })
+      }),
     );
   }
 
@@ -808,31 +808,31 @@ export class SassColor extends Value {
    */
   isChannelPowerless(
     channel: ChannelNameHsl,
-    options?: {space: ColorSpaceHsl}
+    options?: {space: ColorSpaceHsl},
   ): boolean;
   isChannelPowerless(
     channel: ChannelNameHwb,
-    options?: {space: ColorSpaceHwb}
+    options?: {space: ColorSpaceHwb},
   ): boolean;
   isChannelPowerless(
     channel: ChannelNameLab,
-    options?: {space: ColorSpaceLab}
+    options?: {space: ColorSpaceLab},
   ): boolean;
   isChannelPowerless(
     channel: ChannelNameLch,
-    options?: {space: ColorSpaceLch}
+    options?: {space: ColorSpaceLch},
   ): boolean;
   isChannelPowerless(
     channel: ChannelNameRgb,
-    options?: {space: ColorSpaceRgb}
+    options?: {space: ColorSpaceRgb},
   ): boolean;
   isChannelPowerless(
     channel: ChannelNameXyz,
-    options?: {space: ColorSpaceXyz}
+    options?: {space: ColorSpaceXyz},
   ): boolean;
   isChannelPowerless(
     channel: ChannelName,
-    options?: {space: KnownColorSpace}
+    options?: {space: KnownColorSpace},
   ): boolean {
     if (channel === 'alpha') return false;
     const color = options?.space ? this.toSpace(options.space) : this;
@@ -873,7 +873,7 @@ export class SassColor extends Value {
     options?: {
       weight?: number;
       method?: HueInterpolationMethod;
-    }
+    },
   ): SassColor {
     const hueInterpolationMethod =
       options?.method ??
@@ -885,7 +885,7 @@ export class SassColor extends Value {
 
     if (weight < 0 || weight > 1) {
       throw valueError(
-        `Expected \`weight\` between \`0\` and \`1\`, received \`${weight}\`.`
+        `Expected \`weight\` between \`0\` and \`1\`, received \`${weight}\`.`,
       );
     }
 
@@ -938,7 +938,7 @@ export class SassColor extends Value {
   private getChangedColor(
     options: ConstructorOptions,
     space: KnownColorSpace,
-    spaceSetExplicitly: boolean
+    spaceSetExplicitly: boolean,
   ): SassColor {
     const color = this.toSpace(space);
     function getChangedValue(channel: ChannelName): number | null {
@@ -1063,42 +1063,42 @@ export class SassColor extends Value {
       [key in ChannelNameHsl]?: number | null;
     } & {
       space?: ColorSpaceHsl;
-    }
+    },
   ): SassColor;
   change(
     options: {
       [key in ChannelNameHwb]?: number | null;
     } & {
       space?: ColorSpaceHwb;
-    }
+    },
   ): SassColor;
   change(
     options: {
       [key in ChannelNameLab]?: number | null;
     } & {
       space?: ColorSpaceLab;
-    }
+    },
   ): SassColor;
   change(
     options: {
       [key in ChannelNameLch]?: number | null;
     } & {
       space?: ColorSpaceLch;
-    }
+    },
   ): SassColor;
   change(
     options: {
       [key in ChannelNameRgb]?: number | null;
     } & {
       space?: ColorSpaceRgb;
-    }
+    },
   ): SassColor;
   change(
     options: {
       [key in ChannelNameXyz]?: number | null;
     } & {
       space?: ColorSpaceXyz;
-    }
+    },
   ): SassColor;
   change(options: ConstructorOptions): SassColor {
     const spaceSetExplicitly = !!options.space;
@@ -1109,7 +1109,7 @@ export class SassColor extends Value {
 
     // Validate channel values
     const keys = Object.keys(options).filter(
-      key => key !== 'space'
+      key => key !== 'space',
     ) as ChannelName[];
     for (const channel of keys) {
       validateChannelInSpace(channel, space);
@@ -1119,7 +1119,7 @@ export class SassColor extends Value {
     }
 
     return this.getChangedColor(options, space, spaceSetExplicitly).toSpace(
-      this.space
+      this.space,
     );
   }
 

@@ -13,7 +13,7 @@ describe('utils', () => {
         expect(pathToUrlString(filename)).toEqual(
           pathToFileURL(filename)
             .toString()
-            .slice(baseURL.length + 1)
+            .slice(baseURL.length + 1),
         );
       }
     });
@@ -25,13 +25,13 @@ describe('utils', () => {
         expect(pathToUrlString(lowercase)).toEqual(
           pathToFileURL(lowercase)
             .toString()
-            .slice(baseURL.length + 1)
+            .slice(baseURL.length + 1),
         );
         const uppercase = lowercase.toUpperCase();
         expect(pathToUrlString(uppercase)).toEqual(
           pathToFileURL(uppercase)
             .toString()
-            .slice(baseURL.length + 1)
+            .slice(baseURL.length + 1),
         );
       }
     });

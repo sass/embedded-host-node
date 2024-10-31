@@ -13,7 +13,7 @@ export {Deprecation, DeprecationOrId, DeprecationStatus} from './vendor/sass';
  * that's ready to include in a CompileRequest.
  */
 export function getDeprecationIds(
-  arr: (DeprecationOrId | Version)[]
+  arr: (DeprecationOrId | Version)[],
 ): string[] {
   return arr.map(item => {
     if (item instanceof Version) {
@@ -52,7 +52,7 @@ export type DeprecationOptions = Pick<
 export function warnForHostSideDeprecation(
   message: string,
   deprecation: Deprecation,
-  options?: DeprecationOptions
+  options?: DeprecationOptions,
 ): void {
   if (
     deprecation.status === 'future' &&
@@ -75,7 +75,7 @@ export function warnForHostSideDeprecation(
  */
 function isSilent(
   deprecation: Deprecation,
-  options?: DeprecationOptions
+  options?: DeprecationOptions,
 ): boolean {
   if (!options) {
     for (const potentialOptions of activeDeprecationOptions.values()) {
@@ -84,7 +84,7 @@ function isSilent(
     return false;
   }
   return getDeprecationIds(options.silenceDeprecations ?? []).includes(
-    deprecation.id
+    deprecation.id,
   );
 }
 
@@ -94,7 +94,7 @@ function isSilent(
  */
 function isEnabledFuture(
   deprecation: Deprecation,
-  options?: DeprecationOptions
+  options?: DeprecationOptions,
 ): boolean {
   if (!options) {
     for (const potentialOptions of activeDeprecationOptions.values()) {
@@ -103,7 +103,7 @@ function isEnabledFuture(
     return activeDeprecationOptions.size > 0;
   }
   return getDeprecationIds(options.futureDeprecations ?? []).includes(
-    deprecation.id
+    deprecation.id,
   );
 }
 
@@ -113,7 +113,7 @@ function isEnabledFuture(
  */
 function isFatal(
   deprecation: Deprecation,
-  options?: DeprecationOptions
+  options?: DeprecationOptions,
 ): boolean {
   if (!options) {
     for (const potentialOptions of activeDeprecationOptions.values()) {

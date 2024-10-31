@@ -21,17 +21,17 @@ export async function run(
   options?: {
     // Directories to put in the SASS_PATH env variable before running test.
     sassPathDirs?: string[];
-  }
+  },
 ): Promise<void> {
   const testDir = p.join(
     p.dirname(__filename),
     'sandbox',
-    `${Math.random()}`.slice(2)
+    `${Math.random()}`.slice(2),
   );
   fs.mkdirSync(testDir, {recursive: true});
   if (options?.sassPathDirs) {
     process.env.SASS_PATH = options.sassPathDirs.join(
-      process.platform === 'win32' ? ';' : ':'
+      process.platform === 'win32' ? ';' : ':',
     );
   }
   try {

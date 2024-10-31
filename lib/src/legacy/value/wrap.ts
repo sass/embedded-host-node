@@ -32,12 +32,15 @@ import * as types from '../../vendor/sass';
 export function wrapFunction<sync extends 'sync' | 'async'>(
   thisArg: LegacyPluginThis,
   callback: LegacyFunction<sync>,
-  sync: SyncBoolean<sync>
+  sync: SyncBoolean<sync>,
 ): CustomFunction<sync> {
   if (sync) {
     return args =>
       unwrapTypedValue(
-        (callback as LegacyFunction<'sync'>).apply(thisArg, args.map(wrapValue))
+        (callback as LegacyFunction<'sync'>).apply(
+          thisArg,
+          args.map(wrapValue),
+        ),
       );
   } else {
     return args =>
@@ -57,7 +60,7 @@ export function wrapFunction<sync extends 'sync' | 'async'>(
         // The cast here is necesary to work around microsoft/TypeScript#33815.
         const syncResult = (callback as (...args: unknown[]) => unknown).apply(
           thisArg,
-          [...args.map(wrapValue), done]
+          [...args.map(wrapValue), done],
         );
 
         if (syncResult !== undefined) resolve(unwrapTypedValue(syncResult));

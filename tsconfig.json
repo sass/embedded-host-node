@@ -6,10 +6,10 @@
     "resolveJsonModule": true,
     "rootDir": ".",
     "useUnknownInCatchVariables": false,
-    "declaration": false,
     "lib": ["DOM"]
   },
   "include": [
+    "package.json",
     "*.ts",
     "bin/*.ts",
     "lib/**/*.ts",

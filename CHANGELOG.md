@@ -1,7 +1,3 @@
-## 1.80.6
-
-* No user-visible changes.
-
 ## 1.80.5
 
 ### Embedded Host

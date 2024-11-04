@@ -170,7 +170,7 @@ export class SassNumber extends Value {
       | {
           numeratorUnits?: string[] | List<string>;
           denominatorUnits?: string[] | List<string>;
-        }
+        },
   ) {
     super();
 
@@ -339,11 +339,11 @@ export class SassNumber extends Value {
   convert(
     newNumerators: string[] | List<string>,
     newDenominators: string[] | List<string>,
-    name?: string
+    name?: string,
   ): SassNumber {
     return new SassNumber(
       this.convertValue(newNumerators, newDenominators, name),
-      {numeratorUnits: newNumerators, denominatorUnits: newDenominators}
+      {numeratorUnits: newNumerators, denominatorUnits: newDenominators},
     );
   }
 
@@ -361,7 +361,7 @@ export class SassNumber extends Value {
   convertValue(
     newNumerators: string[] | List<string>,
     newDenominators: string[] | List<string>,
-    name?: string
+    name?: string,
   ): number {
     return this.convertOrCoerce({
       coerceUnitless: false,
@@ -384,7 +384,7 @@ export class SassNumber extends Value {
   convertToMatch(
     other: SassNumber,
     name?: string,
-    otherName?: string
+    otherName?: string,
   ): SassNumber {
     return new SassNumber(this.convertValueToMatch(other, name, otherName), {
       numeratorUnits: other.numeratorUnits,
@@ -405,7 +405,7 @@ export class SassNumber extends Value {
   convertValueToMatch(
     other: SassNumber,
     name?: string,
-    otherName?: string
+    otherName?: string,
   ): number {
     return this.convertOrCoerce({
       coerceUnitless: false,
@@ -433,11 +433,11 @@ export class SassNumber extends Value {
   coerce(
     newNumerators: string[] | List<string>,
     newDenominators: string[] | List<string>,
-    name?: string
+    name?: string,
   ): SassNumber {
     return new SassNumber(
       this.coerceValue(newNumerators, newDenominators, name),
-      {numeratorUnits: newNumerators, denominatorUnits: newDenominators}
+      {numeratorUnits: newNumerators, denominatorUnits: newDenominators},
     );
   }
 
@@ -459,7 +459,7 @@ export class SassNumber extends Value {
   coerceValue(
     newNumerators: string[] | List<string>,
     newDenominators: string[] | List<string>,
-    name?: string
+    name?: string,
   ): number {
     return this.convertOrCoerce({
       coerceUnitless: true,
@@ -485,7 +485,7 @@ export class SassNumber extends Value {
   coerceToMatch(
     other: SassNumber,
     name?: string,
-    otherName?: string
+    otherName?: string,
   ): SassNumber {
     return new SassNumber(this.coerceValueToMatch(other, name, otherName), {
       numeratorUnits: other.numeratorUnits,
@@ -509,7 +509,7 @@ export class SassNumber extends Value {
   coerceValueToMatch(
     other: SassNumber,
     name?: string,
-    otherName?: string
+    otherName?: string,
   ): number {
     return this.convertOrCoerce({
       coerceUnitless: true,
@@ -533,7 +533,7 @@ export class SassNumber extends Value {
     const canonicalDenominators = canonicalizeUnits(this.denominatorUnits);
     const canonicalValue = this.convertValue(
       canonicalNumerators,
-      canonicalDenominators
+      canonicalDenominators,
     );
     return (
       fuzzyHashCode(canonicalValue) ^
@@ -545,7 +545,7 @@ export class SassNumber extends Value {
   toString(): string {
     return `${this.value}${unitString(
       this.numeratorUnits,
-      this.denominatorUnits
+      this.denominatorUnits,
     )}`;
   }
 
@@ -571,7 +571,7 @@ export class SassNumber extends Value {
           other: SassNumber;
           otherName?: string;
         }
-    )
+    ),
   ): number {
     const newNumerators =
       'other' in params
@@ -608,7 +608,7 @@ export class SassNumber extends Value {
             `Expected ${this} to have a single ${type} unit (${unitsByType[
               type
             ].join(', ')}).`,
-            params.name
+            params.name,
           );
         }
       }
@@ -620,10 +620,10 @@ export class SassNumber extends Value {
             ? 'no units'
             : `unit${unitSize > 1 ? 's' : ''} ${unitString(
                 newNumerators,
-                newDenominators
+                newDenominators,
               )}`
         }.`,
-        params.name
+        params.name,
       );
     };
 
@@ -687,7 +687,7 @@ function conversionFactor(fromUnit: string, toUnit: string): number | null {
 // `denominators`.
 function unitString(
   numerators: List<string>,
-  denominators: List<string>
+  denominators: List<string>,
 ): string {
   if (numerators.isEmpty() && denominators.isEmpty()) {
     return '';

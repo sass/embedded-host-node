@@ -16,7 +16,7 @@ import * as utils from './utils';
  */
 export async function getLanguageRepo(
   outPath: string,
-  options?: {ref: string} | {path: string}
+  options?: {ref: string} | {path: string},
 ): Promise<void> {
   if (!options || 'ref' in options) {
     utils.fetchRepo({

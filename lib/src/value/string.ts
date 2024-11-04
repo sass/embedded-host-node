@@ -17,7 +17,7 @@ export class SassString extends Value {
   constructor(options?: {quotes?: boolean});
   constructor(
     textOrOptions?: string | {quotes?: boolean},
-    options?: {quotes?: boolean}
+    options?: {quotes?: boolean},
   ) {
     super();
 
@@ -102,7 +102,7 @@ export class SassString extends Value {
     if (Math.abs(sassIdx) > sassLength) {
       throw valueError(
         `Invalid index ${sassIdx} for a string with ${sassLength} characters`,
-        name
+        name,
       );
     }
     if (sassIdx < 0) sassIdx += sassLength + 1;

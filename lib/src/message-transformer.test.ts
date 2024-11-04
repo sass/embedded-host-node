@@ -35,7 +35,7 @@ describe('message transformer', () => {
     beforeEach(() => {
       encodedProtobufs = [];
       messages = new MessageTransformer(new Observable(), buffer =>
-        encodedProtobufs.push(buffer)
+        encodedProtobufs.push(buffer),
       );
     });
 
@@ -76,7 +76,7 @@ describe('message transformer', () => {
             (
               response.result
                 .value as proto.OutboundMessage_CompileResponse_CompileSuccess
-            ).css
+            ).css,
           ).toBe('a {b: c}');
           done();
         },
@@ -87,9 +87,9 @@ describe('message transformer', () => {
           ...varint.encode(1234),
           ...toBinary(
             proto.InboundMessageSchema,
-            validInboundMessage('a {b: c}')
+            validInboundMessage('a {b: c}'),
           ),
-        ])
+        ]),
       );
       protobufs$.complete();
     });
@@ -100,7 +100,7 @@ describe('message transformer', () => {
           messages.outboundMessages$,
           'Compiler caused error: Invalid compilation ID varint: RangeError: ' +
             'Could not decode varint.',
-          done
+          done,
         );
 
         protobufs$.next(Buffer.from([-1]));

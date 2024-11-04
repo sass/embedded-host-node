@@ -46,10 +46,10 @@ export class AsyncCompiler {
       cwd: path.dirname(compilerCommand[0]),
       // Node blocks launching .bat and .cmd without a shell due to CVE-2024-27980
       shell: ['.bat', '.cmd'].includes(
-        path.extname(compilerCommand[0]).toLowerCase()
+        path.extname(compilerCommand[0]).toLowerCase(),
       ),
       windowsHide: true,
-    }
+    },
   );
 
   /** The next compilation ID. */
@@ -101,7 +101,7 @@ export class AsyncCompiler {
   private async compileRequestAsync(
     request: proto.InboundMessage_CompileRequest,
     importers: ImporterRegistry<'async'>,
-    options?: OptionsWithLegacy<'async'> & {legacy?: boolean}
+    options?: OptionsWithLegacy<'async'> & {legacy?: boolean},
   ): Promise<CompileResult> {
     const optionsKey = Symbol();
     activeDeprecationOptions.set(optionsKey, options ?? {});
@@ -116,7 +116,7 @@ export class AsyncCompiler {
           handleFileImportRequest: request => importers.fileImport(request),
           handleCanonicalizeRequest: request => importers.canonicalize(request),
           handleFunctionCallRequest: request => functions.call(request),
-        }
+        },
       );
       dispatcher.logEvents$.subscribe(event => handleLogEvent(options, event));
 
@@ -133,7 +133,7 @@ export class AsyncCompiler {
             } else {
               resolve(response!);
             }
-          })
+          }),
       );
       this.compilations.add(compilation);
 
@@ -148,7 +148,7 @@ export class AsyncCompiler {
     if (flag !== initFlag) {
       throw utils.compilerError(
         'AsyncCompiler can not be directly constructed. ' +
-          'Please use `sass.initAsyncCompiler()` instead.'
+          'Please use `sass.initAsyncCompiler()` instead.',
       );
     }
     this.stderr$.subscribe(data => process.stderr.write(data));
@@ -157,33 +157,33 @@ export class AsyncCompiler {
     });
     this.messageTransformer = new MessageTransformer(
       packetTransformer.outboundProtobufs$,
-      packet => packetTransformer.writeInboundProtobuf(packet)
+      packet => packetTransformer.writeInboundProtobuf(packet),
     );
   }
 
   compileAsync(
     path: string,
-    options?: OptionsWithLegacy<'async'>
+    options?: OptionsWithLegacy<'async'>,
   ): Promise<CompileResult> {
     this.throwIfDisposed();
     const importers = new ImporterRegistry(options);
     return this.compileRequestAsync(
       newCompilePathRequest(path, importers, options),
       importers,
-      options
+      options,
     );
   }
 
   compileStringAsync(
     source: string,
-    options?: StringOptionsWithLegacy<'async'>
+    options?: StringOptionsWithLegacy<'async'>,
   ): Promise<CompileResult> {
     this.throwIfDisposed();
     const importers = new ImporterRegistry(options);
     return this.compileRequestAsync(
       newCompileStringRequest(source, importers, options),
       importers,
-      options
+      options,
     );
   }
 

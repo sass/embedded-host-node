@@ -11,7 +11,7 @@ export {NodePackageImporter} from './importer-registry';
 
 export function compile(
   path: string,
-  options?: OptionsWithLegacy<'sync'>
+  options?: OptionsWithLegacy<'sync'>,
 ): CompileResult {
   const compiler = initCompiler();
   try {
@@ -23,7 +23,7 @@ export function compile(
 
 export function compileString(
   source: string,
-  options?: StringOptionsWithLegacy<'sync'>
+  options?: StringOptionsWithLegacy<'sync'>,
 ): CompileResult {
   const compiler = initCompiler();
   try {
@@ -35,7 +35,7 @@ export function compileString(
 
 export async function compileAsync(
   path: string,
-  options?: OptionsWithLegacy<'async'>
+  options?: OptionsWithLegacy<'async'>,
 ): Promise<CompileResult> {
   const compiler = await initAsyncCompiler();
   try {
@@ -47,7 +47,7 @@ export async function compileAsync(
 
 export async function compileStringAsync(
   source: string,
-  options?: StringOptionsWithLegacy<'async'>
+  options?: StringOptionsWithLegacy<'async'>,
 ): Promise<CompileResult> {
   const compiler = await initAsyncCompiler();
   try {

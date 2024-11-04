@@ -14,7 +14,7 @@ import {PromiseOr, compilerError, hostError, thenOr} from './utils';
 // A callback that accepts a response or error.
 type ResponseCallback = (
   err: unknown,
-  response: proto.OutboundMessage_CompileResponse | undefined
+  response: proto.OutboundMessage_CompileResponse | undefined,
 ) => void;
 
 /**
@@ -68,7 +68,7 @@ export class Dispatcher<sync extends 'sync' | 'async'> {
    */
   readonly logEvents$ = this.messages$.pipe(
     filter(message => message.message.case === 'logEvent'),
-    map(message => message.message.value as proto.OutboundMessage_LogEvent)
+    map(message => message.message.value as proto.OutboundMessage_LogEvent),
   );
 
   constructor(
@@ -77,9 +77,9 @@ export class Dispatcher<sync extends 'sync' | 'async'> {
       [number, proto.OutboundMessage]
     >,
     private readonly writeInboundMessage: (
-      message: [number, proto.InboundMessage]
+      message: [number, proto.InboundMessage],
     ) => void,
-    private readonly outboundRequestHandlers: DispatcherHandlers<sync>
+    private readonly outboundRequestHandlers: DispatcherHandlers<sync>,
   ) {
     if (compilationId < 1) {
       throw Error(`Invalid compilation ID ${compilationId}.`);
@@ -95,7 +95,7 @@ export class Dispatcher<sync extends 'sync' | 'async'> {
             ? result.then(() => message)
             : [message];
         }),
-        takeUntil(this.unsubscribe$)
+        takeUntil(this.unsubscribe$),
       )
       .subscribe({
         next: message => this.messages$.next(message),
@@ -118,7 +118,7 @@ export class Dispatcher<sync extends 'sync' | 'async'> {
    */
   sendCompileRequest(
     request: proto.InboundMessage_CompileRequest,
-    callback: ResponseCallback
+    callback: ResponseCallback,
   ): void {
     // Call the callback but unsubscribe first
     const callback_: ResponseCallback = (err, response) => {
@@ -134,7 +134,7 @@ export class Dispatcher<sync extends 'sync' | 'async'> {
     this.messages$
       .pipe(
         filter(message => message.message.case === 'compileResponse'),
-        map(message => message.message.value as OutboundResponse)
+        map(message => message.message.value as OutboundResponse),
       )
       .subscribe({next: response => callback_(null, response)});
 
@@ -173,7 +173,7 @@ export class Dispatcher<sync extends 'sync' | 'async'> {
   // contains a request, runs the appropriate callback to generate an inbound
   // response, and then sends it inbound.
   private handleOutboundMessage(
-    message: proto.OutboundMessage
+    message: proto.OutboundMessage,
   ): PromiseOr<void, sync> {
     switch (message.message.case) {
       case 'logEvent':
@@ -194,7 +194,7 @@ export class Dispatcher<sync extends 'sync' | 'async'> {
           this.outboundRequestHandlers.handleImportRequest(request),
           response => {
             this.sendInboundMessage(id, {case: type, value: response});
-          }
+          },
         );
       }
 
@@ -207,7 +207,7 @@ export class Dispatcher<sync extends 'sync' | 'async'> {
           this.outboundRequestHandlers.handleFileImportRequest(request),
           response => {
             this.sendInboundMessage(id, {case: type, value: response});
-          }
+          },
         );
       }
 
@@ -220,7 +220,7 @@ export class Dispatcher<sync extends 'sync' | 'async'> {
           this.outboundRequestHandlers.handleCanonicalizeRequest(request),
           response => {
             this.sendInboundMessage(id, {case: type, value: response});
-          }
+          },
         );
       }
 
@@ -233,7 +233,7 @@ export class Dispatcher<sync extends 'sync' | 'async'> {
           this.outboundRequestHandlers.handleFunctionCallRequest(request),
           response => {
             this.sendInboundMessage(id, {case: type, value: response});
-          }
+          },
         );
       }
 
@@ -251,7 +251,7 @@ export class Dispatcher<sync extends 'sync' | 'async'> {
     message: Exclude<
       proto.InboundMessage['message'],
       {case: undefined | 'compileRequest'}
-    >
+    >,
   ): void {
     message.value.id = requestId;
 
@@ -278,15 +278,15 @@ export class Dispatcher<sync extends 'sync' | 'async'> {
  */
 export interface DispatcherHandlers<sync extends 'sync' | 'async'> {
   handleImportRequest: (
-    request: proto.OutboundMessage_ImportRequest
+    request: proto.OutboundMessage_ImportRequest,
   ) => PromiseOr<proto.InboundMessage_ImportResponse, sync>;
   handleFileImportRequest: (
-    request: proto.OutboundMessage_FileImportRequest
+    request: proto.OutboundMessage_FileImportRequest,
   ) => PromiseOr<proto.InboundMessage_FileImportResponse, sync>;
   handleCanonicalizeRequest: (
-    request: proto.OutboundMessage_CanonicalizeRequest
+    request: proto.OutboundMessage_CanonicalizeRequest,
   ) => PromiseOr<proto.InboundMessage_CanonicalizeResponse, sync>;
   handleFunctionCallRequest: (
-    request: proto.OutboundMessage_FunctionCallRequest
+    request: proto.OutboundMessage_FunctionCallRequest,
   ) => PromiseOr<proto.InboundMessage_FunctionCallResponse, sync>;
 }

@@ -30,7 +30,7 @@ describe('SyncProcess', () => {
           expectStdout(node.yield(), 'hi there!\n');
           node.stdin.write('fblthp\n');
           expectStdout(node.yield(), 'fblthp\n');
-        }
+        },
       );
     });
 
@@ -43,7 +43,7 @@ describe('SyncProcess', () => {
         node => {
           node.stdin.end();
           expectStdout(node.yield(), 'closed!\n');
-        }
+        },
       );
     });
   });
@@ -114,7 +114,7 @@ function expectExit(event: Event, codeOrSignal: number | NodeJS.Signals): void {
   expect(event).toEqual(
     typeof codeOrSignal === 'number'
       ? {type: 'exit', code: codeOrSignal}
-      : {type: 'exit', signal: codeOrSignal}
+      : {type: 'exit', signal: codeOrSignal},
   );
 }
 
@@ -124,7 +124,7 @@ function expectExit(event: Event, codeOrSignal: number | NodeJS.Signals): void {
  */
 function withJSProcess(
   contents: string,
-  callback: (process: SyncProcess) => void
+  callback: (process: SyncProcess) => void,
 ): void {
   return withJSFile(contents, file => {
     const node = new SyncProcess(process.argv0, [file]);

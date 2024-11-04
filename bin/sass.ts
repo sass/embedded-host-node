@@ -14,7 +14,7 @@ try {
     {
       stdio: 'inherit',
       windowsHide: true,
-    }
+    },
   );
 } catch (error) {
   if (error.code) {

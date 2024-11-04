@@ -8,7 +8,7 @@ export class Version implements api.Version {
   constructor(
     readonly major: number,
     readonly minor: number,
-    readonly patch: number
+    readonly patch: number,
   ) {}
   static parse(version: string): Version {
     const match = version.match(/^(\d+)\.(\d+)\.(\d+)$/);
@@ -18,7 +18,7 @@ export class Version implements api.Version {
     return new Version(
       parseInt(match[1]),
       parseInt(match[2]),
-      parseInt(match[3])
+      parseInt(match[3]),
     );
   }
   toString(): string {

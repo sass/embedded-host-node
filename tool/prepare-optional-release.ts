@@ -22,7 +22,7 @@ const argv = yargs(process.argv.slice(2))
       'Directory name under `npm` directory that contains optional dependencies.',
     demandOption: true,
     choices: Object.keys(pkg.optionalDependencies).map(
-      name => name.split('sass-embedded-')[1]
+      name => name.split('sass-embedded-')[1],
     ),
   })
   .parseSync();
@@ -86,7 +86,7 @@ async function downloadRelease(options: {
   });
   if (!response.ok) {
     throw Error(
-      `Failed to download ${options.repo} release asset: ${response.statusText}`
+      `Failed to download ${options.repo} release asset: ${response.statusText}`,
     );
   }
   const releaseAsset = Buffer.from(await response.arrayBuffer());
@@ -119,7 +119,7 @@ void (async () => {
     const version = pkg['compiler-version'] as string;
     if (version.endsWith('-dev')) {
       throw Error(
-        "Can't release optional packages for a -dev compiler version."
+        "Can't release optional packages for a -dev compiler version.",
       );
     }
 

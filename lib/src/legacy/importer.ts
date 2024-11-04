@@ -85,7 +85,7 @@ export class LegacyImporterWrapper<sync extends 'sync' | 'async'>
     private readonly callbacks: Array<LegacyImporter<sync>>,
     private readonly loadPaths: string[],
     initialPrev: string,
-    private readonly sync: SyncBoolean<sync>
+    private readonly sync: SyncBoolean<sync>,
   ) {
     const path = initialPrev !== 'stdin';
     this.prev.push({url: path ? p.resolve(initialPrev) : 'stdin', path});
@@ -93,7 +93,7 @@ export class LegacyImporterWrapper<sync extends 'sync' | 'async'>
 
   canonicalize(
     url: string,
-    options: {fromImport: boolean; containingUrl: URL | null}
+    options: {fromImport: boolean; containingUrl: URL | null},
   ): PromiseOr<URL | null, sync> {
     if (url.startsWith(endOfLoadProtocol)) return new URL(url);
 
@@ -131,7 +131,7 @@ export class LegacyImporterWrapper<sync extends 'sync' | 'async'>
       // specifically we want to resolve them on the filesystem to ensure
       // locality.
       const urlWithoutPrefix = url.substring(
-        legacyImporterProtocolPrefix.length
+        legacyImporterProtocolPrefix.length,
       );
       if (urlWithoutPrefix.startsWith('file:')) {
         let resolved: string | null = null;
@@ -185,7 +185,7 @@ export class LegacyImporterWrapper<sync extends 'sync' | 'async'>
           if ('file' in result) {
             return new URL(
               legacyImporterProtocol +
-                encodeURI((result as {file: string}).file)
+                encodeURI((result as {file: string}).file),
             );
           } else if (/^[A-Za-z+.-]+:/.test(url)) {
             return new URL(`${legacyImporterProtocolPrefix}${url}`);
@@ -204,7 +204,7 @@ export class LegacyImporterWrapper<sync extends 'sync' | 'async'>
           for (const prefix of prefixes) {
             const resolved = resolvePath(
               p.join(prefix, result.file),
-              options.fromImport
+              options.fromImport,
             );
             if (resolved !== null) return pathToLegacyFileUrl(resolved);
           }
@@ -223,13 +223,13 @@ export class LegacyImporterWrapper<sync extends 'sync' | 'async'>
           for (const loadPath of this.loadPaths) {
             const resolved = resolvePath(
               p.join(loadPath, url),
-              options.fromImport
+              options.fromImport,
             );
             if (resolved !== null) return pathToLegacyFileUrl(resolved);
           }
           return null;
         }
-      }
+      },
     );
   }
 
@@ -279,7 +279,7 @@ export class LegacyImporterWrapper<sync extends 'sync' | 'async'>
   private invokeCallbacks(
     url: string,
     prev: string,
-    {fromImport}: {fromImport: boolean}
+    {fromImport}: {fromImport: boolean},
   ): PromiseOr<LegacyImporterResult, sync> {
     assert(this.callbacks.length > 0);
 
@@ -287,7 +287,7 @@ export class LegacyImporterWrapper<sync extends 'sync' | 'async'>
     self.options = {...self.options, context: self};
 
     const invokeNthCallback = (
-      n: number
+      n: number,
     ): PromiseOr<LegacyImporterResult, sync> =>
       thenOr(
         this.invokeCallback(this.callbacks[n], self, url, prev),
@@ -304,11 +304,11 @@ export class LegacyImporterWrapper<sync extends 'sync' | 'async'>
             throw new Error(
               `Invalid argument (contents): must be a string but was: ${
                 (result.contents as {}).constructor.name
-              }`
+              }`,
             );
           }
           return result;
-        }
+        },
       );
 
     return invokeNthCallback(0);
@@ -319,7 +319,7 @@ export class LegacyImporterWrapper<sync extends 'sync' | 'async'>
     callback: LegacyImporter<sync>,
     self: LegacyImporterThis,
     url: string,
-    prev: string
+    prev: string,
   ): PromiseOr<LegacyImporterResult, sync> {
     if (this.sync) {
       return (callback as LegacySyncImporter).call(self, url, prev);
@@ -331,7 +331,7 @@ export class LegacyImporterWrapper<sync extends 'sync' | 'async'>
         self,
         url,
         prev,
-        resolve
+        resolve,
       );
 
       if (syncResult !== undefined) resolve(syncResult);

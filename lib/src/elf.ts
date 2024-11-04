@@ -8,7 +8,7 @@ import * as fs from 'fs';
 function readFileDescriptor(
   fd: number,
   position: number,
-  length: number
+  length: number,
 ): Buffer {
   const buffer = Buffer.alloc(length);
   let offset = 0;
@@ -31,7 +31,7 @@ export function getElfInterpreter(path: string): string {
   const fd = fs.openSync(path, 'r');
   try {
     const elfIdentification = new DataView(
-      readFileDescriptor(fd, 0, 64).buffer
+      readFileDescriptor(fd, 0, 64).buffer,
     );
 
     if (
@@ -72,8 +72,8 @@ export function getElfInterpreter(path: string): string {
       readFileDescriptor(
         fd,
         programHeadersOffset,
-        programHeadersEntrySize * programHeadersEntryCount
-      ).buffer
+        programHeadersEntrySize * programHeadersEntryCount,
+      ).buffer,
     );
     for (let i = 0; i < programHeadersEntryCount; i++) {
       const byteOffset = i * programHeadersEntrySize;

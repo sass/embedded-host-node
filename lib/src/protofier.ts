@@ -53,7 +53,7 @@ export class Protofier {
      * This is used to register first-class functions so that the compiler may
      * invoke them.
      */
-    private readonly functions: FunctionRegistry<'sync' | 'async'>
+    private readonly functions: FunctionRegistry<'sync' | 'async'>,
   ) {}
 
   /** Converts `value` to its protocol buffer representation. */
@@ -160,7 +160,7 @@ export class Protofier {
 
   /** Converts `calculation` to its protocol buffer representation. */
   private protofyCalculation(
-    calculation: SassCalculation
+    calculation: SassCalculation,
   ): proto.Value_Calculation {
     return create(proto.Value_CalculationSchema, {
       name: calculation.name,
@@ -173,7 +173,7 @@ export class Protofier {
   /** Converts a CalculationValue that appears within a `SassCalculation` to
    * its protocol buffer representation. */
   private protofyCalculationValue(
-    value: Object
+    value: Object,
   ): proto.Value_Calculation_CalculationValue {
     const result = create(proto.Value_Calculation_CalculationValueSchema, {});
     if (value instanceof SassCalculation) {
@@ -204,7 +204,7 @@ export class Protofier {
 
   /** Converts `operator` to its protocol buffer representation. */
   private protofyCalculationOperator(
-    operator: CalculationOperator
+    operator: CalculationOperator,
   ): proto.CalculationOperator {
     switch (operator) {
       case '+':
@@ -318,13 +318,13 @@ export class Protofier {
         if (separator === null && list.contents.length > 1) {
           throw utils.compilerError(
             `Value.List ${list} can't have an undecided separator because it ` +
-              `has ${list.contents.length} elements`
+              `has ${list.contents.length} elements`,
           );
         }
 
         return new SassList(
           list.contents.map(element => this.deprotofy(element)),
-          {separator, brackets: list.hasBrackets}
+          {separator, brackets: list.hasBrackets},
         );
       }
 
@@ -335,7 +335,7 @@ export class Protofier {
         if (separator === null && list.contents.length > 1) {
           throw utils.compilerError(
             `Value.List ${list} can't have an undecided separator because it ` +
-              `has ${list.contents.length} elements`
+              `has ${list.contents.length} elements`,
           );
         }
 
@@ -345,10 +345,10 @@ export class Protofier {
             Object.entries(list.keywords).map(([key, value]) => [
               key,
               this.deprotofy(value),
-            ])
+            ]),
           ),
           separator,
-          list.id
+          list.id,
         );
         this.argumentLists.push(result);
         return result;
@@ -364,8 +364,8 @@ export class Protofier {
               if (!value) throw utils.mandatoryError('Value.Map.Entry.value');
 
               return [this.deprotofy(key), this.deprotofy(value)];
-            })
-          )
+            }),
+          ),
         );
 
       case 'compilerFunction':
@@ -373,7 +373,7 @@ export class Protofier {
 
       case 'hostFunction':
         throw utils.compilerError(
-          'The compiler may not send Value.host_function.'
+          'The compiler may not send Value.host_function.',
         );
 
       case 'compilerMixin':
@@ -424,17 +424,17 @@ export class Protofier {
 
   /** Converts `calculation` to its Sass representation. */
   private deprotofyCalculation(
-    calculation: proto.Value_Calculation
+    calculation: proto.Value_Calculation,
   ): SassCalculation {
     switch (calculation.name) {
       case 'calc':
         if (calculation.arguments.length !== 1) {
           throw utils.compilerError(
-            'Value.Calculation.arguments must have exactly one argument for calc().'
+            'Value.Calculation.arguments must have exactly one argument for calc().',
           );
         }
         return SassCalculation.calc(
-          this.deprotofyCalculationValue(calculation.arguments[0])
+          this.deprotofyCalculationValue(calculation.arguments[0]),
         );
       case 'clamp':
         if (
@@ -442,7 +442,7 @@ export class Protofier {
           calculation.arguments.length > 3
         ) {
           throw utils.compilerError(
-            'Value.Calculation.arguments must have 1 to 3 arguments for clamp().'
+            'Value.Calculation.arguments must have 1 to 3 arguments for clamp().',
           );
         }
         return SassCalculation.clamp(
@@ -452,36 +452,36 @@ export class Protofier {
             : undefined,
           calculation.arguments.length > 2
             ? this.deprotofyCalculationValue(calculation.arguments[2])
-            : undefined
+            : undefined,
         );
       case 'min':
         if (calculation.arguments.length === 0) {
           throw utils.compilerError(
-            'Value.Calculation.arguments must have at least 1 argument for min().'
+            'Value.Calculation.arguments must have at least 1 argument for min().',
           );
         }
         return SassCalculation.min(
-          calculation.arguments.map(this.deprotofyCalculationValue)
+          calculation.arguments.map(this.deprotofyCalculationValue),
         );
       case 'max':
         if (calculation.arguments.length === 0) {
           throw utils.compilerError(
-            'Value.Calculation.arguments must have at least 1 argument for max().'
+            'Value.Calculation.arguments must have at least 1 argument for max().',
           );
         }
         return SassCalculation.max(
-          calculation.arguments.map(this.deprotofyCalculationValue)
+          calculation.arguments.map(this.deprotofyCalculationValue),
         );
       default:
         throw utils.compilerError(
-          `Value.Calculation.name "${calculation.name}" is not a recognized calculation type.`
+          `Value.Calculation.name "${calculation.name}" is not a recognized calculation type.`,
         );
     }
   }
 
   /** Converts `value` to its Sass representation. */
   private deprotofyCalculationValue(
-    value: proto.Value_Calculation_CalculationValue
+    value: proto.Value_Calculation_CalculationValue,
   ): CalculationValue {
     switch (value.value.case) {
       case 'number':
@@ -494,11 +494,11 @@ export class Protofier {
         return new CalculationOperation(
           this.deprotofyCalculationOperator(value.value.value.operator),
           this.deprotofyCalculationValue(
-            value.value.value.left as proto.Value_Calculation_CalculationValue
+            value.value.value.left as proto.Value_Calculation_CalculationValue,
           ),
           this.deprotofyCalculationValue(
-            value.value.value.right as proto.Value_Calculation_CalculationValue
-          )
+            value.value.value.right as proto.Value_Calculation_CalculationValue,
+          ),
         );
       case 'interpolation':
         return new CalculationInterpolation(value.value.value);
@@ -509,7 +509,7 @@ export class Protofier {
 
   /** Converts `operator` to its Sass representation. */
   private deprotofyCalculationOperator(
-    operator: proto.CalculationOperator
+    operator: proto.CalculationOperator,
   ): CalculationOperator {
     switch (operator) {
       case proto.CalculationOperator.PLUS:

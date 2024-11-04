@@ -35,7 +35,7 @@ export class SyncProcess {
   constructor(
     command: string,
     argsOrOptions?: string[] | Options,
-    options?: Options
+    options?: Options,
   ) {
     let args: string[];
     if (Array.isArray(argsOrOptions)) {
@@ -63,7 +63,7 @@ export class SyncProcess {
             type: 'stdin',
             data: chunk as Buffer,
           },
-          [chunk.buffer]
+          [chunk.buffer],
         );
         callback();
       },
@@ -76,7 +76,7 @@ export class SyncProcess {
     const oldEnd = this.stdin.end.bind(this.stdin) as (
       a1?: unknown,
       a2?: unknown,
-      a3?: unknown
+      a3?: unknown,
     ) => void;
     this.stdin.end = ((a1?: unknown, a2?: unknown, a3?: unknown) => {
       oldEnd(a1, a2, a3);
@@ -84,7 +84,7 @@ export class SyncProcess {
     }) as typeof this.stdin.end;
 
     const oldDestroy = this.stdin.destroy.bind(this.stdin) as (
-      a1?: unknown
+      a1?: unknown,
     ) => void;
     this.stdin.destroy = ((a1?: unknown) => {
       oldDestroy(a1);
@@ -102,7 +102,7 @@ export class SyncProcess {
   yield(): Event {
     if (this.stdin.destroyed) {
       throw new Error(
-        "Can't call SyncProcess.yield() after the process has exited."
+        "Can't call SyncProcess.yield() after the process has exited.",
       );
     }
 
@@ -152,7 +152,7 @@ export class SyncProcess {
  */
 function spawnWorker(
   fileWithoutExtension: string,
-  options: WorkerOptions
+  options: WorkerOptions,
 ): Worker {
   // The released version always spawns the JS worker. The TS worker is only
   // used for development.
@@ -166,7 +166,7 @@ function spawnWorker(
         require('ts-node').register();
         require(${JSON.stringify(tsFile)});
       `,
-      {...options, eval: true}
+      {...options, eval: true},
     );
   }
 

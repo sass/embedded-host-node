@@ -33,7 +33,7 @@ export class NodePackageImporter {
       throw new Error(
         'The Node package importer cannot determine an entry point ' +
           'because `require.main.filename` is not defined. ' +
-          'Please provide an `entryPointDirectory` to the `NodePackageImporter`.'
+          'Please provide an `entryPointDirectory` to the `NodePackageImporter`.',
       );
     }
     this[entryPointDirectoryKey] = entryPointDirectory;
@@ -61,25 +61,25 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
     this.importers = (options?.importers ?? [])
       .map(importer =>
         this.register(
-          importer as Importer<sync> | FileImporter<sync> | NodePackageImporter
-        )
+          importer as Importer<sync> | FileImporter<sync> | NodePackageImporter,
+        ),
       )
       .concat(
         (options?.loadPaths ?? []).map(path =>
           create(proto.InboundMessage_CompileRequest_ImporterSchema, {
             importer: {case: 'path', value: p.resolve(path)},
-          })
-        )
+          }),
+        ),
       );
   }
 
   /** Converts an importer to a proto without adding it to `this.importers`. */
   register(
-    importer: Importer<sync> | FileImporter<sync> | NodePackageImporter
+    importer: Importer<sync> | FileImporter<sync> | NodePackageImporter,
   ): proto.InboundMessage_CompileRequest_Importer {
     const message = create(
       proto.InboundMessage_CompileRequest_ImporterSchema,
-      {}
+      {},
     );
     if (importer instanceof NodePackageImporter) {
       const importerMessage = create(proto.NodePackageImporterSchema, {
@@ -93,7 +93,7 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
       if ('findFileUrl' in importer) {
         throw new Error(
           'Importer may not contain both canonicalize() and findFileUrl(): ' +
-            inspect(importer)
+            inspect(importer),
         );
       }
 
@@ -101,7 +101,7 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
       message.nonCanonicalScheme =
         typeof importer.nonCanonicalScheme === 'string'
           ? [importer.nonCanonicalScheme]
-          : importer.nonCanonicalScheme ?? [];
+          : (importer.nonCanonicalScheme ?? []);
       this.importersById.set(this.id, importer);
     } else {
       message.importer = {case: 'fileImporterId', value: this.id};
@@ -113,7 +113,7 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
 
   /** Handles a canonicalization request. */
   canonicalize(
-    request: proto.OutboundMessage_CanonicalizeRequest
+    request: proto.OutboundMessage_CanonicalizeRequest,
   ): PromiseOr<proto.InboundMessage_CanonicalizeResponse, sync> {
     const importer = this.importersById.get(request.importerId);
     if (!importer) {
@@ -122,7 +122,7 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
 
     const canonicalizeContext = new CanonicalizeContext(
       request.containingUrl ? new URL(request.containingUrl) : null,
-      request.fromImport
+      request.fromImport,
     );
 
     return catchOr(
@@ -136,19 +136,19 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
                   ? {case: undefined}
                   : {case: 'url', value: url.toString()},
               containingUrlUnused: !canonicalizeContext.containingUrlAccessed,
-            })
+            }),
         );
       },
       error =>
         create(proto.InboundMessage_CanonicalizeResponseSchema, {
           result: {case: 'error', value: `${error}`},
-        })
+        }),
     );
   }
 
   /** Handles an import request. */
   import(
-    request: proto.OutboundMessage_ImportRequest
+    request: proto.OutboundMessage_ImportRequest,
   ): PromiseOr<proto.InboundMessage_ImportResponse, sync> {
     const importer = this.importersById.get(request.importerId);
     if (!importer) {
@@ -165,14 +165,14 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
             throw Error(
               `Invalid argument (contents): must be a string but was: ${
                 (result.contents as {}).constructor.name
-              }`
+              }`,
             );
           }
 
           if (result.sourceMapUrl && !result.sourceMapUrl.protocol) {
             throw Error(
               'Invalid argument (sourceMapUrl): must be absolute but was: ' +
-                result.sourceMapUrl
+                result.sourceMapUrl,
             );
           }
 
@@ -191,13 +191,13 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
       error =>
         create(proto.InboundMessage_ImportResponseSchema, {
           result: {case: 'error', value: `${error}`},
-        })
+        }),
     );
   }
 
   /** Handles a file import request. */
   fileImport(
-    request: proto.OutboundMessage_FileImportRequest
+    request: proto.OutboundMessage_FileImportRequest,
   ): PromiseOr<proto.InboundMessage_FileImportResponse, sync> {
     const importer = this.fileImportersById.get(request.importerId);
     if (!importer) {
@@ -206,7 +206,7 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
 
     const canonicalizeContext = new CanonicalizeContext(
       request.containingUrl ? new URL(request.containingUrl) : null,
-      request.fromImport
+      request.fromImport,
     );
 
     return catchOr(
@@ -229,13 +229,13 @@ export class ImporterRegistry<sync extends 'sync' | 'async'> {
               result: {case: 'fileUrl', value: url.toString()},
               containingUrlUnused: !canonicalizeContext.containingUrlAccessed,
             });
-          }
+          },
         );
       },
       error =>
         create(proto.InboundMessage_FileImportResponseSchema, {
           result: {case: 'error', value: `${error}`},
-        })
+        }),
     );
   }
 }

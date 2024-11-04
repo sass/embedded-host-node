@@ -36,7 +36,7 @@ export class PacketTransformer {
 
   constructor(
     private readonly outboundBuffers$: Observable<Uint8Array>,
-    private readonly writeInboundBuffer: (buffer: Buffer) => void
+    private readonly writeInboundBuffer: (buffer: Buffer) => void,
   ) {
     this.outboundBuffers$
       .pipe(mergeMap(buffer => this.decode(buffer)))
@@ -175,7 +175,7 @@ class Packet {
     // the current message is split across multiple chunks).
     const bytesToWrite = Math.min(
       this.payload.length - this.payloadOffset,
-      source.length - i
+      source.length - i,
     );
     this.payload.set(source.subarray(i, i + bytesToWrite), this.payloadOffset);
     this.payloadOffset += bytesToWrite;

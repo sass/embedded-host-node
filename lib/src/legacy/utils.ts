@@ -26,7 +26,7 @@ export const legacyImporterProtocolPrefix = 'legacy-importer-';
 // should be removed from human-readable messages.
 const removeLegacyImporterRegExp = new RegExp(
   `${legacyImporterProtocol}|${legacyImporterProtocolPrefix}`,
-  'g'
+  'g',
 );
 
 // Returns `string` with all instances of legacy importer syntax removed.
@@ -42,7 +42,7 @@ export function removeLegacyImporterFromSpan(span: SourceSpan): SourceSpan {
     ...span,
     url: new URL(
       removeLegacyImporter(span.url.toString()),
-      pathToFileURL(process.cwd())
+      pathToFileURL(process.cwd()),
     ),
   };
 }

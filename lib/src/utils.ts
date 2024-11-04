@@ -26,7 +26,7 @@ export type SyncBoolean<sync extends 'sync' | 'async'> = sync extends 'async'
  */
 export function thenOr<T, V, sync extends 'sync' | 'async'>(
   promiseOrValue: PromiseOr<T, sync>,
-  callback: (value: T) => PromiseOr<V, sync>
+  callback: (value: T) => PromiseOr<V, sync>,
 ): PromiseOr<V, sync> {
   return promiseOrValue instanceof Promise
     ? (promiseOrValue.then(callback) as PromiseOr<V, sync>)
@@ -39,7 +39,7 @@ export function thenOr<T, V, sync extends 'sync' | 'async'>(
  */
 export function catchOr<T, sync extends 'sync' | 'async'>(
   promiseOrValueCallback: () => PromiseOr<T, sync>,
-  callback: (error: unknown) => PromiseOr<T, sync>
+  callback: (error: unknown) => PromiseOr<T, sync>,
 ): PromiseOr<T, sync> {
   try {
     const result = promiseOrValueCallback();
@@ -53,7 +53,7 @@ export function catchOr<T, sync extends 'sync' | 'async'>(
 
 /** Checks for null or undefined. */
 export function isNullOrUndefined<T>(
-  object: T | null | undefined
+  object: T | null | undefined,
 ): object is null | undefined {
   return object === null || object === undefined;
 }
@@ -95,7 +95,7 @@ export function pathToUrlString(path: string): string {
     .replace(/[#?]/g, encodeURIComponent)
     .replace(
       process.platform === 'win32' ? /%(5B|5C|5D|5E|7C)/g : /%(5B|5D|5E|7C)/g,
-      decodeURIComponent
+      decodeURIComponent,
     )
     .replace(/\\/g, '/');
 }
@@ -139,7 +139,7 @@ export function protofySyntax(syntax: Syntax): proto.Syntax {
 
 /** Returns whether `error` is a NodeJS-style exception with an error code. */
 export function isErrnoException(
-  error: unknown
+  error: unknown,
 ): error is NodeJS.ErrnoException {
   return error instanceof Error && ('errno' in error || 'code' in error);
 }
@@ -151,7 +151,7 @@ export function isErrnoException(
 export function putIfAbsent<K, V>(
   map: Map<K, V>,
   key: K,
-  provider: () => V
+  provider: () => V,
 ): V {
   const val = map.get(key);
   if (val !== undefined) {

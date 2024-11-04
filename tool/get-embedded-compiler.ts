@@ -15,7 +15,7 @@ import * as utils from './utils';
  */
 export async function getEmbeddedCompiler(
   outPath: string,
-  options?: {ref: string} | {path: string}
+  options?: {ref: string} | {path: string},
 ): Promise<void> {
   const repo = 'dart-sass';
 

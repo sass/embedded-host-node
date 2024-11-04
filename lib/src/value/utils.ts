@@ -88,7 +88,7 @@ export function fuzzyRound(num: number): number {
 export function fuzzyInRange(
   num: number,
   min: number,
-  max: number
+  max: number,
 ): number | null {
   if (fuzzyEquals(num, min)) return min;
   if (fuzzyEquals(num, max)) return max;
@@ -107,7 +107,7 @@ export function fuzzyAssertInRange(
   num: number,
   min: number,
   max: number,
-  name?: string
+  name?: string,
 ): number {
   if (fuzzyEquals(num, min)) return min;
   if (fuzzyEquals(num, max)) return max;

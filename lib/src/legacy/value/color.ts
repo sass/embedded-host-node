@@ -22,7 +22,7 @@ export class LegacyColor extends LegacyValueBase<SassColor> {
     }
 
     let red: number;
-    if (!green || !blue) {
+    if (green == undefined || blue == undefined) {
       const argb = redOrArgb as number;
       alpha = (argb >> 24) / 0xff;
       red = (argb >> 16) % 0x100;

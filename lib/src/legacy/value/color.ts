@@ -5,6 +5,10 @@
 import {SassColor} from '../../value/color';
 import {LegacyValueBase} from './base';
 
+function isUndefinedOrNull<A>(a: A): boolean {
+  return a === undefined || a === null;
+}
+
 export class LegacyColor extends LegacyValueBase<SassColor> {
   constructor(red: number, green: number, blue: number, alpha?: number);
   constructor(argb: number);
@@ -22,7 +26,7 @@ export class LegacyColor extends LegacyValueBase<SassColor> {
     }
 
     let red: number;
-    if (green == undefined || blue == undefined) {
+    if (isUndefinedOrNull(green) || isUndefinedOrNull(blue)) {
       const argb = redOrArgb as number;
       alpha = (argb >> 24) / 0xff;
       red = (argb >> 16) % 0x100;

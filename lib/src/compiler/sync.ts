@@ -3,6 +3,7 @@
 // https://opensource.org/licenses/MIT.
 
 import {Subject} from 'rxjs';
+import {SyncChildProcess} from 'sync-child-process';
 
 import * as path from 'path';
 import {
@@ -20,7 +21,6 @@ import {FunctionRegistry} from '../function-registry';
 import {ImporterRegistry} from '../importer-registry';
 import {MessageTransformer} from '../message-transformer';
 import {PacketTransformer} from '../packet-transformer';
-import {SyncProcess} from '../sync-process';
 import * as utils from '../utils';
 import * as proto from '../vendor/embedded_sass_pb';
 import {CompileResult} from '../vendor/sass/compile';
@@ -36,7 +36,7 @@ const initFlag = Symbol();
 /** A synchronous wrapper for the embedded Sass compiler */
 export class Compiler {
   /** The underlying process that's being wrapped. */
-  private readonly process = new SyncProcess(
+  private readonly process = new SyncChildProcess(
     compilerCommand[0],
     [...compilerCommand.slice(1), '--embedded'],
     {
@@ -77,7 +77,12 @@ export class Compiler {
 
   /** Yields the next event from the underlying process. */
   private yield(): boolean {
-    const event = this.process.yield();
+    const result = this.process.next();
+    if (result.done) {
+      this.disposed = true;
+      return false;
+    }
+    const event = result.value;
     switch (event.type) {
       case 'stdout':
         this.stdout$.next(event.data);
@@ -86,10 +91,6 @@ export class Compiler {
       case 'stderr':
         this.stderr$.next(event.data);
         return true;
-
-      case 'exit':
-        this.disposed = true;
-        return false;
     }
   }
 

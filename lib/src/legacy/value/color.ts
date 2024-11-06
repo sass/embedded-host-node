@@ -2,12 +2,9 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
+import {isNullOrUndefined} from '../../utils';
 import {SassColor} from '../../value/color';
 import {LegacyValueBase} from './base';
-
-function isUndefinedOrNull<A>(a: A): boolean {
-  return a === undefined || a === null;
-}
 
 export class LegacyColor extends LegacyValueBase<SassColor> {
   constructor(red: number, green: number, blue: number, alpha?: number);
@@ -26,7 +23,7 @@ export class LegacyColor extends LegacyValueBase<SassColor> {
     }
 
     let red: number;
-    if (isUndefinedOrNull(green) || isUndefinedOrNull(blue)) {
+    if (isNullOrUndefined(green) || isNullOrUndefined(blue)) {
       const argb = redOrArgb as number;
       alpha = (argb >> 24) / 0xff;
       red = (argb >> 16) % 0x100;

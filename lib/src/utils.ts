@@ -104,7 +104,7 @@ export function pathToUrlString(path: string): string {
   }
 
   if (process.platform === 'win32') {
-    fileUrl = fileUrl.replace(/%5C/g, '/').replace(/\\/g, '/');
+    fileUrl = fileUrl.replace(/%5C/g, '/');
   }
 
   return fileUrl;

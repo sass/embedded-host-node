@@ -1,3 +1,7 @@
+## 1.83.0
+
+* Allow trailing commas in *all* argument and parameter lists.
+
 ## 1.82.0
 
 ### Command-Line Interface

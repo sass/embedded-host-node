@@ -81,7 +81,6 @@
     "@types/tar": "^6.1.0",
     "@types/varint": "^6.0.1",
     "@types/yargs": "^17.0.4",
-    "del": "^6.0.0",
     "extract-zip": "^2.0.1",
     "gts": "^6.0.2",
     "jest": "^29.4.1",

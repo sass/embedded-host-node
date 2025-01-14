@@ -1,6 +1,6 @@
 {
   "name": "sass-embedded-linux-arm",
-  "version": "1.83.1",
+  "version": "1.83.2",
   "description": "The linux-arm binary for sass-embedded",
   "repository": "sass/embedded-host-node",
   "author": "Google Inc.",

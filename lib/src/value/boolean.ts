@@ -10,7 +10,7 @@ import {Value} from './index';
  * Sass boolean.
  *
  * This is an abstract class that cannot be directly instantiated. Instead,
- * use the provided `true` and `false` singleton instances.
+ * use the provided {@link sassTrue} and {@link sassFalse} singleton instances.
  */
 export abstract class SassBoolean extends Value {
   abstract readonly value: boolean;

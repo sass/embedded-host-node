@@ -59,14 +59,14 @@ describe('compiler', () => {
 
   describe('compilation ID', () => {
     it('resets after callback compilations complete', () => {
-      compiler.compileString('@import "foo"', {importers});
+      compiler.compileString('@use "foo"', {importers});
       compiler.compileString('');
       expect(getIdHistory()).toEqual([1, 2, 1]);
     });
 
     it('keeps working after failed compilations', () => {
       expect(() => compiler.compileString('invalid')).toThrow();
-      compiler.compileString('@import "foo"', {importers});
+      compiler.compileString('@use "foo"', {importers});
       expect(getIdHistory()).toEqual([1, 1, 2]);
     });
   });

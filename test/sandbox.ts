@@ -4,7 +4,6 @@
 
 import * as fs from 'fs';
 import * as p from 'path';
-import * as del from 'del';
 
 import {PromiseOr} from '../lib/src/utils';
 
@@ -38,7 +37,7 @@ export async function run(
     await test((...paths) => p.join(testDir, ...paths));
   } finally {
     if (options?.sassPathDirs) process.env.SASS_PATH = undefined;
-    // TODO(awjin): Change this to rmSync once we drop support for Node 12.
-    del.sync(testDir, {force: true});
+
+    fs.rmSync(testDir, {force: true, recursive: true, maxRetries: 3});
   }
 }

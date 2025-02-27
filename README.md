@@ -91,7 +91,7 @@ inherently asynchronous in Node.js, this package supports the synchronous
 implemented with the [`Atomics.wait()`] primitive. We hope to release this
 library as a stand-alone package at some point in the future.
 
-[synchronous message-passing library]: https://github.com/sass/embedded-host-node/blob/main/lib/src/sync-process/sync-message-port.ts
+[synchronous message-passing library]: https://github.com/sass/sync-message-port
 [`Atomics.wait()`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Atomics/wait
 
 ---

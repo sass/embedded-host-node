@@ -9,17 +9,17 @@ import {Value} from './index';
 /**
  * Sass boolean.
  *
- * Cannot be constructed; exists only as an interface and the exported
- * singletons.
+ * This is an abstract class that cannot be directly instantiated. Instead,
+ * use the provided {@link sassTrue} and {@link sassFalse} singleton instances.
  */
-export interface SassBoolean extends Value {
-  readonly value: boolean;
+export abstract class SassBoolean extends Value {
+  abstract readonly value: boolean;
 }
 
 const trueHash = hash(true);
 const falseHash = hash(false);
 
-export class SassBooleanInternal extends Value implements SassBoolean {
+export class SassBooleanInternal extends SassBoolean {
   // Whether callers are allowed to construct this class. This is set to
   // `false` once the two constants are constructed so that the constructor
   // throws an error for future calls, in accordance with the legacy API.

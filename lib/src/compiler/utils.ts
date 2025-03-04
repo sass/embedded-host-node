@@ -72,7 +72,7 @@ function newCompileRequest(
     globalFunctions: Object.keys(options?.functions ?? {}),
     sourceMap: !!options?.sourceMap,
     sourceMapIncludeSources: !!options?.sourceMapIncludeSources,
-    alertColor: options?.alertColor ?? !!supportsColor.stdout,
+    alertColor: options?.alertColor ?? !!supportsColor.default.stdout,
     alertAscii: !!options?.alertAscii,
     quietDeps: !!options?.quietDeps,
     verbose: !!options?.verbose,

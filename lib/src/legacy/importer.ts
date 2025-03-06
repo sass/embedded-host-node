@@ -168,7 +168,7 @@ export class LegacyImporterWrapper<sync extends 'sync' | 'async'>
 
     const prev = this.prev[this.prev.length - 1];
     return thenOr(
-      thenOr(this.invokeCallbacks(url, prev.url, options), result => {
+      thenOr(this.invokeCallbacks(url, prev?.url, options), result => {
         if (result instanceof Error) throw result;
         if (result === null) return null;
 

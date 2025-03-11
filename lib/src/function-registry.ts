@@ -18,6 +18,7 @@ import {Value} from './value';
  * execute them.
  */
 export class FunctionRegistry<sync extends 'sync' | 'async'> {
+  public readonly compileContext = Symbol();
   private readonly functionsByName = new Map<string, CustomFunction<sync>>();
   private readonly functionsById = new Map<number, CustomFunction<sync>>();
   private readonly idsByFunction = new Map<CustomFunction<sync>, number>();

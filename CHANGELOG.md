@@ -1,3 +1,19 @@
+## 1.86.0
+
+* Add support for `%` as an expression in its own right. It will still be parsed
+  as the modulo operator when between two other expressions, but in any other
+  context it will be an expression whose value is the unquoted string `%`.
+
+* Consider `attr()` to be a special number function that can be used as a
+  channel in color functions.
+
+* Deprecate user-defined functions named `type()` so that we can eventually
+  support the new CSS `type()` function.
+
+### Dart API
+
+* Increase the minimum Dart SDK to 3.6.0.
+
 ## 1.85.1
 
 * Fix a bug where global Sass functions whose names overlap with CSS math

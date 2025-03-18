@@ -20,6 +20,16 @@ export class SassFunction extends Value {
   readonly id: number | undefined;
 
   /**
+   * If this function is defined in the compiler, this is the unique context
+   * that the host uses to determine which compilation this function belongs to.
+   *
+   * This is marked as public so that the protofier can access it, but it's not
+   * part of the package's public API and should not be accessed by user code.
+   * It may be renamed or removed without warning in the future.
+   */
+  readonly compileContext: symbol | undefined;
+
+  /**
    * If this function is defined in the host, this is the signature that
    * describes how to pass arguments to it.
    *
@@ -39,26 +49,32 @@ export class SassFunction extends Value {
    */
   readonly callback: CustomFunction<'sync'> | undefined;
 
-  constructor(id: number);
+  constructor(id: number, compileContext: symbol);
   constructor(signature: string, callback: CustomFunction<'sync'>);
   constructor(
     idOrSignature: number | string,
-    callback?: CustomFunction<'sync'>,
+    callbackOrCompileContext: CustomFunction<'sync'> | symbol,
   ) {
     super();
 
-    if (typeof idOrSignature === 'number') {
+    if (
+      typeof idOrSignature === 'number' &&
+      typeof callbackOrCompileContext === 'symbol'
+    ) {
       this.id = idOrSignature;
+      this.compileContext = callbackOrCompileContext;
     } else {
-      this.signature = idOrSignature;
-      this.callback = callback!;
+      this.signature = idOrSignature as string;
+      this.callback = callbackOrCompileContext as CustomFunction<'sync'>;
     }
   }
 
   equals(other: Value): boolean {
     return this.id === undefined
       ? other === this
-      : other instanceof SassFunction && other.id === this.id;
+      : other instanceof SassFunction &&
+          other.compileContext === this.compileContext &&
+          other.id === this.id;
   }
 
   hashCode(): number {

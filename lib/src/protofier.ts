@@ -44,7 +44,7 @@ export class Protofier {
   get accessedArgumentLists(): number[] {
     return this.argumentLists
       .filter(list => list.keywordsAccessed)
-      .map(list => list.id);
+      .map(list => list.id as number);
   }
 
   constructor(
@@ -85,15 +85,23 @@ export class Protofier {
       });
       result.value = {case: 'list', value: list};
     } else if (value instanceof SassArgumentList) {
-      const list = create(proto.Value_ArgumentListSchema, {
-        id: value.id,
-        separator: this.protofySeparator(value.separator),
-        contents: value.asList.map(element => this.protofy(element)).toArray(),
-      });
-      for (const [key, mapValue] of value.keywordsInternal) {
-        list.keywords[key] = this.protofy(mapValue);
+      if (value.compileContext === this.functions.compileContext) {
+        const list = create(proto.Value_ArgumentListSchema, {
+          id: value.id,
+        });
+        result.value = {case: 'argumentList', value: list};
+      } else {
+        const list = create(proto.Value_ArgumentListSchema, {
+          separator: this.protofySeparator(value.separator),
+          contents: value.asList
+            .map(element => this.protofy(element))
+            .toArray(),
+        });
+        for (const [key, mapValue] of value.keywordsInternal) {
+          list.keywords[key] = this.protofy(mapValue);
+        }
+        result.value = {case: 'argumentList', value: list};
       }
-      result.value = {case: 'argumentList', value: list};
     } else if (value instanceof SassMap) {
       const map = create(proto.Value_MapSchema, {
         entries: value.contents.toArray().map(([key, value]) => ({
@@ -104,6 +112,11 @@ export class Protofier {
       result.value = {case: 'map', value: map};
     } else if (value instanceof SassFunction) {
       if (value.id !== undefined) {
+        if (value.compileContext !== this.functions.compileContext) {
+          throw utils.compilerError(
+            `Value ${value} does not belong to this compilation`,
+          );
+        }
         const fn = create(proto.Value_CompilerFunctionSchema, value);
         result.value = {case: 'compilerFunction', value: fn};
       } else {
@@ -114,6 +127,11 @@ export class Protofier {
         result.value = {case: 'hostFunction', value: fn};
       }
     } else if (value instanceof SassMixin) {
+      if (value.compileContext !== this.functions.compileContext) {
+        throw utils.compilerError(
+          `Value ${value} does not belong to this compilation`,
+        );
+      }
       const mixin = create(proto.Value_CompilerMixinSchema, value);
       result.value = {case: 'compilerMixin', value: mixin};
     } else if (value instanceof SassCalculation) {
@@ -349,6 +367,7 @@ export class Protofier {
           ),
           separator,
           list.id,
+          this.functions.compileContext,
         );
         this.argumentLists.push(result);
         return result;
@@ -369,7 +388,10 @@ export class Protofier {
         );
 
       case 'compilerFunction':
-        return new SassFunction(value.value.value.id);
+        return new SassFunction(
+          value.value.value.id,
+          this.functions.compileContext,
+        );
 
       case 'hostFunction':
         throw utils.compilerError(
@@ -377,7 +399,10 @@ export class Protofier {
         );
 
       case 'compilerMixin':
-        return new SassMixin(value.value.value.id);
+        return new SassMixin(
+          value.value.value.id,
+          this.functions.compileContext,
+        );
 
       case 'calculation':
         return this.deprotofyCalculation(value.value.value);

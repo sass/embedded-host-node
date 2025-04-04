@@ -1,6 +1,6 @@
 {
   "name": "sass-embedded-darwin-x64",
-  "version": "1.86.2",
+  "version": "1.86.3",
   "description": "The darwin-x64 binary for sass-embedded",
   "repository": "sass/embedded-host-node",
   "author": "Google Inc.",

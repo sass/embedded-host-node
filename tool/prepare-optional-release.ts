@@ -13,7 +13,7 @@ export type DartPlatform =
   | 'linux-musl'
   | 'macos'
   | 'windows';
-export type DartArch = 'ia32' | 'x64' | 'arm' | 'arm64' | 'riscv64';
+export type DartArch = 'x64' | 'arm' | 'arm64' | 'riscv64';
 
 const argv = yargs(process.argv.slice(2))
   .option('package', {
@@ -51,10 +51,6 @@ export function nodePlatformToDartPlatform(platform: string): DartPlatform {
 // Sass Embedded.
 export function nodeArchToDartArch(arch: string): DartArch {
   switch (arch) {
-    case 'ia32':
-      return 'ia32';
-    case 'x86':
-      return 'ia32';
     case 'x64':
       return 'x64';
     case 'arm':

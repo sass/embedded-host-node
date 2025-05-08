@@ -44,7 +44,7 @@ export class Protofier {
   get accessedArgumentLists(): number[] {
     return this.argumentLists
       .filter(list => list.keywordsAccessed)
-      .map(list => list.id as number);
+      .map(list => list.id!);
   }
 
   constructor(
@@ -86,9 +86,7 @@ export class Protofier {
       result.value = {case: 'list', value: list};
     } else if (value instanceof SassArgumentList) {
       if (value.compileContext === this.functions.compileContext) {
-        const list = create(proto.Value_ArgumentListSchema, {
-          id: value.id,
-        });
+        const list = create(proto.Value_ArgumentListSchema, {id: value.id});
         result.value = {case: 'argumentList', value: list};
       } else {
         const list = create(proto.Value_ArgumentListSchema, {

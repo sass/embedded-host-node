@@ -13,7 +13,7 @@ export class SassArgumentList extends SassList {
    * compiler which argument lists have had their keywords accessed during a
    * function call.
    *
-   * The special ID 0 indicates an argument list constructed in the host.
+   * The special undefined indicates an argument list constructed in the host.
    *
    * This is marked as public so that the protofier can access it, but it's not
    * part of the package's public API and should not be accessed by user code.

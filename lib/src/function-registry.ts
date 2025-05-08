@@ -18,6 +18,10 @@ import {Value} from './value';
  * execute them.
  */
 export class FunctionRegistry<sync extends 'sync' | 'async'> {
+  /**
+   * The globally unique identifier of the current compilation used for tracking
+   * the ownership of CompilerFunction and CompilerMixin objects.
+   */
   public readonly compileContext = Symbol();
   private readonly functionsByName = new Map<string, CustomFunction<sync>>();
   private readonly functionsById = new Map<number, CustomFunction<sync>>();

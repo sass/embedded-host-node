@@ -13,13 +13,24 @@ export class SassArgumentList extends SassList {
    * compiler which argument lists have had their keywords accessed during a
    * function call.
    *
-   * The special ID 0 indicates an argument list constructed in the host.
+   * The special undefined indicates an argument list constructed in the host.
    *
    * This is marked as public so that the protofier can access it, but it's not
    * part of the package's public API and should not be accessed by user code.
    * It may be renamed or removed without warning in the future.
    */
-  readonly id: number;
+  readonly id: number | undefined;
+
+  /**
+   * If this argument list is constructed in the compiler, this is the unique
+   * context that the host uses to determine which compilation this argument
+   * list belongs to.
+   *
+   * This is marked as public so that the protofier can access it, but it's not
+   * part of the package's public API and should not be accessed by user code.
+   * It may be renamed or removed without warning in the future.
+   */
+  readonly compileContext: symbol | undefined;
 
   /**
    * The argument list's keywords. This isn't exposed directly so that we can
@@ -54,11 +65,13 @@ export class SassArgumentList extends SassList {
     keywords: Record<string, Value> | OrderedMap<string, Value>,
     separator?: ListSeparator,
     id?: number,
+    compileContext?: symbol,
   ) {
     super(contents, {separator});
     this.keywordsInternal = isOrderedMap(keywords)
       ? keywords
       : OrderedMap(keywords);
-    this.id = id ?? 0;
+    this.id = id;
+    this.compileContext = compileContext;
   }
 }

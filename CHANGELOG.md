@@ -1,3 +1,18 @@
+## 1.88.0
+
+* Allow custom properties with empty values (such as `--var:;`).
+
+* Fix a bug when calculating source spans for interpolations.
+
+### Dart and JS APIs
+
+* **Potentially breaking bug fix:** Throw an error when passing a function or
+  mixin object from one compilation to another.
+
+### Dart API
+
+* Deprecate passing a relative URL to `compileString()` and related functions.
+
 ## 1.87.0
 
 * **Potentially breaking bug fix:** When a plain CSS file with a top-level

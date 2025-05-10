@@ -1,6 +1,6 @@
 {
   "name": "sass-embedded-win32-ia32",
-  "version": "1.87.0",
+  "version": "1.88.0",
   "description": "The win32-ia32 binary for sass-embedded",
   "repository": "sass/embedded-host-node",
   "author": "Google Inc.",

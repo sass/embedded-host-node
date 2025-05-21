@@ -2,9 +2,11 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
+import {promises as fs} from 'fs';
 import * as p from 'path';
 import * as shell from 'shelljs';
 
+import {compilerModule} from '../lib/src/compiler-module';
 import * as utils from './utils';
 
 /**
@@ -14,7 +16,7 @@ import * as utils from './utils';
  * at `path`. By default, checks out the latest revision from GitHub.
  */
 export async function getEmbeddedCompiler(
-  outPath: string,
+  js?: boolean,
   options?: {ref: string} | {path: string},
 ): Promise<void> {
   const repo = 'dart-sass';
@@ -41,21 +43,43 @@ export async function getEmbeddedCompiler(
     await utils.link(languageInHost, languageInCompiler);
   }
 
-  buildDartSassEmbedded(source);
-  await utils.link(p.join(source, 'build'), p.join(outPath, repo));
+  buildDartSassEmbedded(source, js ?? false);
+
+  const jsModulePath = p.resolve('node_modules/sass');
+  const dartModulePath = p.resolve(p.join('node_modules', compilerModule));
+  if (js) {
+    await fs.rm(dartModulePath, {force: true, recursive: true});
+    await utils.link(p.join(source, 'build/npm'), jsModulePath);
+  } else {
+    await fs.rm(jsModulePath, {force: true, recursive: true});
+    await utils.link(p.join(source, 'build'), p.join(dartModulePath, repo));
+  }
 }
 
 // Builds the Embedded Dart Sass executable from the source at `repoPath`.
-function buildDartSassEmbedded(repoPath: string): void {
+function buildDartSassEmbedded(repoPath: string, js: boolean): void {
   console.log("Downloading Dart Sass's dependencies.");
   shell.exec('dart pub upgrade', {
     cwd: repoPath,
     silent: true,
   });
 
-  console.log('Building the Dart Sass executable.');
-  shell.exec('dart run grinder protobuf pkg-standalone-dev', {
-    cwd: repoPath,
-    env: {...process.env, UPDATE_SASS_PROTOCOL: 'false'},
-  });
+  if (js) {
+    shell.exec('npm install', {
+      cwd: repoPath,
+      silent: true,
+    });
+
+    console.log('Building the Dart Sass npm package.');
+    shell.exec('dart run grinder protobuf pkg-npm-dev', {
+      cwd: repoPath,
+      env: {...process.env, UPDATE_SASS_PROTOCOL: 'false'},
+    });
+  } else {
+    console.log('Building the Dart Sass executable.');
+    shell.exec('dart run grinder protobuf pkg-standalone-dev', {
+      cwd: repoPath,
+      env: {...process.env, UPDATE_SASS_PROTOCOL: 'false'},
+    });
+  }
 }

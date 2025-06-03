@@ -7,8 +7,9 @@ import yargs from 'yargs';
 import {getDeprecations} from './get-deprecations';
 import {getEmbeddedCompiler} from './get-embedded-compiler';
 import {getLanguageRepo} from './get-language-repo';
+import {hideBin} from 'yargs/helpers';
 
-const argv = yargs(process.argv.slice(2))
+const argv = yargs(hideBin(process.argv))
   .option('compiler-path', {
     type: 'string',
     description:

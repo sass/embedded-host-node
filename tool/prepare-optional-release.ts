@@ -3,6 +3,7 @@ import {promises as fs} from 'fs';
 import * as p from 'path';
 import {extract as extractTar} from 'tar';
 import yargs from 'yargs';
+import {hideBin} from 'yargs/helpers';
 
 import * as pkg from '../package.json';
 import * as utils from './utils';
@@ -15,7 +16,7 @@ export type DartPlatform =
   | 'windows';
 export type DartArch = 'x64' | 'arm' | 'arm64' | 'riscv64';
 
-const argv = yargs(process.argv.slice(2))
+const argv = yargs(hideBin(process.argv))
   .option('package', {
     type: 'string',
     description:

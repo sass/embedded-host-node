@@ -2,7 +2,7 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-import yargs from 'yargs';
+import * as yargs from 'yargs';
 
 import {getDeprecations} from './get-deprecations';
 import {getEmbeddedCompiler} from './get-embedded-compiler';

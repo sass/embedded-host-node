@@ -2,7 +2,7 @@ import extractZip = require('extract-zip');
 import {promises as fs} from 'fs';
 import * as p from 'path';
 import {extract as extractTar} from 'tar';
-import yargs from 'yargs';
+import * as yargs from 'yargs';
 import {hideBin} from 'yargs/helpers';
 
 import * as pkg from '../package.json';

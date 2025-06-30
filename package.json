@@ -70,7 +70,7 @@
     "@bufbuild/protoc-gen-es": "^2.5.0",
     "@types/buffer-builder": "^0.2.0",
     "@types/google-protobuf": "^3.7.2",
-    "@types/jest": "^29.4.0",
+    "@types/jest": "^30.0.0",
     "@types/node": "^24.0.3",
     "@types/shelljs": "^0.8.8",
     "@types/supports-color": "^8.1.1",

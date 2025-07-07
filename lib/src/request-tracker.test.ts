@@ -36,14 +36,14 @@ describe('request tracker', () => {
     });
 
     it('errors if the request ID is invalid', () => {
-      expect(() => tracker.add(-1, 'compileResponse')).toThrowError(
+      expect(() => tracker.add(-1, 'compileResponse')).toThrow(
         'Invalid request ID -1.',
       );
     });
 
     it('errors if the request ID overlaps that of an existing in-flight request', () => {
       tracker.add(0, 'compileResponse');
-      expect(() => tracker.add(0, 'compileResponse')).toThrowError(
+      expect(() => tracker.add(0, 'compileResponse')).toThrow(
         'Request ID 0 is already in use by an in-flight request.',
       );
     });
@@ -74,14 +74,14 @@ describe('request tracker', () => {
     });
 
     it('errors if the response ID does not match any existing request IDs', () => {
-      expect(() => tracker.resolve(0, 'compileResponse')).toThrowError(
+      expect(() => tracker.resolve(0, 'compileResponse')).toThrow(
         'Response ID 0 does not match any pending requests.',
       );
     });
 
     it('errors if the response type does not match what the request is expecting', () => {
       tracker.add(0, 'importResponse');
-      expect(() => tracker.resolve(0, 'fileImportResponse')).toThrowError(
+      expect(() => tracker.resolve(0, 'fileImportResponse')).toThrow(
         "Response with ID 0 does not match pending request's type. Expected " +
           'importResponse but received fileImportResponse.',
       );

@@ -59,15 +59,19 @@ void (async () => {
 
     if (!argv['skip-compiler']) {
       if (argv['compiler-ref']) {
-        await getEmbeddedCompiler(argv['compiler-js'], {
+        await getEmbeddedCompiler({
           ref: argv['compiler-ref'],
+          js: argv['compiler-js'],
         });
       } else if (argv['compiler-path']) {
-        await getEmbeddedCompiler(argv['compiler-js'], {
+        await getEmbeddedCompiler({
           path: argv['compiler-path'],
+          js: argv['compiler-js'],
         });
       } else {
-        await getEmbeddedCompiler(argv['compiler-js']);
+        await getEmbeddedCompiler({
+          js: argv['compiler-js'],
+        });
       }
     }
 

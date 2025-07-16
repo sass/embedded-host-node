@@ -14,23 +14,33 @@ import * as utils from './utils';
  *
  * Can check out and build the source from a Git `ref` or build from the source
  * at `path`. By default, checks out the latest revision from GitHub.
+ *
+ * The embedded compiler will be built as dart snapshot by default, or pure node
+ * js if the `js` option is `true`.
  */
 export async function getEmbeddedCompiler(
-  js?: boolean,
-  options?: {ref: string} | {path: string},
+  options?:
+    | {
+        ref?: string;
+        js?: boolean;
+      }
+    | {
+        path: string;
+        js?: boolean;
+      },
 ): Promise<void> {
   const repo = 'dart-sass';
 
   let source: string;
-  if (!options || 'ref' in options) {
+  if (options !== undefined && 'path' in options) {
+    source = options.path;
+  } else {
     utils.fetchRepo({
       repo,
       outPath: 'build',
       ref: options?.ref ?? 'main',
     });
     source = p.join('build', repo);
-  } else {
-    source = options.path;
   }
 
   // Make sure the compiler sees the same version of the language repo that the
@@ -43,7 +53,8 @@ export async function getEmbeddedCompiler(
     await utils.link(languageInHost, languageInCompiler);
   }
 
-  buildDartSassEmbedded(source, js ?? false);
+  const js = options?.js ?? false;
+  buildDartSassEmbedded(source, js);
 
   const jsModulePath = p.resolve('node_modules/sass');
   const dartModulePath = p.resolve(p.join('node_modules', compilerModule));

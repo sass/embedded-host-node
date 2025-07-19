@@ -131,7 +131,7 @@ void (async () => {
       );
     }
 
-    const sassDependencyVersion = optPkg?.dependencies?.sass;
+    const sassDependencyVersion = optPkg.dependencies?.sass;
     if (sassDependencyVersion !== undefined) {
       if (sassDependencyVersion !== pkg.version) {
         throw Error(

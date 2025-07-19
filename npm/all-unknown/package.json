@@ -1,7 +1,7 @@
 {
   "name": "sass-embedded-all-unknown",
   "version": "1.89.2",
-  "description": "The all-unknown binary for sass-embedded",
+  "description": "The pure js optional dependency for sass-embedded",
   "repository": "sass/embedded-host-node",
   "author": "Google Inc.",
   "license": "MIT",

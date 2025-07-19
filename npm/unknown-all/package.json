@@ -1,0 +1,17 @@
+{
+  "name": "sass-embedded-unknown-all",
+  "version": "1.89.2",
+  "description": "The unknown-all binary for sass-embedded",
+  "repository": "sass/embedded-host-node",
+  "author": "Google Inc.",
+  "license": "MIT",
+  "os": [
+    "!android",
+    "!darwin",
+    "!linux",
+    "!win32"
+  ],
+  "dependencies": {
+    "sass": "1.89.2"
+  }
+}

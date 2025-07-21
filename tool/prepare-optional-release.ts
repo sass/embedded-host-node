@@ -119,6 +119,29 @@ void (async () => {
       );
     }
 
+    const optPkg = JSON.parse(
+      (
+        await fs.readFile(p.join('npm', argv.package, 'package.json'))
+      ).toString(),
+    ) as {['version']: string; ['dependencies']?: {['sass']?: string}};
+
+    if (optPkg.version !== pkg.version) {
+      throw Error(
+        "Optional package's version does not match main package's version",
+      );
+    }
+
+    const sassDependencyVersion = optPkg.dependencies?.sass;
+    if (sassDependencyVersion !== undefined) {
+      if (sassDependencyVersion !== pkg.version) {
+        throw Error(
+          "Optional package's sass dependency version does not match main package's version",
+        );
+      }
+
+      return;
+    }
+
     const index = argv.package.lastIndexOf('-');
     const nodePlatform = argv.package.substring(0, index);
     const nodeArch = argv.package.substring(index + 1);

@@ -119,9 +119,19 @@ jobs:
       - name: Compile
         run: npm run compile
 
+      # The new --experimental-strip-types option conflicts with `ts-node`. Disable it if it's supported.
+      # See: https://github.com/TypeStrong/ts-node/issues/2152
+      # TODO: switch to native typescript support once node<22 are dropped
+      - name: Check NODE_OPTIONS
+        id: node-options
+        run: |
+          echo "NODE_OPTIONS=$(node --no-experimental-strip-types -e 'console.log("--no-experimental-strip-types")')" | tee -a "$GITHUB_OUTPUT"
+
       - name: Run tests
         run: npm run js-api-spec -- --sassPackage .. --sassSassRepo ../language
         working-directory: sass-spec
+        env:
+          NODE_OPTIONS: ${{ steps.node-options.outputs.NODE_OPTIONS }}
 
   deploy_npm:
     name: Deploy npm

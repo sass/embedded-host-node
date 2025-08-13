@@ -37,7 +37,7 @@ export const compilerCommand = (() => {
   try {
     return [
       process.execPath,
-      p.join(p.dirname(require.resolve('sass')), 'sass.js'),
+      p.join(p.dirname(require.resolve('sass')), 'sass.js'), // eslint-disable-line n/no-extraneous-require
     ];
   } catch (e) {
     if (e.code !== 'MODULE_NOT_FOUND') {

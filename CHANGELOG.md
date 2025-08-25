@@ -1,3 +1,18 @@
+## 1.91.0
+
+* **Potentially breaking change:** `meta.inspect()` (as well as other systems
+  that use it such as `@debug` and certain error messages) now emits numbers
+  with as high precision as is available instead of rounding to the nearest
+  1e⁻¹⁰ as we do when serializing to CSS. This better fits the purpose of
+  `meta.inspect()`, which is to provide full information about the structure of
+  a Sass value.
+
+* Passing a rest argument (`$arg...`) before a positional or named argument when
+  calling a function or mixin is now deprecated. This was always outside the
+  specified syntax, but it was historically treated the same as passing the rest
+  argument at the end of the argument list whether or not that matched the
+  visual order of the arguments.
+
 ## 1.90.0
 
 * Allow a `@forward`ed module to be loaded with a configuration when that module

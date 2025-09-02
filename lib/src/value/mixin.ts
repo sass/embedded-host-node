@@ -18,13 +18,28 @@ export class SassMixin extends Value {
    */
   readonly id: number;
 
-  constructor(id: number) {
+  /**
+   * This is the unique context that the host uses to determine which
+   * compilation this mixin belongs to.
+   *
+   * This is marked as public so that the protofier can access it, but it's not
+   * part of the package's public API and should not be accessed by user code.
+   * It may be renamed or removed without warning in the future.
+   */
+  readonly compileContext: symbol;
+
+  constructor(id: number, compileContext: symbol) {
     super();
     this.id = id;
+    this.compileContext = compileContext;
   }
 
   equals(other: Value): boolean {
-    return other instanceof SassMixin && other.id === this.id;
+    return (
+      other instanceof SassMixin &&
+      other.compileContext === this.compileContext &&
+      other.id === this.id
+    );
   }
 
   hashCode(): number {

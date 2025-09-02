@@ -18,6 +18,10 @@ const argv = yargs(process.argv.slice(2))
     type: 'string',
     description: 'Build the Embedded Dart Sass binary from this Git ref.',
   })
+  .option('compiler-js', {
+    type: 'boolean',
+    description: 'Build the Embedded Dart Sass with dart2js.',
+  })
   .option('skip-compiler', {
     type: 'boolean',
     description: "Don't Embedded Dart Sass at all.",
@@ -55,15 +59,19 @@ void (async () => {
 
     if (!argv['skip-compiler']) {
       if (argv['compiler-ref']) {
-        await getEmbeddedCompiler(outPath, {
+        await getEmbeddedCompiler({
           ref: argv['compiler-ref'],
+          js: argv['compiler-js'],
         });
       } else if (argv['compiler-path']) {
-        await getEmbeddedCompiler(outPath, {
+        await getEmbeddedCompiler({
           path: argv['compiler-path'],
+          js: argv['compiler-js'],
         });
       } else {
-        await getEmbeddedCompiler(outPath);
+        await getEmbeddedCompiler({
+          js: argv['compiler-js'],
+        });
       }
     }
 

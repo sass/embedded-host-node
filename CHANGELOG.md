@@ -1,3 +1,27 @@
+## 1.92.0
+
+* **Breaking change:** Emit declarations, childless at-rules, and comments in
+  the order they appear in the source even when they're interleaved with nested
+  rules. This obsoletes the `mixed-decls` deprecation.
+
+* **Breaking change:** The function name `type()` is now fully reserved for the
+  plain CSS function. This means that `@function` definitions with the name
+  `type` will produce errors, while function calls will be parsed as special
+  function strings.
+
+* Configuring private variables using `@use ... with`, `@forward ... with`, and
+  `meta.load-css(..., $with: ...)` is now deprecated. Private variables were
+  always intended to be fully encapsulated within the module that defines them,
+  and this helps enforce that encapsulation.
+
+* Fix a bug where `@extend` rules loaded through a mixture of `@import` and
+  `@use` rules could fail to apply correctly.
+
+### Command-Line Interface
+
+* In `--watch` mode, delete the source map when the associated source file is
+  deleted.
+
 ## 1.91.0
 
 * **Potentially breaking change:** `meta.inspect()` (as well as other systems

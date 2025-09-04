@@ -13,7 +13,7 @@ export type DartPlatform =
   | 'linux-musl'
   | 'macos'
   | 'windows';
-export type DartArch = 'ia32' | 'x64' | 'arm' | 'arm64' | 'riscv64';
+export type DartArch = 'x64' | 'arm' | 'arm64' | 'riscv64';
 
 const argv = yargs(process.argv.slice(2))
   .option('package', {
@@ -51,10 +51,6 @@ export function nodePlatformToDartPlatform(platform: string): DartPlatform {
 // Sass Embedded.
 export function nodeArchToDartArch(arch: string): DartArch {
   switch (arch) {
-    case 'ia32':
-      return 'ia32';
-    case 'x86':
-      return 'ia32';
     case 'x64':
       return 'x64';
     case 'arm':
@@ -121,6 +117,29 @@ void (async () => {
       throw Error(
         "Can't release optional packages for a -dev compiler version.",
       );
+    }
+
+    const optPkg = JSON.parse(
+      (
+        await fs.readFile(p.join('npm', argv.package, 'package.json'))
+      ).toString(),
+    ) as {['version']: string; ['dependencies']?: {['sass']?: string}};
+
+    if (optPkg.version !== pkg.version) {
+      throw Error(
+        "Optional package's version does not match main package's version",
+      );
+    }
+
+    const sassDependencyVersion = optPkg.dependencies?.sass;
+    if (sassDependencyVersion !== undefined) {
+      if (sassDependencyVersion !== pkg.version) {
+        throw Error(
+          "Optional package's sass dependency version does not match main package's version",
+        );
+      }
+
+      return;
     }
 
     const index = argv.package.lastIndexOf('-');

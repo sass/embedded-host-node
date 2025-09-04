@@ -2,78 +2,55 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-import * as fs from 'fs';
 import * as p from 'path';
-import {getElfInterpreter} from './elf';
-import {isErrnoException} from './utils';
-
-/**
- * Detect if the given binary is linked with musl libc by checking if
- * the interpreter basename starts with "ld-musl-"
- */
-function isLinuxMusl(path: string): boolean {
-  try {
-    const interpreter = getElfInterpreter(path);
-    return p.basename(interpreter).startsWith('ld-musl-');
-  } catch (error) {
-    console.warn(
-      `Warning: Failed to detect linux-musl, fallback to linux-gnu: ${error.message}`,
-    );
-    return false;
-  }
-}
+import {compilerModule} from './compiler-module';
 
 /** The full command for the embedded compiler executable. */
 export const compilerCommand = (() => {
-  const platform =
-    process.platform === 'linux' && isLinuxMusl(process.execPath)
-      ? 'linux-musl'
-      : (process.platform as string);
-
-  const arch = process.arch;
-
-  // find for development
-  for (const path of ['vendor', '../../../lib/src/vendor']) {
-    const executable = p.resolve(
-      __dirname,
-      path,
-      `dart-sass/sass${platform === 'win32' ? '.bat' : ''}`,
-    );
-
-    if (fs.existsSync(executable)) return [executable];
+  try {
+    return [
+      require.resolve(
+        `${compilerModule}/dart-sass/src/dart` +
+          (process.platform === 'win32' ? '.exe' : ''),
+      ),
+      require.resolve(`${compilerModule}/dart-sass/src/sass.snapshot`),
+    ];
+  } catch (e) {
+    if (e.code !== 'MODULE_NOT_FOUND') {
+      throw e;
+    }
   }
 
   try {
     return [
       require.resolve(
-        `sass-embedded-${platform}-${arch}/dart-sass/src/dart` +
-          (platform === 'win32' ? '.exe' : ''),
-      ),
-      require.resolve(
-        `sass-embedded-${platform}-${arch}/dart-sass/src/sass.snapshot`,
+        `${compilerModule}/dart-sass/sass` +
+          (process.platform === 'win32' ? '.bat' : ''),
       ),
     ];
-  } catch (ignored) {
-    // ignored
+  } catch (e) {
+    if (e.code !== 'MODULE_NOT_FOUND') {
+      throw e;
+    }
   }
 
   try {
     return [
-      require.resolve(
-        `sass-embedded-${platform}-${arch}/dart-sass/sass` +
-          (platform === 'win32' ? '.bat' : ''),
-      ),
+      process.execPath,
+      // This is a fallback which is required indirectly through
+      // sass-embedded-all-unknown.
+      // eslint-disable-next-line n/no-extraneous-require
+      p.join(p.dirname(require.resolve('sass')), 'sass.js'),
     ];
-  } catch (e: unknown) {
-    if (!(isErrnoException(e) && e.code === 'MODULE_NOT_FOUND')) {
+  } catch (e) {
+    if (e.code !== 'MODULE_NOT_FOUND') {
       throw e;
     }
   }
 
   throw new Error(
     "Embedded Dart Sass couldn't find the embedded compiler executable. " +
-      'Please make sure the optional dependency ' +
-      `sass-embedded-${platform}-${arch} is installed in ` +
-      'node_modules.',
+      `Please make sure the optional dependency ${compilerModule} or sass is ` +
+      'installed in node_modules.',
   );
 })();

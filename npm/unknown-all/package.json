@@ -1,6 +1,6 @@
 {
   "name": "sass-embedded-unknown-all",
-  "version": "1.92.0",
+  "version": "1.92.1",
   "description": "The pure js optional dependency for sass-embedded",
   "repository": "sass/embedded-host-node",
   "author": "Google Inc.",
@@ -12,6 +12,6 @@
     "!win32"
   ],
   "dependencies": {
-    "sass": "1.92.0"
+    "sass": "1.92.1"
   }
 }

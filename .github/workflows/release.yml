@@ -1,0 +1,33 @@
+name: Release
+
+on:
+  workflow_call:
+
+jobs:
+  deploy_npm:
+    name: Deploy npm
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 'lts/*'
+          check-latest: true
+          registry-url: 'https://registry.npmjs.org'
+
+      # npm trusted publisher infrastructure requires npm >=11.5.1
+      - run: npm install -g npm@latest
+
+      - run: npm install
+
+      - name: "Check we're not using a -dev version of the embedded protocol"
+        run: jq -r '.["protocol-version"]' package.json | grep -qv -- '-dev$'
+      - name: "Check we're not using a -dev version of the embedded compiler"
+        run: jq -r '.["compiler-version"]' package.json | grep -qv -- '-dev$'
+
+      - name: Publish optional dependencies
+        run: |
+          find ./npm -mindepth 1 -maxdepth 1 -print0 | xargs -0 -n 1 -- sh -xc 'npx ts-node ./tool/prepare-optional-release.ts --package=$(basename $1) && npm publish $1' --
+
+      - run: npm publish

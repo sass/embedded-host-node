@@ -16,6 +16,7 @@ import {
   handleLogEvent,
   newCompilePathRequest,
   newCompileStringRequest,
+  promiseWithResolvers,
 } from './utils';
 import {compilerCommand} from '../compiler-path';
 import {activeDeprecationOptions} from '../deprecations';
@@ -128,22 +129,28 @@ export class AsyncCompiler {
       );
       dispatcher.logEvents$.subscribe(event => handleLogEvent(options, event));
 
-      const compilation = new Promise<proto.OutboundMessage_CompileResponse>(
-        (resolve, reject) =>
-          dispatcher.sendCompileRequest(request, (err, response) => {
-            this.compilations.delete(compilation);
-            // Reset the compilation ID when the compiler goes idle (no active
-            // compilations) to avoid overflowing it.
-            // https://github.com/sass/embedded-host-node/pull/261#discussion_r1429266794
-            if (this.compilations.size === 0) this.compilationId = 1;
-            if (err) {
-              reject(err);
-            } else {
-              resolve(response!);
-            }
-          }),
-      );
+      // Avoid `new Promise()` here because `dispatcher.sendCompilerequest` can
+      // run its callback synchronously, so `compilation` needs to be assigned
+      // and in `this.compilations` before we call it.
+      const {
+        promise: compilation,
+        resolve,
+        reject,
+      } = promiseWithResolvers<proto.OutboundMessage_CompileResponse>();
       this.compilations.add(compilation);
+
+      dispatcher.sendCompileRequest(request, (err, response) => {
+        this.compilations.delete(compilation);
+        // Reset the compilation ID when the compiler goes idle (no active
+        // compilations) to avoid overflowing it.
+        // https://github.com/sass/embedded-host-node/pull/261#discussion_r1429266794
+        if (this.compilations.size === 0) this.compilationId = 1;
+        if (err) {
+          reject(err);
+        } else {
+          resolve(response!);
+        }
+      });
 
       return handleCompileResponse(await compilation);
     } finally {

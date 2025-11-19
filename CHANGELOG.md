@@ -1,3 +1,25 @@
+## 1.94.2
+
+### Command-Line Interface
+
+* Using `--fatal-deprecation <version>` no longer emits warnings about
+  deprecations that are obsolete.
+
+### Dart API
+
+* `Deprecation.forVersion` now excludes obsolete deprecations from the set it
+  returns.
+
+### JS API
+
+* Excludes obsolete deprecations from `fatalDeprecations` when a `Version` is
+  passed.
+
+### Node.js Embedded Host
+
+* Fix a bug where a variable could be used before it was initialized during
+  async compilation.
+
 ## 1.94.1
 
 * No user-visible changes.

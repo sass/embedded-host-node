@@ -28,6 +28,6 @@ jobs:
 
       - name: Publish optional dependencies
         run: |
-          find ./npm -mindepth 1 -maxdepth 1 -print0 | xargs -0 -n 1 -- sh -xc 'npx ts-node ./tool/prepare-optional-release.ts --package=$(basename $1) && npm publish $1' --
+          find ./npm -mindepth 1 -maxdepth 1 -print0 | xargs -0 -n 1 -- sh -xc 'npx ts-node ./tool/prepare-optional-release.ts --package=$(basename $1) && npm publish --provenance $1' --
 
-      - run: npm publish
+      - run: npm publish --provenance

@@ -124,10 +124,8 @@ jobs:
         working-directory: sass-spec
 
   deploy_npm:
-    name: Deploy npm
-    runs-on: ubuntu-latest
-    if: "github.ref_type == 'tag' && github.event.repository.fork == false"
     needs: [static_analysis, tests, sass_spec]
+    if: "github.ref_type == 'tag' && github.event.repository.fork == false"
     permissions:
       attestations: write
       contents: write

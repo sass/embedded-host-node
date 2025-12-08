@@ -1,6 +1,6 @@
 {
   "name": "sass-embedded-android-riscv64",
-  "version": "1.94.2",
+  "version": "1.94.3",
   "description": "The android-riscv64 binary for sass-embedded",
   "repository": "sass/embedded-host-node",
   "author": "Google Inc.",

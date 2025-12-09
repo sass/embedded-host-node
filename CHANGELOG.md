@@ -1,3 +1,7 @@
+## 1.95.1
+
+* No user-visible changes.
+
 ## 1.95.0
 
 * Add support for the [CSS-style `if()` function]. In addition to supporting the
@@ -14,7 +18,7 @@
   to the new CSS syntax. `if($condition, $if-true, $if-false)` can be changed to
   `if(sass($condition): $if-true; else: $if-false)`.
 
-  See [the Sass website](https://sass-lang.com/d/css-if) for details.
+  See [the Sass website](https://sass-lang.com/d/if-function) for details.
 
 * Plain-CSS `if()` functions are now considered "special numbers", meaning that
   they can be used in place of arguments to CSS color functions.

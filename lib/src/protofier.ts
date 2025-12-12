@@ -262,6 +262,7 @@ export class Protofier {
           case 'srgb':
           case 'srgb-linear':
           case 'display-p3':
+          case 'display-p3-linear':
           case 'a98-rgb':
           case 'prophoto-rgb':
           case 'rec2020':

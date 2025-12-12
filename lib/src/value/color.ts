@@ -45,6 +45,7 @@ type ChannelNameLch = 'lightness' | 'chroma' | 'hue' | 'alpha';
 type ColorSpaceRgb =
   | 'a98-rgb'
   | 'display-p3'
+  | 'display-p3-linear'
   | 'prophoto-rgb'
   | 'rec2020'
   | 'rgb'
@@ -154,6 +155,8 @@ function encodeSpaceForColorJs(space?: KnownColorSpace): string | undefined {
       return 'a98rgb';
     case 'display-p3':
       return 'p3';
+    case 'display-p3-linear':
+      return 'p3-linear';
     case 'prophoto-rgb':
       return 'prophoto';
   }
@@ -182,6 +185,8 @@ function decodeSpaceFromColorJs(space: string, isRgb = false): KnownColorSpace {
       return 'a98-rgb';
     case 'p3':
       return 'display-p3';
+    case 'p3-linear':
+      return 'display-p3-linear';
     case 'prophoto':
       return 'prophoto-rgb';
   }
@@ -216,6 +221,7 @@ function validateChannelInSpace(
     case 'srgb':
     case 'srgb-linear':
     case 'display-p3':
+    case 'display-p3-linear':
     case 'a98-rgb':
     case 'prophoto-rgb':
     case 'rec2020':
@@ -382,6 +388,7 @@ export class SassColor extends Value {
       case 'srgb':
       case 'srgb-linear':
       case 'display-p3':
+      case 'display-p3-linear':
       case 'a98-rgb':
       case 'prophoto-rgb':
       case 'rec2020':
@@ -482,6 +489,7 @@ export class SassColor extends Value {
 
       case 'srgb-linear':
       case 'display-p3':
+      case 'display-p3-linear':
       case 'a98-rgb':
       case 'prophoto-rgb':
       case 'rec2020':
@@ -1029,6 +1037,7 @@ export class SassColor extends Value {
 
       case 'a98-rgb':
       case 'display-p3':
+      case 'display-p3-linear':
       case 'prophoto-rgb':
       case 'rec2020':
       case 'srgb':

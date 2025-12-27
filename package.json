@@ -1,7 +1,7 @@
 {
   "name": "sass-embedded",
   "version": "1.97.3",
-  "protocol-version": "3.2.0",
+  "protocol-version": "3.3.0",
   "compiler-version": "1.97.3",
   "description": "Node.js library that communicates with Embedded Dart Sass using the Embedded Sass protocol",
   "repository": "sass/embedded-host-node",

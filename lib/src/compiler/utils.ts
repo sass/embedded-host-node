@@ -71,7 +71,9 @@ function newCompileRequest(
     importers: importers.importers,
     globalFunctions: Object.keys(options?.functions ?? {}),
     sourceMap: !!options?.sourceMap,
-    sourceMapIncludeSources: !!options?.sourceMapIncludeSources,
+    sourceMapIncludeSources: utils.protofySourceMapIncludeSources(
+      options?.sourceMapIncludeSources ?? 'auto',
+    ),
     alertColor: options?.alertColor ?? !!supportsColor.stdout,
     alertAscii: !!options?.alertAscii,
     quietDeps: !!options?.quietDeps,

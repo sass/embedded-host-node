@@ -7,7 +7,7 @@ import * as p from 'path';
 import * as url from 'url';
 
 import * as proto from './vendor/embedded_sass_pb';
-import {Syntax} from './vendor/sass';
+import {SourceMapIncludeSources, Syntax} from './vendor/sass';
 
 export type PromiseOr<
   T,
@@ -144,6 +144,31 @@ export function protofySyntax(syntax: Syntax): proto.Syntax {
 
     default:
       throw new Error(`Unknown syntax: "${syntax}"`);
+  }
+}
+
+/** Converts a JS sourceMapIncludeSources value into a protobuf
+ * sourceMapIncludeSources enum.
+ */
+export function protofySourceMapIncludeSources(
+  sourceMapIncludeSources: SourceMapIncludeSources | boolean,
+): proto.SourceMapIncludeSources {
+  switch (sourceMapIncludeSources) {
+    case 'auto':
+      return proto.SourceMapIncludeSources.AUTO;
+
+    case 'always':
+    case true:
+      return proto.SourceMapIncludeSources.ALWAYS;
+
+    case 'never':
+    case false:
+      return proto.SourceMapIncludeSources.NEVER;
+
+    default:
+      throw new Error(
+        `Unknown sourceMapIncludeSources: "${sourceMapIncludeSources}"`,
+      );
   }
 }
 

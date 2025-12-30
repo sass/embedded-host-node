@@ -18,7 +18,13 @@ const cjs = await import('../dist/lib/index.js');
 const esm = await import('../dist/lib/index.mjs');
 
 for (const [name, value] of Object.entries(cjs)) {
-  if (name === '__esModule' || name === 'default') continue;
+  if (
+    name === '__esModule' ||
+    name === 'default' ||
+    name === 'module.exports'
+  ) {
+    continue;
+  }
   if (!esm[name]) {
     throw new Error(`ESM module is missing export ${name}.`);
   } else if (esm[name] !== value) {

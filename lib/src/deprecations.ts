@@ -130,6 +130,7 @@ function isFatal(
   for (const fatal of options.fatalDeprecations ?? []) {
     if (fatal instanceof Version) {
       if (versionNumber === null) continue;
+      if (deprecation.obsoleteIn !== null) continue;
       if (
         versionNumber <=
         fatal.major * 1000000 + fatal.minor * 1000 + fatal.patch

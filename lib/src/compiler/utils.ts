@@ -228,3 +228,31 @@ export function handleCompileResponse(
     throw utils.compilerError('Compiler sent empty CompileResponse.');
   }
 }
+
+/**
+ * A polyfill for the return type of `Promise.withResolvers()` until it's
+ * universally available in LTS Node.js versions.
+ */
+interface PromiseWithResolvers<T> {
+  promise: Promise<T>;
+  resolve: (value: T | PromiseLike<T>) => void;
+  // Type definition comes from official types for Node v22.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  reject: (reason?: any) => void;
+}
+
+// TODO(nweiz): Replace this with the library function once Node 22 is the
+// oldest LTS version (May 2026).
+/**
+ * A polyfill for `Promise.withResolvers()` until it's universally available in
+ * LTS Node.js versions.
+ */
+export function promiseWithResolvers<T>(): PromiseWithResolvers<T> {
+  let resolve: PromiseWithResolvers<T>['resolve'] | undefined;
+  let reject: PromiseWithResolvers<T>['reject'] | undefined;
+  const promise = new Promise<T>((resolve_, reject_) => {
+    resolve = resolve_;
+    reject = reject_;
+  });
+  return {promise, resolve: resolve!, reject: reject!};
+}

@@ -2,7 +2,8 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-import {spawn} from 'child_process';
+import * as child_process from 'child_process';
+
 import {Observable} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
 
@@ -15,6 +16,7 @@ import {
   handleLogEvent,
   newCompilePathRequest,
   newCompileStringRequest,
+  promiseWithResolvers,
 } from './utils';
 import {compilerCommand} from '../compiler-path';
 import {activeDeprecationOptions} from '../deprecations';
@@ -36,21 +38,28 @@ const initFlag = Symbol();
 /** An asynchronous wrapper for the embedded Sass compiler */
 export class AsyncCompiler {
   /** The underlying process that's being wrapped. */
-  private readonly process = spawn(
-    compilerCommand[0],
-    [...compilerCommand.slice(1), '--embedded'],
-    {
+  private readonly process = (() => {
+    let command = compilerCommand[0];
+    let args = [...compilerCommand.slice(1), '--embedded'];
+    const options: child_process.SpawnOptions = {
       // Use the command's cwd so the compiler survives the removal of the
       // current working directory.
       // https://github.com/sass/embedded-host-node/pull/261#discussion_r1438712923
       cwd: path.dirname(compilerCommand[0]),
-      // Node blocks launching .bat and .cmd without a shell due to CVE-2024-27980
-      shell: ['.bat', '.cmd'].includes(
-        path.extname(compilerCommand[0]).toLowerCase(),
-      ),
       windowsHide: true,
-    },
-  );
+    };
+
+    // Node forbids launching .bat and .cmd without a shell due to CVE-2024-27980,
+    // and DEP0190 forbids passing an argument list *with* shell: true. To work
+    // around this, we have to manually concatenate the arguments.
+    if (['.bat', '.cmd'].includes(path.extname(command).toLowerCase())) {
+      command = `${command} ${args!.join(' ')}`;
+      args = [];
+      options.shell = true;
+    }
+
+    return child_process.spawn(command, args, options);
+  })();
 
   /** The next compilation ID. */
   private compilationId = 1;
@@ -73,17 +82,17 @@ export class AsyncCompiler {
 
   /** The buffers emitted by the child process's stdout. */
   private readonly stdout$ = new Observable<Buffer>(observer => {
-    this.process.stdout.on('data', buffer => observer.next(buffer));
+    this.process.stdout!.on('data', buffer => observer.next(buffer));
   }).pipe(takeUntil(this.exit$));
 
   /** The buffers emitted by the child process's stderr. */
   private readonly stderr$ = new Observable<Buffer>(observer => {
-    this.process.stderr.on('data', buffer => observer.next(buffer));
+    this.process.stderr!.on('data', buffer => observer.next(buffer));
   }).pipe(takeUntil(this.exit$));
 
   /** Writes `buffer` to the child process's stdin. */
   private writeStdin(buffer: Buffer): void {
-    this.process.stdin.write(buffer);
+    this.process.stdin!.write(buffer);
   }
 
   /** Guards against using a disposed compiler. */
@@ -120,22 +129,28 @@ export class AsyncCompiler {
       );
       dispatcher.logEvents$.subscribe(event => handleLogEvent(options, event));
 
-      const compilation = new Promise<proto.OutboundMessage_CompileResponse>(
-        (resolve, reject) =>
-          dispatcher.sendCompileRequest(request, (err, response) => {
-            this.compilations.delete(compilation);
-            // Reset the compilation ID when the compiler goes idle (no active
-            // compilations) to avoid overflowing it.
-            // https://github.com/sass/embedded-host-node/pull/261#discussion_r1429266794
-            if (this.compilations.size === 0) this.compilationId = 1;
-            if (err) {
-              reject(err);
-            } else {
-              resolve(response!);
-            }
-          }),
-      );
+      // Avoid `new Promise()` here because `dispatcher.sendCompilerequest` can
+      // run its callback synchronously, so `compilation` needs to be assigned
+      // and in `this.compilations` before we call it.
+      const {
+        promise: compilation,
+        resolve,
+        reject,
+      } = promiseWithResolvers<proto.OutboundMessage_CompileResponse>();
       this.compilations.add(compilation);
+
+      dispatcher.sendCompileRequest(request, (err, response) => {
+        this.compilations.delete(compilation);
+        // Reset the compilation ID when the compiler goes idle (no active
+        // compilations) to avoid overflowing it.
+        // https://github.com/sass/embedded-host-node/pull/261#discussion_r1429266794
+        if (this.compilations.size === 0) this.compilationId = 1;
+        if (err) {
+          reject(err);
+        } else {
+          resolve(response!);
+        }
+      });
 
       return handleCompileResponse(await compilation);
     } finally {
@@ -190,7 +205,7 @@ export class AsyncCompiler {
   async dispose(): Promise<void> {
     this.disposed = true;
     await Promise.all(this.compilations);
-    this.process.stdin.end();
+    this.process.stdin!.end();
     await this.exit$;
   }
 }

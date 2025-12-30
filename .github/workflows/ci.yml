@@ -18,8 +18,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: 'lts/*'
           check-latest: true
@@ -46,8 +46,8 @@ jobs:
       fail-fast: false
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node-version }}
           check-latest: true
@@ -89,10 +89,10 @@ jobs:
             node_version: lts/-2
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: dart-lang/setup-dart@v1
         with: {sdk: stable}
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with: {node-version: "${{ matrix.node_version }}"}
 
       - name: Check out Dart Sass
@@ -124,31 +124,10 @@ jobs:
         working-directory: sass-spec
 
   deploy_npm:
-    name: Deploy npm
-    runs-on: ubuntu-latest
-    if: "startsWith(github.ref, 'refs/tags/') && github.repository == 'sass/embedded-host-node'"
     needs: [static_analysis, tests, sass_spec]
-
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 'lts/*'
-          check-latest: true
-          registry-url: 'https://registry.npmjs.org'
-      - run: npm install
-
-      - name: "Check we're not using a -dev version of the embedded protocol"
-        run: jq -r '.["protocol-version"]' package.json | grep -qv -- '-dev$'
-      - name: "Check we're not using a -dev version of the embedded compiler"
-        run: jq -r '.["compiler-version"]' package.json | grep -qv -- '-dev$'
-
-      - name: Publish optional dependencies
-        env:
-          NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}'
-        run: |
-          find ./npm -mindepth 1 -maxdepth 1 -print0 | xargs -0 -n 1 -- sh -xc 'npx ts-node ./tool/prepare-optional-release.ts --package=$(basename $1) && npm publish $1' --
-
-      - run: npm publish
-        env:
-          NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}'
+    if: "github.ref_type == 'tag' && github.event.repository.fork == false"
+    permissions:
+      attestations: write
+      contents: write
+      id-token: write
+    uses: ./.github/workflows/release.yml

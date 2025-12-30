@@ -5,6 +5,9 @@
       "error",
       {"allowExpressions": true}
     ],
+    "n/no-extraneous-require": ["error", {
+      "allowModules": ["sass"]
+    }],
     "func-style": ["error", "declaration"],
     "prefer-const": ["error", {"destructuring": "all"}],
     // It would be nice to sort import declaration order as well, but that's not

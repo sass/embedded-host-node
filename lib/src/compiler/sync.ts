@@ -2,10 +2,11 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-import {Subject} from 'rxjs';
-import {SyncChildProcess} from 'sync-child-process';
-
 import * as path from 'path';
+
+import {Subject} from 'rxjs';
+import * as sync_child_process from 'sync-child-process';
+
 import {
   OptionsWithLegacy,
   createDispatcher,
@@ -36,21 +37,28 @@ const initFlag = Symbol();
 /** A synchronous wrapper for the embedded Sass compiler */
 export class Compiler {
   /** The underlying process that's being wrapped. */
-  private readonly process = new SyncChildProcess(
-    compilerCommand[0],
-    [...compilerCommand.slice(1), '--embedded'],
-    {
+  private readonly process = (() => {
+    let command = compilerCommand[0];
+    let args = [...compilerCommand.slice(1), '--embedded'];
+    const options: sync_child_process.Options = {
       // Use the command's cwd so the compiler survives the removal of the
       // current working directory.
       // https://github.com/sass/embedded-host-node/pull/261#discussion_r1438712923
       cwd: path.dirname(compilerCommand[0]),
-      // Node blocks launching .bat and .cmd without a shell due to CVE-2024-27980
-      shell: ['.bat', '.cmd'].includes(
-        path.extname(compilerCommand[0]).toLowerCase(),
-      ),
       windowsHide: true,
-    },
-  );
+    };
+
+    // Node forbids launching .bat and .cmd without a shell due to CVE-2024-27980,
+    // and DEP0190 forbids passing an argument list *with* shell: true. To work
+    // around this, we have to manually concatenate the arguments.
+    if (['.bat', '.cmd'].includes(path.extname(command).toLowerCase())) {
+      command = `${command} ${args!.join(' ')}`;
+      args = [];
+      options.shell = true;
+    }
+
+    return new sync_child_process.SyncChildProcess(command, args, options);
+  })();
 
   /** The next compilation ID. */
   private compilationId = 1;

@@ -1,6 +1,6 @@
 {
   "name": "sass-embedded-linux-musl-x64",
-  "version": "1.97.1",
+  "version": "1.97.2",
   "description": "The linux-musl-x64 binary for sass-embedded",
   "repository": "sass/embedded-host-node",
   "author": "Google Inc.",

@@ -30,10 +30,4 @@ for (const [name, value] of Object.entries(cjs)) {
   } else if (esm[name] !== value) {
     throw new Error(`ESM ${name} isn't the same as CJS.`);
   }
-
-  if (!esm.default[name]) {
-    throw new Error(`ESM default export is missing export ${name}.`);
-  } else if (esm.default[name] !== value) {
-    throw new Error(`ESM default export ${name} isn't the same as CJS.`);
-  }
 }

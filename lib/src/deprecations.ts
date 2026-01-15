@@ -31,7 +31,7 @@ export function getDeprecationIds(
  * This is used to determine which options to use when handling host-side
  * deprecation warnings that aren't explicitly tied to a particular compilation.
  */
-export const activeDeprecationOptions: Map<Symbol, DeprecationOptions> =
+export const activeDeprecationOptions: Map<symbol, DeprecationOptions> =
   new Map();
 
 /**

@@ -189,7 +189,7 @@ export class Protofier {
   /** Converts a CalculationValue that appears within a `SassCalculation` to
    * its protocol buffer representation. */
   private protofyCalculationValue(
-    value: Object,
+    value: object,
   ): proto.Value_Calculation_CalculationValue {
     const result = create(proto.Value_Calculation_CalculationValueSchema, {});
     if (value instanceof SassCalculation) {

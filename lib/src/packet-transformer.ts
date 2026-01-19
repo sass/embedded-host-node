@@ -4,7 +4,6 @@
 
 import {Observable, Subject} from 'rxjs';
 import {mergeMap} from 'rxjs/operators';
-import BufferBuilder = require('buffer-builder');
 
 /**
  * Decodes arbitrarily-chunked buffers, for example
@@ -57,18 +56,19 @@ export class PacketTransformer {
 
       // Write the length in varint format, 7 bits at a time from least to most
       // significant.
-      const header = new BufferBuilder(8);
+      const header = Buffer.alloc(8);
+      let offset = 0;
       while (length > 0) {
         // The highest-order bit indicates whether more bytes are necessary to
-        // fully express the number. The lower 7 bits indicate the number's
-        // value.
-        header.appendUInt8((length > 0x7f ? 0x80 : 0) | (length & 0x7f));
+        // fully express the number. The lower 7 bits indicate the number's value.
+        header.writeUInt8((length > 0x7f ? 0x80 : 0) | (length & 0x7f), offset);
+        offset++;
         length >>= 7;
       }
 
-      const packet = Buffer.alloc(header.length + protobuf.length);
-      header.copy(packet);
-      packet.set(protobuf, header.length);
+      const packet = Buffer.alloc(offset + protobuf.length);
+      header.copy(packet, 0, 0, offset);
+      packet.set(protobuf, offset);
       this.writeInboundBuffer(packet);
     } catch (error) {
       this.outboundProtobufsInternal$.error(error);

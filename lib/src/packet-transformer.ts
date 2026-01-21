@@ -60,7 +60,8 @@ export class PacketTransformer {
       let offset = 0;
       while (length > 0) {
         // The highest-order bit indicates whether more bytes are necessary to
-        // fully express the number. The lower 7 bits indicate the number's value.
+        // fully express the number. The lower 7 bits indicate the number's
+        // value.
         header.writeUInt8((length > 0x7f ? 0x80 : 0) | (length & 0x7f), offset);
         offset++;
         length >>= 7;

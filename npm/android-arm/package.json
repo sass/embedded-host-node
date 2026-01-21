@@ -1,6 +1,6 @@
 {
   "name": "sass-embedded-android-arm",
-  "version": "1.97.2",
+  "version": "1.97.3",
   "description": "The android-arm binary for sass-embedded",
   "repository": "sass/embedded-host-node",
   "author": "Google Inc.",

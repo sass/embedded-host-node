@@ -119,14 +119,6 @@ function getColorSpace(options: ChannelOptions): KnownColorSpace {
 
 /**
  * Convert from the ColorJS representation of a missing component (`null`) to
- * `NaN`.
- */
-function nullToNaN(val: number | null): number {
-  return val ?? NaN;
-}
-
-/**
- * Convert from the ColorJS representation of a missing component (`null`) to
  * `0`.
  */
 function nullToZero(val: number | null): number {
@@ -650,8 +642,7 @@ export class SassColor extends Value {
    */
   get red(): number {
     emitColor4ApiGetterDeprecation('red');
-    const val = nullToZero(coordToRgb(this.color.srgb.red));
-    return fuzzyRound(val);
+    return fuzzyRound(coordToRgb(this.color.srgb.red)) ?? 0;
   }
 
   /**
@@ -661,8 +652,7 @@ export class SassColor extends Value {
    */
   get green(): number {
     emitColor4ApiGetterDeprecation('green');
-    const val = nullToZero(coordToRgb(this.color.srgb.green));
-    return fuzzyRound(val);
+    return fuzzyRound(coordToRgb(this.color.srgb.green)) ?? 0;
   }
 
   /**
@@ -672,8 +662,7 @@ export class SassColor extends Value {
    */
   get blue(): number {
     emitColor4ApiGetterDeprecation('blue');
-    const val = nullToZero(coordToRgb(this.color.srgb.blue));
-    return fuzzyRound(val);
+    return fuzzyRound(coordToRgb(this.color.srgb.blue)) ?? 0;
   }
 
   /**
@@ -1157,25 +1146,23 @@ export class SassColor extends Value {
         coords = this.color
           .to('srgb')
           .coords.map(coordToRgb)
-          .map(nullToNaN)
-          .map(fuzzyRound) as [number, number, number];
+          .map(fuzzyRound) as [number | null, number | null, number | null];
         otherCoords = other.color
           .to('srgb')
           .coords.map(coordToRgb)
-          .map(nullToNaN)
-          .map(fuzzyRound) as [number, number, number];
+          .map(fuzzyRound) as [number | null, number | null, number | null];
       }
       return (
-        fuzzyEquals(nullToNaN(coords[0]), nullToNaN(otherCoords[0])) &&
-        fuzzyEquals(nullToNaN(coords[1]), nullToNaN(otherCoords[1])) &&
-        fuzzyEquals(nullToNaN(coords[2]), nullToNaN(otherCoords[2]))
+        fuzzyEquals(coords[0], otherCoords[0]) &&
+        fuzzyEquals(coords[1], otherCoords[1]) &&
+        fuzzyEquals(coords[2], otherCoords[2])
       );
     }
     return (
       this.space === other.space &&
-      fuzzyEquals(nullToNaN(coords[0]), nullToNaN(otherCoords[0])) &&
-      fuzzyEquals(nullToNaN(coords[1]), nullToNaN(otherCoords[1])) &&
-      fuzzyEquals(nullToNaN(coords[2]), nullToNaN(otherCoords[2])) &&
+      fuzzyEquals(coords[0], otherCoords[0]) &&
+      fuzzyEquals(coords[1], otherCoords[1]) &&
+      fuzzyEquals(coords[2], otherCoords[2]) &&
       fuzzyEquals(this.alpha, other.alpha)
     );
   }
@@ -1183,23 +1170,23 @@ export class SassColor extends Value {
   hashCode(): number {
     let coords = this.color.coords;
     if (this.isLegacy) {
-      coords = this.color
-        .to('srgb')
-        .coords.map(coordToRgb)
-        .map(nullToNaN)
-        .map(fuzzyRound) as [number, number, number];
+      coords = this.color.to('srgb').coords.map(coordToRgb).map(fuzzyRound) as [
+        number,
+        number,
+        number,
+      ];
       return (
-        fuzzyHashCode(nullToNaN(coords[0])) ^
-        fuzzyHashCode(nullToNaN(coords[1])) ^
-        fuzzyHashCode(nullToNaN(coords[2])) ^
+        fuzzyHashCode(coords[0]) ^
+        fuzzyHashCode(coords[1]) ^
+        fuzzyHashCode(coords[2]) ^
         fuzzyHashCode(this.alpha)
       );
     }
     return (
       hash(this.space) ^
-      fuzzyHashCode(nullToNaN(coords[0])) ^
-      fuzzyHashCode(nullToNaN(coords[1])) ^
-      fuzzyHashCode(nullToNaN(coords[2])) ^
+      fuzzyHashCode(coords[0]) ^
+      fuzzyHashCode(coords[1]) ^
+      fuzzyHashCode(coords[2]) ^
       fuzzyHashCode(this.alpha)
     );
   }

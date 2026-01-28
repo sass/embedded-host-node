@@ -114,14 +114,6 @@ function getColorSpace(options: ChannelOptions): KnownColorSpace {
   throw valueError('No color space found');
 }
 
-/**
- * Convert from the ColorJS representation of a missing component (`null`) to
- * `0`.
- */
-function nullToZero(val: number | null): number {
-  return val ?? 0;
-}
-
 /** Convert from sRGB (0-1) to RGB (0-255) units. */
 function coordToRgb(val: number | null): number | null {
   return val === null ? val : val * 255;
@@ -580,7 +572,7 @@ export class SassColor extends Value {
 
   /** This color's alpha channel, between `0` and `1`. */
   get alpha(): number {
-    return nullToZero(this.color.alpha);
+    return this.color.alpha ?? 0;
   }
 
   /** The name of this color's color space. */
@@ -629,7 +621,7 @@ export class SassColor extends Value {
         number | null,
       ];
     }
-    return List(coords.map(nullToZero));
+    return List(coords.map(val => val ?? 0));
   }
 
   /**
@@ -669,7 +661,7 @@ export class SassColor extends Value {
    */
   get hue(): number {
     emitColor4ApiGetterDeprecation('hue');
-    return nullToZero(this.color.hsl.hue);
+    return this.color.hsl.hue ?? 0;
   }
 
   /**
@@ -679,7 +671,7 @@ export class SassColor extends Value {
    */
   get saturation(): number {
     emitColor4ApiGetterDeprecation('saturation');
-    return nullToZero(this.color.hsl.saturation);
+    return this.color.hsl.saturation ?? 0;
   }
 
   /**
@@ -689,7 +681,7 @@ export class SassColor extends Value {
    */
   get lightness(): number {
     emitColor4ApiGetterDeprecation('lightness');
-    return nullToZero(this.color.hsl.lightness);
+    return this.color.hsl.lightness ?? 0;
   }
 
   /**
@@ -699,7 +691,7 @@ export class SassColor extends Value {
    */
   get whiteness(): number {
     emitColor4ApiGetterDeprecation('whiteness');
-    return nullToZero(this.color.hwb.whiteness);
+    return this.color.hwb.whiteness ?? 0;
   }
 
   /**
@@ -709,7 +701,7 @@ export class SassColor extends Value {
    */
   get blackness(): number {
     emitColor4ApiGetterDeprecation('blackness');
-    return nullToZero(this.color.hwb.blackness);
+    return this.color.hwb.blackness ?? 0;
   }
 
   assertColor(): SassColor {
@@ -786,7 +778,7 @@ export class SassColor extends Value {
       });
     }
     if (space === 'rgb') val = coordToRgb(val);
-    return nullToZero(val);
+    return val ?? 0;
   }
 
   /**

@@ -273,10 +273,9 @@ function isPolarColorSpace(space: KnownColorSpace): space is PolarColorSpace {
 }
 
 /**
- * Convert from ColorJS coordinates (which use `null` for missing components,
- * and a range of `0-1` for `rgb` channel values) to Sass Color coordinates
- * (which use `null` for missing components, and a range of `0-255` for `rgb`
- * channel values).
+ * Convert from ColorJS coordinates (which use a range of `0-1` for `rgb`
+ * channel values) to Sass Color coordinates (which use a range of `0-255` for
+ * `rgb` channel values).
  */
 function decodeCoordsFromColorJs(
   coords: [number | null, number | null, number | null], // ColorJS coordinates

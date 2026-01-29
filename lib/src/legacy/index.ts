@@ -303,7 +303,7 @@ function newLegacyResult(
           return pathToUrlString(
             p.relative(sourceMapDir, fileUrlToPathCrossPlatform(source)),
           );
-        } else if (source.startsWith('data:')) {
+        } else if (source === '') {
           return 'stdin';
         } else {
           return source;

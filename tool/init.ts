@@ -4,6 +4,7 @@
 
 import yargs from 'yargs';
 
+import {fixColorJsTypes} from './fix-colorjs-types';
 import {getDeprecations} from './get-deprecations';
 import {getEmbeddedCompiler} from './get-embedded-compiler';
 import {getLanguageRepo} from './get-language-repo';
@@ -43,6 +44,8 @@ const argv = yargs(process.argv.slice(2))
 
 void (async () => {
   try {
+    fixColorJsTypes();
+
     const outPath = 'lib/src/vendor';
 
     if (argv['language-ref']) {

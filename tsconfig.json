@@ -1,8 +1,6 @@
 {
   "extends": "./node_modules/gts/tsconfig-google.json",
   "compilerOptions": {
-    "module": "node20",
-    "moduleResolution": "node16",
     "allowJs": true,
     "outDir": "dist",
     "resolveJsonModule": true,

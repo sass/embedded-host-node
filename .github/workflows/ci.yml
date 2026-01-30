@@ -42,12 +42,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu, macos, windows]
-        # Temporarily disable test on lts/-2 (currently node 20)
-        # https://github.com/jestjs/jest/issues/13350
-        # https://github.com/kulshekhar/ts-jest/issues/4198
-        #
-        # node-version: ['lts/*', 'lts/-1', 'lts/-2']
-        node-version: ['lts/*', 'lts/-1']
+        node-version: ['lts/*', 'lts/-1', 'lts/-2']
       fail-fast: false
 
     steps:

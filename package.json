@@ -73,7 +73,7 @@
     "@bufbuild/buf": "^1.54.0",
     "@bufbuild/protoc-gen-es": "^2.5.0",
     "@eslint/eslintrc": "^3.3.3",
-    "@eslint/js": "^9.39.2",
+    "@eslint/js": "^10.0.1",
     "@types/buffer-builder": "^0.2.0",
     "@types/google-protobuf": "^3.7.2",
     "@types/jest": "^30.0.0",

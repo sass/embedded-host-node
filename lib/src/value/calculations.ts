@@ -126,6 +126,10 @@ export class CalculationOperation implements ValueObject {
   hashCode(): number {
     return hash(this.operator) ^ hash(this.left) ^ hash(this.right);
   }
+
+  toString(): string {
+    return `${this.left} ${this.operator} ${this.right}`;
+  }
 }
 
 export class CalculationInterpolation implements ValueObject {
@@ -139,5 +143,9 @@ export class CalculationInterpolation implements ValueObject {
 
   hashCode(): number {
     return hash(this.value);
+  }
+
+  toString(): string {
+    return `#{${this.value}}`;
   }
 }

@@ -159,7 +159,7 @@ export class AsyncCompiler {
   }
 
   /** Initialize resources shared across compilations. */
-  constructor(flag: Symbol | undefined) {
+  constructor(flag: symbol | undefined) {
     if (flag !== initFlag) {
       throw utils.compilerError(
         'AsyncCompiler can not be directly constructed. ' +

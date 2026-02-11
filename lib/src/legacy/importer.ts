@@ -70,9 +70,9 @@ interface PreviousUrl {
  * A wrapper around a `LegacyImporter` callback that exposes it as a new-API
  * `Importer`.
  */
-export class LegacyImporterWrapper<sync extends 'sync' | 'async'>
-  implements Importer<sync>
-{
+export class LegacyImporterWrapper<
+  sync extends 'sync' | 'async',
+> implements Importer<sync> {
   // A stack of previous URLs passed to `this.callbacks`.
   private readonly prev: PreviousUrl[] = [];
 

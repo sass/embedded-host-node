@@ -173,7 +173,7 @@ export class Compiler {
   }
 
   /** Initialize resources shared across compilations. */
-  constructor(flag: Symbol | undefined) {
+  constructor(flag: symbol | undefined) {
     if (flag !== initFlag) {
       throw utils.compilerError(
         'Compiler can not be directly constructed. ' +

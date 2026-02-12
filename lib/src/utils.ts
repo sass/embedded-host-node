@@ -147,7 +147,8 @@ export function protofySyntax(syntax: Syntax): proto.Syntax {
   }
 }
 
-/** Converts a JS sourceMapIncludeSources value into a protobuf
+/**
+ * Converts a JS sourceMapIncludeSources value into a protobuf
  * sourceMapIncludeSources enum.
  */
 export function protofySourceMapIncludeSources(

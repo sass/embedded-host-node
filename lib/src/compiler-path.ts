@@ -39,7 +39,7 @@ export const compilerCommand = (() => {
       process.execPath,
       // This is a fallback which is required indirectly through
       // sass-embedded-all-unknown.
-      // eslint-disable-next-line n/no-extraneous-require
+
       p.join(p.dirname(require.resolve('sass')), 'sass.js'),
     ];
   } catch (e) {

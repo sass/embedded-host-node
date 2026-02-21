@@ -44,7 +44,7 @@ export class LegacyColor extends LegacyValueBase<SassColor> {
   }
 
   getR(): number {
-    return this.inner.red;
+    return Math.round(this.inner.channel('red'));
   }
 
   setR(value: number): void {
@@ -52,7 +52,7 @@ export class LegacyColor extends LegacyValueBase<SassColor> {
   }
 
   getG(): number {
-    return this.inner.green;
+    return Math.round(this.inner.channel('green'));
   }
 
   setG(value: number): void {
@@ -60,7 +60,7 @@ export class LegacyColor extends LegacyValueBase<SassColor> {
   }
 
   getB(): number {
-    return this.inner.blue;
+    return Math.round(this.inner.channel('blue'));
   }
 
   setB(value: number): void {

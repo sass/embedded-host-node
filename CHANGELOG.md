@@ -1,3 +1,26 @@
+## 1.98.0
+
+### Command-Line Interface
+
+* Gracefully handle dependency loops in `--watch` mode.
+
+### Dart API
+
+* Add a `const Logger.defaultLogger` field. This provides a logger that emits to
+  standard error or the browser console, but automatically chooses whether to
+  use terminal colors.
+
+### JavaScript API
+
+* Fix a crash when manually constructing a `SassCalculation` for `'calc'` with
+  an argument that can't be simplified.
+
+* Properly emit deprecation warnings as text rather than `StringBuffer` objects
+  when running in a browser.
+
+* Emit colored warnings and other messages on the console when running in a
+  browser.
+
 ## 1.97.3
 
 * Fix a bug where nesting an at-rule within multiple style rules in plain CSS

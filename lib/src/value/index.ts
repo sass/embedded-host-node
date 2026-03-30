@@ -86,7 +86,7 @@ export abstract class Value implements ValueObject {
     }
     if (Math.abs(index) > this.lengthAsList) {
       throw valueError(
-        `Invalid index ${sassIndex} for a list with ${this.lengthAsList} elements.`,
+        `Invalid index ${sassIndex} for a list with ${this.lengthAsList} elements`,
         name,
       );
     }

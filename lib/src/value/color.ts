@@ -249,7 +249,7 @@ function validateChannelInSpace(
   }
   if (!valid) {
     throw valueError(
-      `Unknown channel name "${channel}" for color space "${space}".`,
+      `Unknown channel name "${channel}" for color space "${space}"`,
     );
   }
 }
@@ -893,7 +893,7 @@ export class SassColor extends Value {
 
     if (weight < 0 || weight > 1) {
       throw valueError(
-        `Expected \`weight\` between \`0\` and \`1\`, received \`${weight}\`.`,
+        `Expected \`weight\` between \`0\` and \`1\`, received \`${weight}\``,
       );
     }
 

@@ -324,7 +324,7 @@ export class Protofier {
             });
 
           default:
-            throw utils.compilerError(`Unknown color space "${color.space}".`);
+            throw utils.compilerError(`Unknown color space "${color.space}"`);
         }
       }
 
@@ -394,7 +394,7 @@ export class Protofier {
 
       case 'hostFunction':
         throw utils.compilerError(
-          'The compiler may not send Value.host_function.',
+          'The compiler may not send Value.host_function',
         );
 
       case 'compilerMixin':
@@ -454,7 +454,7 @@ export class Protofier {
       case 'calc':
         if (calculation.arguments.length !== 1) {
           throw utils.compilerError(
-            'Value.Calculation.arguments must have exactly one argument for calc().',
+            'Value.Calculation.arguments must have exactly one argument for calc()',
           );
         }
         return SassCalculation.calc(
@@ -466,7 +466,7 @@ export class Protofier {
           calculation.arguments.length > 3
         ) {
           throw utils.compilerError(
-            'Value.Calculation.arguments must have 1 to 3 arguments for clamp().',
+            'Value.Calculation.arguments must have 1 to 3 arguments for clamp()',
           );
         }
         return SassCalculation.clamp(
@@ -481,7 +481,7 @@ export class Protofier {
       case 'min':
         if (calculation.arguments.length === 0) {
           throw utils.compilerError(
-            'Value.Calculation.arguments must have at least 1 argument for min().',
+            'Value.Calculation.arguments must have at least 1 argument for min()',
           );
         }
         return SassCalculation.min(
@@ -490,7 +490,7 @@ export class Protofier {
       case 'max':
         if (calculation.arguments.length === 0) {
           throw utils.compilerError(
-            'Value.Calculation.arguments must have at least 1 argument for max().',
+            'Value.Calculation.arguments must have at least 1 argument for max()',
           );
         }
         return SassCalculation.max(
@@ -498,7 +498,7 @@ export class Protofier {
         );
       default:
         throw utils.compilerError(
-          `Value.Calculation.name "${calculation.name}" is not a recognized calculation type.`,
+          `Value.Calculation.name "${calculation.name}" is not a recognized calculation type`,
         );
     }
   }

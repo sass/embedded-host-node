@@ -225,7 +225,7 @@ export function handleCompileResponse(
   } else if (response.result.case === 'failure') {
     throw new Exception(response.result.value);
   } else {
-    throw utils.compilerError('Compiler sent empty CompileResponse.');
+    throw utils.compilerError('Compiler sent empty CompileResponse');
   }
 }
 

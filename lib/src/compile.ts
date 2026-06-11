@@ -3,15 +3,14 @@
 // https://opensource.org/licenses/MIT.
 
 import {initAsyncCompiler} from './compiler/async';
-import {OptionsWithLegacy, StringOptionsWithLegacy} from './compiler/utils';
 import {initCompiler} from './compiler/sync';
-import {CompileResult} from './vendor/sass';
+import {CompileResult, Options, StringOptions} from './vendor/sass';
 
 export {NodePackageImporter} from './importer-registry';
 
 export function compile(
   path: string,
-  options?: OptionsWithLegacy<'sync'>,
+  options?: Options<'sync'>,
 ): CompileResult {
   const compiler = initCompiler();
   try {
@@ -23,7 +22,7 @@ export function compile(
 
 export function compileString(
   source: string,
-  options?: StringOptionsWithLegacy<'sync'>,
+  options?: StringOptions<'sync'>,
 ): CompileResult {
   const compiler = initCompiler();
   try {
@@ -35,7 +34,7 @@ export function compileString(
 
 export async function compileAsync(
   path: string,
-  options?: OptionsWithLegacy<'async'>,
+  options?: Options<'async'>,
 ): Promise<CompileResult> {
   const compiler = await initAsyncCompiler();
   try {
@@ -47,7 +46,7 @@ export async function compileAsync(
 
 export async function compileStringAsync(
   source: string,
-  options?: StringOptionsWithLegacy<'async'>,
+  options?: StringOptions<'async'>,
 ): Promise<CompileResult> {
   const compiler = await initAsyncCompiler();
   try {

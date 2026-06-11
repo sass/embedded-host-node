@@ -37,42 +37,6 @@ See [the Sass website] for full API documentation.
 
 [the Sass website]: https://sass-lang.com/documentation/js-api
 
-### Legacy API
-
-The `sass-embedded` package also supports the older JavaScript API that's fully
-compatible with [Node Sass] (with a few exceptions listed below), with support
-for both the [`render()`] and [`renderSync()`] functions. This API is considered
-deprecated and will be removed in Dart Sass 2.0.0, so it should be avoided in
-new projects.
-
-[Node Sass]: https://github.com/sass/node-sass
-[`render()`]: https://sass-lang.com/documentation/js-api/modules#render
-[`renderSync()`]: https://sass-lang.com/documentation/js-api/modules#renderSync
-
-Sass's support for the legacy JavaScript API has the following limitations:
-
-* Only the `"expanded"` and `"compressed"` values of [`outputStyle`] are
-  supported.
-
-* The `sass-embedded` package doesn't support the [`precision`] option. Dart
-  Sass defaults to a sufficiently high precision for all existing browsers, and
-  making this customizable would make the code substantially less efficient.
-
-* The `sass-embedded` package doesn't support the [`sourceComments`] option.
-  Source maps are the recommended way of locating the origin of generated
-  selectors.
-
-* The `sass-embedded` package doesn't support the [`indentWidth`],
-  [`indentType`], or [`linefeed`] options. It implements the legacy API as a
-  wrapper around the new API, and the new API has dropped support for these
-  options.
-
-[`outputStyle`]: https://sass-lang.com/documentation/js-api/interfaces/LegacySharedOptions#outputStyle
-[`precision`]: https://github.com/sass/node-sass#precision
-[`indentWidth`]: https://sass-lang.com/documentation/js-api/interfaces/LegacySharedOptions#indentWidth
-[`indentType`]: https://sass-lang.com/documentation/js-api/interfaces/LegacySharedOptions#indentType
-[`linefeed`]: https://sass-lang.com/documentation/js-api/interfaces/LegacySharedOptions#linefeed
-
 ## How Does It Work?
 
 The `sass-embedded` runs the Dart Sass [embedded compiler] as a separate

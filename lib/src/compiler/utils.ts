@@ -11,11 +11,6 @@ import {deprotofySourceSpan} from '../deprotofy-span';
 import {Dispatcher, DispatcherHandlers} from '../dispatcher';
 import {Exception} from '../exception';
 import {ImporterRegistry} from '../importer-registry';
-import {
-  legacyImporterProtocol,
-  removeLegacyImporter,
-  removeLegacyImporterFromSpan,
-} from '../legacy/utils';
 import {Logger} from '../logger';
 import {MessageTransformer} from '../message-transformer';
 import * as utils from '../utils';
@@ -23,27 +18,6 @@ import * as proto from '../vendor/embedded_sass_pb';
 import {SourceSpan} from '../vendor/sass';
 import {CompileResult} from '../vendor/sass/compile';
 import {Options, StringOptions} from '../vendor/sass/options';
-
-/**
- * Allow the legacy API to pass in an option signaling to the modern API that
- * it's being run in legacy mode.
- *
- * This is not intended for API users to pass in, and may be broken without
- * warning in the future.
- */
-export type OptionsWithLegacy<sync extends 'sync' | 'async'> = Options<sync> & {
-  legacy?: boolean;
-};
-
-/**
- * Allow the legacy API to pass in an option signaling to the modern API that
- * it's being run in legacy mode.
- *
- * This is not intended for API users to pass in, and may be broken without
- * warning in the future.
- */
-export type StringOptionsWithLegacy<sync extends 'sync' | 'async'> =
-  StringOptions<sync> & {legacy?: boolean};
 
 /**
  * Creates a dispatcher that dispatches messages from the given `stdout` stream.
@@ -123,19 +97,10 @@ export function newCompileStringRequest(
   });
 
   const url = options?.url?.toString();
-  if (url && url !== legacyImporterProtocol) {
-    input.url = url;
-  }
+  if (url) input.url = url;
 
   if (options && 'importer' in options && options.importer) {
     input.importer = importers.register(options.importer);
-  } else if (url === legacyImporterProtocol) {
-    input.importer = create(
-      proto.InboundMessage_CompileRequest_ImporterSchema,
-      {
-        importer: {case: 'path', value: p.resolve('.')},
-      },
-    );
   } else {
     // When importer is not set on the host, the compiler will set a
     // FileSystemImporter if `url` is set to a file: url or a NoOpImporter.
@@ -155,26 +120,21 @@ function validDeprecationId(
 
 /** Handles a log event according to `options`. */
 export function handleLogEvent(
-  options: OptionsWithLegacy<'sync' | 'async'> | undefined,
+  options: Options<'sync' | 'async'> | undefined,
   event: proto.OutboundMessage_LogEvent,
 ): void {
-  let span = event.span ? deprotofySourceSpan(event.span) : null;
-  if (span && options?.legacy) span = removeLegacyImporterFromSpan(span);
-  let message = event.message;
-  if (options?.legacy) message = removeLegacyImporter(message);
-  let formatted = event.formatted;
-  if (options?.legacy) formatted = removeLegacyImporter(formatted);
+  const span = event.span ? deprotofySourceSpan(event.span) : null;
   const deprecationType = validDeprecationId(event.deprecationType)
     ? deprecations[event.deprecationType]
     : null;
 
   if (event.type === proto.LogEventType.DEBUG) {
     if (options?.logger?.debug) {
-      options.logger.debug(message, {
+      options.logger.debug(event.message, {
         span: span!,
       });
     } else {
-      console.error(formatted);
+      console.error(event.formatted);
     }
   } else {
     if (options?.logger?.warn) {
@@ -193,13 +153,11 @@ export function handleLogEvent(
       if (span) params.span = span;
 
       const stack = event.stackTrace;
-      if (stack) {
-        params.stack = options?.legacy ? removeLegacyImporter(stack) : stack;
-      }
+      if (stack) params.stack = stack;
 
-      options.logger.warn(message, params);
+      options.logger.warn(event.message, params);
     } else {
-      console.error(formatted);
+      console.error(event.formatted);
     }
   }
 }

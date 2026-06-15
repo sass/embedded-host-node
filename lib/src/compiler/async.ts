@@ -9,8 +9,6 @@ import {takeUntil} from 'rxjs/operators';
 
 import * as path from 'path';
 import {
-  OptionsWithLegacy,
-  StringOptionsWithLegacy,
   createDispatcher,
   handleCompileResponse,
   handleLogEvent,
@@ -26,7 +24,7 @@ import {MessageTransformer} from '../message-transformer';
 import {PacketTransformer} from '../packet-transformer';
 import * as utils from '../utils';
 import * as proto from '../vendor/embedded_sass_pb';
-import {CompileResult} from '../vendor/sass';
+import {CompileResult, Options, StringOptions} from '../vendor/sass';
 
 /**
  * Flag allowing the constructor passed by `initAsyncCompiler` so we can
@@ -110,7 +108,7 @@ export class AsyncCompiler {
   private async compileRequestAsync(
     request: proto.InboundMessage_CompileRequest,
     importers: ImporterRegistry<'async'>,
-    options?: OptionsWithLegacy<'async'> & {legacy?: boolean},
+    options?: Options<'async'>,
   ): Promise<CompileResult> {
     const optionsKey = Symbol();
     activeDeprecationOptions.set(optionsKey, options ?? {});
@@ -178,7 +176,7 @@ export class AsyncCompiler {
 
   compileAsync(
     path: string,
-    options?: OptionsWithLegacy<'async'>,
+    options?: Options<'async'>,
   ): Promise<CompileResult> {
     this.throwIfDisposed();
     const importers = new ImporterRegistry(options);
@@ -191,7 +189,7 @@ export class AsyncCompiler {
 
   compileStringAsync(
     source: string,
-    options?: StringOptionsWithLegacy<'async'>,
+    options?: StringOptions<'async'>,
   ): Promise<CompileResult> {
     this.throwIfDisposed();
     const importers = new ImporterRegistry(options);

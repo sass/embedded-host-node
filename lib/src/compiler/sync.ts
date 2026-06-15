@@ -8,7 +8,6 @@ import {Subject} from 'rxjs';
 import * as sync_child_process from 'sync-child-process';
 
 import {
-  OptionsWithLegacy,
   createDispatcher,
   handleCompileResponse,
   handleLogEvent,
@@ -116,7 +115,7 @@ export class Compiler {
   private compileRequestSync(
     request: proto.InboundMessage_CompileRequest,
     importers: ImporterRegistry<'sync'>,
-    options?: OptionsWithLegacy<'sync'>,
+    options?: Options<'sync'>,
   ): CompileResult {
     const optionsKey = Symbol();
     activeDeprecationOptions.set(optionsKey, options ?? {});

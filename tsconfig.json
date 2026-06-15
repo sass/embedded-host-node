@@ -8,7 +8,8 @@
     "useUnknownInCatchVariables": false,
     "declarationDir": "_types",
     "lib": ["DOM"],
-    "types": ["node", "jest"]
+    "types": ["node", "jest"],
+    "moduleResolution": "bundler",
   },
   "include": [
     "package.json",

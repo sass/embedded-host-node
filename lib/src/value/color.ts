@@ -87,10 +87,7 @@ type PolarColorSpace = ColorSpaceHsl | ColorSpaceHwb | ColorSpaceLch;
  * colors.
  */
 type HueInterpolationMethod =
-  | 'decreasing'
-  | 'increasing'
-  | 'longer'
-  | 'shorter';
+  'decreasing' | 'increasing' | 'longer' | 'shorter';
 
 /**
  * Methods by which colors in bounded spaces can be mapped to within their

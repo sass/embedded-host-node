@@ -1,3 +1,51 @@
+## 1.101.7
+
+* No user-visible changes.
+
+## 1.101.6
+
+* No user-visible changes.
+
+## 1.101.5
+
+* No user-visible changes.
+
+## 1.101.4
+
+* Avoid emitting `rgb()` or `rgba()` functions with non-percent decimal
+  channels. Older browsers only support integer values or (potentially decimal)
+  percentages for these functions, so in order to preserve
+  backwards-compatibility while retaining full precision for modern browsers,
+  legacy colors that contain at least one non-integer channel will now use
+  percentages for their channels (for example, `rgb(0%, 100%, 50%)` rather than
+  `rgb(0, 255, 127.5)`).
+
+* Fix a bug where the values of plain-CSS `if()` expressions were emitted using
+  their `meta.inspect()` format rather than their CSS serialization format.
+
+## 1.101.3
+
+* No user-visible changes.
+
+## 1.101.2
+
+* Fix a bug where the deprecation warning for vendor-prefixed `expression()`
+  functions would incorrectly indicate whether or not the function would be
+  invalid Sass in Dart Sass 2.0.0.
+
+## 1.101.1
+
+* Sass stack trace entries are now always either absolute URLs, absolute paths,
+  or paths relative to the current working directory. Previously, if a
+  stylesheet was loaded using a relative URL (as from a load path), that
+  relative URL was listed even if it couldn't be resolved relative to the
+  current working directory. However, this created potential ambiguities, so
+  this behavior has been removed.
+
+### Command Line Interface
+
+* `--watch` mode now handles atomically-written files more gracefully.
+
 ## 1.101.0
 
 * **Potentially breaking bug fix:** The Node package importer now properly

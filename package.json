@@ -83,6 +83,7 @@
     "@types/tar": "^7.0.87",
     "@types/varint": "^6.0.1",
     "@types/yargs": "^17.0.4",
+    "@typescript/native": "npm:typescript@^7.0.2",
     "extract-zip": "^2.0.1",
     "gts": "^7.0.0",
     "jest": "^30.0.3",
@@ -93,7 +94,7 @@
     "tar": "^7.4.3",
     "ts-jest": "^29.4.11",
     "ts-node": "^10.2.1",
-    "typescript": "^6.0.3",
+    "typescript": "npm:@typescript/typescript6@^6.0.2",
     "yaml": "^2.2.1",
     "yargs": "^17.2.1"
   }

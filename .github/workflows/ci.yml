@@ -51,7 +51,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           check-latest: true
-      - uses: dart-lang/setup-dart@v1
+      - uses: dart-lang/setup-dart@v1.7.2
         with: {sdk: stable}
       - run: dart --version
 
@@ -90,7 +90,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v7
-      - uses: dart-lang/setup-dart@v1
+      - uses: dart-lang/setup-dart@v1.7.2
         with: {sdk: stable}
       - uses: actions/setup-node@v7
         with: {node-version: "${{ matrix.node_version }}"}

@@ -124,6 +124,65 @@ export function fileUrlToPathCrossPlatform(fileUrl: url.URL | string): string {
   return /^\/[A-Za-z]:\//.test(path) ? path.substring(1) : path;
 }
 
+/**
+ * Returns a pretty URL similar to Dart's `path.prettyUri`.
+ */
+export function prettyUrl(url: string): string {
+  if (!url.startsWith('file:')) return url;
+
+  const absolutePath = fileUrlToPathCrossPlatform(url);
+  const relativePath = p.relative(process.cwd(), absolutePath);
+  return relativePath.split(p.sep).length > absolutePath.split(p.sep).length
+    ? absolutePath
+    : relativePath;
+}
+
+/**
+ * Reformat URLs in formatted text from the embedded compiler.
+ */
+export function prettyFormatted(formatted: string, stack: string): string {
+  let longest = 0;
+
+  const frames = stack
+    .split('\n')
+    .filter(frame => frame !== '')
+    .map(frame => {
+      let [location, member] = frame.split(/  +/, 2);
+      let [url, lineColumn] = location.split(' ', 2);
+
+      url = prettyUrl(url);
+      location = lineColumn === undefined ? url : `${url} ${lineColumn}`;
+
+      if (location.length > longest) {
+        longest = location.length;
+      }
+      return {
+        frame,
+        location,
+        member,
+      };
+    });
+
+  let offset = formatted.length;
+
+  frames.reverse().forEach(({frame, location, member}) => {
+    const index = formatted.lastIndexOf(frame, offset);
+    if (index !== -1) {
+      offset = index;
+
+      const replacement = `${location.padEnd(longest)}  ${member}`;
+      if (frame !== replacement) {
+        formatted =
+          formatted.slice(0, index) +
+          replacement +
+          formatted.slice(index + frame.length);
+      }
+    }
+  });
+
+  return formatted;
+}
+
 /** Returns `path` without an extension, if it had one. */
 export function withoutExtension(path: string): string {
   const extension = p.extname(path);

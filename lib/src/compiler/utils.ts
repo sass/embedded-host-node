@@ -174,9 +174,25 @@ export function handleLogEvent(
         span: span!,
       });
     } else {
+      const url = event.span?.url;
+      if (url) {
+        const index = formatted.indexOf(url);
+        if (index !== -1) {
+          const replacement = utils.prettyUrl(url);
+          if (url !== replacement) {
+            formatted =
+              formatted.slice(0, index) +
+              replacement +
+              formatted.slice(index + url.length);
+          }
+        }
+      }
       console.error(formatted);
     }
   } else {
+    let stack = event.stackTrace;
+    if (stack && options?.legacy) stack = removeLegacyImporter(stack);
+
     if (options?.logger?.warn) {
       const params: (
         | {
@@ -192,14 +208,13 @@ export function handleLogEvent(
         : {deprecation: false};
       if (span) params.span = span;
 
-      const stack = event.stackTrace;
       if (stack) {
-        params.stack = options?.legacy ? removeLegacyImporter(stack) : stack;
+        params.stack = stack;
       }
 
       options.logger.warn(message, params);
     } else {
-      console.error(formatted);
+      console.error(utils.prettyFormatted(formatted, stack));
     }
   }
 }

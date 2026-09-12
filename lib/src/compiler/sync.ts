@@ -153,7 +153,7 @@ export class Compiler {
 
       for (;;) {
         if (!this.yield()) {
-          throw utils.compilerError('Embedded compiler exited unexpectedly.');
+          throw utils.compilerError('Embedded compiler exited unexpectedly');
         }
 
         if (error) throw error;
@@ -167,7 +167,7 @@ export class Compiler {
   /** Guards against using a disposed compiler. */
   private throwIfDisposed(): void {
     if (this.disposed) {
-      throw utils.compilerError('Sync compiler has already been disposed.');
+      throw utils.compilerError('Sync compiler has already been disposed');
     }
   }
 
@@ -176,7 +176,7 @@ export class Compiler {
     if (flag !== initFlag) {
       throw utils.compilerError(
         'Compiler can not be directly constructed. ' +
-          'Please use `sass.initAsyncCompiler()` instead.',
+          'Please use `sass.initCompiler()` instead',
       );
     }
     this.stderr$.subscribe(data => process.stderr.write(data));

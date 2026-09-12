@@ -596,7 +596,7 @@ export class SassNumber extends Value {
       }
 
       if (!otherHasUnits) {
-        return valueError(`Expected ${this} to have no units.`, params.name);
+        return valueError(`Expected ${this} to have no units`, params.name);
       }
 
       // For single numerators, throw a detailed error with info about which unit
@@ -607,7 +607,7 @@ export class SassNumber extends Value {
           return valueError(
             `Expected ${this} to have a single ${type} unit (${unitsByType[
               type
-            ].join(', ')}).`,
+            ].join(', ')})`,
             params.name,
           );
         }
@@ -622,7 +622,7 @@ export class SassNumber extends Value {
                 newNumerators,
                 newDenominators,
               )}`
-        }.`,
+        }`,
         params.name,
       );
     };

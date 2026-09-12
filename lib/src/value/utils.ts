@@ -16,7 +16,10 @@ export const precision = 10;
 const epsilon = 10 ** (-precision - 1);
 
 /** Whether `num1` and `num2` are equal within `epsilon`. */
-export function fuzzyEquals(num1: number, num2: number): boolean {
+export function fuzzyEquals(num1: number | null, num2: number | null): boolean {
+  if (num1 === null || num2 === null) {
+    return false;
+  }
   return Math.abs(num1 - num2) < epsilon;
 }
 
@@ -25,10 +28,8 @@ export function fuzzyEquals(num1: number, num2: number): boolean {
  *
  * Two numbers that `fuzzyEquals` each other must have the same hash code.
  */
-export function fuzzyHashCode(num: number): number {
-  return !isFinite(num) || isNaN(num)
-    ? hash(num)
-    : hash(Math.round(num / epsilon));
+export function fuzzyHashCode(num: number | null): number {
+  return num === null ? hash(num) : hash(Math.round(num / epsilon));
 }
 
 /** Whether `num1` < `num2`, within `epsilon`. */
@@ -72,7 +73,10 @@ export function fuzzyAsInt(num: number): number | null {
  *
  * If `num` `fuzzyEquals` `x.5`, rounds away from zero.
  */
-export function fuzzyRound(num: number): number {
+export function fuzzyRound(num: number | null): number | null {
+  if (num === null) {
+    return num;
+  }
   if (num > 0) {
     return fuzzyLessThan(num % 1, 0.5) ? Math.floor(num) : Math.ceil(num);
   } else {

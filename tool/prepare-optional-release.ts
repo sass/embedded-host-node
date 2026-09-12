@@ -8,11 +8,7 @@ import * as pkg from '../package.json';
 import * as utils from './utils';
 
 export type DartPlatform =
-  | 'android'
-  | 'linux'
-  | 'linux-musl'
-  | 'macos'
-  | 'windows';
+  'android' | 'linux' | 'linux-musl' | 'macos' | 'windows';
 export type DartArch = 'x64' | 'arm' | 'arm64' | 'riscv64';
 
 const argv = yargs(process.argv.slice(2))

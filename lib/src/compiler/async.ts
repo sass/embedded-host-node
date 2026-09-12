@@ -96,7 +96,7 @@ export class AsyncCompiler {
   /** Guards against using a disposed compiler. */
   private throwIfDisposed(): void {
     if (this.disposed) {
-      throw utils.compilerError('Async compiler has already been disposed.');
+      throw utils.compilerError('Async compiler has already been disposed');
     }
   }
 
@@ -161,7 +161,7 @@ export class AsyncCompiler {
     if (flag !== initFlag) {
       throw utils.compilerError(
         'AsyncCompiler can not be directly constructed. ' +
-          'Please use `sass.initAsyncCompiler()` instead.',
+          'Please use `sass.initAsyncCompiler()` instead',
       );
     }
     this.stderr$.subscribe(data => process.stderr.write(data));

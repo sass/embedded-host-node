@@ -1,3 +1,24 @@
+## 1.104.1
+
+* Fix a bug where loud comments before `@use` rules could be emitted multiple
+  times under certain circumstances.
+
+* Fix a bug in which an invalid selector at the end of an indented syntax
+  stylesheet would cause the parser to crash instead of emitting a useful error
+  message.
+
+### Command Line Interface
+
+* Many-to-many compilations no longer compile any files that appear in the
+  output directory if the output directory is also within the source directory.
+  This fixes a bug where `--watch` mode could enter an infinite loop recompiling
+  the same CSS file over and over.
+
+* Sass now sets the modification time of output files to the time compilation
+  *started* rather than the time it *ended*. This ensures that, if a source file
+  is modified during compilation, `--watch` and `--update` mode will recompile
+  the outputs to include the new source file contents.
+
 ## 1.104.0
 
 * **Potentially breaking compatibility fix:** Colors now convert the special

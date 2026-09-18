@@ -26,6 +26,7 @@ import {
   SassCalculation,
 } from './value/calculations';
 import {SassMixin} from './value/mixin';
+import {SassModule} from './value/module';
 
 /**
  * A class that converts [Value] objects into protobufs.
@@ -132,6 +133,14 @@ export class Protofier {
       }
       const mixin = create(proto.Value_CompilerMixinSchema, value);
       result.value = {case: 'compilerMixin', value: mixin};
+    } else if (value instanceof SassModule) {
+      if (value.compileContext !== this.functions.compileContext) {
+        throw utils.compilerError(
+          `Value ${value} does not belong to this compilation`,
+        );
+      }
+      const module = create(proto.Value_CompilerModuleSchema, value);
+      result.value = {case: 'compilerModule', value: module};
     } else if (value instanceof SassCalculation) {
       result.value = {
         case: 'calculation',
@@ -399,6 +408,12 @@ export class Protofier {
 
       case 'compilerMixin':
         return new SassMixin(
+          value.value.value.id,
+          this.functions.compileContext,
+        );
+
+      case 'compilerModule':
+        return new SassModule(
           value.value.value.id,
           this.functions.compileContext,
         );

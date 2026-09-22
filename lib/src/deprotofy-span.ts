@@ -14,20 +14,20 @@ export function deprotofySourceSpan(buffer: proto.SourceSpan): SourceSpan {
   const text = buffer.text;
 
   if (buffer.start === undefined) {
-    throw compilerError('Expected SourceSpan to have start.');
+    throw compilerError('Expected SourceSpan to have start');
   }
 
   let end;
   if (buffer.end === undefined) {
     if (text !== '') {
-      throw compilerError('Expected SourceSpan text to be empty.');
+      throw compilerError('Expected SourceSpan text to be empty');
     } else {
       end = buffer.start;
     }
   } else {
     end = buffer.end;
     if (end.offset < buffer.start.offset) {
-      throw compilerError('Expected SourceSpan end to be after start.');
+      throw compilerError('Expected SourceSpan end to be after start');
     }
   }
 

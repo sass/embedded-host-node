@@ -73,7 +73,7 @@ export function compilerError(message: string): Error {
  * been included but was not.
  */
 export function mandatoryError(field: string): Error {
-  return compilerError(`Missing mandatory field ${field}`);
+  return compilerError(`Missing mandatory field ${field}.`);
 }
 
 /** Constructs a host-caused Error. */

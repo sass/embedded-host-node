@@ -121,7 +121,10 @@ export class Dispatcher<sync extends 'sync' | 'async'> {
     callback: ResponseCallback,
   ): void {
     // Call the callback but unsubscribe first
+    let calledCallback = false;
     const callback_: ResponseCallback = (err, response) => {
+      if (calledCallback) return;
+      calledCallback = true;
       this.unsubscribe();
       return callback(err, response);
     };
@@ -136,7 +139,20 @@ export class Dispatcher<sync extends 'sync' | 'async'> {
         filter(message => message.message.case === 'compileResponse'),
         map(message => message.message.value as OutboundResponse),
       )
-      .subscribe({next: response => callback_(null, response)});
+      .subscribe({
+        next: response => callback_(null, response),
+        complete: () =>
+          // Wrap this in a setTimeout so that, if it's racing with
+          // `this.error$`, the error message wins.
+          setTimeout(
+            () =>
+              callback_(
+                new Error('Dispatcher closed before compilation completed'),
+                undefined,
+              ),
+            0,
+          ),
+      });
 
     this.error$.subscribe({
       error: error => callback_(error, undefined),

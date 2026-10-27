@@ -2,27 +2,97 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-import {Deprecation, DeprecationOrId, Options} from './vendor/sass';
-import {Version} from './version';
+import {deprecations} from './vendor/deprecations';
+import {
+  Deprecation,
+  DeprecationOrId,
+  DeprecationSelector,
+  DeprecationSelectorDifference,
+  Deprecations,
+  Options,
+} from './vendor/sass';
+import {Version, compareVersions} from './version';
 
 export {deprecations} from './vendor/deprecations';
 export {Deprecation, DeprecationOrId, DeprecationStatus} from './vendor/sass';
+
+/**
+ * A normalized representation of a {@link DeprecationSelector} which can easily
+ * be passed to a compile request or checked for a given deprecation.
+ */
+interface NormalizedDeprecationSelector {
+  /** Sass implementation versions selected by this selector. */
+  versions?: Version[];
+
+  /** Deprecation IDs selected by this selector. */
+  include?: Set<keyof Deprecations>;
+
+  /** Deprecation IDs excluded by this selector. */
+  exclude?: Set<keyof Deprecations>;
+}
+
+Object.defineProperty(deprecations, 'dartSass2', {
+  value: {
+    include: Version.parse('1.105.0'),
+    exclude: ['color-module-compat', 'import', 'global-builtin', 'if-function'],
+  },
+  enumerable: false,
+  writable: false,
+});
+
+/**
+ * Converts a {@link DeprecationSelector} to an array of IDs
+ * that's ready to include in a CompileRequest.
+ */
+export function normalizeDeprecationSelector(
+  selector: DeprecationSelector,
+): NormalizedDeprecationSelector {
+  if (Array.isArray(selector)) {
+    const result: NormalizedDeprecationSelector = {
+      versions: [],
+      include: new Set(),
+      exclude: new Set(),
+    };
+    for (const element of selector) {
+      const normalized = normalizeDeprecationSelector(element);
+      if (normalized.versions) result.versions!.push(...normalized.versions);
+      for (const id of normalized.include ?? []) {
+        result.include!.add(id);
+        result.exclude!.delete(id);
+      }
+      for (const id of normalized.exclude ?? []) {
+        result.exclude!.add(id);
+      }
+    }
+    return result;
+  }
+
+  if (selector instanceof Version) {
+    return {versions: [selector]};
+  } else if (typeof selector === 'string') {
+    return {include: new Set([selector])};
+  } else if ('id' in selector) {
+    return {include: new Set([selector.id])};
+  } else {
+    const difference = selector as DeprecationSelectorDifference;
+    const result = normalizeDeprecationSelector(difference.include);
+    result.exclude ??= new Set();
+    for (const id of getDeprecationIds(difference.exclude)) {
+      result.exclude.add(id);
+    }
+    return result;
+  }
+}
 
 /**
  * Converts a mixed array of deprecations, IDs, and versions to an array of IDs
  * that's ready to include in a CompileRequest.
  */
 export function getDeprecationIds(
-  arr: (DeprecationOrId | Version)[],
-): string[] {
-  return arr.map(item => {
-    if (item instanceof Version) {
-      return item.toString();
-    } else if (typeof item === 'string') {
-      return item;
-    }
-    return item.id;
-  });
+  arr: DeprecationOrId | DeprecationOrId[],
+): (keyof Deprecations)[] {
+  if (!Array.isArray(arr)) arr = [arr];
+  return arr.map(item => (typeof item === 'string' ? item : item.id));
 }
 
 /**
@@ -121,27 +191,18 @@ function isFatal(
     }
     return activeDeprecationOptions.size > 0;
   }
-  const versionNumber =
-    deprecation.deprecatedIn === null
-      ? null
-      : deprecation.deprecatedIn.major * 1000000 +
-        deprecation.deprecatedIn.minor * 1000 +
-        deprecation.deprecatedIn.patch;
-  for (const fatal of options.fatalDeprecations ?? []) {
-    if (fatal instanceof Version) {
-      if (versionNumber === null) continue;
-      if (deprecation.obsoleteIn !== null) continue;
-      if (
-        versionNumber <=
-        fatal.major * 1000000 + fatal.minor * 1000 + fatal.patch
-      ) {
-        return true;
-      }
-    } else if (typeof fatal === 'string') {
-      if (fatal === deprecation.id) return true;
-    } else {
-      if ((fatal as Deprecation).id === deprecation.id) return true;
+
+  const fatalDeprecations = normalizeDeprecationSelector(
+    options.fatalDeprecations ?? [],
+  );
+  if (deprecation.deprecatedIn && !deprecation.obsoleteIn) {
+    for (const version of fatalDeprecations.versions ?? []) {
+      if (compareVersions(deprecation.deprecatedIn, version) <= 0) return true;
     }
   }
-  return false;
+
+  return !!(
+    fatalDeprecations.include?.has(deprecation.id) &&
+    !fatalDeprecations.exclude?.has(deprecation.id)
+  );
 }

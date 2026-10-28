@@ -41,8 +41,8 @@ Object.defineProperty(deprecations, 'dartSass2', {
 });
 
 /**
- * Converts a {@link DeprecationSelector} to an array of IDs
- * that's ready to include in a CompileRequest.
+ * Normalized a {@link DeprecationSelector} to a form that's easier to include
+ * in a CompileRequest.
  */
 export function normalizeDeprecationSelector(
   selector: DeprecationSelector,

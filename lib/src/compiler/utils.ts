@@ -6,7 +6,12 @@ import * as p from 'path';
 import * as supportsColor from 'supports-color';
 import {create} from '@bufbuild/protobuf';
 
-import {Deprecation, deprecations, getDeprecationIds} from '../deprecations';
+import {
+  Deprecation,
+  deprecations,
+  getDeprecationIds,
+  normalizeDeprecationSelector,
+} from '../deprecations';
 import {deprotofySourceSpan} from '../deprotofy-span';
 import {Dispatcher, DispatcherHandlers} from '../dispatcher';
 import {Exception} from '../exception';
@@ -67,6 +72,10 @@ function newCompileRequest(
   importers: ImporterRegistry<'sync' | 'async'>,
   options?: Options<'sync' | 'async'>,
 ): proto.InboundMessage_CompileRequest {
+  const normalizedFatalDeprecations = normalizeDeprecationSelector(
+    options?.fatalDeprecations ?? [],
+  );
+
   const request = create(proto.InboundMessage_CompileRequestSchema, {
     importers: importers.importers,
     globalFunctions: Object.keys(options?.functions ?? {}),
@@ -78,10 +87,21 @@ function newCompileRequest(
     verbose: !!options?.verbose,
     charset: !!(options?.charset ?? true),
     silent: options?.logger === Logger.silent,
-    fatalDeprecation: getDeprecationIds(options?.fatalDeprecations ?? []),
+    fatalDeprecationExcept: [...(normalizedFatalDeprecations.exclude ?? [])],
     silenceDeprecation: getDeprecationIds(options?.silenceDeprecations ?? []),
     futureDeprecation: getDeprecationIds(options?.futureDeprecations ?? []),
   });
+
+  if (normalizedFatalDeprecations.versions) {
+    request.fatalDeprecation.push(
+      ...normalizedFatalDeprecations.versions.map(version =>
+        version.toString(),
+      ),
+    );
+  }
+  if (normalizedFatalDeprecations.include) {
+    request.fatalDeprecation.push(...normalizedFatalDeprecations.include);
+  }
 
   switch (options?.style ?? 'expanded') {
     case 'expanded':

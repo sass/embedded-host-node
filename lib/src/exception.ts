@@ -15,7 +15,7 @@ export class Exception extends Error implements SassException {
     super(failure.formatted);
 
     this.sassMessage = failure.message;
-    this.sassStack = failure.stackTrace;
+    this.sassStack = failure.formatted.slice(failure.formattedStackTraceOffset);
     this.span = deprotofySourceSpan(failure.span!);
   }
 

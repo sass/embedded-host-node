@@ -212,7 +212,7 @@ export function handleLogEvent(
         : {deprecation: false};
       if (span) params.span = span;
 
-      const stack = event.stackTrace;
+      const stack = event.formatted.slice(event.formattedStackTraceOffset);
       if (stack) {
         params.stack = options?.legacy ? removeLegacyImporter(stack) : stack;
       }

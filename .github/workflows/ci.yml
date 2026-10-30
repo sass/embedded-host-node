@@ -6,6 +6,12 @@ defaults:
 env:
   PROTOC_VERSION: 3.x
 
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-build-linux-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 on:
   push:
     branches: [main, feature.*]
@@ -18,14 +24,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
+          package-manager-cache: ${{ !startsWith(github.ref, 'refs/tags/') }} # zizmor: ignore[cache-poisoning] zizmorcore/zizmor#2496
           node-version: 'lts/*'
           check-latest: true
 
       - name: Check out the language repo
-        uses: sass/clone-linked-repo@v1
+        uses: sass/clone-linked-repo@ec2dcd11c5eaec56b64855712372056a14e9614d # v1.0.0
         with: {repo: sass/sass, path: language}
 
       - run: npm install
@@ -34,6 +42,17 @@ jobs:
           npm run init -- --skip-compiler --language-path=language $args
 
       - run: npm run check
+
+  static_analysis_ci:
+    name: Static analysis (GitHub Actions)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: {persist-credentials: false}
+      - uses: zizmorcore/zizmor-action@cc914d7f3750a2d13d75c7f184a1060aa0e9d482 # v0.6.4
+        with:
+          persona: pedantic
+          advanced-security: false # Fail the GitHub action if Zizmor has findings
 
   tests:
     name: 'Tests | Node ${{ matrix.node-version }} | ${{ matrix.os }}'
@@ -46,21 +65,23 @@ jobs:
       fail-fast: false
 
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
+          package-manager-cache: ${{ !startsWith(github.ref, 'refs/tags/') }} # zizmor: ignore[cache-poisoning] zizmorcore/zizmor#2496
           node-version: ${{ matrix.node-version }}
           check-latest: true
-      - uses: dart-lang/setup-dart@v1.8.1
+      - uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d # v1.8.1
         with: {sdk: stable}
       - run: dart --version
 
       - name: Check out Dart Sass
-        uses: sass/clone-linked-repo@v1
+        uses: sass/clone-linked-repo@ec2dcd11c5eaec56b64855712372056a14e9614d # v1.0.0
         with: {repo: sass/dart-sass}
 
       - name: Check out the language repo
-        uses: sass/clone-linked-repo@v1
+        uses: sass/clone-linked-repo@ec2dcd11c5eaec56b64855712372056a14e9614d # v1.0.0
         with: {repo: sass/sass, path: language}
 
       - run: npm install
@@ -89,18 +110,21 @@ jobs:
             node_version: lts/-2
 
     steps:
-      - uses: actions/checkout@v7
-      - uses: dart-lang/setup-dart@v1.8.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: {persist-credentials: false}
+      - uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d # v1.8.1
         with: {sdk: stable}
-      - uses: actions/setup-node@v7
-        with: {node-version: "${{ matrix.node_version }}"}
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          package-manager-cache: ${{ !startsWith(github.ref, 'refs/tags/') }} # zizmor: ignore[cache-poisoning] zizmorcore/zizmor#2496
+          node-version: "${{ matrix.node_version }}"
 
       - name: Check out Dart Sass
-        uses: sass/clone-linked-repo@v1
+        uses: sass/clone-linked-repo@ec2dcd11c5eaec56b64855712372056a14e9614d # v1.0.0
         with: {repo: sass/dart-sass}
 
       - name: Check out the language repo
-        uses: sass/clone-linked-repo@v1
+        uses: sass/clone-linked-repo@ec2dcd11c5eaec56b64855712372056a14e9614d # v1.0.0
         with: {repo: sass/sass, path: language}
 
       - run: npm install
@@ -109,7 +133,7 @@ jobs:
           npm run init -- --compiler-path=dart-sass --language-path=language $args
 
       - name: Check out sass-spec
-        uses: sass/clone-linked-repo@v1
+        uses: sass/clone-linked-repo@ec2dcd11c5eaec56b64855712372056a14e9614d # v1.0.0
         with: {repo: sass/sass-spec}
 
       - name: Install sass-spec dependencies
@@ -127,7 +151,5 @@ jobs:
     needs: [static_analysis, tests, sass_spec]
     if: "github.ref_type == 'tag' && github.event.repository.fork == false"
     permissions:
-      attestations: write
-      contents: write
-      id-token: write
-    uses: ./.github/workflows/release.yml
+      id-token: write # Forwarded
+    uses: $/.github/workflows/release.yml

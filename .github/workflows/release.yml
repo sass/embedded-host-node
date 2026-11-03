@@ -3,21 +3,32 @@ name: Release
 on:
   workflow_call:
 
+permissions: {}
+
+# Prevent an attacker who can write to the cache in a less-privileged action
+# from using it to escalate to a release action.
+cache-mode: none
+
 jobs:
   deploy_npm:
     name: Deploy npm
     runs-on: ubuntu-latest
 
+    permissions:
+      id-token: write # Mints OIDC token to request Sigstore signing certificate
+
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
+          package-manager-cache: false
           node-version: 'lts/*'
           check-latest: true
           registry-url: 'https://registry.npmjs.org'
 
       # npm trusted publisher infrastructure requires npm >=11.5.1
-      - run: npm install -g npm@latest
+      - run: npm install -g npm@latest # zizmor: ignore[adhoc-packages]
 
       - run: npm install
 

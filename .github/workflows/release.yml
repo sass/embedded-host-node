@@ -23,7 +23,7 @@ jobs:
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           package-manager-cache: false
-          node-version: 'lts/*'
+          node-version: '24.x' # max-mapper/extract-zip#154 and sass/embedded-host-node#457
           check-latest: true
           registry-url: 'https://registry.npmjs.org'
 

@@ -2,7 +2,7 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-import {Observable, Subject} from 'rxjs';
+import {Observable, Subject, Subscriber} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {fromBinary, toBinary} from '@bufbuild/protobuf';
 import * as varint from 'varint';
@@ -32,13 +32,61 @@ export class MessageTransformer {
    */
   readonly outboundMessages$ = this.outboundMessagesInternal$.pipe();
 
+  // The subscriber to each compilation's OutboundMessages, by compilation ID.
+  // Routing by ID keeps the cost of each message independent of the number of
+  // compilations in flight.
+  private readonly compilationSubscribers = new Map<
+    number,
+    Subscriber<OutboundMessage>
+  >();
+
+  // Set once `outboundMessages$` errors or completes, to end subscriptions
+  // made after that the same way.
+  private endSubscriber?: (subscriber: Subscriber<OutboundMessage>) => void;
+
   constructor(
     private readonly outboundProtobufs$: Observable<Uint8Array>,
     private readonly writeInboundProtobuf: (buffer: Uint8Array) => void,
   ) {
+    this.outboundMessagesInternal$.subscribe({
+      next: ([compilationId, message]) =>
+        this.compilationSubscribers.get(compilationId)?.next(message),
+      error: error => this.end(subscriber => subscriber.error(error)),
+      complete: () => this.end(subscriber => subscriber.complete()),
+    });
+
     this.outboundProtobufs$
       .pipe(map(decode))
       .subscribe(this.outboundMessagesInternal$);
+  }
+
+  /**
+   * The OutboundMessages for `compilationId`. Errors or completes when
+   * `outboundMessages$` does. Each compilation ID supports one subscriber at a
+   * time.
+   */
+  outboundMessagesFor(compilationId: number): Observable<OutboundMessage> {
+    return new Observable(subscriber => {
+      if (this.endSubscriber) {
+        this.endSubscriber(subscriber);
+        return;
+      }
+      this.compilationSubscribers.set(compilationId, subscriber);
+      return () => {
+        if (this.compilationSubscribers.get(compilationId) === subscriber) {
+          this.compilationSubscribers.delete(compilationId);
+        }
+      };
+    });
+  }
+
+  private end(
+    endSubscriber: (subscriber: Subscriber<OutboundMessage>) => void,
+  ): void {
+    this.endSubscriber = endSubscriber;
+    for (const subscriber of [...this.compilationSubscribers.values()]) {
+      endSubscriber(subscriber);
+    }
   }
 
   /**

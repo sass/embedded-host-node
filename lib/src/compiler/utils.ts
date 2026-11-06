@@ -60,7 +60,7 @@ export function createDispatcher<sync extends 'sync' | 'async'>(
 ): Dispatcher<sync> {
   return new Dispatcher<sync>(
     compilationId,
-    messageTransformer.outboundMessages$,
+    messageTransformer.outboundMessagesFor(compilationId),
     message => messageTransformer.writeInboundMessage(message),
     handlers,
   );

@@ -83,8 +83,8 @@
     "@types/tar": "^7.0.87",
     "@types/varint": "^6.0.1",
     "@types/yargs": "^17.0.4",
+    "@types/yauzl": "^3.4.0",
     "@typescript/native": "npm:typescript@^7.0.2",
-    "extract-zip": "^2.0.1",
     "gts": "^7.0.0",
     "jest": "^30.0.3",
     "npm-run-all": "^4.1.5",
@@ -96,6 +96,7 @@
     "ts-node": "^10.2.1",
     "typescript": "npm:@typescript/typescript6@^6.0.2",
     "yaml": "^2.2.1",
-    "yargs": "^17.2.1"
+    "yargs": "^17.2.1",
+    "yauzl": "^3.4.0"
   }
 }

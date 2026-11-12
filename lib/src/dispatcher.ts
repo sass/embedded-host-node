@@ -73,9 +73,7 @@ export class Dispatcher<sync extends 'sync' | 'async'> {
 
   constructor(
     private readonly compilationId: number,
-    private readonly outboundMessages$: Observable<
-      [number, proto.OutboundMessage]
-    >,
+    private readonly outboundMessages$: Observable<proto.OutboundMessage>,
     private readonly writeInboundMessage: (
       message: [number, proto.InboundMessage],
     ) => void,
@@ -87,8 +85,6 @@ export class Dispatcher<sync extends 'sync' | 'async'> {
 
     this.outboundMessages$
       .pipe(
-        filter(([compilationId]) => compilationId === this.compilationId),
-        map(([, message]) => message),
         mergeMap(message => {
           const result = this.handleOutboundMessage(message);
           return result instanceof Promise

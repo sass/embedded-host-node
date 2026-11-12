@@ -2,7 +2,7 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-import {Observable, Subject} from 'rxjs';
+import {Observable, Subject, Subscription} from 'rxjs';
 import * as varint from 'varint';
 import {create, toBinary} from '@bufbuild/protobuf';
 
@@ -105,6 +105,99 @@ describe('message transformer', () => {
 
         protobufs$.next(Buffer.from([-1]));
       });
+    });
+  });
+
+  describe('outboundMessagesFor', () => {
+    let protobufs$: Subject<Uint8Array>;
+
+    beforeEach(() => {
+      protobufs$ = new Subject();
+      messages = new MessageTransformer(protobufs$, () => {});
+    });
+
+    function sendLogEvent(compilationId: number, text: string): void {
+      protobufs$.next(
+        Uint8Array.from([
+          ...varint.encode(compilationId),
+          ...toBinary(
+            proto.OutboundMessageSchema,
+            create(proto.OutboundMessageSchema, {
+              message: {case: 'logEvent', value: {message: text}},
+            }),
+          ),
+        ]),
+      );
+    }
+
+    function collect(compilationId: number): {
+      texts: string[];
+      subscription: Subscription;
+    } {
+      const texts: string[] = [];
+      const subscription = messages
+        .outboundMessagesFor(compilationId)
+        .subscribe(message =>
+          texts.push(
+            (message.message.value as proto.OutboundMessage_LogEvent).message,
+          ),
+        );
+      return {texts, subscription};
+    }
+
+    it("emits only the compilation's messages", () => {
+      const first = collect(1);
+      const second = collect(2);
+
+      sendLogEvent(1, 'a');
+      sendLogEvent(2, 'b');
+      sendLogEvent(3, 'c');
+      sendLogEvent(1, 'd');
+
+      expect(first.texts).toEqual(['a', 'd']);
+      expect(second.texts).toEqual(['b']);
+    });
+
+    it('routes a reused compilation ID to its new subscriber', () => {
+      const previous = collect(1);
+      sendLogEvent(1, 'a');
+      previous.subscription.unsubscribe();
+
+      const next = collect(1);
+      sendLogEvent(1, 'b');
+
+      expect(previous.texts).toEqual(['a']);
+      expect(next.texts).toEqual(['b']);
+    });
+
+    it('errors every compilation when a message fails to decode', () => {
+      const errors: unknown[] = [];
+      for (const compilationId of [1, 2]) {
+        messages
+          .outboundMessagesFor(compilationId)
+          .subscribe({error: error => errors.push(error)});
+      }
+
+      protobufs$.next(Buffer.from([-1]));
+      messages
+        .outboundMessagesFor(3)
+        .subscribe({error: error => errors.push(error)});
+
+      expect(errors).toHaveLength(3);
+    });
+
+    it('completes every compilation when the compiler exits', () => {
+      let completed = 0;
+      for (const compilationId of [1, 2]) {
+        messages
+          .outboundMessagesFor(compilationId)
+          .subscribe({complete: () => completed++});
+      }
+
+      protobufs$.complete();
+      messages.outboundMessagesFor(3).subscribe({complete: () => completed++});
+
+      expect(completed).toBe(3);
     });
   });
 });

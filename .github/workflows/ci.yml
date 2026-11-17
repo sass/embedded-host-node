@@ -33,7 +33,7 @@ jobs:
           check-latest: true
 
       - name: Check out the language repo
-        uses: sass/clone-linked-repo@ec2dcd11c5eaec56b64855712372056a14e9614d # v1.0.0
+        uses: sass/clone-linked-repo@5c6b8c79dc302d9104921eb4fee1942b15031e36 # v1.2.0
         with: {repo: sass/sass, path: language}
 
       - run: npm install
@@ -77,11 +77,11 @@ jobs:
       - run: dart --version
 
       - name: Check out Dart Sass
-        uses: sass/clone-linked-repo@ec2dcd11c5eaec56b64855712372056a14e9614d # v1.0.0
+        uses: sass/clone-linked-repo@5c6b8c79dc302d9104921eb4fee1942b15031e36 # v1.2.0
         with: {repo: sass/dart-sass}
 
       - name: Check out the language repo
-        uses: sass/clone-linked-repo@ec2dcd11c5eaec56b64855712372056a14e9614d # v1.0.0
+        uses: sass/clone-linked-repo@5c6b8c79dc302d9104921eb4fee1942b15031e36 # v1.2.0
         with: {repo: sass/sass, path: language}
 
       - run: npm install
@@ -120,11 +120,11 @@ jobs:
           node-version: "${{ matrix.node_version }}"
 
       - name: Check out Dart Sass
-        uses: sass/clone-linked-repo@ec2dcd11c5eaec56b64855712372056a14e9614d # v1.0.0
+        uses: sass/clone-linked-repo@5c6b8c79dc302d9104921eb4fee1942b15031e36 # v1.2.0
         with: {repo: sass/dart-sass}
 
       - name: Check out the language repo
-        uses: sass/clone-linked-repo@ec2dcd11c5eaec56b64855712372056a14e9614d # v1.0.0
+        uses: sass/clone-linked-repo@5c6b8c79dc302d9104921eb4fee1942b15031e36 # v1.2.0
         with: {repo: sass/sass, path: language}
 
       - run: npm install
@@ -133,7 +133,7 @@ jobs:
           npm run init -- --compiler-path=dart-sass --language-path=language $args
 
       - name: Check out sass-spec
-        uses: sass/clone-linked-repo@ec2dcd11c5eaec56b64855712372056a14e9614d # v1.0.0
+        uses: sass/clone-linked-repo@5c6b8c79dc302d9104921eb4fee1942b15031e36 # v1.2.0
         with: {repo: sass/sass-spec}
 
       - name: Install sass-spec dependencies

@@ -10,6 +10,7 @@ export class Version implements api.Version {
     readonly minor: number,
     readonly patch: number,
   ) {}
+
   static parse(version: string): Version {
     const match = version.match(/^(\d+)\.(\d+)\.(\d+)$/);
     if (match === null) {
@@ -21,7 +22,21 @@ export class Version implements api.Version {
       parseInt(match[3]),
     );
   }
+
   toString(): string {
     return `${this.major}.${this.minor}.${this.patch}`;
   }
+}
+
+/**
+ * Returns a negative number if `version1` comes before `version2` in semantic
+ * order, a positive number if `version2` comes before `version1`, and 0 if
+ * they're equal.
+ */
+export function compareVersions(version1: Version, version2: Version): number {
+  const major = version1.major - version2.major;
+  if (major !== 0) return major;
+  const minor = version1.minor - version2.minor;
+  if (minor !== 0) return minor;
+  return version1.patch - version2.patch;
 }

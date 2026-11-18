@@ -2,9 +2,11 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-import {existsSync, promises as fs, lstatSync} from 'fs';
+import {createWriteStream, existsSync, promises as fs, lstatSync} from 'fs';
+import stream from 'stream';
 import * as p from 'path';
 import * as shell from 'shelljs';
+import * as yauzl from 'yauzl';
 
 shell.config.fatal = true;
 
@@ -85,5 +87,22 @@ async function tryRealpath(path: string): Promise<string | null> {
     return await fs.realpath(p.resolve(path));
   } catch (_) {
     return null;
+  }
+}
+
+// Extract a zip file.
+//
+// Use this function only on trusted zip files.
+export async function extractZip(source: string, dest: string): Promise<void> {
+  const zipfile = await yauzl.openPromise(source);
+  for await (const entry of zipfile.eachEntry()) {
+    if (entry.fileName.endsWith('/')) {
+      continue;
+    } else {
+      const file = p.join(dest, entry.fileName);
+      await fs.mkdir(p.dirname(file), {recursive: true});
+      const readStream = await zipfile.openReadStreamPromise(entry);
+      await stream.promises.pipeline(readStream, createWriteStream(file));
+    }
   }
 }

@@ -1,4 +1,3 @@
-import extractZip = require('extract-zip');
 import {promises as fs} from 'fs';
 import * as p from 'path';
 import {extract as extractTar} from 'tar';
@@ -93,9 +92,10 @@ async function downloadRelease(options: {
     options.outPath + '/' + options.repo + archiveExtension;
   await fs.writeFile(zippedAssetPath, releaseAsset);
   if (archiveExtension === '.zip') {
-    await extractZip(zippedAssetPath, {
-      dir: p.join(process.cwd(), options.outPath),
-    });
+    await utils.extractZip(
+      zippedAssetPath,
+      p.join(process.cwd(), options.outPath),
+    );
   } else {
     extractTar({
       file: zippedAssetPath,

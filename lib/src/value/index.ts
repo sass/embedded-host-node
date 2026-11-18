@@ -13,6 +13,7 @@ import {SassString} from './string';
 import {valueError} from '../utils';
 import {SassCalculation} from './calculations';
 import {SassMixin} from './mixin';
+import {SassModule} from './module';
 
 /**
  * A SassScript value.
@@ -149,6 +150,17 @@ export abstract class Value implements ValueObject {
    */
   assertMixin(name?: string): SassMixin {
     throw valueError(`${this} is not a mixin reference`, name);
+  }
+
+  /**
+   * Casts `this` to `SassModule`; throws if `this` isn't a module
+   * reference.
+   *
+   * If `this` came from a function argument, `name` is the argument name
+   * (without the `$`) and is used for error reporting.
+   */
+  assertModule(name?: string): SassModule {
+    throw valueError(`${this} is not a module reference`, name);
   }
 
   /**

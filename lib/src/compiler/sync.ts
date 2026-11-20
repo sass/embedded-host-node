@@ -4,12 +4,11 @@
 
 import * as path from 'path';
 
-import {Subject} from 'rxjs';
+import {Subject, filter, map} from 'rxjs';
 import * as sync_child_process from 'sync-child-process';
 
 import {
   OptionsWithLegacy,
-  createDispatcher,
   handleCompileResponse,
   handleLogEvent,
   newCompilePathRequest,
@@ -17,7 +16,6 @@ import {
 } from './utils';
 import {compilerCommand} from '../compiler-path';
 import {activeDeprecationOptions} from '../deprecations';
-import {Dispatcher} from '../dispatcher';
 import {FunctionRegistry} from '../function-registry';
 import {ImporterRegistry} from '../importer-registry';
 import {MessageTransformer} from '../message-transformer';
@@ -26,6 +24,7 @@ import * as utils from '../utils';
 import * as proto from '../vendor/embedded_sass_pb';
 import {CompileResult} from '../vendor/sass/compile';
 import {Options} from '../vendor/sass/options';
+import {dispatchCompilation} from '../dispatch-compilation';
 
 /**
  * Flag allowing the constructor passed by `initCompiler` so we can
@@ -63,8 +62,8 @@ export class Compiler {
   /** The next compilation ID. */
   private compilationId = 1;
 
-  /** A list of active dispatchers. */
-  private readonly dispatchers: Set<Dispatcher<'sync'>> = new Set();
+  /** The set of IDs for active compilations. */
+  private readonly activeCompilationIds = new Set<number>();
 
   /** The buffers emitted by the child process's stdout. */
   private readonly stdout$ = new Subject<Buffer>();
@@ -122,35 +121,52 @@ export class Compiler {
     activeDeprecationOptions.set(optionsKey, options ?? {});
     try {
       const functions = new FunctionRegistry(options?.functions);
+      const compilationId = this.compilationId++;
+      this.activeCompilationIds.add(compilationId);
 
-      const dispatcher = createDispatcher<'sync'>(
-        this.compilationId++,
-        this.messageTransformer,
+      let error: unknown;
+      let response: proto.OutboundMessage_CompileResponse | undefined;
+      dispatchCompilation<'sync'>(
+        compilationId,
+        request,
+        this.messageTransformer.outboundMessages$.pipe(
+          // Almost universally, there will only be one compilation running
+          // since it's synchronously blocking everything else. However, it's
+          // possible in principle for a request callback to start another
+          // compilation on the same compiler, so we should filter for the right
+          // ID just in case.
+          filter(([messageCompilationId, _]) => {
+            if (!this.activeCompilationIds.has(messageCompilationId)) {
+              throw utils.compilerError(
+                'Compiler sent a message for non-existent or completed ' +
+                  `compilation with ID ${compilationId}.`,
+              );
+            }
+            return messageCompilationId === compilationId;
+          }),
+          map(([_, message]) => message),
+        ),
+        message => this.messageTransformer.writeInboundMessage(message),
         {
           handleImportRequest: request => importers.import(request),
           handleFileImportRequest: request => importers.fileImport(request),
           handleCanonicalizeRequest: request => importers.canonicalize(request),
           handleFunctionCallRequest: request => functions.call(request),
+          handleLogEvent: event => handleLogEvent(options, event),
+        },
+        (error_, response_) => {
+          this.activeCompilationIds.delete(compilationId);
+          // Reset the compilation ID when the compiler goes idle (no active
+          // dispatchers) to avoid overflowing it.
+          // https://github.com/sass/embedded-host-node/pull/261#discussion_r1429266794
+          if (this.activeCompilationIds.size === 0) this.compilationId = 1;
+          if (error_) {
+            error = error_;
+          } else {
+            response = response_;
+          }
         },
       );
-      this.dispatchers.add(dispatcher);
-
-      dispatcher.logEvents$.subscribe(event => handleLogEvent(options, event));
-
-      let error: unknown;
-      let response: proto.OutboundMessage_CompileResponse | undefined;
-      dispatcher.sendCompileRequest(request, (error_, response_) => {
-        this.dispatchers.delete(dispatcher);
-        // Reset the compilation ID when the compiler goes idle (no active
-        // dispatchers) to avoid overflowing it.
-        // https://github.com/sass/embedded-host-node/pull/261#discussion_r1429266794
-        if (this.dispatchers.size === 0) this.compilationId = 1;
-        if (error_) {
-          error = error_;
-        } else {
-          response = response_;
-        }
-      });
 
       for (;;) {
         if (!this.yield()) {

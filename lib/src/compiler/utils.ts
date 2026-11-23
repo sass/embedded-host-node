@@ -13,7 +13,6 @@ import {
   normalizeDeprecationSelector,
 } from '../deprecations';
 import {deprotofySourceSpan} from '../deprotofy-span';
-import {Dispatcher, DispatcherHandlers} from '../dispatcher';
 import {Exception} from '../exception';
 import {ImporterRegistry} from '../importer-registry';
 import {
@@ -22,7 +21,6 @@ import {
   removeLegacyImporterFromSpan,
 } from '../legacy/utils';
 import {Logger} from '../logger';
-import {MessageTransformer} from '../message-transformer';
 import * as utils from '../utils';
 import * as proto from '../vendor/embedded_sass_pb';
 import {SourceSpan} from '../vendor/sass';
@@ -49,22 +47,6 @@ export type OptionsWithLegacy<sync extends 'sync' | 'async'> = Options<sync> & {
  */
 export type StringOptionsWithLegacy<sync extends 'sync' | 'async'> =
   StringOptions<sync> & {legacy?: boolean};
-
-/**
- * Creates a dispatcher that dispatches messages from the given `stdout` stream.
- */
-export function createDispatcher<sync extends 'sync' | 'async'>(
-  compilationId: number,
-  messageTransformer: MessageTransformer,
-  handlers: DispatcherHandlers<sync>,
-): Dispatcher<sync> {
-  return new Dispatcher<sync>(
-    compilationId,
-    messageTransformer.outboundMessages$,
-    message => messageTransformer.writeInboundMessage(message),
-    handlers,
-  );
-}
 
 // Creates a compilation request for the given `options` without adding any
 // input-specific options.

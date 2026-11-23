@@ -5,16 +5,19 @@
 import * as fs from 'fs';
 import {chdir} from 'process';
 import {AsyncCompiler, initAsyncCompiler} from './compiler/async';
-import * as compilerModule from './compiler/utils';
+import * as dispatchCompilationModule from './dispatch-compilation';
 import {Compiler, initCompiler} from './compiler/sync';
 
-const createDispatcher = jest.spyOn(compilerModule, 'createDispatcher');
+const dispatchCompilation = jest.spyOn(
+  dispatchCompilationModule,
+  'dispatchCompilation',
+);
 function getIdHistory(): number[] {
-  return createDispatcher.mock.calls.map(([id]) => id);
+  return dispatchCompilation.mock.calls.map(([id]) => id);
 }
 
 afterEach(() => {
-  createDispatcher.mockClear();
+  dispatchCompilation.mockClear();
 });
 
 describe('compiler', () => {

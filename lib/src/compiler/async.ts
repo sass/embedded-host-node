@@ -4,14 +4,13 @@
 
 import * as child_process from 'child_process';
 
-import {Observable} from 'rxjs';
+import {Observable, Subject} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
 
 import * as path from 'path';
 import {
   OptionsWithLegacy,
   StringOptionsWithLegacy,
-  createDispatcher,
   handleCompileResponse,
   handleLogEvent,
   newCompilePathRequest,
@@ -27,6 +26,7 @@ import {PacketTransformer} from '../packet-transformer';
 import * as utils from '../utils';
 import * as proto from '../vendor/embedded_sass_pb';
 import {CompileResult} from '../vendor/sass';
+import {dispatchCompilation} from '../dispatch-compilation';
 
 /**
  * Flag allowing the constructor passed by `initAsyncCompiler` so we can
@@ -64,13 +64,17 @@ export class AsyncCompiler {
   /** The next compilation ID. */
   private compilationId = 1;
 
-  /** A list of active compilations. */
-  private readonly compilations: Set<
-    Promise<proto.OutboundMessage_CompileResponse>
-  > = new Set();
+  /** A map from compilation IDs to objects relating to active compilations. */
+  private readonly compilations = new Map<number, ActiveCompilation>();
 
   /** Whether the underlying compiler has already exited. */
   private disposed = false;
+
+  /**
+   * An error that has occurred when no compilations were running. This will be
+   * thrown next time a user calls a method.
+   */
+  private outOfBandError: unknown;
 
   /** Reusable message transformer for all compilations.  */
   private readonly messageTransformer: MessageTransformer;
@@ -98,7 +102,12 @@ export class AsyncCompiler {
   /** Guards against using a disposed compiler. */
   private throwIfDisposed(): void {
     if (this.disposed) {
-      throw utils.compilerError('Async compiler has already been disposed');
+      if (this.outOfBandError !== undefined) {
+        this.outOfBandError = undefined;
+        throw this.outOfBandError;
+      } else {
+        throw utils.compilerError('Async compiler has already been disposed');
+      }
     }
   }
 
@@ -117,17 +126,8 @@ export class AsyncCompiler {
     try {
       const functions = new FunctionRegistry(options?.functions);
 
-      const dispatcher = createDispatcher<'async'>(
-        this.compilationId++,
-        this.messageTransformer,
-        {
-          handleImportRequest: request => importers.import(request),
-          handleFileImportRequest: request => importers.fileImport(request),
-          handleCanonicalizeRequest: request => importers.canonicalize(request),
-          handleFunctionCallRequest: request => functions.call(request),
-        },
-      );
-      dispatcher.logEvents$.subscribe(event => handleLogEvent(options, event));
+      const compilationId = this.compilationId++;
+      const outboundMessages$ = new Subject<proto.OutboundMessage>();
 
       // Avoid `new Promise()` here because `dispatcher.sendCompilerequest` can
       // run its callback synchronously, so `compilation` needs to be assigned
@@ -137,20 +137,37 @@ export class AsyncCompiler {
         resolve,
         reject,
       } = promiseWithResolvers<proto.OutboundMessage_CompileResponse>();
-      this.compilations.add(compilation);
-
-      dispatcher.sendCompileRequest(request, (err, response) => {
-        this.compilations.delete(compilation);
-        // Reset the compilation ID when the compiler goes idle (no active
-        // compilations) to avoid overflowing it.
-        // https://github.com/sass/embedded-host-node/pull/261#discussion_r1429266794
-        if (this.compilations.size === 0) this.compilationId = 1;
-        if (err) {
-          reject(err);
-        } else {
-          resolve(response!);
-        }
+      this.compilations.set(compilationId, {
+        outboundMessages$,
+        result: compilation,
+        reject,
       });
+
+      dispatchCompilation<'async'>(
+        compilationId,
+        request,
+        outboundMessages$,
+        message => this.messageTransformer.writeInboundMessage(message),
+        {
+          handleImportRequest: request => importers.import(request),
+          handleFileImportRequest: request => importers.fileImport(request),
+          handleCanonicalizeRequest: request => importers.canonicalize(request),
+          handleFunctionCallRequest: request => functions.call(request),
+          handleLogEvent: event => handleLogEvent(options, event),
+        },
+        (err, response) => {
+          this.compilations.delete(compilationId);
+          // Reset the compilation ID when the compiler goes idle (no active
+          // compilations) to avoid overflowing it.
+          // https://github.com/sass/embedded-host-node/pull/261#discussion_r1429266794
+          if (this.compilations.size === 0) this.compilationId = 1;
+          if (err) {
+            reject(err);
+          } else {
+            resolve(response!);
+          }
+        },
+      );
 
       return handleCompileResponse(await compilation);
     } finally {
@@ -174,6 +191,27 @@ export class AsyncCompiler {
       packetTransformer.outboundProtobufs$,
       packet => packetTransformer.writeInboundProtobuf(packet),
     );
+    this.messageTransformer.outboundMessages$.subscribe({
+      next: ([compilationId, message]) => {
+        const compilation = this.compilations.get(compilationId);
+        if (!compilation) {
+          this.handleOutOfBandError(
+            utils.compilerError(
+              'Compiler sent a message for non-existent or completed ' +
+                `compilation with ID ${compilationId}.`,
+            ),
+          );
+        } else {
+          compilation.outboundMessages$.next(message);
+        }
+      },
+      error: error => this.handleOutOfBandError(error),
+      complete: () => {
+        for (const compilation of this.compilations.values()) {
+          compilation.outboundMessages$.complete();
+        }
+      },
+    });
   }
 
   compileAsync(
@@ -204,10 +242,54 @@ export class AsyncCompiler {
 
   async dispose(): Promise<void> {
     this.disposed = true;
-    await Promise.all(this.compilations);
+    // TODO: Call `.map()` directly on the iterator once we use a more recent ES
+    // version.
+    await Promise.all(
+      [...this.compilations.values()].map(compilation => compilation.result),
+    );
     this.process.stdin!.end();
     await this.exit$;
   }
+
+  /**
+   * Handles an error that isn't part of any specific compilation.
+   *
+   * If there are compilaitons running, this ends them with this error.
+   * Otherwise, it saves the error for the next time the user calls a method.
+   * Either way, it disposes the dispatcher.
+   */
+  private handleOutOfBandError(error: unknown): void {
+    if (this.disposed) return;
+    this.disposed = true;
+    this.process.kill();
+    if (this.compilations.size > 0) {
+      for (const compilation of this.compilations.values()) {
+        compilation.reject(error);
+      }
+      this.compilations.clear();
+    } else {
+      this.outOfBandError = error;
+    }
+  }
+}
+
+/** Objects related to an ongoing compilation. */
+interface ActiveCompilation {
+  /**
+   * The subject used to send messages from the compiler to this compilation's
+   * dispatcher.
+   */
+  readonly outboundMessages$: Subject<proto.OutboundMessage>;
+
+  /** The promise that will complete once this compilation has finished. */
+  readonly result: Promise<proto.OutboundMessage_CompileResponse>;
+
+  /**
+   * A function that rejects this compilation's promise if it's not already
+   * complete. Only used when handling unexpected errors outside the normal flow
+   * of compilation.
+   */
+  readonly reject: (error: unknown) => void;
 }
 
 export async function initAsyncCompiler(): Promise<AsyncCompiler> {
